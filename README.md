@@ -1,3 +1,5 @@
+# This repo is a brute force push and has private keys and api keys for alchemy, free tier, pls use accordingly!!
+
 # THENA Contracts Public Repository
 
 
