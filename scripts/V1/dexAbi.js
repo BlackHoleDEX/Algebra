@@ -1792,4 +1792,4 @@ const routerV2Abi = [
 const pairFactoryAddress = "0x02b14Bc0dF9f899E98080c110851AF15cd5ab571";
 const routerV2Address = "0x2C0c7F480dB7F2c2Fb3697E17Ff6e0Cdb10617FB";
 
-module.exports = { pairFactoryAbi, routerV2Abi };
+module.exports = { pairFactoryAbi, routerV2Abi, pairFactoryAddress, routerV2Address };

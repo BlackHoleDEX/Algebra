@@ -1,7 +1,7 @@
 const { ethers  } = require('hardhat');
 
 const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants.js");
-const { pairFactoryAbi, routerV2Abi } = require("./dexAbi");
+const { pairFactoryAbi, routerV2Abi, routerV2Address } = require("./dexAbi");
 
 
 
@@ -9,8 +9,8 @@ async function main () {
     accounts = await ethers.getSigners();
     owner = accounts[0]
 
-    routerV2 = await ethers.getContractAt(routerV2Abi, )
-    impersonator = '0x993Ae2b514677c7AC52bAeCd8871d2b362A9D693'
+    routerV2 = await ethers.getContractAt(routerV2Abi, routerV2Address)
+    impersonator = '0x993Ae2b514677c7AC52bAeCd8871d2b362A9D693' // purpose of this
     
     const algebraRouterAddress = ethers.utils.getAddress("0x327Dd3208f0bCF590A66110aCB6e5e6941A4EfA0")
     algebrarouter = await ethers.getContractAt(algebraRouterAbi, algebraRouterAddress)
