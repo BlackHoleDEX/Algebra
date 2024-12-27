@@ -2,20 +2,28 @@
 pragma solidity =0.8.20;
 
 import '@cryptoalgebra/integral-core/contracts/libraries/Plugins.sol';
-
 import '@cryptoalgebra/integral-core/contracts/interfaces/plugin/IAlgebraPlugin.sol';
 
+import './plugins/DynamicFeePlugin.sol';
 import './plugins/FarmingProxyPlugin.sol';
-import './plugins/SlidingFeePlugin.sol';
 import './plugins/VolatilityOraclePlugin.sol';
+import './plugins/SecurityPlugin.sol';
+import './plugins/SlidingFeePlugin.sol';
 
-/// @title Algebra Integral 1.2 sliding fee plugin
-contract AlgebraBasePluginV2 is SlidingFeePlugin, FarmingProxyPlugin, VolatilityOraclePlugin {
+/// @title Algebra Integral 1.2, contains adaptive + sliding fee, twap oracle, farming proxy and security plugins
+contract AlgebraBasePluginV4 is DynamicFeePlugin, FarmingProxyPlugin, VolatilityOraclePlugin, SecurityPlugin, SlidingFeePlugin {
   using Plugins for uint8;
 
   /// @inheritdoc IAlgebraPlugin
   uint8 public constant override defaultPluginConfig =
-    uint8(Plugins.AFTER_INIT_FLAG | Plugins.BEFORE_SWAP_FLAG | Plugins.AFTER_SWAP_FLAG | Plugins.DYNAMIC_FEE);
+    uint8(
+      Plugins.BEFORE_POSITION_MODIFY_FLAG |
+        Plugins.AFTER_INIT_FLAG |
+        Plugins.BEFORE_SWAP_FLAG |
+        Plugins.AFTER_SWAP_FLAG |
+        Plugins.DYNAMIC_FEE |
+        Plugins.BEFORE_FLASH_FLAG
+    );
 
   constructor(address _pool, address _factory, address _pluginFactory) BasePlugin(_pool, _factory, _pluginFactory) {}
 
@@ -29,11 +37,24 @@ contract AlgebraBasePluginV2 is SlidingFeePlugin, FarmingProxyPlugin, Volatility
   function afterInitialize(address, uint160, int24 tick) external override onlyPool returns (bytes4) {
     _initialize_TWAP(tick);
 
+    IAlgebraPool(pool).setFee(_feeConfig.baseFee());
     return IAlgebraPlugin.afterInitialize.selector;
   }
 
   /// @dev unused
-  function beforeModifyPosition(address, address, int24, int24, int128, bytes calldata) external override onlyPool returns (bytes4, uint24) {
+  function beforeModifyPosition(
+    address,
+    address,
+    int24,
+    int24,
+    int128 liquidity,
+    bytes calldata
+  ) external override onlyPool returns (bytes4, uint24) {
+    if (liquidity < 0) {
+      _checkStatusOnBurn();
+    } else {
+      _checkStatus();
+    }
     _updatePluginConfigInPool(defaultPluginConfig); // should not be called, reset config
     return (IAlgebraPlugin.beforeModifyPosition.selector, 0);
   }
@@ -53,11 +74,18 @@ contract AlgebraBasePluginV2 is SlidingFeePlugin, FarmingProxyPlugin, Volatility
     bool,
     bytes calldata
   ) external override onlyPool returns (bytes4, uint24, uint24) {
+    /// security plugin check
+    _checkStatus();
+    /// get ticks for slidiing fee calculation
     (, int24 currentTick, , ) = _getPoolState();
     int24 lastTick = _getLastTick();
-    uint16 newFee = _getFeeAndUpdateFactors(zeroToOne, currentTick, lastTick, false, 0);
-
+    /// write timepoint to oracle
     _writeTimepoint();
+    /// calculate volatility and dynamic fee
+    uint88 volatilityAverage = _getAverageVolatilityLast();
+    uint16 newFee = _getCurrentFee(volatilityAverage);
+    /// calcucalate sliding fee based on dynamic fee
+    newFee = _getFeeAndUpdateFactors(zeroToOne, currentTick, lastTick, true, newFee);
     return (IAlgebraPlugin.beforeSwap.selector, newFee, 0);
   }
 
@@ -68,6 +96,7 @@ contract AlgebraBasePluginV2 is SlidingFeePlugin, FarmingProxyPlugin, Volatility
 
   /// @dev unused
   function beforeFlash(address, address, uint256, uint256, bytes calldata) external override onlyPool returns (bytes4) {
+    _checkStatus();
     _updatePluginConfigInPool(defaultPluginConfig); // should not be called, reset config
     return IAlgebraPlugin.beforeFlash.selector;
   }
@@ -76,5 +105,10 @@ contract AlgebraBasePluginV2 is SlidingFeePlugin, FarmingProxyPlugin, Volatility
   function afterFlash(address, address, uint256, uint256, uint256, uint256, bytes calldata) external override onlyPool returns (bytes4) {
     _updatePluginConfigInPool(defaultPluginConfig); // should not be called, reset config
     return IAlgebraPlugin.afterFlash.selector;
+  }
+
+  function getCurrentFee() external view override returns (uint16 fee) {
+    uint88 volatilityAverage = _getAverageVolatilityLast();
+    fee = _getCurrentFee(volatilityAverage);
   }
 }

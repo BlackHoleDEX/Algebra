@@ -9,14 +9,14 @@ contract SlidingFeeTest is SlidingFeePlugin {
   constructor() BasePlugin(msg.sender, msg.sender, msg.sender) {}
 
   function getFeeForSwap(bool zeroToOne, int24 lastTick, int24 currentTick) external returns (uint16 fee) {
-    fee = _getFeeAndUpdateFactors(zeroToOne, currentTick, lastTick);
+    fee = _getFeeAndUpdateFactors(zeroToOne, currentTick, lastTick, false, 0);
     emit Fee(fee);
   }
 
   function getGasCostOfGetFeeForSwap(bool zeroToOne, int24 lastTick, int24 currentTick) external returns (uint256) {
     unchecked {
       uint256 gasBefore = gasleft();
-      _getFeeAndUpdateFactors(zeroToOne, currentTick, lastTick);
+      _getFeeAndUpdateFactors(zeroToOne, currentTick, lastTick, false, 0);
       return gasBefore - gasleft();
     }
   }

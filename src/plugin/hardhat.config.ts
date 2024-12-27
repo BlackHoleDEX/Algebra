@@ -73,6 +73,9 @@ export default {
   },
   solidity: {
     compilers: [HIGHEST_OPTIMIZER_COMPILER_SETTINGS],
+    overrides: {
+      'contracts/BasePluginV4Factory.sol': DEFAULT_COMPILER_SETTINGS
+    },
   },
   docgen: {
     outputDir: '../../docs/Contracts/Plugin',

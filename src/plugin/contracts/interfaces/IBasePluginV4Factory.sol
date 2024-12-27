@@ -6,9 +6,9 @@ import '@cryptoalgebra/integral-core/contracts/interfaces/plugin/IAlgebraPluginF
 
 import '../base/AlgebraFeeConfiguration.sol';
 
-/// @title The interface for the BasePluginV3Factory
-/// @notice This contract creates Algebra default plugins for Algebra liquidity pools
-interface IBasePluginV3Factory is IAlgebraPluginFactory {
+/// @title The interface for the BasePluginV4Factory
+/// @notice This contract creates Algebra base plugins for Algebra liquidity pools
+interface IBasePluginV4Factory is IAlgebraPluginFactory {
   /// @notice Emitted when the default fee configuration is changed
   /// @param newConfig The structure with dynamic fee parameters
   /// @dev See the AdaptiveFee library for more details
