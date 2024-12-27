@@ -185,6 +185,7 @@ contract LimitOrderPlugin is ILimitOrderPlugin, LimitOrderPayments {
       epochInfo = epochInfos[epoch];
       epochInfo.token0 = poolKey.token0;
       epochInfo.token1 = poolKey.token1;
+      epochInfo.deployer = poolKey.deployer;
     } else {
       epochInfo = epochInfos[epoch];
     }

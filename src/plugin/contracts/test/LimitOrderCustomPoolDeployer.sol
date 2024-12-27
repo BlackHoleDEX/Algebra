@@ -33,13 +33,13 @@ contract LimitOrderCustomPoolDeployer is ILimitOrderPluginFactory {
 
   /// @inheritdoc IAlgebraPluginFactory
   function beforeCreatePoolHook(address pool, address, address, address, address, bytes calldata) external override returns (address) {
-    require(msg.sender == algebraFactory);
+    require(msg.sender == entryPoint);
     return _createPlugin(pool);
   }
 
   /// @inheritdoc IAlgebraPluginFactory
   function afterCreatePoolHook(address, address, address) external view override {
-    require(msg.sender == algebraFactory);
+    require(msg.sender == entryPoint);
   }
 
   /// @inheritdoc ILimitOrderPluginFactory
@@ -69,14 +69,8 @@ contract LimitOrderCustomPoolDeployer is ILimitOrderPluginFactory {
     emit LimitOrderPlugin(newLimitOrderPlugin);
   }
 
-  function createCustomPool(
-    address deployer,
-    address creator,
-    address tokenA,
-    address tokenB,
-    bytes calldata data
-  ) external returns (address customPool) {
-    return IAlgebraCustomPoolEntryPoint(entryPoint).createCustomPool(deployer, creator, tokenA, tokenB, data);
+  function createCustomPool(address, address creator, address tokenA, address tokenB, bytes calldata data) external returns (address customPool) {
+    return IAlgebraCustomPoolEntryPoint(entryPoint).createCustomPool(address(this), creator, tokenA, tokenB, data);
   }
 
   function setTickSpacing(address pool, int24 newTickSpacing) external {
