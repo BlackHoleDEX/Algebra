@@ -20,12 +20,14 @@ abstract contract SecurityPlugin is BasePlugin, ISecurityPlugin {
   address internal securityRegistry;
 
   function _checkStatus() internal {
-    ISecurityRegistry.Status status = ISecurityRegistry(securityRegistry).getPoolStatus(msg.sender);
-    if (status != ISecurityRegistry.Status.ENABLED) {
-      if (status == ISecurityRegistry.Status.DISABLED) {
-        revert PoolDisabled();
-      } else {
-        revert BurnOnly();
+    if (securityRegistry != address(0)) {
+      ISecurityRegistry.Status status = ISecurityRegistry(securityRegistry).getPoolStatus(msg.sender);
+      if (status != ISecurityRegistry.Status.ENABLED) {
+        if (status == ISecurityRegistry.Status.DISABLED) {
+          revert PoolDisabled();
+        } else {
+          revert BurnOnly();
+        }
       }
     }
   }
