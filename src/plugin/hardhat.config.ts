@@ -74,7 +74,8 @@ export default {
   solidity: {
     compilers: [HIGHEST_OPTIMIZER_COMPILER_SETTINGS],
     overrides: {
-      'contracts/BasePluginV4Factory.sol': DEFAULT_COMPILER_SETTINGS
+      'contracts/BasePluginV4Factory.sol': DEFAULT_COMPILER_SETTINGS,
+      'contracts/tests/MockBasePluginV4Factory.sol': DEFAULT_COMPILER_SETTINGS
     },
   },
   docgen: {

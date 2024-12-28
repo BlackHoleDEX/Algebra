@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat';
 import { MockFactory, MockPool, AlgebraSecurityPlugin, SecurityRegistry, MockTimeAlgebraBasePluginV1, MockTimeAlgebraBasePluginV2, MockTimeDSFactoryV2, SecurityPluginFactory, MockTimeDSFactory, BasePluginV1Factory, BasePluginV2Factory } from '../../typechain';
-import { SecurityRegistryEvent } from '../../typechain/contracts/AlgebraSecurityPlugin';
+import { MockTimeDSFactoryV4, MockTimeAlgebraBasePluginV4 } from '../../typechain';
 
 type Fixture<T> = () => Promise<T>;
 interface MockFactoryFixture {
@@ -16,8 +16,8 @@ async function mockFactoryFixture(): Promise<MockFactoryFixture> {
 }
 
 interface PluginFixture extends MockFactoryFixture {
-  plugin: MockTimeAlgebraBasePluginV1 | MockTimeAlgebraBasePluginV2;
-  mockPluginFactory: MockTimeDSFactory | MockTimeDSFactoryV2;
+  plugin: MockTimeAlgebraBasePluginV1 | MockTimeAlgebraBasePluginV2 | MockTimeAlgebraBasePluginV4;
+  mockPluginFactory: MockTimeDSFactory | MockTimeDSFactoryV2 | MockTimeDSFactoryV4;
   mockPool: MockPool;
 }
 
@@ -93,6 +93,35 @@ export const pluginFixtureV2: Fixture<PluginFixture> = async function (): Promis
 
   const mockDSOperatorFactory = await ethers.getContractFactory('MockTimeAlgebraBasePluginV2');
   const plugin = mockDSOperatorFactory.attach(pluginAddress) as any as MockTimeAlgebraBasePluginV2;
+
+  return {
+    plugin,
+    mockPluginFactory,
+    mockPool,
+    mockFactory,
+  };
+};
+
+export const pluginFixtureV4: Fixture<PluginFixture> = async function (): Promise<PluginFixture> {
+  const { mockFactory } = await mockFactoryFixture();
+  //const { token0, token1, token2 } = await tokensFixture()
+
+  const mockPluginFactoryFactory = await ethers.getContractFactory('MockTimeDSFactoryV4');
+  const mockPluginFactory = (await mockPluginFactoryFactory.deploy(mockFactory)) as any as MockTimeDSFactoryV4;
+
+  const mockPoolFactory = await ethers.getContractFactory('MockPool');
+  const mockPool = (await mockPoolFactory.deploy()) as any as MockPool;
+
+  const registryFactory = await ethers.getContractFactory('SecurityRegistry');
+  const registry = (await registryFactory.deploy(mockFactory)) as any as SecurityRegistry;
+
+  await mockPluginFactory.setSecurityRegistry(registry)
+
+  await mockPluginFactory.beforeCreatePoolHook(mockPool, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, '0x');
+  const pluginAddress = await mockPluginFactory.pluginByPool(mockPool);
+
+  const mockDSOperatorFactory = await ethers.getContractFactory('MockTimeAlgebraBasePluginV4');
+  const plugin = mockDSOperatorFactory.attach(pluginAddress) as any as MockTimeAlgebraBasePluginV4;
 
   return {
     plugin,
