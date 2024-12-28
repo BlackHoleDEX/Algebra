@@ -27,6 +27,7 @@ contract MockTimeDSFactoryV4 is IBasePluginV4Factory {
 
   constructor(address _algebraFactory) {
     algebraFactory = _algebraFactory;
+    defaultFeeConfiguration = AdaptiveFee.initialFeeConfiguration();
   }
 
   /// @inheritdoc IAlgebraPluginFactory
