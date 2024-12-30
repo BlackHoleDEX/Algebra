@@ -31,4 +31,10 @@ export const deployedPairs = [
         stable: true,
         pairAddress: "0x91De570eCb5266aDf0767ce7c0488d43D3f46E97"
     },
+    {
+        token0: tokenEight,
+        token1: tokenNine,
+        stable: true,
+        pairAddress: "0x88C42515D5B51b25927b77EF1E74d14E7f0A5257"
+    },
 ]
