@@ -15,16 +15,6 @@ async function main () {
   txDeployed = await pairFactory.deployed();
   console.log("pairFactory: ", pairFactory.address)
 
-  data = await ethers.getContractFactory("GaugeFactory");
-  gaugeFactory = await data.deploy();
-  txDeployed = await gaugeFactory.deployed();
-  console.log("gaugeFactory: ", gaugeFactory.address)
-
-  data = await ethers.getContractFactory("BribeFactory");
-  bribeFactory = await data.deploy();
-  txDeployed = await bribeFactory.deployed();
-  console.log("bribeFactory: ", bribeFactory.address)
-
 }
 
 main()
