@@ -3361,6 +3361,4 @@ const tokenEight = "0x7ee700efc1866804c03390494ba3d8F2D7563546";
 const tokenNine = "0x13B68A127cE0343F4ddb3A205a43386819bf6182";
 const tokenTen = "0xAbFD656e7C9bB2Ab9b2BEab66FedE4a71e5bb1BE";
 
-const pairAddressForTT_TO = "0x1c2b9eb0a6c13e7d21f9915bea738e4d7a24c358"
-
-module.exports = { pairFactoryAbi, routerV2Abi, pairFactoryAddress, routerV2Address, tokenAbi, tokenOne, tokenTwo, tokenThree, tokenFour, tokenFive, pairAbi, pairAddressForTT_TO };
+module.exports = { pairFactoryAbi, routerV2Abi, pairFactoryAddress, routerV2Address, tokenAbi, tokenOne, tokenTwo, tokenThree, tokenFour, tokenFive, pairAbi };

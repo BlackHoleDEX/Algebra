@@ -1,12 +1,13 @@
 const { ethers  } = require('hardhat');
-const { pairAbi, pairAddress, tokenAbi, tokenOne, tokenTwo } = require("./dexAbi");
+const { pairAbi, tokenAbi, tokenOne, tokenTwo } = require("./dexAbi");
+const { deployedPairs } = require("./../../constants/pairs");
 
 async function main(){
     accounts = await ethers.getSigners();
     owner = accounts[0];
     console.log("selfAddress : ", owner.address);
     const selfAddress = owner.address;
-    const pairAddress = "0x1C2b9eb0a6C13e7d21f9915BEA738E4d7A24c358";
+    const pairAddress = deployedPairs[0].pairAddress;
     const pairContract = await ethers.getContractAt(pairAbi, pairAddress);
 
     const pairBalanceInWallet  = await pairContract.balanceOf(owner.address);
