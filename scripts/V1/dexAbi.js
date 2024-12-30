@@ -3355,6 +3355,11 @@ const tokenTwo = "0x30816e127553dd03f0318bfab72ba9f3c452a92a";
 const tokenThree = "0x230819d91ccad0da03c4b32c9cc79a058c293552";
 const tokenFour = "0x734c6da2fc0086328fc6651186c360abae61f8bd";
 const tokenFive = "0x1d2d59b30BEAdf493A0c8f46F0A4c88fDFAFaCaB";
+const tokenSix = "0x89Eb5Ed61eBa94D52Dc0D2091C8f337F956475A2";
+const tokenSeven = "0x4099758b2204D189953cE85E74162A93f3dccA62";
+const tokenEight = "0x7ee700efc1866804c03390494ba3d8F2D7563546";
+const tokenNine = "0x13B68A127cE0343F4ddb3A205a43386819bf6182";
+const tokenTen = "0xAbFD656e7C9bB2Ab9b2BEab66FedE4a71e5bb1BE";
 
 const pairAddressForTT_TO = "0x1c2b9eb0a6c13e7d21f9915bea738e4d7a24c358"
 

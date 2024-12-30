@@ -9,7 +9,7 @@ contract TokenFour is ERC20, Ownable {
     // Initial supply is set in the constructor
     uint256 private constant _initialSupply = 1000000 * 10 ** 18; // 1,000,000 tokens with 18 decimals
 
-    constructor() ERC20("TokenFive", "TFI") Ownable () {
+    constructor() ERC20("TokenEleven", "TELV") Ownable () {
         // Mint the initial supply to the contract deployer
         _mint(msg.sender, _initialSupply);
     }
