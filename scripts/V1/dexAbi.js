@@ -3354,8 +3354,8 @@ const tokenOne = "0x635a8c9fda481482cd83969709cc9f46114032f7";
 const tokenTwo = "0x30816e127553dd03f0318bfab72ba9f3c452a92a";
 const tokenThree = "0x230819d91ccad0da03c4b32c9cc79a058c293552";
 const tokenFour = "0x734c6da2fc0086328fc6651186c360abae61f8bd";
-
+const tokenFive = "0x1d2d59b30BEAdf493A0c8f46F0A4c88fDFAFaCaB";
 
 const pairAddressForTT_TO = "0x1c2b9eb0a6c13e7d21f9915bea738e4d7a24c358"
 
-module.exports = { pairFactoryAbi, routerV2Abi, pairFactoryAddress, routerV2Address, tokenAbi, tokenOne, tokenTwo, tokenThree, tokenFour, pairAbi, pairAddressForTT_TO };
+module.exports = { pairFactoryAbi, routerV2Abi, pairFactoryAddress, routerV2Address, tokenAbi, tokenOne, tokenTwo, tokenThree, tokenFour, tokenFive, pairAbi, pairAddressForTT_TO };

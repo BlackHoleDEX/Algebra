@@ -1,9 +1,8 @@
 const { ethers  } = require('hardhat');
 
 async function main(){
-    const TokenFactory = await ethers.getContractFactory("CustomToken");
-    const initialSupply = ethers.utils.parseUnits("1000000", 18); // 1000000 * 10 ** 18 initial supply
-    const token = await TokenFactory.deploy("MyToken2", "MTK2", initialSupply); 
+    const TokenFactory = await ethers.getContractFactory("TokenFour");
+    const token = await TokenFactory.deploy(); 
     await token.deployed();
     console.log("Token deployed at:", token.address);
 }
