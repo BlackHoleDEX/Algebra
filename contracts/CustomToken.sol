@@ -5,13 +5,14 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract TokenFour is ERC20, Ownable {
-    // Initial supply is set in the constructor
-    uint256 private constant _initialSupply = 1000000 * 10 ** 18; // 1,000,000 tokens with 18 decimals
+contract CustomToken is ERC20, Ownable {
 
-    constructor() ERC20("TokenFour", "TOF") Ownable () {
-        // Mint the initial supply to the contract deployer
-        _mint(msg.sender, _initialSupply);
+    constructor(
+        string memory name, 
+        string memory symbol, 
+        uint256 initialSupply
+    ) ERC20(name, symbol){
+        _mint(msg.sender, initialSupply);
     }
 
     /**
