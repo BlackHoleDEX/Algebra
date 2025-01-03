@@ -1,7 +1,7 @@
 const { ethers  } = require('hardhat');
 
 const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants.js");
-const { pairFactoryAbi, routerV2Abi, routerV2Address, tokenOne, tokenTwo, tokenAbi } = require("./dexAbi");
+const { pairFactoryAbi, routerV2Abi, routerV2Address, tokenOne, tokenTwo, tokenAbi, tokenFive, tokenThree, tokenFour, tokenEight, tokenTen, tokenNine } = require("./dexAbi");
 
 
 
@@ -9,11 +9,17 @@ async function main () {
     accounts = await ethers.getSigners();
     owner = accounts[0]
     const selfAddress = "0x8ec18CcA7E8d40861dc07C217a6426f60005A661";
-    const tokenOneContract = await ethers.getContractAt(tokenAbi, tokenOne);
-    const tokenTwoContract = await ethers.getContractAt(tokenAbi, tokenTwo);
-    const txApprovalOne = await tokenOneContract.approve(routerV2Address, "12000000");
+    const tokenA = tokenTwo;
+    const tokenB = tokenThree;
+    const tokenAAmount = 100;
+    const tokenBAmount = 99;
+    const approvalAmount = Math.max(tokenAAmount, tokenBAmount)
+    const approvalAmountString = (BigInt(approvalAmount) * BigInt(10 ** 18)).toString();
+    const tokenOneContract = await ethers.getContractAt(tokenAbi, tokenA);
+    const tokenTwoContract = await ethers.getContractAt(tokenAbi, tokenB);
+    const txApprovalOne = await tokenOneContract.approve(routerV2Address, approvalAmountString);
     await txApprovalOne.wait();
-    const txApprovalTwo = await tokenTwoContract.approve(routerV2Address, "12000000");
+    const txApprovalTwo = await tokenTwoContract.approve(routerV2Address, approvalAmountString);
     await txApprovalTwo.wait();
     const routerV2Contract = await ethers.getContractAt(routerV2Abi, routerV2Address);
     /**
@@ -27,13 +33,11 @@ async function main () {
         address to,
         uint deadline
      */
-    const tokenA = tokenOne;
-    const tokenB = tokenTwo;
     const stable = false;
-    const amountADesired = "1200000";
-    const amountBDesired = "1200000";
-    const amountAMin = "1000000";
-    const amountBMin = "1000000";
+    const amountADesired = (BigInt(tokenAAmount) * BigInt(10 ** 18)).toString();
+    const amountBDesired = (BigInt(tokenBAmount) * BigInt(10 ** 18)).toString();
+    const amountAMin = "0";
+    const amountBMin = "0";
     const to = selfAddress;
     const deadlineUnixTimestamp = Math.floor(Date.now() / 1000) + 718080;
     console.log(deadlineUnixTimestamp);

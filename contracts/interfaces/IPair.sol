@@ -24,6 +24,4 @@ interface IPair {
     function claimable1(address _user) external view returns (uint);
 
     function isStable() external view returns(bool);
-
-
 }

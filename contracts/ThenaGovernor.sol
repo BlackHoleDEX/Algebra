@@ -41,7 +41,7 @@ contract ThenaGovernor is L2Governor, L2GovernorCountingSimple, L2GovernorVotes,
         proposalNumerator = numerator;
     }
 
-    function proposalThreshold() public view override(L2Governor) returns (uint256){
+    function proposalThreshold() public view override (L2Governor) returns (uint256){
         return (token.getPastTotalSupply(block.timestamp) * proposalNumerator) / PROPOSAL_DENOMINATOR;
     }
 }

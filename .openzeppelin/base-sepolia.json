@@ -29,6 +29,21 @@
       "address": "0x02db94dE4695d6e41b18E0E4211c37E83a989641",
       "txHash": "0x081659005ab771a73c09de42dc9cca5239e2ede335d9d7a36fae9bb5801d887d",
       "kind": "transparent"
+    },
+    {
+      "address": "0x2d3b778334E73B55D4768AA3C70D82e9ec28f527",
+      "txHash": "0xd1cacff4a1d31f0ecc4537742929c73b831611bf2bae90d32a0ffe5668fc9e3f",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xFe304712fC606672A9Ce4D4230E9967e205F04Cb",
+      "txHash": "0xff2ebe23d3c60c0fc2229fa4e6b0befef87e80d4ff306a8cbb394c9b1f4df133",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xDEB2963856d3eaAc913b776C63a552b7CAb0580b",
+      "txHash": "0xc2f67e9d4fb1a05cde3ac7cf93fe0baa0bd8d304d4bf4a8aae69c3fe0ca37e0f",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -650,6 +665,128 @@
             "numberOfBytes": "1"
           }
         }
+      }
+    },
+    "5618269665087e6e539f27fb145e6637755b8019ec9526edb9a50b064abe7f02": {
+      "address": "0xCe0629fD0dED30E1298720aB847FEeB7cBCeCdCd",
+      "txHash": "0x2f451b9249bb0a3ec122b9236ed8cae9b95bdf723e415118e0414ec3011afd5e",
+      "layout": {
+        "solcVersion": "0.8.13",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "pairFactory",
+            "offset": 2,
+            "slot": "0",
+            "type": "t_contract(IPairFactory)1710",
+            "contract": "BlackHolePairAPI",
+            "src": "contracts/APIHelper/BlackHolePairAPI.sol:88"
+          },
+          {
+            "label": "owner",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_address",
+            "contract": "BlackHolePairAPI",
+            "src": "contracts/APIHelper/BlackHolePairAPI.sol:90"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IPairFactory)1710": {
+            "label": "contract IPairFactory",
+            "numberOfBytes": "20"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "2a3697b757849fb5cbe334db45f5a8bf1bd990bd091caabf6b00e108a39624e2": {
+      "address": "0xC5AeF405aeB37176b77667D31065bDcbd9cd1324",
+      "txHash": "0xfc22bbbff6dba981de96c5733c593ad378d711ba40a3556c9fe05c0e9ee26d4c",
+      "layout": {
+        "solcVersion": "0.8.13",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "pairFactory",
+            "offset": 2,
+            "slot": "0",
+            "type": "t_contract(IPairFactory)1712",
+            "contract": "BlackHolePairAPI",
+            "src": "contracts/APIHelper/BlackHolePairAPI.sol:88"
+          },
+          {
+            "label": "owner",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_address",
+            "contract": "BlackHolePairAPI",
+            "src": "contracts/APIHelper/BlackHolePairAPI.sol:90"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IPairFactory)1712": {
+            "label": "contract IPairFactory",
+            "numberOfBytes": "20"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
       }
     }
   }
