@@ -15,14 +15,24 @@ async function main () {
     console.log("voterV3Contract ", voterV3Address, voterV3Contract.address)
 
     // creating gauge for pair bwn - token one and token two - basic volatile pool
-    const pairAddressTrial = "0x1c2b9eb0a6c13e7d21f9915bea738e4d7a24c358";
 
-    const createGaugeTx = await voterV3Contract.createGauge(pairAddressTrial, BigInt(0), {
-        gasLimit: 21000000
-    });
-    console.log('createdgaugetx', createGaugeTx);
-    await createGaugeTx.wait();
-
+    const blackHoleAllPairContract =  await ethers.getContractAt(blackHoleAllPairAbi, blackHoleAllPairProxyAddress);
+    const allPairs = await blackHoleAllPairContract.getAllPair(owner.address, BigInt(8), BigInt(0));
+    const pairs = allPairs[1];
+    // console.log("all pairs", pairs)
+    for(const p of pairs){
+        const currentAddress = p[0];
+        console.log("current pair ", currentAddress);
+        const currentGaugeAddress = await voterV3Contract.gauges(currentAddress);
+        console.log("currentGaugeAddress", currentGaugeAddress);
+        if(currentGaugeAddress === ZERO_ADDRESS){
+            const createGaugeTx = await voterV3Contract.createGauge(currentAddress, BigInt(0), {
+                gasLimit: 2100000
+            });
+            // await createGaugeTx.wait();
+            console.log('createdgaugetx', createGaugeTx);
+        }
+    }
     console.log('done creation of gauge tx')
 }   
 
