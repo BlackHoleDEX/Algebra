@@ -1,15 +1,21 @@
 const { ethers } = require("hardhat")
+const { permissionsRegistryAddress } = require('./abhijeet-new-constants/permissions-registry')
+const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants.js");
+
+
 async function main () {
-    data = await ethers.getContractFactory("GaugeFactoryV2");
-    gaugeFactory = await data.deploy();
-    txDeployed = await gaugeFactory.deployed();
-    console.log("gaugeFactory: ", gaugeFactory.address)
+    // data = await ethers.getContractFactory("GaugeFactoryV2");
+    // input = [permissionRegistry]
+    // gaugeFactory = await upgrades.deployProxy(data, input, {initializer: 'initialize'});
+    // txDeployed = await gaugeFactory.deployed();
+    // console.log("gaugeFactory: ", gaugeFactory.address)
 
     data = await ethers.getContractFactory("BribeFactoryV3");
     console.log('deploying...')
-    BribeFactoryV2 = await upgrades.deployProxy(data,[owner.address, '0x0000000000000000000000000000000000000000'], {initializer: 'initialize'});
-    txDeployed = await BribeFactoryV2.deployed();
-    console.log('deployed b fact: ', BribeFactoryV2.address)
+    input = [ZERO_ADDRESS, permissionsRegistryAddress]
+    BribeFactoryV3 = await upgrades.deployProxy(data, input, {initializer: 'initialize'});
+    txDeployed = await BribeFactoryV3.deployed();
+    console.log('deployed bribefactory v3: ', BribeFactoryV3.address)
 }
 
 
