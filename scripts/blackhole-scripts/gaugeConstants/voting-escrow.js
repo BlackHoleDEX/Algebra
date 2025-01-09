@@ -1,5 +1,7 @@
 const votingEscrowAddress = "0x163E28845621D10B41a6A021C915B7b8A32734CD";
 
+const veNFTOne = "https://sepolia.basescan.org/token/0x163e28845621d10b41a6a021c915b7b8a32734cd?a=1"
+
 const votingEscrowAbi = [
     {
       "inputs": [
