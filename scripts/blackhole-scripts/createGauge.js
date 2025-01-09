@@ -4,7 +4,7 @@ async function main () {
 
 const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants.js");
 const { blackHoleAllPairAbi, blackHoleAllPairProxyAddress } = require('./pairApiConstants');
-const { voterV3Abi, voterV3Address } = require('./abhijeet-new-constants/voter-v3');
+const { voterV3Abi, voterV3Address } = require('./gaugeConstants/voter-v3');
 
 async function main () {
     accounts = await ethers.getSigners();

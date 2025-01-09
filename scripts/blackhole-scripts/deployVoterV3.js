@@ -1,8 +1,8 @@
 const { ethers } = require("hardhat")
-const { votingEscrowAddress } = require('./abhijeet-new-constants/voting-escrow')
-const { gaugeFactoryV2Address } = require('./abhijeet-new-constants/gauge-factory-v2')
-const { bribeFactoryV3Address } = require('./abhijeet-new-constants/bribe-factory-v3')
-const { permissionsRegistryAddress } = require('./abhijeet-new-constants/permissions-registry')
+const { votingEscrowAddress } = require('./gaugeConstants/voting-escrow')
+const { gaugeFactoryV2Address } = require('./gaugeConstants/gauge-factory-v2')
+const { bribeFactoryV3Address } = require('./gaugeConstants/bribe-factory-v3')
+const { permissionsRegistryAddress } = require('./gaugeConstants/permissions-registry')
 const { pairFactoryAddress, tokenOne, tokenTwo, tokenThree, tokenFour, tokenFive, tokenSix, tokenSeven, tokenEight, tokenNine, tokenTen } = require("../V1/dexAbi");
 
 async function main () {

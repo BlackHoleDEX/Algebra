@@ -1,6 +1,6 @@
 const { ethers  } = require('hardhat');
 
-const { permissionRegistryAbi, permissionsRegistryAddress } = require('./abhijeet-new-constants/permissions-registry')
+const { permissionRegistryAbi, permissionsRegistryAddress } = require('./gaugeConstants/permissions-registry')
 
 
 

@@ -1,5 +1,5 @@
 const { ethers  } = require('hardhat');
-const { gaugeFactoryV2Abi, gaugeFactoryV2Address } = require('./abhijeet-new-constants/gauge-factory-v2');
+const { gaugeFactoryV2Abi, gaugeFactoryV2Address } = require('./gaugeConstants/gauge-factory-v2');
 
 
 

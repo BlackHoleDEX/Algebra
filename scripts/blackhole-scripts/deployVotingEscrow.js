@@ -1,6 +1,6 @@
 const { ethers } = require("hardhat")
-const { thenaAddress } = require('./abhijeet-new-constants/thena');
-const { VeArtProxyUpgradeableAddress } = require('./abhijeet-new-constants/ve-art-proxy-upgradeable')
+const { thenaAddress } = require('./gaugeConstants/thena');
+const { VeArtProxyUpgradeableAddress } = require('./gaugeConstants/ve-art-proxy-upgradeable')
 
 async function main () {
     //need to deploy VeArtProxyUpgradeable first and the generated address need to pass in VotingEscrow

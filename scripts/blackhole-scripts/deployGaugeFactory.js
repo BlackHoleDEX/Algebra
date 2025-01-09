@@ -1,5 +1,5 @@
 const { ethers } = require("hardhat")
-const { permissionsRegistryAddress } = require("./abhijeet-new-constants/permissions-registry")
+const { permissionsRegistryAddress } = require("./gaugeConstants/permissions-registry")
 
 async function main () {
     data = await ethers.getContractFactory("GaugeFactoryV2");

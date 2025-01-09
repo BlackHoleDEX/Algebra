@@ -1,5 +1,5 @@
 const { ethers } = require("hardhat")
-const { permissionsRegistryAddress } = require('./abhijeet-new-constants/permissions-registry')
+const { permissionsRegistryAddress } = require('./gaugeConstants/permissions-registry')
 const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants.js");
 
 

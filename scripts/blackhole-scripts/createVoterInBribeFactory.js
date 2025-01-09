@@ -1,6 +1,6 @@
-const { bribeFactoryV3Abi, bribeFactoryV3Address } = require('./abhijeet-new-constants/bribe-factory-v3')
+const { bribeFactoryV3Abi, bribeFactoryV3Address } = require('./gaugeConstants/bribe-factory-v3')
 const { ethers  } = require('hardhat');
-const { voterV3Address } = require('./abhijeet-new-constants/voter-v3')
+const { voterV3Address } = require('./gaugeConstants/voter-v3')
 const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants.js");
 
 async function main () {
