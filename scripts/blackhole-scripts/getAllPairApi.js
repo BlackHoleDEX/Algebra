@@ -13,7 +13,7 @@ async function main () {
     const blackHoleAllPairContractOwner = await blackHoleAllPairContract.owner();
     console.log("blackHoleAllPairContract owner : ", blackHoleAllPairContractOwner);
 
-    const  blackHoleAllPairContractPairsData = await blackHoleAllPairContract.getAllPair(owner.address, BigInt(2), BigInt(0));
+    const  blackHoleAllPairContractPairsData = await blackHoleAllPairContract.getAllPair(owner.address, BigInt(1), BigInt(0));
     const totalPairs = blackHoleAllPairContractPairsData[0];
     const pairs = blackHoleAllPairContractPairsData[1];
     console.log("Total pairs : ", totalPairs);

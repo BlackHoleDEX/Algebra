@@ -18,9 +18,7 @@ async function main () {
     data = await ethers.getContractFactory("Voter");
     Voter = await data.deploy(ve, pairFactory, gaugeFactory, bribeFactory);
     txDeployed = await Voter.deployed();
-    console.log("Voter: ", Voter.address)
-
-
+    console.log("Voter: ", Voter.address) 
 
 }
 
