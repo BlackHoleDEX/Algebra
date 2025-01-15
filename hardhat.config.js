@@ -34,7 +34,8 @@ module.exports = {
     baseSepolia: {
       url: "https://base-sepolia.g.alchemy.com/v2/zY8fO9bbJbzywRt0xRheXQWpWjWiCqop",
       // chainId: 84532, // Sepolia's Chain ID
-      accounts: [PRIVATEKEY]
+      accounts: [PRIVATEKEY],
+      gas: 21000000,
     },
 
     // hardhat: {

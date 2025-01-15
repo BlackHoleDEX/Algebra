@@ -28,8 +28,7 @@ interface IAlgebraFactory{
     function poolByPair(address, address) external view returns(address);
 }
 
-contract PairAPI is Initializable {
-
+contract BlackholePairAPIV2 is Initializable {
 
     struct pairInfo {
         // pair info

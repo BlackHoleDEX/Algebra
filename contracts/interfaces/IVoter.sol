@@ -6,7 +6,7 @@ interface IVoter {
     function gauges(address _pair) external view returns (address);
     function isGauge(address _gauge) external view returns (bool);
     function poolForGauge(address _gauge) external view returns (address);
-    function factory() external view returns (address);
+    function factories() external view returns(address[] memory);
     function minter() external view returns(address);
     function isWhitelisted(address token) external view returns (bool);
     function notifyRewardAmount(uint amount) external;
