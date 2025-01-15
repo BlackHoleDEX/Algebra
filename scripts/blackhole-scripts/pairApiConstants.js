@@ -1,4 +1,4 @@
-export const blackHoleAllPairAbi = [
+const blackHoleAllPairAbi = [
     {
       "inputs": [],
       "stateMutability": "nonpayable",
@@ -415,5 +415,7 @@ export const blackHoleAllPairAbi = [
   ]
 
 
-export const blackHoleAllPairProxyAddress = "0xdeb2963856d3eaac913b776c63a552b7cab0580b";
-export const blackHoleAllPairAddress = "0xc5aef405aeb37176b77667d31065bdcbd9cd1324";
+const blackHoleAllPairProxyAddress = "0xdeb2963856d3eaac913b776c63a552b7cab0580b";
+const blackHoleAllPairAddress = "0xc5aef405aeb37176b77667d31065bdcbd9cd1324";
+
+module.exports = {blackHoleAllPairAbi, blackHoleAllPairAddress, blackHoleAllPairProxyAddress}
