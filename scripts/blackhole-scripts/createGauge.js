@@ -17,17 +17,20 @@ async function main () {
     // creating gauge for pair bwn - token one and token two - basic volatile pool
 
     const blackHoleAllPairContract =  await ethers.getContractAt(blackHoleAllPairAbi, blackHoleAllPairProxyAddress);
-    const allPairs = await blackHoleAllPairContract.getAllPair(owner.address, BigInt(8), BigInt(0));
+    const allPairs = await blackHoleAllPairContract.getAllPair(owner.address, BigInt(1000), BigInt(0));
     const pairs = allPairs[1];
     // console.log("all pairs", pairs)
     for(const p of pairs){
         const currentAddress = p[0];
+        if(currentAddress === ZERO_ADDRESS)
+            break;
+
         console.log("current pair ", currentAddress);
         const currentGaugeAddress = await voterV3Contract.gauges(currentAddress);
         console.log("currentGaugeAddress", currentGaugeAddress);
         if(currentGaugeAddress === ZERO_ADDRESS){
             const createGaugeTx = await voterV3Contract.createGauge(currentAddress, BigInt(0), {
-                gasLimit: 2100000
+                gasLimit: 21000000
             });
             // await createGaugeTx.wait();
             console.log('createdgaugetx', createGaugeTx);
