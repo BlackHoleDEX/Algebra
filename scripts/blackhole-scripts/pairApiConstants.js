@@ -304,7 +304,7 @@ const blackHolePairApiV2Abi = [
             }
           ],
           "internalType": "struct BlackholePairAPIV2.pairInfo[]",
-          "name": "Pairs",
+          "name": "pairs",
           "type": "tuple[]"
         }
       ],
@@ -671,6 +671,6 @@ const blackHolePairApiV2Abi = [
 // const blackHoleAllPairProxyAddress = "0xdeb2963856d3eaac913b776c63a552b7cab0580b";
 // const blackHoleAllPairAddress = "0xc5aef405aeb37176b77667d31065bdcbd9cd1324";
 
-const blackHolePairApiV2ProxyAddress = "0x861Ffe2Bc107272eb66EFf44920A25fF7b5CaF54";
+const blackHolePairApiV2ProxyAddress = "0x4c1bFA42111e78Cd814745123fA7583222FE038D";
 
 module.exports = { blackHolePairApiV2Abi, blackHolePairApiV2ProxyAddress}

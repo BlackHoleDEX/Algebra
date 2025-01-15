@@ -13,6 +13,7 @@ import '../interfaces/IPairInfo.sol';
 import '../interfaces/IPairFactory.sol';
 import '../interfaces/IVoter.sol';
 import '../interfaces/IVotingEscrow.sol';
+import '../../contracts/Pair.sol';
 
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -119,18 +120,45 @@ contract BlackholePairAPIV2 is Initializable {
         
     }
 
+    function getClaimable(address _account, address _pair) internal view returns(uint claimable0, uint claimable1){
+
+        Pair pair = Pair(_pair);
+
+        uint _supplied = pair.balanceOf(_account); // get LP balance of `_user`
+        uint _claim0 = pair.claimable0(_account);
+        uint _claim1 = pair.claimable1(_account);
+        if (_supplied > 0) {
+            uint _supplyIndex0 = pair.supplyIndex0(_account); // get last adjusted index0 for recipient
+            uint _supplyIndex1 = pair.supplyIndex1(_account);
+            uint _index0 = pair.index0(); // get global index0 for accumulated fees
+            uint _index1 = pair.index1();
+            uint _delta0 = _index0 - _supplyIndex0; // see if there is any difference that need to be accrued
+            uint _delta1 = _index1 - _supplyIndex1;
+            if (_delta0 > 0) {
+                _claim0 += _supplied * _delta0 / 1e18; // add accrued difference for each supplied token
+            }
+            if (_delta1 > 0) {
+                _claim1 += _supplied * _delta1 / 1e18;
+            }
+        } 
+
+        return (_claim0, _claim1);
+    }
+
 
     // valid only for sAMM and vAMM
-    function getAllPair(address _user, uint _amounts, uint _offset) external view returns(pairInfo[] memory Pairs){
+    function getAllPair(address _user, uint _amounts, uint _offset) external view returns(pairInfo[] memory pairs){
 
         
         require(_amounts <= MAX_PAIRS, 'too many pair');
 
-        Pairs = new pairInfo[](_amounts);
+        pairs = new pairInfo[](_amounts);
         
         uint i = _offset;
         uint totPairs = pairFactory.allPairsLength();
         address _pair;
+        uint claim0;
+        uint claim1;
 
         for(i; i < _offset + _amounts; i++){
             // if totalPairs is reached, break.
@@ -138,7 +166,11 @@ contract BlackholePairAPIV2 is Initializable {
                 break;
             }
             _pair = pairFactory.allPairs(i);
-            Pairs[i - _offset] = _pairAddressToInfo(_pair, _user);
+            pairs[i - _offset] = _pairAddressToInfo(_pair, _user);
+
+            (claim0, claim1) = getClaimable(_user, _pair);
+            pairs[i - _offset].claimable0 = claim0;
+            pairs[i - _offset].claimable1 = claim1;
         }
 
 
@@ -166,6 +198,7 @@ contract BlackholePairAPIV2 is Initializable {
         } else {
             (r0,r1,) = ipair.getReserves();
         }
+    
 
         IGaugeAPI _gauge = IGaugeAPI(voter.gauges(_pair));
         uint accountGaugeLPAmount = 0;
@@ -173,17 +206,18 @@ contract BlackholePairAPIV2 is Initializable {
         uint gaugeTotalSupply = 0;
         uint emissions = 0;
         
-
-        if(address(_gauge) != address(0)){
-            if(_account != address(0)){
-                accountGaugeLPAmount = _gauge.balanceOf(_account);
-                earned = _gauge.earned(_account);
-            } else {
-                accountGaugeLPAmount = 0;
-                earned = 0;
+        {
+            if(address(_gauge) != address(0)){
+                if(_account != address(0)){
+                    accountGaugeLPAmount = _gauge.balanceOf(_account);
+                    earned = _gauge.earned(_account);
+                } else {
+                    accountGaugeLPAmount = 0;
+                    earned = 0;
+                }
+                gaugeTotalSupply = _gauge.totalSupply();
+                emissions = _gauge.rewardRate();
             }
-            gaugeTotalSupply = _gauge.totalSupply();
-            emissions = _gauge.rewardRate();
         }
         
 
