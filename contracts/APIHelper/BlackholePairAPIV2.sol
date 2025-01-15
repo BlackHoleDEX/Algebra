@@ -14,7 +14,7 @@ import '../interfaces/IPairFactory.sol';
 import '../interfaces/IVoter.sol';
 import '../interfaces/IVotingEscrow.sol';
 import '../../contracts/Pair.sol';
-
+import './IVoterV3.sol';
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
@@ -68,6 +68,9 @@ contract BlackholePairAPIV2 is Initializable {
         uint account_token1_balance; 	// account 2nd token balance
         uint account_gauge_balance;     // account pair staked in gauge balance
         uint account_gauge_earned; 		// account earned emissions for this pair
+
+        // votes
+        uint votes;
     }
 
 
@@ -95,6 +98,7 @@ contract BlackholePairAPIV2 is Initializable {
     IPairFactory public pairFactory;
     IAlgebraFactory public algebraFactory;
     IVoter public voter;
+    IVoterV3 public voterV3;
 
     address public underlyingToken;
 
@@ -112,6 +116,7 @@ contract BlackholePairAPIV2 is Initializable {
         owner = msg.sender;
 
         voter = IVoter(_voter);
+        voterV3 = IVoterV3(_voter);
 
         pairFactory = IPairFactory(voter.factories()[0]);
         underlyingToken = IVotingEscrow(voter._ve()).token();
@@ -194,7 +199,7 @@ contract BlackholePairAPIV2 is Initializable {
         
         if(_type == false){
             // hypervisor totalAmounts = algebra.pool + gamma.unused
-            (r0,r1) = IHypervisor(_pair).getTotalAmounts();
+            // (r0,r1) = IHypervisor(_pair).getTotalAmounts();
         } else {
             (r0,r1,) = ipair.getReserves();
         }
@@ -261,6 +266,9 @@ contract BlackholePairAPIV2 is Initializable {
         _pairInfo.account_token1_balance = IERC20(token_1).balanceOf(_account);
         _pairInfo.account_gauge_balance = accountGaugeLPAmount;
         _pairInfo.account_gauge_earned = earned;
+
+        // votes
+        _pairInfo.votes = voterV3.weights(_pair);
         
     }
 

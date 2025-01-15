@@ -18,12 +18,13 @@ async function main () {
     const blackHoleAllPairContract = await ethers.getContractAt(blackHolePairApiV2Abi, blackHolePairApiV2ProxyAddress);
     const blackHoleAllPairContractOwner = await blackHoleAllPairContract.owner();
     console.log("blackHoleAllPairContract owner : ", blackHoleAllPairContractOwner);
-
+    console.log('get all pair inputs', owner.address, BigInt(pairsLength), BigInt(0))
     const  blackHoleAllPairContractPairsData = await blackHoleAllPairContract.getAllPair(owner.address, BigInt(pairsLength), BigInt(0));
     // const totalPairs = blackHoleAllPairContractPairsData[0];
     // const pairs = blackHoleAllPairContractPairsData[1];
     // console.log("Total pairs : ", totalPairs);
     console.log("All pairs : ", blackHoleAllPairContractPairsData);
+    console.log("voterV3: ", await blackHoleAllPairContract.voterV3())
 
 }
 

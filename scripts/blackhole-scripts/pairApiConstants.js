@@ -301,6 +301,11 @@ const blackHolePairApiV2Abi = [
               "internalType": "uint256",
               "name": "account_gauge_earned",
               "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "votes",
+              "type": "uint256"
             }
           ],
           "internalType": "struct BlackholePairAPIV2.pairInfo[]",
@@ -466,6 +471,11 @@ const blackHolePairApiV2Abi = [
             {
               "internalType": "uint256",
               "name": "account_gauge_earned",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "votes",
               "type": "uint256"
             }
           ],
@@ -664,13 +674,25 @@ const blackHolePairApiV2Abi = [
       ],
       "stateMutability": "view",
       "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "voterV3",
+      "outputs": [
+        {
+          "internalType": "contract IVoterV3",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     }
   ]
-
 
 // const blackHoleAllPairProxyAddress = "0xdeb2963856d3eaac913b776c63a552b7cab0580b";
 // const blackHoleAllPairAddress = "0xc5aef405aeb37176b77667d31065bdcbd9cd1324";
 
-const blackHolePairApiV2ProxyAddress = "0x4c1bFA42111e78Cd814745123fA7583222FE038D";
+const blackHolePairApiV2ProxyAddress = "0xD8CEb7f01378fC9ea0CB7fC452e0962b9903FBe8";
 
 module.exports = { blackHolePairApiV2Abi, blackHolePairApiV2ProxyAddress}
