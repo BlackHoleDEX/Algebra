@@ -3,7 +3,7 @@ async function main () {
 }const { ethers  } = require('hardhat');
 
 const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants.js");
-const { blackHoleAllPairAbi, blackHoleAllPairProxyAddress } = require('./pairApiConstants');
+const { blackHolePairApiV2Abi, blackHolePairApiV2ProxyAddress } = require('./pairApiConstants');
 const { voterV3Abi, voterV3Address } = require('./gaugeConstants/voter-v3');
 
 async function main () {
@@ -16,11 +16,11 @@ async function main () {
 
     // creating gauge for pair bwn - token one and token two - basic volatile pool
 
-    const blackHoleAllPairContract =  await ethers.getContractAt(blackHoleAllPairAbi, blackHoleAllPairProxyAddress);
+    const blackHoleAllPairContract =  await ethers.getContractAt(blackHolePairApiV2Abi, blackHolePairApiV2ProxyAddress);
     const allPairs = await blackHoleAllPairContract.getAllPair(owner.address, BigInt(1000), BigInt(0));
     const pairs = allPairs[1];
-    // console.log("all pairs", pairs)
-    for(const p of pairs){
+    // console.log("all pairs", allPairs)
+    for(const p of allPairs){
         const currentAddress = p[0];
         if(currentAddress === ZERO_ADDRESS)
             break;
