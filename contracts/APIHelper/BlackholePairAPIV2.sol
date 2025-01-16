@@ -98,7 +98,7 @@ contract BlackholePairAPIV2 is Initializable {
     IPairFactory public pairFactory;
     IAlgebraFactory public algebraFactory;
     IVoter public voter;
-    IVoterV3 public voterV3;
+    // IVoterV3 public voterV3;
 
     address public underlyingToken;
 
@@ -116,7 +116,7 @@ contract BlackholePairAPIV2 is Initializable {
         owner = msg.sender;
 
         voter = IVoter(_voter);
-        voterV3 = IVoterV3(_voter);
+        // voterV3 = IVoterV3(_voter);
 
         pairFactory = IPairFactory(voter.factories()[0]);
         underlyingToken = IVotingEscrow(voter._ve()).token();
@@ -268,7 +268,7 @@ contract BlackholePairAPIV2 is Initializable {
         _pairInfo.account_gauge_earned = earned;
 
         // votes
-        _pairInfo.votes = voterV3.weights(_pair);
+        _pairInfo.votes = voter.weights(_pair);
         
     }
 

@@ -21,5 +21,14 @@ interface IVoter {
     function poolVote(uint id, uint _index) external view returns(address _pair);
     function votes(uint id, address _pool) external view returns(uint votes);
     function poolVoteLength(uint tokenId) external view returns(uint);
+
+    function length() external view returns (uint);
+    function factoryLength() external view returns(uint);
+    function gaugeFactories() external view returns(address[] memory);
+    function gaugeFactoriesLength() external view returns(uint);
+    function weights(address _pool) external view returns(uint);
+    function weightsAt(address _pool, uint _time) external view returns(uint);
+    function totalWeight() external view returns(uint);
+    function totalWeightAt(uint _time) external view returns(uint);
     
 }
