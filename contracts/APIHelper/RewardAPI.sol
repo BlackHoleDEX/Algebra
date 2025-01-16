@@ -35,7 +35,7 @@ contract RewardAPI is Initializable {
   
         owner = msg.sender;
         voter = IVoter(_voter);
-        pairFactory = IPairFactory(voter.factory());
+        pairFactory = IPairFactory(voter.factories()[0]);
         underlyingToken = IVotingEscrow(voter._ve()).token();
     }
 
@@ -173,7 +173,7 @@ contract RewardAPI is Initializable {
         require(_voter != address(0), 'zeroAddr');
         voter = IVoter(_voter);
         // update variable depending on voter
-        pairFactory = IPairFactory(voter.factory());
+        pairFactory = IPairFactory(voter.factories()[0]);
         underlyingToken = IVotingEscrow(voter._ve()).token();
     }
 

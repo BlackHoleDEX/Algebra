@@ -1,19 +1,22 @@
-const { ethers  } = require('hardhat');
-
-const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants.js");
-const { pairFactoryAddress } = require("../V1/dexAbi");
-
-
+const { ethers } = require("hardhat")
+const { voterV3Address } = require("./gaugeConstants/voter-v3");
 
 async function main () {
-    accounts = await ethers.getSigners();
-    owner = accounts[0]
 
-    data = await ethers.getContractFactory("BlackHolePairAPI");
-    const blackHolePairAPIFactory = await upgrades.deployProxy(data, [pairFactoryAddress], {initializer: 'initialize'});
-    await blackHolePairAPIFactory.deployed();
-    console.log("BlackHolePairAPIFactory : ", blackHolePairAPIFactory.address);
+    // data = await ethers.getContractFactory("BlackHolePairAPI");
+    // console.log('deploying...')
+    // const blackHolePairAPIFactory = await upgrades.deployProxy(data, [pairFactoryAddress], {initializer: 'initialize'});
+    // await blackHolePairAPIFactory.deployed();
+    // console.log("BlackHolePairAPIFactory : ", blackHolePairAPIFactory.address);
+
+    data = await ethers.getContractFactory("BlackholePairAPIV2");
+    console.log('deploying...')
+    input = [voterV3Address]
+    const blackHolePairAPIV2Factory = await upgrades.deployProxy(data, input, {initializer: 'initialize'});
+    txDeployed = await blackHolePairAPIV2Factory.deployed();
+    console.log('BlackHolePairAPIV2Factory : ', blackHolePairAPIV2Factory.address)
 }
+
 
 main()
   .then(() => process.exit(0))

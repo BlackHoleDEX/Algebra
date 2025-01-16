@@ -138,7 +138,7 @@ contract veNFTAPI is Initializable {
         ve = IVotingEscrow( rewardDisitributor.voting_escrow() );
         underlyingToken = IVotingEscrow(ve).token();
 
-        pairFactory = IPairFactory(voter.factory());
+        pairFactory = IPairFactory(voter.factories()[0]);
 
     }
 
