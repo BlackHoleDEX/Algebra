@@ -674,12 +674,25 @@ const blackHolePairApiV2Abi = [
       ],
       "stateMutability": "view",
       "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "voterV3",
+      "outputs": [
+        {
+          "internalType": "contract IVoterV3",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     }
   ]
 
 // const blackHoleAllPairProxyAddress = "0xdeb2963856d3eaac913b776c63a552b7cab0580b";
 // const blackHoleAllPairAddress = "0xc5aef405aeb37176b77667d31065bdcbd9cd1324";
 
-const blackHolePairApiV2ProxyAddress = "0xC4478cF13A28891630644D1f8E9e36013F99C7f6";
+const blackHolePairApiV2ProxyAddress = "0xE5913fF704b65D3922142a35838C1Af8A5C39fCb";
 
 module.exports = { blackHolePairApiV2Abi, blackHolePairApiV2ProxyAddress}
