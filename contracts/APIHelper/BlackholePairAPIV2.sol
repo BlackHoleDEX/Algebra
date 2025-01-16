@@ -159,7 +159,7 @@ contract BlackholePairAPIV2 is Initializable {
 
 
     // valid only for sAMM and vAMM
-    function getAllPair(address _user, uint _amounts, uint _offset) external view returns(pairInfo[] memory pairs){
+    function getAllPair(address _user, uint _amounts, uint _offset) external view returns(uint totPairs, bool hasNext, pairInfo[] memory pairs){
 
         
         require(_amounts <= MAX_PAIRS, 'too many pair');
@@ -167,7 +167,8 @@ contract BlackholePairAPIV2 is Initializable {
         pairs = new pairInfo[](_amounts);
         
         uint i = _offset;
-        uint totPairs = pairFactory.allPairsLength();
+        totPairs = pairFactory.allPairsLength();
+        hasNext = true;
         address _pair;
         uint claim0;
         uint claim1;
@@ -178,6 +179,7 @@ contract BlackholePairAPIV2 is Initializable {
         for(i; i < _offset + _amounts; i++){
             // if totalPairs is reached, break.
             if(i == totPairs) {
+                hasNext = false;
                 break;
             }
             _pair = pairFactory.allPairs(i);

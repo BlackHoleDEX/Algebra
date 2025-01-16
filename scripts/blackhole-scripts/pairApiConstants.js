@@ -161,6 +161,16 @@ const blackHolePairApiV2Abi = [
       "name": "getAllPair",
       "outputs": [
         {
+          "internalType": "uint256",
+          "name": "totPairs",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "hasNext",
+          "type": "bool"
+        },
+        {
           "components": [
             {
               "internalType": "address",
@@ -743,6 +753,6 @@ const blackHolePairApiV2Abi = [
 // const blackHoleAllPairProxyAddress = "0xdeb2963856d3eaac913b776c63a552b7cab0580b";
 // const blackHoleAllPairAddress = "0xc5aef405aeb37176b77667d31065bdcbd9cd1324";
 
-const blackHolePairApiV2ProxyAddress = "0xF3c8D4d979e2f0699E2d91f024465b3D5866A8c7";
+const blackHolePairApiV2ProxyAddress = "0x49a220A7345eb22dF8A01D70d93D74159b0eB017";
 
 module.exports = { blackHolePairApiV2Abi, blackHolePairApiV2ProxyAddress}
