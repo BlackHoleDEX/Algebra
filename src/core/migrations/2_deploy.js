@@ -9,18 +9,22 @@ const deployerAddress = "TGq5GWxruUu47FaTcHLiX8oJGNtD8aRcoV"
 const tronWeb = tronbox.tronWeb.nile
 
 module.exports = async function(deployer) {
-    deployer.deploy(AlgebraFactory)
+
+    await deployer.deploy(AlgebraFactory)
     console.log("AlgebraFactory deployed to:", AlgebraFactory.address)
 
-    deployer.deploy(AlgebraPoolDeployer, "410d5a029ee3b8f9a38c9abc1fdb681721d42a11fb").then(() => {
+    deployer.deploy(AlgebraPoolDeployer, AlgebraFactory.address).then(() => {
       console.log("AlgebraPoolDeployer deployed to:", AlgebraPoolDeployer.address)
     })
 
-    // TODO: add setting of a deployer to the factory
+    await AlgebraFactory.setDeployerAddress(AlgebraPoolDeployer.address).send();
+    console.log(
+      `Check tx on the explorer: https://nile.tronscan.org/#/transaction/${txId}`
+    );
 
     await deployer.deploy(
         AlgebraCommunityVault,
-        tronWeb.address.toHex("TBBocaEBHP4cYenZuPdsL7EnLTp58h9dsG"), // factory
+        tronWeb.address.toHex(AlgebraFactory.address), // factory
         tronWeb.address.toHex(deployerAddress) // deployer
     )
     await AlgebraCommunityVault.deployed()
@@ -31,7 +35,7 @@ module.exports = async function(deployer) {
     const stub = await AlgebraVaultFactoryStub.deployed()
     console.log("AlgebraVaultFactoryStub deployed to:", AlgebraVaultFactoryStub.address)
 
-    const factoryContract = await tronWeb.contract().at("TBBocaEBHP4cYenZuPdsL7EnLTp58h9dsG");
+    const factoryContract = await tronWeb.contract().at(AlgebraFactory.address);
     await factoryContract.setVaultFactory(stub.address).send();
     console.log("set vault factory to:", stub.address)
 
@@ -52,6 +56,14 @@ module.exports = async function(deployer) {
     await vaultContract.proposeAlgebraFeeChange(algebraFeeShare).send();
     await vaultContract.acceptAlgebraFeeChangeProposal(algebraFeeShare).send()
 
-    // await (await factoryContract.transferOwnership(partnerAddress)).send();
-    // console.log("transfer ownership to:", partnerAddress)
+    await factoryContract.transferOwnership(partnerAddress).send();
+    console.log("transfer ownership to:", partnerAddress)
+
+    const deployDataPath = path.resolve(__dirname, '../../../deploys.json');
+    let deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'));
+    deploysData.poolDeployer = AlgebraPoolDeployer.address;
+    deploysData.factory = AlgebraFactory.address;
+    deploysData.vault = AlgebraCommunityVault.address;
+    deploysData.vaultFactory = AlgebraVaultFactoryStub.address;
+    fs.writeFileSync(deployDataPath, JSON.stringify(deploysData), 'utf-8');
 }
