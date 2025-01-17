@@ -561,7 +561,7 @@
     },
     "account_token1_balance": {
       "type": "BigNumber",
-      "hex": "0xd3c21bcecceda0edb080"
+      "hex": "0xd3c1f22ca8d2aac1b080"
     },
     "account_gauge_balance": {
       "type": "BigNumber",
@@ -656,7 +656,7 @@
     },
     "account_token0_balance": {
       "type": "BigNumber",
-      "hex": "0xd3b716d9cdebc74d8793"
+      "hex": "0xd3b6d1763c6982598793"
     },
     "account_token1_balance": {
       "type": "BigNumber",
@@ -755,7 +755,7 @@
     },
     "account_token0_balance": {
       "type": "BigNumber",
-      "hex": "0xd3b716d9cdebc74d8793"
+      "hex": "0xd3b6d1763c6982598793"
     },
     "account_token1_balance": {
       "type": "BigNumber",
@@ -969,7 +969,7 @@
     },
     "votes": {
       "type": "BigNumber",
-      "hex": "0x00"
+      "hex": "0x0dd047b643caaa49"
     },
     "feeAddress": "0xf756b65ec9c3639816969aEe0De8304030617b7d",
     "token_current_fees_0": {
@@ -1266,9 +1266,108 @@
     },
     "votes": {
       "type": "BigNumber",
-      "hex": "0x00"
+      "hex": "0x2970d722cb5ffedb"
     },
     "feeAddress": "0xDdEb370f39d48B7615Cf4Fcf70608db477801bb2",
+    "token_current_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_current_fees_1": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_1": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    }
+  },
+  {
+    "pair_address": "0x6D168549f696BD00F88FA34C1Dc4AFA5798a4c41",
+    "symbol": "vAMM-TNI/TTE",
+    "name": "VolatileV1 AMM - TNI/TTE",
+    "decimals": {
+      "type": "BigNumber",
+      "hex": "0x12"
+    },
+    "stable": false,
+    "total_supply": {
+      "type": "BigNumber",
+      "hex": "0x35bf99d55bb26235"
+    },
+    "token0": "0x13B68A127cE0343F4ddb3A205a43386819bf6182",
+    "token0_symbol": "TNI",
+    "token0_decimals": {
+      "type": "BigNumber",
+      "hex": "0x12"
+    },
+    "reserve0": {
+      "type": "BigNumber",
+      "hex": "0x4563918244f40000"
+    },
+    "claimable0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token1": "0xAbFD656e7C9bB2Ab9b2BEab66FedE4a71e5bb1BE",
+    "token1_symbol": "TTE",
+    "token1_decimals": {
+      "type": "BigNumber",
+      "hex": "0x12"
+    },
+    "reserve1": {
+      "type": "BigNumber",
+      "hex": "0x29a2241af62c0000"
+    },
+    "claimable1": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "gauge": "0x636395628D2b2EF960718c963aF688B11Bc8EC22",
+    "gauge_total_supply": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "internal_bribe_address": "0x4C742337b571837AbB1ab4Dd49dC3f763Bf50dfA",
+    "external_bribe_address": "0x90f155e9E016c1BF951773bEA5334AAF8D7Cc026",
+    "emissions": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "emissions_token": "0x68b8220c62513493777563943037Ea919ba0b24C",
+    "emissions_token_decimals": {
+      "type": "BigNumber",
+      "hex": "0x12"
+    },
+    "account_lp_balance": {
+      "type": "BigNumber",
+      "hex": "0x35bf99d55bb25e4d"
+    },
+    "account_token0_balance": {
+      "type": "BigNumber",
+      "hex": "0xd3b6d1763c6982598793"
+    },
+    "account_token1_balance": {
+      "type": "BigNumber",
+      "hex": "0xd3c1f22ca8d2aac1b080"
+    },
+    "account_gauge_balance": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "account_gauge_earned": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "votes": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "feeAddress": "0xB54Bd3B34EF7B990350D8BA2fe35cc2Ed54cC364",
     "token_current_fees_0": {
       "type": "BigNumber",
       "hex": "0x00"
