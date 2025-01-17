@@ -29,7 +29,7 @@ Then, run the migration with:
 
       */
       userFeePercentage: 100,
-      feeLimit: 1000 * 1e6,
+      feeLimit: 2000 * 1e6,
       fullHost: 'https://api.trongrid.io',
       network_id: '1'
     },
@@ -55,11 +55,6 @@ Then, run the migration with:
       fullHost: 'http://127.0.0.1:' + port,
       network_id: '9'
     },
-    compilers: {
-      solc: {
-        version: '0.8.20'
-      }
-    }
   },
   // solc compiler optimize
   solc: {

@@ -1,5 +1,6 @@
 const tronbox = require('../tronbox-config');
-
+const fs = require('fs')
+const path = require('path')
 const AlgebraPluginFactory = artifacts.require("BasePluginV1Factory");
 
 const tronWeb = tronbox.tronWeb.nile
@@ -9,9 +10,8 @@ module.exports = async function(deployer) {
     const deployDataPath = path.resolve(__dirname, '../../../deploys.json')
     const deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'))
 
-    deployer.deploy(AlgebraPluginFactory, deploysData.factory).then(() => {
-      console.log("AlgebraPluginFactory deployed to:", AlgebraPluginFactory.address)
-    })
+    await deployer.deploy(AlgebraPluginFactory, deploysData.factory)
+    console.log("AlgebraPluginFactory deployed to:", AlgebraPluginFactory.address)
 
     let factory = await tronWeb.contract().at(deploysData.factory);
 

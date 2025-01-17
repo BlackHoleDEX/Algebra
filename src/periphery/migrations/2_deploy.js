@@ -1,6 +1,6 @@
-const { artifacts } = require('hardhat');
 const tronbox = require('../tronbox-config');
-
+const fs = require('fs')
+const path = require('path')
 const AlgebraCustomPoolEntryPoint = artifacts.require("AlgebraCustomPoolEntryPoint");
 const TickLens = artifacts.require("TickLens");
 const Quoter = artifacts.require('Quoter');
@@ -24,10 +24,9 @@ module.exports = async function(deployer) {
   
     deploysData.wrapped = WNativeTokenAddress;
 
-    deployer.deploy(AlgebraCustomPoolEntryPoint, deploysData.factory).then(() => {
-      console.log("AlgebraCustomPoolEntryPoint deployed to:", AlgebraCustomPoolEntryPoint.address)
-    })
-  
+    await deployer.deploy(AlgebraCustomPoolEntryPoint, deploysData.factory)
+    console.log("AlgebraCustomPoolEntryPoint deployed to:", AlgebraCustomPoolEntryPoint.address)
+
     deploysData.entryPoint = AlgebraCustomPoolEntryPoint.address
     console.log('EntryPoint deployed to:', AlgebraCustomPoolEntryPoint.address)
   
@@ -40,19 +39,19 @@ module.exports = async function(deployer) {
     deploysData.tickLens = TickLens.address;
     console.log('TickLens deployed to:', TickLens.address);
   
-    deployer.deploy(Quoter, deploysData.factory, WNativeTokenAddress, deploysData.poolDeployer).then(() => {
-      console.log("Quoter deployed to:", Quoter.address)
-    })
+    await deployer.deploy(Quoter, deploysData.factory, WNativeTokenAddress, deploysData.poolDeployer)
+    console.log("Quoter deployed to:", Quoter.address)
+
     deploysData.quoter = Quoter.address;
 
-    deployer.deploy(QuoterV2, deploysData.factory, WNativeTokenAddress, deploysData.poolDeployer).then(() => {
-      console.log("QuoterV2 deployed to:", QuoterV2.address)
-    })
+    await deployer.deploy(QuoterV2, deploysData.factory, WNativeTokenAddress, deploysData.poolDeployer)
+    console.log("QuoterV2 deployed to:", QuoterV2.address)
+
     deploysData.quoterV2 = QuoterV2.address;
   
-    deployer.deploy(SwapRouter, deploysData.factory, WNativeTokenAddress, deploysData.poolDeployer).then(() => {
-      console.log("SwapRouter deployed to:", SwapRouter.address)
-    })
+    await deployer.deploy(SwapRouter, deploysData.factory, WNativeTokenAddress, deploysData.poolDeployer)
+    console.log("SwapRouter deployed to:", SwapRouter.address)
+
     deploysData.swapRouter = SwapRouter.address;
   
     await deployer.deploy(NFTDescriptor)
@@ -60,19 +59,19 @@ module.exports = async function(deployer) {
     console.log('NFTDescriptor deployed to:', NFTDescriptor.address);
     
     await deployer.link(NFTDescriptor, NonfungibleTokenPositionDescriptor);
-    deployer.deploy(NonfungibleTokenPositionDescriptor, WNativeTokenAddress, 'TRON', []).then(() => {
-      console.log("NonfungibleTokenPositionDescriptor deployed to:", NonfungibleTokenPositionDescriptor.address)
-    })
+    await deployer.deploy(NonfungibleTokenPositionDescriptor, WNativeTokenAddress, 'TRON', [])
+    console.log("NonfungibleTokenPositionDescriptor deployed to:", NonfungibleTokenPositionDescriptor.address)
+
     deploysData.NonfungibleTokenPositionDescriptor = NonfungibleTokenPositionDescriptor.address;
 
-    deployer.deploy(Proxy, NonfungibleTokenPositionDescriptor.address, deployerAddress, '0x').then(() => {
-      console.log("Proxy deployed to:", Proxy.address)
-    })
+    await deployer.deploy(Proxy, NonfungibleTokenPositionDescriptor.address, deployerAddress, '0x')
+    console.log("Proxy deployed to:", Proxy.address)
+
     deploysData.proxy = Proxy.address;
 
-    deployer.deploy(NonfungiblePositionManager, deploysData.factory, WNativeTokenAddress, Proxy.address, deploysData.poolDeployer).then(() => {
-      console.log("NonfungiblePositionManager deployed to:", NonfungiblePositionManager.address)
-    })
+    await deployer.deploy(NonfungiblePositionManager, deploysData.factory, WNativeTokenAddress, Proxy.address, deploysData.poolDeployer)
+    console.log("NonfungiblePositionManager deployed to:", NonfungiblePositionManager.address)
+
     deploysData.nonfungiblePositionManager = NonfungiblePositionManager.address;
 
     await deployer.deploy(AlgebraInterfaceMulticall)

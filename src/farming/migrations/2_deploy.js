@@ -1,5 +1,6 @@
 const tronbox = require('../tronbox-config');
-
+const fs = require('fs')
+const path = require('path')
 const AlgebraEternalFarming = artifacts.require("AlgebraEternalFarming");
 const FarmingCenter = artifacts.require("FarmingCenter");
 
@@ -10,19 +11,18 @@ module.exports = async function(deployer) {
     const deployDataPath = path.resolve(__dirname, '../../../deploys.json')
     const deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'))
 
-    deployer.deploy(AlgebraEternalFarming, deploysData.poolDeployer, deploysData.nonfungiblePositionManager).then(() => {
-      console.log("AlgebraEternalFarming deployed to:", AlgebraEternalFarming.address)
-    })
+    await deployer.deploy(AlgebraEternalFarming, deploysData.poolDeployer, deploysData.nonfungiblePositionManager)
+    console.log("AlgebraEternalFarming deployed to:", AlgebraEternalFarming.address)
   
     deploysData.eternal = AlgebraEternalFarming.address;
 
-    deployer.deploy(FarmingCenter, AlgebraEternalFarming.address, deploysData.nonfungiblePositionManager).then(() => {
-      console.log("FarmingCenter deployed to:", FarmingCenter.address)
-    })
-  
+    await deployer.deploy(FarmingCenter, AlgebraEternalFarming.address, deploysData.nonfungiblePositionManager)
+    console.log("FarmingCenter deployed to:", FarmingCenter.address)
+
     deploysData.fc = FarmingCenter.target;
     
-    await AlgebraEternalFarming.setFarmingCenterAddress(FarmingCenter.address).send();
+    let eternalFarming = await tronWeb.contract().at(AlgebraEternalFarming.address);
+    await eternalFarming.setFarmingCenterAddress(FarmingCenter.address).send();
     console.log('Updated farming center address in eternal(incentive) farming')
 
     let pluginFactory = await tronWeb.contract().at(deploysData.BasePluginV1Factory);

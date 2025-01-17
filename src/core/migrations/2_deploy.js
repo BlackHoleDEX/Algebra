@@ -1,5 +1,6 @@
 const tronbox = require('../tronbox-config');
-
+const fs = require('fs')
+const path = require('path')
 const AlgebraFactory = artifacts.require("AlgebraFactory.sol");
 const AlgebraPoolDeployer = artifacts.require("AlgebraPoolDeployer.sol");
 const AlgebraCommunityVault = artifacts.require('AlgebraCommunityVault');
@@ -13,14 +14,8 @@ module.exports = async function(deployer) {
     await deployer.deploy(AlgebraFactory)
     console.log("AlgebraFactory deployed to:", AlgebraFactory.address)
 
-    deployer.deploy(AlgebraPoolDeployer, AlgebraFactory.address).then(() => {
-      console.log("AlgebraPoolDeployer deployed to:", AlgebraPoolDeployer.address)
-    })
-
-    await AlgebraFactory.setDeployerAddress(AlgebraPoolDeployer.address).send();
-    console.log(
-      `Check tx on the explorer: https://nile.tronscan.org/#/transaction/${txId}`
-    );
+    await deployer.deploy(AlgebraPoolDeployer, AlgebraFactory.address)
+    console.log("AlgebraPoolDeployer deployed to:", AlgebraPoolDeployer.address)
 
     await deployer.deploy(
         AlgebraCommunityVault,
@@ -36,6 +31,10 @@ module.exports = async function(deployer) {
     console.log("AlgebraVaultFactoryStub deployed to:", AlgebraVaultFactoryStub.address)
 
     const factoryContract = await tronWeb.contract().at(AlgebraFactory.address);
+
+    await factoryContract.setDeployerAddress(AlgebraPoolDeployer.address).send();
+    console.log("set deployer address");
+
     await factoryContract.setVaultFactory(stub.address).send();
     console.log("set vault factory to:", stub.address)
 
