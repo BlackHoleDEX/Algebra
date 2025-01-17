@@ -22,4 +22,7 @@ interface IAlgebraPoolDeployer {
   /// @param token1 The second token of the pool by address sort order
   /// @return pool The deployed pool's address
   function deploy(address plugin, address token0, address token1, address deployer) external returns (address pool);
+
+  /// @dev returns pool init code hash
+  function getPairHash() external pure returns (bytes32);
 }

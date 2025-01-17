@@ -27,6 +27,10 @@ contract AlgebraPoolDeployer is IAlgebraPoolDeployer {
     _factory = factory;
   }
 
+  function getPairHash() public pure override returns (bytes32) {
+    return keccak256(type(AlgebraPool).creationCode);
+  }
+
   /// @inheritdoc IAlgebraPoolDeployer
   function deploy(address plugin, address token0, address token1, address deployer) external override returns (address pool) {
     require(msg.sender == factory);
@@ -61,5 +65,4 @@ contract AlgebraPoolDeployer is IAlgebraPoolDeployer {
       token1 := and(_cache1, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
     }
   }
-
 }
