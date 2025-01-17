@@ -1,4 +1,5 @@
 artifacts/
+build/contracts/
 cache/
 crytic-export/
 node_modules/
