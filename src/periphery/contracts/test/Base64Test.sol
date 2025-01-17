@@ -2,6 +2,7 @@
 pragma solidity =0.8.20;
 
 import '@openzeppelin/contracts/utils/Base64.sol';
+import '@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol';
 
 contract Base64Test {
     function encode(bytes memory data) external pure returns (string memory) {

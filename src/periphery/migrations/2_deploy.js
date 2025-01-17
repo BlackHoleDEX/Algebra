@@ -6,9 +6,9 @@ const TickLens = artifacts.require("TickLens");
 const Quoter = artifacts.require('Quoter');
 const SwapRouter = artifacts.require('SwapRouter');
 const QuoterV2 = artifacts.require('QuoterV2');
-const NFTDescriptor = artifacts.require('NFTDescriptor')
+// const NFTDescriptor = artifacts.require('NFTDescriptor')
 const Proxy = artifacts.require('TransparentUpgradeableProxy')
-const NonfungibleTokenPositionDescriptor = artifacts.require('NonfungibleTokenPositionDescriptor')
+// const NonfungibleTokenPositionDescriptor = artifacts.require('NonfungibleTokenPositionDescriptor')
 const NonfungiblePositionManager = artifacts.require('NonfungiblePositionManager')
 const AlgebraInterfaceMulticall = artifacts.require('AlgebraInterfaceMulticall');
 
@@ -54,17 +54,17 @@ module.exports = async function(deployer) {
 
     deploysData.swapRouter = SwapRouter.address;
   
-    await deployer.deploy(NFTDescriptor)
-    deploysData.NFTDescriptor = NFTDescriptor.address;
-    console.log('NFTDescriptor deployed to:', NFTDescriptor.address);
+    // await deployer.deploy(NFTDescriptor)
+    // deploysData.NFTDescriptor = NFTDescriptor.address;
+    // console.log('NFTDescriptor deployed to:', NFTDescriptor.address);
     
-    await deployer.link(NFTDescriptor, NonfungibleTokenPositionDescriptor);
-    await deployer.deploy(NonfungibleTokenPositionDescriptor, WNativeTokenAddress, 'TRON', [])
-    console.log("NonfungibleTokenPositionDescriptor deployed to:", NonfungibleTokenPositionDescriptor.address)
+    // await deployer.link(NFTDescriptor, NonfungibleTokenPositionDescriptor);
+    // await deployer.deploy(NonfungibleTokenPositionDescriptor, WNativeTokenAddress, 'TRON', [])
+    // console.log("NonfungibleTokenPositionDescriptor deployed to:", NonfungibleTokenPositionDescriptor.address)
 
-    deploysData.NonfungibleTokenPositionDescriptor = NonfungibleTokenPositionDescriptor.address;
+    // deploysData.NonfungibleTokenPositionDescriptor = NonfungibleTokenPositionDescriptor.address;
 
-    await deployer.deploy(Proxy, NonfungibleTokenPositionDescriptor.address, deployerAddress, '0x')
+    await deployer.deploy(Proxy, deployerAddress, deployerAddress, '0x')
     console.log("Proxy deployed to:", Proxy.address)
 
     deploysData.proxy = Proxy.address;

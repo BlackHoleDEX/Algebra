@@ -55,6 +55,11 @@ Then, run the migration with:
       fullHost: 'http://127.0.0.1:' + port,
       network_id: '9'
     },
+    compilers: {
+      solc: {
+        version: '0.8.20'
+      }
+    }
   },
   // solc compiler optimize
   solc: {
