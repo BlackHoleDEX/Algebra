@@ -20,7 +20,7 @@ module.exports = async function(deployer) {
     let deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'));
   
     // WNativeTokenAddress
-    const WNativeTokenAddress = 'TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR';
+    const WNativeTokenAddress = 'TYsbWxNnyTgsZaTFaue9hqpxkU3Fkco94a';
   
     deploysData.wrapped = WNativeTokenAddress;
 
@@ -64,12 +64,12 @@ module.exports = async function(deployer) {
 
     // deploysData.NonfungibleTokenPositionDescriptor = NonfungibleTokenPositionDescriptor.address;
 
-    await deployer.deploy(Proxy, deployerAddress, deployerAddress, '0x')
-    console.log("Proxy deployed to:", Proxy.address)
+    // await deployer.deploy(Proxy, deployerAddress, deployerAddress, '0x')
+    // console.log("Proxy deployed to:", Proxy.address)
 
-    deploysData.proxy = Proxy.address;
+    // deploysData.proxy = Proxy.address;
 
-    await deployer.deploy(NonfungiblePositionManager, deploysData.factory, WNativeTokenAddress, Proxy.address, deploysData.poolDeployer)
+    await deployer.deploy(NonfungiblePositionManager, deploysData.factory, WNativeTokenAddress, "0x0000000000000000000000000000000000000000", deploysData.poolDeployer)
     console.log("NonfungiblePositionManager deployed to:", NonfungiblePositionManager.address)
 
     deploysData.nonfungiblePositionManager = NonfungiblePositionManager.address;

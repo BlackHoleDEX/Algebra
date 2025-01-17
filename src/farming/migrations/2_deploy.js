@@ -19,7 +19,7 @@ module.exports = async function(deployer) {
     await deployer.deploy(FarmingCenter, AlgebraEternalFarming.address, deploysData.nonfungiblePositionManager)
     console.log("FarmingCenter deployed to:", FarmingCenter.address)
 
-    deploysData.fc = FarmingCenter.target;
+    deploysData.fc = FarmingCenter.address;
     
     let eternalFarming = await tronWeb.contract().at(AlgebraEternalFarming.address);
     await eternalFarming.setFarmingCenterAddress(FarmingCenter.address).send();
@@ -27,12 +27,11 @@ module.exports = async function(deployer) {
 
     let pluginFactory = await tronWeb.contract().at(deploysData.BasePluginV1Factory);
 
-    await pluginFactory.setFarmingAddress(FarmingCenter.target).send()
+    await pluginFactory.setFarmingAddress(FarmingCenter.address).send()
     console.log('Updated farming center address in plugin factory')
   
     let posManager = await tronWeb.contract().at(deploysData.nonfungiblePositionManager);
-    await posManager.setFarmingCenter(FarmingCenter.target).send()
+    await posManager.setFarmingCenter(FarmingCenter.address).send()
   
     fs.writeFileSync(deployDataPath, JSON.stringify(deploysData), 'utf-8');
-  }
 }
