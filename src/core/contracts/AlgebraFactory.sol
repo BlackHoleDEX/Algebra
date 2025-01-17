@@ -84,13 +84,13 @@ contract AlgebraFactory is IAlgebraFactory, Ownable2Step, AccessControlEnumerabl
 
   /// @inheritdoc IAlgebraFactory
   function computePoolAddress(address token0, address token1) public view override returns (address pool) {
-    pool = address(uint160(uint256(keccak256(abi.encodePacked(hex'ff', poolDeployer, keccak256(abi.encode(token0, token1)), POOL_INIT_CODE_HASH)))));
+    pool = address(uint160(uint256(keccak256(abi.encodePacked(hex'41', poolDeployer, keccak256(abi.encode(token0, token1)), POOL_INIT_CODE_HASH)))));
   }
 
   /// @inheritdoc IAlgebraFactory
   function computeCustomPoolAddress(address deployer, address token0, address token1) public view override returns (address customPool) {
     customPool = address(
-      uint160(uint256(keccak256(abi.encodePacked(hex'ff', poolDeployer, keccak256(abi.encode(deployer, token0, token1)), POOL_INIT_CODE_HASH))))
+      uint160(uint256(keccak256(abi.encodePacked(hex'41', poolDeployer, keccak256(abi.encode(deployer, token0, token1)), POOL_INIT_CODE_HASH))))
     );
   }
 
