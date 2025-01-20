@@ -564,6 +564,6 @@ const minterUpgradableAbi = [
     }
   ]
 
-const minterUpgradableAddress = "0x09BEa83a172D591Bf39D7FE799EE478d4488D18A";
+const minterUpgradableAddress = "0x9b9A49c465409b054762Dc60A476532405E2C5d2";
 
 module.exports = { minterUpgradableAbi, minterUpgradableAddress };

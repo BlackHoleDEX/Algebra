@@ -10,7 +10,6 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 contract EpochController is AutomationCompatibleInterface, OwnableUpgradeable  {
 
     address public automationRegistry;
-
     address public minter;
     address public voter;
 
@@ -34,6 +33,7 @@ contract EpochController is AutomationCompatibleInterface, OwnableUpgradeable  {
         (bool upkeepNeeded, ) = checkUpkeep('0');
         require(upkeepNeeded, "condition not met");
         IVoter(voter).distributeAll();
+        IVoter(voter).distributeFees();
     }
 
     function setAutomationRegistry(address _automationRegistry) external onlyOwner {
