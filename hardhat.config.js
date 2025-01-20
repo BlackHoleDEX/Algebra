@@ -16,15 +16,9 @@ module.exports = {
             enabled: true,
             runs: 200,
           },
-        },
-      },
-      {
-        version: "0.7.0",
-        settings: {
-          optimizer: {
-            enabled: true,
-            runs: 200,
-          },
+          metadata: {
+              useLiteralContent: true
+          }
         },
       },
     ],
@@ -37,18 +31,9 @@ module.exports = {
       accounts: [PRIVATEKEY],
       gas: 21000000,
     },
-
-    // hardhat: {
-    //   forking: {
-    //     url: "https://base-sepolia.g.alchemy.com/v2/zY8fO9bbJbzywRt0xRheXQWpWjWiCqop",// Base Sepolia forking
-    //     chainId: 84532,
-    //   },
-    //   accounts: [PRIVATEKEY]
-    // },
   },
 
   etherscan: {
-    // Your API key for Etherscan (can also be used for Base block explorers)
     apiKey: APIKEY,
   },
 
