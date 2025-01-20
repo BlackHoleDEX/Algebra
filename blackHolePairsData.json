@@ -45,8 +45,8 @@
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "fee": "0x562200E5E69b9beC7585378e51Fb3E7d51F1408C",
-    "bribe": "0xe5FE72570876a295BecA2A81928Ad89a2026476f",
+    "internal_bribe_address": "0x562200E5E69b9beC7585378e51Fb3E7d51F1408C",
+    "external_bribe_address": "0xe5FE72570876a295BecA2A81928Ad89a2026476f",
     "emissions": {
       "type": "BigNumber",
       "hex": "0x00"
@@ -77,6 +77,23 @@
       "hex": "0x00"
     },
     "votes": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "feeAddress": "0x6Fe40674347Ed877299239Ca9956fE7d69cD39F2",
+    "token_current_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x0b41477aa60000"
+    },
+    "token_current_fees_1": {
+      "type": "BigNumber",
+      "hex": "0x07e3"
+    },
+    "token_last_epoch_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_1": {
       "type": "BigNumber",
       "hex": "0x00"
     }
@@ -127,8 +144,8 @@
       "type": "BigNumber",
       "hex": "0x06659436cf28180000"
     },
-    "fee": "0x47a2a263207227D0E964306aBF666EDBE09432Ab",
-    "bribe": "0x302e0E20C63081Cb90cE935b8eDF4696eD44A78E",
+    "internal_bribe_address": "0x47a2a263207227D0E964306aBF666EDBE09432Ab",
+    "external_bribe_address": "0x302e0E20C63081Cb90cE935b8eDF4696eD44A78E",
     "emissions": {
       "type": "BigNumber",
       "hex": "0x00"
@@ -159,6 +176,23 @@
       "hex": "0x00"
     },
     "votes": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "feeAddress": "0xb3b7B1dF263877ed9B3C18faD2bAD59B7883e8C2",
+    "token_current_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_current_fees_1": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_1": {
       "type": "BigNumber",
       "hex": "0x00"
     }
@@ -209,8 +243,8 @@
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "fee": "0x9A0c79Cc644dA853a9ad2852Ff7fD8a2d6b36606",
-    "bribe": "0x5F2aB08b2E54dCbA65F9a07f9f336B424f33Bb49",
+    "internal_bribe_address": "0x9A0c79Cc644dA853a9ad2852Ff7fD8a2d6b36606",
+    "external_bribe_address": "0x5F2aB08b2E54dCbA65F9a07f9f336B424f33Bb49",
     "emissions": {
       "type": "BigNumber",
       "hex": "0x00"
@@ -241,6 +275,23 @@
       "hex": "0x00"
     },
     "votes": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "feeAddress": "0x6deA8257b9E9F2f6F1554e0b6D36798D59500C20",
+    "token_current_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_current_fees_1": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_1": {
       "type": "BigNumber",
       "hex": "0x00"
     }
@@ -291,8 +342,8 @@
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "fee": "0x0F90113f92b39e8Fe9Ffa987778f6789229E790B",
-    "bribe": "0xB495794a48208F30bE83ce9534aB6fd7Bd8Ecc99",
+    "internal_bribe_address": "0x0F90113f92b39e8Fe9Ffa987778f6789229E790B",
+    "external_bribe_address": "0xB495794a48208F30bE83ce9534aB6fd7Bd8Ecc99",
     "emissions": {
       "type": "BigNumber",
       "hex": "0x00"
@@ -323,6 +374,23 @@
       "hex": "0x00"
     },
     "votes": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "feeAddress": "0x7B64CFe95F2FCbF4e4aCDcD7916Bcff24e78B8b2",
+    "token_current_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_current_fees_1": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_1": {
       "type": "BigNumber",
       "hex": "0x00"
     }
@@ -373,8 +441,8 @@
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "fee": "0xD3B5ad982167C295632b0518815f0C86be507627",
-    "bribe": "0xC1aE10d7A803FF5cF1141bBd309347Ca8dCd9481",
+    "internal_bribe_address": "0xD3B5ad982167C295632b0518815f0C86be507627",
+    "external_bribe_address": "0xC1aE10d7A803FF5cF1141bBd309347Ca8dCd9481",
     "emissions": {
       "type": "BigNumber",
       "hex": "0x00"
@@ -405,6 +473,23 @@
       "hex": "0x00"
     },
     "votes": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "feeAddress": "0xD0EA5A605C669929a5f9001133429e954d0D4b37",
+    "token_current_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_current_fees_1": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_1": {
       "type": "BigNumber",
       "hex": "0x00"
     }
@@ -455,8 +540,8 @@
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "fee": "0x3958c3c88Dc688005F3b0B06A323861Ce1794e12",
-    "bribe": "0x7bDa382B87020f6dB1BFA6D325EFC43C523C17a4",
+    "internal_bribe_address": "0x3958c3c88Dc688005F3b0B06A323861Ce1794e12",
+    "external_bribe_address": "0x7bDa382B87020f6dB1BFA6D325EFC43C523C17a4",
     "emissions": {
       "type": "BigNumber",
       "hex": "0x00"
@@ -476,7 +561,7 @@
     },
     "account_token1_balance": {
       "type": "BigNumber",
-      "hex": "0xd3c21bcecceda0edb080"
+      "hex": "0xd3c1f22ca8d2aac1b080"
     },
     "account_gauge_balance": {
       "type": "BigNumber",
@@ -487,6 +572,23 @@
       "hex": "0x00"
     },
     "votes": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "feeAddress": "0x65Adf6dd5883E0C8B2A49C273B4C15E2f447eC48",
+    "token_current_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_current_fees_1": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_1": {
       "type": "BigNumber",
       "hex": "0x00"
     }
@@ -537,8 +639,8 @@
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "fee": "0x136d237420dae5ae285604dB78B06d53b37e59A7",
-    "bribe": "0xe3dBD774FBB307669899B2E58B9a5d7a536A7F91",
+    "internal_bribe_address": "0x136d237420dae5ae285604dB78B06d53b37e59A7",
+    "external_bribe_address": "0xe3dBD774FBB307669899B2E58B9a5d7a536A7F91",
     "emissions": {
       "type": "BigNumber",
       "hex": "0x00"
@@ -554,7 +656,7 @@
     },
     "account_token0_balance": {
       "type": "BigNumber",
-      "hex": "0xd3b716d9cdebc74d8793"
+      "hex": "0xd3b6d1763c6982598793"
     },
     "account_token1_balance": {
       "type": "BigNumber",
@@ -569,6 +671,23 @@
       "hex": "0x00"
     },
     "votes": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "feeAddress": "0x95A458476e52d4B41B0dF6d6FcdCcC5c826Db353",
+    "token_current_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_current_fees_1": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_1": {
       "type": "BigNumber",
       "hex": "0x00"
     }
@@ -619,8 +738,8 @@
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "fee": "0x1208cd10Aa4580Ff4fc88cc71FFc6D535F12d944",
-    "bribe": "0x8F6F141747342F6a1DD77e9d919d521dec407672",
+    "internal_bribe_address": "0x1208cd10Aa4580Ff4fc88cc71FFc6D535F12d944",
+    "external_bribe_address": "0x8F6F141747342F6a1DD77e9d919d521dec407672",
     "emissions": {
       "type": "BigNumber",
       "hex": "0x00"
@@ -636,7 +755,7 @@
     },
     "account_token0_balance": {
       "type": "BigNumber",
-      "hex": "0xd3b716d9cdebc74d8793"
+      "hex": "0xd3b6d1763c6982598793"
     },
     "account_token1_balance": {
       "type": "BigNumber",
@@ -651,6 +770,23 @@
       "hex": "0x00"
     },
     "votes": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "feeAddress": "0x42bee1F79BaD250E2760150Caf19c17f657C5E63",
+    "token_current_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_current_fees_1": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_1": {
       "type": "BigNumber",
       "hex": "0x00"
     }
@@ -701,8 +837,8 @@
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "fee": "0x67E90e51FD2F4B188DcE447139ab8973929FB70F",
-    "bribe": "0xABdaf5e85585C6dB9Fc26430734F0ACD49D7340c",
+    "internal_bribe_address": "0x67E90e51FD2F4B188DcE447139ab8973929FB70F",
+    "external_bribe_address": "0xABdaf5e85585C6dB9Fc26430734F0ACD49D7340c",
     "emissions": {
       "type": "BigNumber",
       "hex": "0x00"
@@ -733,6 +869,23 @@
       "hex": "0x00"
     },
     "votes": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "feeAddress": "0x78b57a7Ce9547b1d8C21Bc11F8A183Ca325E49E6",
+    "token_current_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_current_fees_1": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_1": {
       "type": "BigNumber",
       "hex": "0x00"
     }
@@ -783,8 +936,8 @@
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "fee": "0xce779e523c2Fb01D9Bb00a4DFbFAaea35892C2F4",
-    "bribe": "0xF0324310d52c1C5D4f2DcaF366343f8Ee21719eB",
+    "internal_bribe_address": "0xce779e523c2Fb01D9Bb00a4DFbFAaea35892C2F4",
+    "external_bribe_address": "0xF0324310d52c1C5D4f2DcaF366343f8Ee21719eB",
     "emissions": {
       "type": "BigNumber",
       "hex": "0x00"
@@ -815,6 +968,23 @@
       "hex": "0x00"
     },
     "votes": {
+      "type": "BigNumber",
+      "hex": "0x0dd047b643caaa49"
+    },
+    "feeAddress": "0xf756b65ec9c3639816969aEe0De8304030617b7d",
+    "token_current_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_current_fees_1": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_1": {
       "type": "BigNumber",
       "hex": "0x00"
     }
@@ -865,8 +1035,8 @@
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "fee": "0x9b99aE2D7737665e9211f3Ad0750D96e2eB5045F",
-    "bribe": "0xdD554BAe8A215112f7126c3b3c548d5fad2fFB4d",
+    "internal_bribe_address": "0x9b99aE2D7737665e9211f3Ad0750D96e2eB5045F",
+    "external_bribe_address": "0xdD554BAe8A215112f7126c3b3c548d5fad2fFB4d",
     "emissions": {
       "type": "BigNumber",
       "hex": "0x00"
@@ -897,6 +1067,23 @@
       "hex": "0x00"
     },
     "votes": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "feeAddress": "0xF1D9837DFA070690eb3e3Dc850db83C9eF15888b",
+    "token_current_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_current_fees_1": {
+      "type": "BigNumber",
+      "hex": "0x0a012317b00000"
+    },
+    "token_last_epoch_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_1": {
       "type": "BigNumber",
       "hex": "0x00"
     }
@@ -947,8 +1134,8 @@
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "fee": "0xA38011FD72E25B20FCc163D1A22f3C1974386491",
-    "bribe": "0xD228E126CF736839F318A1E079ad3450488bff8c",
+    "internal_bribe_address": "0xA38011FD72E25B20FCc163D1A22f3C1974386491",
+    "external_bribe_address": "0xD228E126CF736839F318A1E079ad3450488bff8c",
     "emissions": {
       "type": "BigNumber",
       "hex": "0x00"
@@ -979,6 +1166,23 @@
       "hex": "0x00"
     },
     "votes": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "feeAddress": "0xA8a577AfA306CE02f8C430043d76A04e83230850",
+    "token_current_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_current_fees_1": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_1": {
       "type": "BigNumber",
       "hex": "0x00"
     }
@@ -1029,8 +1233,8 @@
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "fee": "0x1b83839Fe0E267e6d5616e5c10AC11B6D28734E8",
-    "bribe": "0x5cB309E85C181Eb8399D43A5a3DBb19dA7631A6B",
+    "internal_bribe_address": "0x1b83839Fe0E267e6d5616e5c10AC11B6D28734E8",
+    "external_bribe_address": "0x5cB309E85C181Eb8399D43A5a3DBb19dA7631A6B",
     "emissions": {
       "type": "BigNumber",
       "hex": "0x00"
@@ -1061,6 +1265,122 @@
       "hex": "0x00"
     },
     "votes": {
+      "type": "BigNumber",
+      "hex": "0x2970d722cb5ffedb"
+    },
+    "feeAddress": "0xDdEb370f39d48B7615Cf4Fcf70608db477801bb2",
+    "token_current_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_current_fees_1": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_1": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    }
+  },
+  {
+    "pair_address": "0x6D168549f696BD00F88FA34C1Dc4AFA5798a4c41",
+    "symbol": "vAMM-TNI/TTE",
+    "name": "VolatileV1 AMM - TNI/TTE",
+    "decimals": {
+      "type": "BigNumber",
+      "hex": "0x12"
+    },
+    "stable": false,
+    "total_supply": {
+      "type": "BigNumber",
+      "hex": "0x35bf99d55bb26235"
+    },
+    "token0": "0x13B68A127cE0343F4ddb3A205a43386819bf6182",
+    "token0_symbol": "TNI",
+    "token0_decimals": {
+      "type": "BigNumber",
+      "hex": "0x12"
+    },
+    "reserve0": {
+      "type": "BigNumber",
+      "hex": "0x4563918244f40000"
+    },
+    "claimable0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token1": "0xAbFD656e7C9bB2Ab9b2BEab66FedE4a71e5bb1BE",
+    "token1_symbol": "TTE",
+    "token1_decimals": {
+      "type": "BigNumber",
+      "hex": "0x12"
+    },
+    "reserve1": {
+      "type": "BigNumber",
+      "hex": "0x29a2241af62c0000"
+    },
+    "claimable1": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "gauge": "0x636395628D2b2EF960718c963aF688B11Bc8EC22",
+    "gauge_total_supply": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "internal_bribe_address": "0x4C742337b571837AbB1ab4Dd49dC3f763Bf50dfA",
+    "external_bribe_address": "0x90f155e9E016c1BF951773bEA5334AAF8D7Cc026",
+    "emissions": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "emissions_token": "0x68b8220c62513493777563943037Ea919ba0b24C",
+    "emissions_token_decimals": {
+      "type": "BigNumber",
+      "hex": "0x12"
+    },
+    "account_lp_balance": {
+      "type": "BigNumber",
+      "hex": "0x35bf99d55bb25e4d"
+    },
+    "account_token0_balance": {
+      "type": "BigNumber",
+      "hex": "0xd3b6d1763c6982598793"
+    },
+    "account_token1_balance": {
+      "type": "BigNumber",
+      "hex": "0xd3c1f22ca8d2aac1b080"
+    },
+    "account_gauge_balance": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "account_gauge_earned": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "votes": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "feeAddress": "0xB54Bd3B34EF7B990350D8BA2fe35cc2Ed54cC364",
+    "token_current_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_current_fees_1": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_0": {
+      "type": "BigNumber",
+      "hex": "0x00"
+    },
+    "token_last_epoch_fees_1": {
       "type": "BigNumber",
       "hex": "0x00"
     }

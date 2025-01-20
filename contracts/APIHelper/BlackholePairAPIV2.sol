@@ -56,8 +56,8 @@ contract BlackholePairAPIV2 is Initializable {
         // pairs gauge
         address gauge; 				    // pair gauge address
         uint gauge_total_supply; 		// pair staked tokens (less/eq than/to pair total supply)
-        address fee; 				    // pair fees contract address
-        address bribe; 				    // pair bribes contract address
+        address internal_bribe_address; // pair fees contract address
+        address external_bribe_address; // pair bribes contract address
         uint emissions; 			    // pair emissions (per second)
         address emissions_token; 		// pair emissions token address
         uint emissions_token_decimals; 	// pair emissions token decimals
@@ -71,6 +71,13 @@ contract BlackholePairAPIV2 is Initializable {
 
         // votes
         uint votes;
+
+        // fees
+        address feeAddress; 
+        uint token_current_fees_0;      // token 0 fees accumulated till now
+        uint token_current_fees_1;      // token 1 fees accumulated till now
+        uint token_last_epoch_fees_0;   // token 0 fees from staked of last epoch
+        uint token_last_epoch_fees_1;   // token 1 fees from staked of last epoch
     }
 
 
@@ -152,7 +159,7 @@ contract BlackholePairAPIV2 is Initializable {
 
 
     // valid only for sAMM and vAMM
-    function getAllPair(address _user, uint _amounts, uint _offset) external view returns(pairInfo[] memory pairs){
+    function getAllPair(address _user, uint _amounts, uint _offset) external view returns(uint totPairs, bool hasNext, pairInfo[] memory pairs){
 
         
         require(_amounts <= MAX_PAIRS, 'too many pair');
@@ -160,14 +167,19 @@ contract BlackholePairAPIV2 is Initializable {
         pairs = new pairInfo[](_amounts);
         
         uint i = _offset;
-        uint totPairs = pairFactory.allPairsLength();
+        totPairs = pairFactory.allPairsLength();
+        hasNext = true;
         address _pair;
         uint claim0;
         uint claim1;
+        address feeAddress; 
+        uint tokenCurrentFees0;     
+        uint tokenCurrentFees1; 
 
         for(i; i < _offset + _amounts; i++){
             // if totalPairs is reached, break.
             if(i == totPairs) {
+                hasNext = false;
                 break;
             }
             _pair = pairFactory.allPairs(i);
@@ -176,6 +188,11 @@ contract BlackholePairAPIV2 is Initializable {
             (claim0, claim1) = getClaimable(_user, _pair);
             pairs[i - _offset].claimable0 = claim0;
             pairs[i - _offset].claimable1 = claim1;
+
+            (tokenCurrentFees0, tokenCurrentFees1, feeAddress) = getCurrentFees(_pair, pairs[i - _offset].token0, pairs[i - _offset].token1);
+            pairs[i - _offset].feeAddress = feeAddress;
+            pairs[i - _offset].token_current_fees_0 = tokenCurrentFees0;
+            pairs[i - _offset].token_current_fees_1 = tokenCurrentFees1;   
         }
 
 
@@ -257,8 +274,8 @@ contract BlackholePairAPIV2 is Initializable {
         _pairInfo.emissions_token_decimals = IERC20(underlyingToken).decimals();
         
         // external address
-        _pairInfo.fee = voter.internal_bribes(address(_gauge)); 				    
-        _pairInfo.bribe = voter.external_bribes(address(_gauge)); 				    
+        _pairInfo.internal_bribe_address = voter.internal_bribes(address(_gauge)); 				    
+        _pairInfo.external_bribe_address = voter.external_bribes(address(_gauge)); 				    
 
         // Account Info
         _pairInfo.account_lp_balance = IERC20(_pair).balanceOf(_account);
@@ -268,8 +285,17 @@ contract BlackholePairAPIV2 is Initializable {
         _pairInfo.account_gauge_earned = earned;
 
         // votes
-        _pairInfo.votes = voterV3.weights(_pair);
-        
+        _pairInfo.votes = voterV3.weights(_pair);     
+    }
+
+    function getCurrentFees(address _pair, address token_0, address token_1)  internal view returns(uint _tokenFees0, uint _tokenFees1, address _feesAddress) {
+        Pair pair = Pair(_pair);  
+
+        address feesAddress = pair.fees();
+        uint tokenFees0 = IERC20(token_0).balanceOf(feesAddress);
+        uint tokenFees1 = IERC20(token_1).balanceOf(feesAddress);
+
+        return (tokenFees0, tokenFees1, feesAddress);
     }
 
     function getPairBribe(uint _amounts, uint _offset, address _pair) external view returns(pairBribeEpoch[] memory _pairEpoch){

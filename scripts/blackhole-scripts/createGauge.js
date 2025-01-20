@@ -18,9 +18,11 @@ async function main () {
 
     const blackHoleAllPairContract =  await ethers.getContractAt(blackHolePairApiV2Abi, blackHolePairApiV2ProxyAddress);
     const allPairs = await blackHoleAllPairContract.getAllPair(owner.address, BigInt(1000), BigInt(0));
-    const pairs = allPairs[1];
+    const pairs = allPairs[2];
+
+
     // console.log("all pairs", allPairs)
-    for(const p of allPairs){
+    for(const p of pairs){
         const currentAddress = p[0];
         if(currentAddress === ZERO_ADDRESS)
             break;

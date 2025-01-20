@@ -21,14 +21,17 @@ async function main () {
     const blackHoleAllPairContractOwner = await blackHoleAllPairContract.owner();
     // console.log("blackHoleAllPairContract owner : ", blackHoleAllPairContractOwner);
     // console.log('get all pair inputs', owner.address, BigInt(pairsLength), BigInt(0))
-    const  blackHoleAllPairContractPairsData = await blackHoleAllPairContract.getAllPair(owner.address, BigInt(pairsLength), BigInt(0));
+    const blackHoleAllPairContractPairsData = await blackHoleAllPairContract.getAllPair(owner.address, BigInt(pairsLength), BigInt(0));
 
-    // console.log("All pairs : ", blackHoleAllPairContractPairsData);
+    const totalPairs = blackHoleAllPairContractPairsData[0];
+    const hasNextPage = blackHoleAllPairContractPairsData[1]
+    const pairsInfo = blackHoleAllPairContractPairsData[2];
+    console.log("All pairs : ", totalPairs, hasNextPage);
 
 
     let list = []
     try {
-        blackHoleAllPairContractPairsData.forEach(elm => {
+        pairsInfo.forEach(elm => {
             let i = 1;
             const keys = Object.keys(elm);
             let mp = {};

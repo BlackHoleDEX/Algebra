@@ -161,6 +161,16 @@ const blackHolePairApiV2Abi = [
       "name": "getAllPair",
       "outputs": [
         {
+          "internalType": "uint256",
+          "name": "totPairs",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "hasNext",
+          "type": "bool"
+        },
+        {
           "components": [
             {
               "internalType": "address",
@@ -254,12 +264,12 @@ const blackHolePairApiV2Abi = [
             },
             {
               "internalType": "address",
-              "name": "fee",
+              "name": "internal_bribe_address",
               "type": "address"
             },
             {
               "internalType": "address",
-              "name": "bribe",
+              "name": "external_bribe_address",
               "type": "address"
             },
             {
@@ -305,6 +315,31 @@ const blackHolePairApiV2Abi = [
             {
               "internalType": "uint256",
               "name": "votes",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "feeAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "token_current_fees_0",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "token_current_fees_1",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "token_last_epoch_fees_0",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "token_last_epoch_fees_1",
               "type": "uint256"
             }
           ],
@@ -425,12 +460,12 @@ const blackHolePairApiV2Abi = [
             },
             {
               "internalType": "address",
-              "name": "fee",
+              "name": "internal_bribe_address",
               "type": "address"
             },
             {
               "internalType": "address",
-              "name": "bribe",
+              "name": "external_bribe_address",
               "type": "address"
             },
             {
@@ -476,6 +511,31 @@ const blackHolePairApiV2Abi = [
             {
               "internalType": "uint256",
               "name": "votes",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "feeAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "token_current_fees_0",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "token_current_fees_1",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "token_last_epoch_fees_0",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "token_last_epoch_fees_1",
               "type": "uint256"
             }
           ],
@@ -693,6 +753,6 @@ const blackHolePairApiV2Abi = [
 // const blackHoleAllPairProxyAddress = "0xdeb2963856d3eaac913b776c63a552b7cab0580b";
 // const blackHoleAllPairAddress = "0xc5aef405aeb37176b77667d31065bdcbd9cd1324";
 
-const blackHolePairApiV2ProxyAddress = "0xE5913fF704b65D3922142a35838C1Af8A5C39fCb";
+const blackHolePairApiV2ProxyAddress = "0x49a220A7345eb22dF8A01D70d93D74159b0eB017";
 
 module.exports = { blackHolePairApiV2Abi, blackHolePairApiV2ProxyAddress}
