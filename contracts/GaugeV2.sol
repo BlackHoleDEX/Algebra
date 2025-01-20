@@ -211,7 +211,6 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
 
         _balances[account] = _balances[account] + amount;
         _totalSupply = _totalSupply + amount;
-
         if (address(gaugeRewarder) != address(0)) {
             IRewarder(gaugeRewarder).onReward(account, account, _balances[account]);
         }
