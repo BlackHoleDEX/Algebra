@@ -9,7 +9,8 @@ async function main () {
     const blackholeContract = await ethers.getContractAt(thenaAbi, thenaAddress);
     let balanceOfOwner = await blackholeContract.balanceOf(owner);
     console.log('balanceOfOwner pre minting', balanceOfOwner)
-    const mintingTx = await blackholeContract.mint(owner, BigNumber.from(100_000_000));
+    const mintAmount = BigNumber.from("100000000").mul(BigNumber.from("1000000000000000000")); // 100M * 10^18
+    const mintingTx = await blackholeContract.mint(owner, mintAmount);
     await mintingTx.wait();
     balanceOfOwner = await blackholeContract.balanceOf(owner);
     console.log('balanceOfOwner post minting', balanceOfOwner)
