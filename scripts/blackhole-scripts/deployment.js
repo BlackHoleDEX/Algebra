@@ -6,6 +6,7 @@ const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants.js");
 const { blackHolePairApiV2Abi, blackHolePairApiV2ProxyAddress } = require('./pairApiConstants');
 const { voterV3Abi } = require('./gaugeConstants/voter-v3')
 const { minterUpgradableAbi } = require('./gaugeConstants/minter-upgradable')
+const { thenaAbi, thenaAddress } = require('./gaugeConstants/thena')
 const { pairFactoryAddress, tokenOne, tokenTwo, tokenThree, tokenFour, tokenFive, tokenSix, tokenSeven, tokenEight, tokenNine, tokenTen } = require("../V1/dexAbi");
 
 const deployVoterV3AndSetInit = async (ownerAddress, bribeFactoryV3Address, gaugeV2Address) => {
@@ -112,6 +113,23 @@ const deployGaugeV2Factory = async () => {
     }
 }
 
+const setMinterUpgradableInVoterV3 = async(voterV3Address, minterUpgradableAddress)=>{
+    const voterV3Contract = await ethers.getContractAt(voterV3Abi, voterV3Address);
+    await voterV3Contract.setMinter(minterUpgradableAddress);
+    console.log('set minter in voterV3Contract');
+}
+
+const setMinterInThena = async(minterUpgradableAddress) => {
+    const thenaContract = await ethers.getContractAt(thenaAbi, thenaAddress);
+    await thenaContract.setMinter(minterUpgradableAddress);
+    console.log('set minter in Thena');
+}
+
+const setMinterInRewardDistributer = async(minterUpgradableAddress, rewardsDistributorAddress) => {
+    await rewardsDistributorAddress.setDepositor(minterUpgradableAddress);
+    console.log('set depositor in rewardDistributer');
+}
+
 const initializeMinter = async (minterUpgradableAddress) => {
     try {
         const minterContract = await ethers.getContractAt(minterUpgradableAbi, minterUpgradableAddress);
@@ -153,8 +171,16 @@ async function main () {
     //deploy minterUpgradable
     const minterUpgradableAddress = await deployMinterUpgradeable(voterV3Address, rewardsDistributorAddress);
 
+    //set MinterUpgradable in VoterV3
+    await setMinterUpgradableInVoterV3(voterV3Address, minterUpgradableAddress);
+
     // call _initialize
     await initializeMinter(minterUpgradableAddress);
+
+    //set minter in thena
+    await setMinterInThena(minterUpgradableAddress);
+
+    await setMinterInRewardDistributer(minterUpgradableAddress, rewardsDistributorAddress); //set as depositor
 
     //create Gauges
     await createGauges(voterV3Address);
