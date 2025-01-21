@@ -1,5 +1,5 @@
 const { ethers } = require("hardhat")
-const { voterV3Address } = require("./gaugeConstants/voter-v3");
+const { voterV3Address } = require("../gaugeConstants/voter-v3");
 
 async function main () {
 

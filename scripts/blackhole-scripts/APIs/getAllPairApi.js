@@ -1,9 +1,9 @@
 const { ethers  } = require('hardhat');
 
 const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants.js");
-const { blackHolePairApiV2Abi, blackHolePairApiV2ProxyAddress } = require('./pairApiConstants');
-const { pairFactoryAbi, pairFactoryAddress } = require('../V1/dexAbi');
-const { voterV3Abi, voterV3Address } = require('./gaugeConstants/voter-v3');
+const { blackHolePairApiV2Abi, blackHolePairApiV2ProxyAddress } = require('../pairApiConstants');
+const { pairFactoryAbi, pairFactoryAddress } = require('../../V1/dexAbi');
+const { voterV3Abi, voterV3Address } = require('../gaugeConstants/voter-v3');
 const fs = require("fs");
 
 async function main () {

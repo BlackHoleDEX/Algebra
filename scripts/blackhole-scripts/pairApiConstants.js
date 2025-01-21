@@ -324,23 +324,67 @@ const blackHolePairApiV2Abi = [
             },
             {
               "internalType": "uint256",
-              "name": "token_current_fees_0",
+              "name": "token0_fees",
               "type": "uint256"
             },
             {
               "internalType": "uint256",
-              "name": "token_current_fees_1",
+              "name": "token1_fees",
               "type": "uint256"
             },
             {
-              "internalType": "uint256",
-              "name": "token_last_epoch_fees_0",
-              "type": "uint256"
+              "components": [
+                {
+                  "internalType": "address[]",
+                  "name": "tokens",
+                  "type": "address[]"
+                },
+                {
+                  "internalType": "string[]",
+                  "name": "symbols",
+                  "type": "string[]"
+                },
+                {
+                  "internalType": "uint256[]",
+                  "name": "decimals",
+                  "type": "uint256[]"
+                },
+                {
+                  "internalType": "uint256[]",
+                  "name": "amounts",
+                  "type": "uint256[]"
+                }
+              ],
+              "internalType": "struct BlackholePairAPIV2.Bribes",
+              "name": "internal_bribes",
+              "type": "tuple"
             },
             {
-              "internalType": "uint256",
-              "name": "token_last_epoch_fees_1",
-              "type": "uint256"
+              "components": [
+                {
+                  "internalType": "address[]",
+                  "name": "tokens",
+                  "type": "address[]"
+                },
+                {
+                  "internalType": "string[]",
+                  "name": "symbols",
+                  "type": "string[]"
+                },
+                {
+                  "internalType": "uint256[]",
+                  "name": "decimals",
+                  "type": "uint256[]"
+                },
+                {
+                  "internalType": "uint256[]",
+                  "name": "amounts",
+                  "type": "uint256[]"
+                }
+              ],
+              "internalType": "struct BlackholePairAPIV2.Bribes",
+              "name": "external_bribes",
+              "type": "tuple"
             }
           ],
           "internalType": "struct BlackholePairAPIV2.pairInfo[]",
@@ -520,23 +564,67 @@ const blackHolePairApiV2Abi = [
             },
             {
               "internalType": "uint256",
-              "name": "token_current_fees_0",
+              "name": "token0_fees",
               "type": "uint256"
             },
             {
               "internalType": "uint256",
-              "name": "token_current_fees_1",
+              "name": "token1_fees",
               "type": "uint256"
             },
             {
-              "internalType": "uint256",
-              "name": "token_last_epoch_fees_0",
-              "type": "uint256"
+              "components": [
+                {
+                  "internalType": "address[]",
+                  "name": "tokens",
+                  "type": "address[]"
+                },
+                {
+                  "internalType": "string[]",
+                  "name": "symbols",
+                  "type": "string[]"
+                },
+                {
+                  "internalType": "uint256[]",
+                  "name": "decimals",
+                  "type": "uint256[]"
+                },
+                {
+                  "internalType": "uint256[]",
+                  "name": "amounts",
+                  "type": "uint256[]"
+                }
+              ],
+              "internalType": "struct BlackholePairAPIV2.Bribes",
+              "name": "internal_bribes",
+              "type": "tuple"
             },
             {
-              "internalType": "uint256",
-              "name": "token_last_epoch_fees_1",
-              "type": "uint256"
+              "components": [
+                {
+                  "internalType": "address[]",
+                  "name": "tokens",
+                  "type": "address[]"
+                },
+                {
+                  "internalType": "string[]",
+                  "name": "symbols",
+                  "type": "string[]"
+                },
+                {
+                  "internalType": "uint256[]",
+                  "name": "decimals",
+                  "type": "uint256[]"
+                },
+                {
+                  "internalType": "uint256[]",
+                  "name": "amounts",
+                  "type": "uint256[]"
+                }
+              ],
+              "internalType": "struct BlackholePairAPIV2.Bribes",
+              "name": "external_bribes",
+              "type": "tuple"
             }
           ],
           "internalType": "struct BlackholePairAPIV2.pairInfo",
@@ -753,6 +841,6 @@ const blackHolePairApiV2Abi = [
 // const blackHoleAllPairProxyAddress = "0xdeb2963856d3eaac913b776c63a552b7cab0580b";
 // const blackHoleAllPairAddress = "0xc5aef405aeb37176b77667d31065bdcbd9cd1324";
 
-const blackHolePairApiV2ProxyAddress = "0x49a220A7345eb22dF8A01D70d93D74159b0eB017";
+const blackHolePairApiV2ProxyAddress = "0x65792478e83ec5c4a3573aCF29d765d752E2c38a";
 
 module.exports = { blackHolePairApiV2Abi, blackHolePairApiV2ProxyAddress}

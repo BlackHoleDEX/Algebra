@@ -81,22 +81,94 @@
       "hex": "0x00"
     },
     "feeAddress": "0x6Fe40674347Ed877299239Ca9956fE7d69cD39F2",
-    "token_current_fees_0": {
+    "token0_fees": {
       "type": "BigNumber",
       "hex": "0x0b41477aa60000"
     },
-    "token_current_fees_1": {
+    "token1_fees": {
       "type": "BigNumber",
       "hex": "0x07e3"
     },
-    "token_last_epoch_fees_0": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    },
-    "token_last_epoch_fees_1": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    }
+    "internal_bribes": [
+      [
+        "0x30816e127553dd03F0318bFab72bA9F3C452A92A",
+        "0x635a8C9Fda481482cD83969709cc9f46114032F7",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TT",
+        "TO",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ],
+    "external_bribes": [
+      [
+        "0x30816e127553dd03F0318bFab72bA9F3C452A92A",
+        "0x635a8C9Fda481482cD83969709cc9f46114032F7",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TT",
+        "TO",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ]
   },
   {
     "pair_address": "0xC6e39a293117881cbf6156d1616Bb362121bBB0A",
@@ -180,22 +252,94 @@
       "hex": "0x00"
     },
     "feeAddress": "0xb3b7B1dF263877ed9B3C18faD2bAD59B7883e8C2",
-    "token_current_fees_0": {
+    "token0_fees": {
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "token_current_fees_1": {
+    "token1_fees": {
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "token_last_epoch_fees_0": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    },
-    "token_last_epoch_fees_1": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    }
+    "internal_bribes": [
+      [
+        "0x230819D91cCaD0da03C4b32c9cC79A058c293552",
+        "0x30816e127553dd03F0318bFab72bA9F3C452A92A",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TTH",
+        "TT",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ],
+    "external_bribes": [
+      [
+        "0x230819D91cCaD0da03C4b32c9cC79A058c293552",
+        "0x30816e127553dd03F0318bFab72bA9F3C452A92A",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TTH",
+        "TT",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ]
   },
   {
     "pair_address": "0x1922FAF49e860c3533528DA3c65E7290E1015008",
@@ -279,22 +423,94 @@
       "hex": "0x00"
     },
     "feeAddress": "0x6deA8257b9E9F2f6F1554e0b6D36798D59500C20",
-    "token_current_fees_0": {
+    "token0_fees": {
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "token_current_fees_1": {
+    "token1_fees": {
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "token_last_epoch_fees_0": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    },
-    "token_last_epoch_fees_1": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    }
+    "internal_bribes": [
+      [
+        "0x1d2d59b30BEAdf493A0c8f46F0A4c88fDFAFaCaB",
+        "0x7ee700efc1866804c03390494ba3d8F2D7563546",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TFI",
+        "TEG",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ],
+    "external_bribes": [
+      [
+        "0x1d2d59b30BEAdf493A0c8f46F0A4c88fDFAFaCaB",
+        "0x7ee700efc1866804c03390494ba3d8F2D7563546",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TFI",
+        "TEG",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ]
   },
   {
     "pair_address": "0x339f9514D0879eC278C8d9cadAEa17aD3e39feC1",
@@ -378,22 +594,94 @@
       "hex": "0x00"
     },
     "feeAddress": "0x7B64CFe95F2FCbF4e4aCDcD7916Bcff24e78B8b2",
-    "token_current_fees_0": {
+    "token0_fees": {
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "token_current_fees_1": {
+    "token1_fees": {
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "token_last_epoch_fees_0": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    },
-    "token_last_epoch_fees_1": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    }
+    "internal_bribes": [
+      [
+        "0x230819D91cCaD0da03C4b32c9cC79A058c293552",
+        "0x7ee700efc1866804c03390494ba3d8F2D7563546",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TTH",
+        "TEG",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ],
+    "external_bribes": [
+      [
+        "0x230819D91cCaD0da03C4b32c9cC79A058c293552",
+        "0x7ee700efc1866804c03390494ba3d8F2D7563546",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TTH",
+        "TEG",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ]
   },
   {
     "pair_address": "0xe59B5c1913EF7AAAa7538149C1F2748c98305a7d",
@@ -477,22 +765,94 @@
       "hex": "0x00"
     },
     "feeAddress": "0xD0EA5A605C669929a5f9001133429e954d0D4b37",
-    "token_current_fees_0": {
+    "token0_fees": {
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "token_current_fees_1": {
+    "token1_fees": {
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "token_last_epoch_fees_0": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    },
-    "token_last_epoch_fees_1": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    }
+    "internal_bribes": [
+      [
+        "0x635a8C9Fda481482cD83969709cc9f46114032F7",
+        "0x7ee700efc1866804c03390494ba3d8F2D7563546",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TO",
+        "TEG",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ],
+    "external_bribes": [
+      [
+        "0x635a8C9Fda481482cD83969709cc9f46114032F7",
+        "0x7ee700efc1866804c03390494ba3d8F2D7563546",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TO",
+        "TEG",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ]
   },
   {
     "pair_address": "0x285e4B9137c2e0D482A044Db0B1c1E8616fa8c3e",
@@ -576,22 +936,94 @@
       "hex": "0x00"
     },
     "feeAddress": "0x65Adf6dd5883E0C8B2A49C273B4C15E2f447eC48",
-    "token_current_fees_0": {
+    "token0_fees": {
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "token_current_fees_1": {
+    "token1_fees": {
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "token_last_epoch_fees_0": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    },
-    "token_last_epoch_fees_1": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    }
+    "internal_bribes": [
+      [
+        "0x635a8C9Fda481482cD83969709cc9f46114032F7",
+        "0xAbFD656e7C9bB2Ab9b2BEab66FedE4a71e5bb1BE",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TO",
+        "TTE",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ],
+    "external_bribes": [
+      [
+        "0x635a8C9Fda481482cD83969709cc9f46114032F7",
+        "0xAbFD656e7C9bB2Ab9b2BEab66FedE4a71e5bb1BE",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TO",
+        "TTE",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ]
   },
   {
     "pair_address": "0x91De570eCb5266aDf0767ce7c0488d43D3f46E97",
@@ -675,22 +1107,94 @@
       "hex": "0x00"
     },
     "feeAddress": "0x95A458476e52d4B41B0dF6d6FcdCcC5c826Db353",
-    "token_current_fees_0": {
+    "token0_fees": {
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "token_current_fees_1": {
+    "token1_fees": {
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "token_last_epoch_fees_0": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    },
-    "token_last_epoch_fees_1": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    }
+    "internal_bribes": [
+      [
+        "0x13B68A127cE0343F4ddb3A205a43386819bf6182",
+        "0x30816e127553dd03F0318bFab72bA9F3C452A92A",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TNI",
+        "TT",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ],
+    "external_bribes": [
+      [
+        "0x13B68A127cE0343F4ddb3A205a43386819bf6182",
+        "0x30816e127553dd03F0318bFab72bA9F3C452A92A",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TNI",
+        "TT",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ]
   },
   {
     "pair_address": "0x88C42515D5B51b25927b77EF1E74d14E7f0A5257",
@@ -774,22 +1278,94 @@
       "hex": "0x00"
     },
     "feeAddress": "0x42bee1F79BaD250E2760150Caf19c17f657C5E63",
-    "token_current_fees_0": {
+    "token0_fees": {
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "token_current_fees_1": {
+    "token1_fees": {
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "token_last_epoch_fees_0": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    },
-    "token_last_epoch_fees_1": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    }
+    "internal_bribes": [
+      [
+        "0x13B68A127cE0343F4ddb3A205a43386819bf6182",
+        "0x7ee700efc1866804c03390494ba3d8F2D7563546",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TNI",
+        "TEG",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ],
+    "external_bribes": [
+      [
+        "0x13B68A127cE0343F4ddb3A205a43386819bf6182",
+        "0x7ee700efc1866804c03390494ba3d8F2D7563546",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TNI",
+        "TEG",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ]
   },
   {
     "pair_address": "0xc0445E7d891AE94958016FAfaD9dDa8F831f8eaa",
@@ -873,22 +1449,94 @@
       "hex": "0x00"
     },
     "feeAddress": "0x78b57a7Ce9547b1d8C21Bc11F8A183Ca325E49E6",
-    "token_current_fees_0": {
+    "token0_fees": {
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "token_current_fees_1": {
+    "token1_fees": {
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "token_last_epoch_fees_0": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    },
-    "token_last_epoch_fees_1": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    }
+    "internal_bribes": [
+      [
+        "0x734c6dA2fC0086328fc6651186c360aBAe61f8Bd",
+        "0x89Eb5Ed61eBa94D52Dc0D2091C8f337F956475A2",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TOF",
+        "TSX",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ],
+    "external_bribes": [
+      [
+        "0x734c6dA2fC0086328fc6651186c360aBAe61f8Bd",
+        "0x89Eb5Ed61eBa94D52Dc0D2091C8f337F956475A2",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TOF",
+        "TSX",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ]
   },
   {
     "pair_address": "0x57Be8A5c82Cae42D10023CD66812c8cee8e65D7e",
@@ -969,25 +1617,97 @@
     },
     "votes": {
       "type": "BigNumber",
-      "hex": "0x0dd047b643caaa49"
+      "hex": "0x00"
     },
     "feeAddress": "0xf756b65ec9c3639816969aEe0De8304030617b7d",
-    "token_current_fees_0": {
+    "token0_fees": {
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "token_current_fees_1": {
+    "token1_fees": {
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "token_last_epoch_fees_0": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    },
-    "token_last_epoch_fees_1": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    }
+    "internal_bribes": [
+      [
+        "0x230819D91cCaD0da03C4b32c9cC79A058c293552",
+        "0x30816e127553dd03F0318bFab72bA9F3C452A92A",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TTH",
+        "TT",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ],
+    "external_bribes": [
+      [
+        "0x230819D91cCaD0da03C4b32c9cC79A058c293552",
+        "0x30816e127553dd03F0318bFab72bA9F3C452A92A",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TTH",
+        "TT",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ]
   },
   {
     "pair_address": "0xE669a44E745aA305Cd25197D1EA47f51D283484b",
@@ -1071,22 +1791,94 @@
       "hex": "0x00"
     },
     "feeAddress": "0xF1D9837DFA070690eb3e3Dc850db83C9eF15888b",
-    "token_current_fees_0": {
+    "token0_fees": {
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "token_current_fees_1": {
+    "token1_fees": {
       "type": "BigNumber",
       "hex": "0x0a012317b00000"
     },
-    "token_last_epoch_fees_0": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    },
-    "token_last_epoch_fees_1": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    }
+    "internal_bribes": [
+      [
+        "0x30816e127553dd03F0318bFab72bA9F3C452A92A",
+        "0x635a8C9Fda481482cD83969709cc9f46114032F7",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TT",
+        "TO",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ],
+    "external_bribes": [
+      [
+        "0x30816e127553dd03F0318bFab72bA9F3C452A92A",
+        "0x635a8C9Fda481482cD83969709cc9f46114032F7",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TT",
+        "TO",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ]
   },
   {
     "pair_address": "0x963A21C6ab4A28B30Ab78d2310355854b88c0E0c",
@@ -1170,22 +1962,94 @@
       "hex": "0x00"
     },
     "feeAddress": "0xA8a577AfA306CE02f8C430043d76A04e83230850",
-    "token_current_fees_0": {
+    "token0_fees": {
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "token_current_fees_1": {
+    "token1_fees": {
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "token_last_epoch_fees_0": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    },
-    "token_last_epoch_fees_1": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    }
+    "internal_bribes": [
+      [
+        "0x7ee700efc1866804c03390494ba3d8F2D7563546",
+        "0x89Eb5Ed61eBa94D52Dc0D2091C8f337F956475A2",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TEG",
+        "TSX",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ],
+    "external_bribes": [
+      [
+        "0x7ee700efc1866804c03390494ba3d8F2D7563546",
+        "0x89Eb5Ed61eBa94D52Dc0D2091C8f337F956475A2",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TEG",
+        "TSX",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ]
   },
   {
     "pair_address": "0xA7d49Ba2C7084fD06340bda5d63ff368cbE54613",
@@ -1266,25 +2130,97 @@
     },
     "votes": {
       "type": "BigNumber",
-      "hex": "0x2970d722cb5ffedb"
+      "hex": "0x6e0ccceb99b4aa2e"
     },
     "feeAddress": "0xDdEb370f39d48B7615Cf4Fcf70608db477801bb2",
-    "token_current_fees_0": {
+    "token0_fees": {
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "token_current_fees_1": {
+    "token1_fees": {
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "token_last_epoch_fees_0": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    },
-    "token_last_epoch_fees_1": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    }
+    "internal_bribes": [
+      [
+        "0x7ee700efc1866804c03390494ba3d8F2D7563546",
+        "0x89Eb5Ed61eBa94D52Dc0D2091C8f337F956475A2",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TEG",
+        "TSX",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ],
+    "external_bribes": [
+      [
+        "0x7ee700efc1866804c03390494ba3d8F2D7563546",
+        "0x89Eb5Ed61eBa94D52Dc0D2091C8f337F956475A2",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TEG",
+        "TSX",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ]
   },
   {
     "pair_address": "0x6D168549f696BD00F88FA34C1Dc4AFA5798a4c41",
@@ -1365,24 +2301,96 @@
     },
     "votes": {
       "type": "BigNumber",
-      "hex": "0x00"
+      "hex": "0x014a2666c2cd1dfe8a"
     },
     "feeAddress": "0xB54Bd3B34EF7B990350D8BA2fe35cc2Ed54cC364",
-    "token_current_fees_0": {
+    "token0_fees": {
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "token_current_fees_1": {
+    "token1_fees": {
       "type": "BigNumber",
       "hex": "0x00"
     },
-    "token_last_epoch_fees_0": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    },
-    "token_last_epoch_fees_1": {
-      "type": "BigNumber",
-      "hex": "0x00"
-    }
+    "internal_bribes": [
+      [
+        "0x13B68A127cE0343F4ddb3A205a43386819bf6182",
+        "0xAbFD656e7C9bB2Ab9b2BEab66FedE4a71e5bb1BE",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TNI",
+        "TTE",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ],
+    "external_bribes": [
+      [
+        "0x13B68A127cE0343F4ddb3A205a43386819bf6182",
+        "0xAbFD656e7C9bB2Ab9b2BEab66FedE4a71e5bb1BE",
+        "0x68b8220c62513493777563943037Ea919ba0b24C"
+      ],
+      [
+        "TNI",
+        "TTE",
+        "$BLACK"
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x12"
+        }
+      ],
+      [
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        },
+        {
+          "type": "BigNumber",
+          "hex": "0x00"
+        }
+      ]
+    ]
   }
 ]
