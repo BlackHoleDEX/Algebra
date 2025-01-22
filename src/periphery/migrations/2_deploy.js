@@ -20,7 +20,7 @@ module.exports = async function(deployer) {
     let deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'));
   
     // WNativeTokenAddress
-    const WNativeTokenAddress = 'TYsbWxNnyTgsZaTFaue9hqpxkU3Fkco94a';
+    const WNativeTokenAddress = 'TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR';
   
     deploysData.wrapped = WNativeTokenAddress;
 

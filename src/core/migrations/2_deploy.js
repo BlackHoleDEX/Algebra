@@ -6,7 +6,7 @@ const AlgebraPoolDeployer = artifacts.require("AlgebraPoolDeployer.sol");
 const AlgebraCommunityVault = artifacts.require('AlgebraCommunityVault');
 const AlgebraVaultFactoryStub = artifacts.require('AlgebraVaultFactoryStub');
 
-const deployerAddress = "TGq5GWxruUu47FaTcHLiX8oJGNtD8aRcoV"
+const deployerAddress = "TEoThvS54oAEG2mchPnbi4oSu87gLffohn"
 const tronWeb = tronbox.tronWeb.nile
 
 module.exports = async function(deployer) {
@@ -38,10 +38,10 @@ module.exports = async function(deployer) {
     await factoryContract.setVaultFactory(stub.address).send();
     console.log("set vault factory to:", stub.address)
 
-    const algebraFeeRecipient = tronWeb.address.toHex("TGq5GWxruUu47FaTcHLiX8oJGNtD8aRcoV")
-    const partnerAddress = tronWeb.address.toHex("TGq5GWxruUu47FaTcHLiX8oJGNtD8aRcoV") // owner address, must be changed
-    const algebraFeeShare =  1000 // specified on algebraVault, 100% of community fee by default(3% of all fees)
-    const defaultCommunityFee = 30 // 3% by default
+    const algebraFeeRecipient = tronWeb.address.toHex("TEoThvS54oAEG2mchPnbi4oSu87gLffohn")
+    const partnerAddress = tronWeb.address.toHex("TEoThvS54oAEG2mchPnbi4oSu87gLffohn") // owner address, must be changed
+    const algebraFeeShare =  150 // specified on algebraVault, 100% of community fee by default(3% of all fees)
+    const defaultCommunityFee = 100 // 3% by default
 
     await factoryContract.setDefaultCommunityFee(defaultCommunityFee).send();
     console.log("set default community fee to:", defaultCommunityFee)
