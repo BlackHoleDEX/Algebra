@@ -11,25 +11,25 @@ async function main () {
     console.log('Deploying Contract...');
     
     
-    /*data = await ethers.getContractFactory("Thena");
-    thena = await data.deploy();
-    txDeployed = await thena.deployed();
-    console.log("thena Address: ", thena.address)*/
+    /*data = await ethers.getContractFactory("Black");
+    black = await data.deploy();
+    txDeployed = await black.deployed();
+    console.log("black Address: ", black.address)*/
 
     data = await ethers.getContractFactory("VeArtProxyUpgradeable");
     veArtProxy = await upgrades.deployProxy(data,[], {initializer: 'initialize'});
     txDeployed = await veArtProxy.deployed();
     console.log("veArtProxy Address: ", veArtProxy.address)
 
-    const thena = ethers.utils.getAddress("0xF4C8E32EaDEC4BFe97E0F595AdD0f4450a863a11")
+    const black = ethers.utils.getAddress("0xF4C8E32EaDEC4BFe97E0F595AdD0f4450a863a11")
 
     data = await ethers.getContractFactory("VotingEscrow");
-    veThena = await data.deploy(thena, veArtProxy.address);
-    txDeployed = await veThena.deployed();
-    console.log("veThena Address: ", veThena.address);
+    veBlack = await data.deploy(black, veArtProxy.address);
+    txDeployed = await veBlack.deployed();
+    console.log("veBlack Address: ", veBlack.address);
 
     data = await ethers.getContractFactory("RewardsDistributor");
-    RewardsDistributor = await data.deploy(veThena.address);
+    RewardsDistributor = await data.deploy(veBlack.address);
     txDeployed = await RewardsDistributor.deployed();
     console.log("RewardsDistributor Address: ", RewardsDistributor.address)
 

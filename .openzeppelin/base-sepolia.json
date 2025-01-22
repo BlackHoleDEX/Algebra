@@ -9024,10 +9024,10 @@
             "src": "contracts/MinterUpgradeable.sol:33"
           },
           {
-            "label": "_thena",
+            "label": "_black",
             "offset": 0,
             "slot": "111",
-            "type": "t_contract(IThena)17294",
+            "type": "t_contract(IBlack)17294",
             "contract": "MinterUpgradeable",
             "src": "contracts/MinterUpgradeable.sol:35"
           },
@@ -9077,8 +9077,8 @@
             "label": "contract IRewardsDistributor",
             "numberOfBytes": "20"
           },
-          "t_contract(IThena)17294": {
-            "label": "contract IThena",
+          "t_contract(IBlack)17294": {
+            "label": "contract IBlack",
             "numberOfBytes": "20"
           },
           "t_contract(IVoter)17457": {
@@ -9669,10 +9669,10 @@
             "src": "contracts/MinterUpgradeable.sol:33"
           },
           {
-            "label": "_thena",
+            "label": "_black",
             "offset": 0,
             "slot": "111",
-            "type": "t_contract(IThena)54291",
+            "type": "t_contract(IBlack)54291",
             "contract": "MinterUpgradeable",
             "src": "contracts/MinterUpgradeable.sol:35"
           },
@@ -9722,8 +9722,8 @@
             "label": "contract IRewardsDistributor",
             "numberOfBytes": "20"
           },
-          "t_contract(IThena)54291": {
-            "label": "contract IThena",
+          "t_contract(IBlack)54291": {
+            "label": "contract IBlack",
             "numberOfBytes": "20"
           },
           "t_contract(IVoter)54609": {
