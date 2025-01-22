@@ -6,7 +6,7 @@ const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants.js");
 const { blackHolePairApiV2Abi, blackHolePairApiV2ProxyAddress } = require('./pairApiConstants');
 const { voterV3Abi } = require('./gaugeConstants/voter-v3')
 const { minterUpgradableAbi } = require('./gaugeConstants/minter-upgradable')
-const { thenaAbi, thenaAddress } = require('./gaugeConstants/thena')
+const { blackAbi, blackAddress } = require('./gaugeConstants/black')
 const { pairFactoryAddress, tokenOne, tokenTwo, tokenThree, tokenFour, tokenFive, tokenSix, tokenSeven, tokenEight, tokenNine, tokenTen } = require("../V1/dexAbi");
 
 const deployVoterV3AndSetInit = async (ownerAddress, bribeFactoryV3Address, gaugeV2Address) => {
@@ -119,10 +119,10 @@ const setMinterUpgradableInVoterV3 = async(voterV3Address, minterUpgradableAddre
     console.log('set minter in voterV3Contract');
 }
 
-const setMinterInThena = async(minterUpgradableAddress) => {
-    const thenaContract = await ethers.getContractAt(thenaAbi, thenaAddress);
-    await thenaContract.setMinter(minterUpgradableAddress);
-    console.log('set minter in Thena');
+const setMinterInBlack = async(minterUpgradableAddress) => {
+    const blackContract = await ethers.getContractAt(blackAbi, blackAddress);
+    await blackContract.setMinter(minterUpgradableAddress);
+    console.log('set minter in Black');
 }
 
 const setMinterInRewardDistributer = async(minterUpgradableAddress, rewardsDistributorAddress) => {
@@ -177,8 +177,8 @@ async function main () {
     // call _initialize
     await initializeMinter(minterUpgradableAddress);
 
-    //set minter in thena
-    await setMinterInThena(minterUpgradableAddress);
+    //set minter in black
+    await setMinterInBlack(minterUpgradableAddress);
 
     await setMinterInRewardDistributer(minterUpgradableAddress, rewardsDistributorAddress); //set as depositor
 

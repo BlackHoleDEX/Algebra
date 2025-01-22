@@ -1,5 +1,5 @@
 const { ethers } = require("hardhat");
-const { thenaAbi, thenaAddress } = require("./gaugeConstants/thena");
+const { blackAbi, blackAddress } = require("./gaugeConstants/black");
 const { votingEscrowAbi, votingEscrowAddress } = require("./gaugeConstants/voting-escrow")
 const { BigNumber } = require("ethers");
 
@@ -7,7 +7,7 @@ async function main () {
     const acc = await ethers.getSigners();
     const owner = acc[0].address;
     console.log('owner is', owner)
-    const blackholeContract = await ethers.getContractAt(thenaAbi, thenaAddress);
+    const blackholeContract = await ethers.getContractAt(blackAbi, blackAddress);
     const veContract =  await ethers.getContractAt(votingEscrowAbi, votingEscrowAddress);
     let balanceOfOwner = await blackholeContract.balanceOf(owner);
     console.log('balanceOfOwner pre minting', balanceOfOwner)
