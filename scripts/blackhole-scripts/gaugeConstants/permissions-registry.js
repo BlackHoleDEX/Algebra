@@ -91,7 +91,7 @@ const permissionRegistryAbi = [
           "type": "address"
         }
       ],
-      "name": "SetThenaMultisig",
+      "name": "SetBlackMultisig",
       "type": "event"
     },
     {
@@ -104,7 +104,7 @@ const permissionRegistryAbi = [
           "type": "address"
         }
       ],
-      "name": "SetThenaTeamMultisig",
+      "name": "SetBlackTeamMultisig",
       "type": "event"
     },
     {
@@ -342,7 +342,7 @@ const permissionRegistryAbi = [
           "type": "address"
         }
       ],
-      "name": "setThenaMultisig",
+      "name": "setBlackMultisig",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -355,14 +355,14 @@ const permissionRegistryAbi = [
           "type": "address"
         }
       ],
-      "name": "setThenaTeamMultisig",
+      "name": "setBlackTeamMultisig",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
     },
     {
       "inputs": [],
-      "name": "thenaMultisig",
+      "name": "blackMultisig",
       "outputs": [
         {
           "internalType": "address",
@@ -375,7 +375,7 @@ const permissionRegistryAbi = [
     },
     {
       "inputs": [],
-      "name": "thenaTeamMultisig",
+      "name": "blackTeamMultisig",
       "outputs": [
         {
           "internalType": "address",

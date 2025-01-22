@@ -1,5 +1,5 @@
 const { ethers } = require("hardhat");
-const { thenaAbi, thenaAddress } = require("./gaugeConstants/thena");
+const { blackAbi, blackAddress } = require("./gaugeConstants/black");
 const { BigNumber } = require("ethers");
 const { votingEscrowAbi, votingEscrowAddress } = require("./gaugeConstants/voting-escrow");
 

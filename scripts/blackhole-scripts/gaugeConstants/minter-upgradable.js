@@ -196,10 +196,10 @@ const minterUpgradableAbi = [
     },
     {
       "inputs": [],
-      "name": "_thena",
+      "name": "_black",
       "outputs": [
         {
-          "internalType": "contract IThena",
+          "internalType": "contract IBlack",
           "name": "",
           "type": "address"
         }
