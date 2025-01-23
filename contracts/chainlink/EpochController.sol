@@ -25,8 +25,7 @@ contract EpochController is AutomationCompatibleInterface, OwnableUpgradeable  {
 
 
     function checkUpkeep(bytes memory /*checkdata*/) public view override returns (bool upkeepNeeded, bytes memory /*performData*/) {
-        upkeepNeeded = IMinter(minter).check()
-;
+        upkeepNeeded = IMinter(minter).check();
     }
 
     function performUpkeep(bytes calldata /*performData*/) external override {

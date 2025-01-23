@@ -777,7 +777,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     /// @dev    this function track the gauge index to emit the correct $the amount after the distribution
     function _updateForAfterDistribution(address _gauge) private {
         address _pool = poolForGauge[_gauge];
-        uint256 _time = epochTimestamp() - 604800;
+        uint256 _time = epochTimestamp() - 1800;
         uint256 _supplied = weightsPerEpoch[_time][_pool];
 
         if (_supplied > 0) {
