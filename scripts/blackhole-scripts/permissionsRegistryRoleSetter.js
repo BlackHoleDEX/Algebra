@@ -11,25 +11,16 @@ async function main () {
 
     const permissionRegistryContract = await ethers.getContractAt(permissionRegistryAbi, permissionsRegistryAddress);
     const permissionRegistryContractRoles = await permissionRegistryContract.roles();
-    // console.log("permissionRegistryContractRoles ", permissionRegistryContractRoles);
-    console.log("permissionRegistryContractRoles ", permissionRegistryContractRoles);
 
     const permissionRegistryRolesInStringFormat = await permissionRegistryContract.rolesToString();
     
-    // for(const p of permissionRegistryContractRoles){
-    //     const permissionRegistryContractRoles = await permissionRegistryContract.rolesToString();
-    //     console.log("permissionRegistryContractRoles ", permissionRegistryContractRoles);
-    // }
     await Promise.all(
         permissionRegistryRolesInStringFormat.map(async (element) => {
             try {
-                console.log('Role in string format:', element);
-    
                 const setRoleTx = await permissionRegistryContract.setRoleFor(adminAddress, element, {
                     gasLimit: 21000000
                 });
                 await setRoleTx.wait();
-                console.log('SetRole transaction:', setRoleTx);
             } catch (err) {
                 console.log('Error in this part:', err);
             }
