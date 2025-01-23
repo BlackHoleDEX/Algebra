@@ -688,17 +688,28 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     }
 
 
-    /// @notice distribute the LP Fees to the internal bribes
-    /// @param  _gauges  gauge address where to claim the fees 
-    /// @dev    the gauge is the owner of the LPs so it has to claim
-    function distributeFees(address[] memory _gauges) external {
-        for (uint256 i = 0; i < _gauges.length; i++) {
-            if (isGauge[_gauges[i]] && isAlive[_gauges[i]]){
-                IGauge(_gauges[i]).claimFees();
+    // / @notice distribute the LP Fees to the internal bribes
+    // / @param  _gauges  gauge address where to claim the fees 
+    // / @dev    the gauge is the owner of the LPs so it has to claim
+    
+    // function distributeFees(address[] memory _gauges) external {
+    //     for (uint256 i = 0; i < _gauges.length; i++) {
+    //         if (isGauge[_gauges[i]] && isAlive[_gauges[i]]){
+    //             IGauge(_gauges[i]).claimFees();
+    //         }
+    //     }
+    // }
+
+    function distributeFees() external {
+        uint256 i = 0;
+        uint256 poolsLength = pools.length;
+        for (i; i < poolsLength; i++) {
+            
+            if (isGauge[gauges[pools[i]]] && isAlive[gauges[pools[i]]]){
+                IGauge(gauges[pools[i]]).claimFees();
             }
         }
     }
-
     
     /// @notice Distribute the emission for ALL gauges 
     function distributeAll() external nonReentrant {

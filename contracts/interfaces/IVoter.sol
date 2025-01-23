@@ -11,7 +11,8 @@ interface IVoter {
     function isWhitelisted(address token) external view returns (bool);
     function notifyRewardAmount(uint amount) external;
     function distributeAll() external;
-    function distributeFees(address[] memory _gauges) external;
+    // function distributeFees(address[] memory _gauges) external;
+    function distributeFees() external;
 
     function internal_bribes(address _gauge) external view returns (address);
     function external_bribes(address _gauge) external view returns (address);

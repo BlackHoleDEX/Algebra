@@ -1,4 +1,4 @@
-const gaugeFactoryV2Address = "0x37fC567696BA656eA7b34Ce0BB1aC60e8Ab98493";
+const gaugeFactoryV2Address = "0xB790B38e1683Ce9F966983119d9878acE81ABecf";
 const gaugeFactoryV2Abi = [
     {
       "inputs": [],
