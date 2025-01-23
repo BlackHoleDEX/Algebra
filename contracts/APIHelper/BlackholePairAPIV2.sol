@@ -314,12 +314,19 @@ contract BlackholePairAPIV2 is Initializable {
 
         // get external
         _gaugeAddress = voter.gauges(pair);
-        _bribeAddress = voter.external_bribes(_gaugeAddress);
-        _tempReward[0] = _getNextEpochRewards(_bribeAddress);
-        
-        // get internal
-        _bribeAddress = voter.internal_bribes(_gaugeAddress);
-        _tempReward[1] = _getNextEpochRewards(_bribeAddress);
+
+        {
+            if(address(_gaugeAddress) != address(0)){
+                
+                _bribeAddress = voter.external_bribes(_gaugeAddress);
+                _tempReward[0] = _getNextEpochRewards(_bribeAddress);
+                
+                // get internal
+                _bribeAddress = voter.internal_bribes(_gaugeAddress);
+                _tempReward[1] = _getNextEpochRewards(_bribeAddress);
+            }
+        }
+
         return _tempReward;
             
     }
