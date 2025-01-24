@@ -56,8 +56,6 @@ contract BlackholePairAPIV2 is Initializable {
         // pairs gauge
         address gauge; 				    // pair gauge address
         uint gauge_total_supply; 		// pair staked tokens (less/eq than/to pair total supply)
-        address internal_bribe_address; // pair fees contract address
-        address external_bribe_address; // pair bribes contract address
         uint emissions; 			    // pair emissions (per second)
         address emissions_token; 		// pair emissions token address
         uint emissions_token_decimals; 	// pair emissions token decimals
@@ -98,6 +96,7 @@ contract BlackholePairAPIV2 is Initializable {
     }
 
     struct Bribes {
+        address bribeAddress;
         address[] tokens;
         string[] symbols;
         uint[] decimals;
@@ -187,6 +186,7 @@ contract BlackholePairAPIV2 is Initializable {
         uint tokenCurrentFees0;     
         uint tokenCurrentFees1; 
         Bribes[] memory bribes;
+
 
         for(i; i < _offset + _amounts; i++){
             // if totalPairs is reached, break.
@@ -287,11 +287,7 @@ contract BlackholePairAPIV2 is Initializable {
         _pairInfo.gauge_total_supply = gaugeTotalSupply;
         _pairInfo.emissions = emissions;
         _pairInfo.emissions_token = underlyingToken;
-        _pairInfo.emissions_token_decimals = IERC20(underlyingToken).decimals();
-        
-        // external address
-        _pairInfo.internal_bribe_address = voter.internal_bribes(address(_gauge)); 				    
-        _pairInfo.external_bribe_address = voter.external_bribes(address(_gauge)); 				    
+        _pairInfo.emissions_token_decimals = IERC20(underlyingToken).decimals();			    
 
         // Account Info
         _pairInfo.account_lp_balance = IERC20(_pair).balanceOf(_account);
@@ -352,6 +348,7 @@ contract BlackholePairAPIV2 is Initializable {
             
         }
 
+        _rewards.bribeAddress = _bribeAddress;
         _rewards.tokens = _tokens;
         _rewards.amounts = _amounts;
         _rewards.symbols = _symbol;

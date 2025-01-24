@@ -6,6 +6,7 @@ const { veNFTAPIAbi, veNFTAPIAddress } = require('./gaugeConstants/ve-nft-api');
 
 async function main () {
     accounts = await ethers.getSigners();
+    console.log("accounts", accounts);
     owner = accounts[0]
 
     const veNFTApi = await ethers.getContractAt(veNFTAPIAbi, veNFTAPIAddress);

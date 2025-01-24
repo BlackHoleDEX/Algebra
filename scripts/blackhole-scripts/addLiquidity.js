@@ -6,7 +6,7 @@ const { pairFactoryAbi, routerV2Abi, tokenOne, tokenTwo, tokenAbi, tokenFive, to
 async function addLiquidity(routerV2Address, tokenOne, TokenTwo) {
     accounts = await ethers.getSigners();
     owner = accounts[0]
-    const selfAddress = "0x8ec18CcA7E8d40861dc07C217a6426f60005A661";
+    const selfAddress = "0xa7243fc6FB83b0490eBe957941a339be4Db11c29";
     const tokenA = tokenOne;
     const tokenB = TokenTwo;
     const tokenAAmount = 100;

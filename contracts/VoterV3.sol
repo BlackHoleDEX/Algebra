@@ -45,7 +45,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     uint256 internal constant DURATION = 7 days;                   // rewards are released over 7 days
     uint256 public VOTE_DELAY;                                     // delay between votes in seconds
     uint256 public constant MAX_VOTE_DELAY = 7 days;               // Max vote delay allowed
-
+    uint public constant EPOCH_DURATION = 1800; //Current duration need to change 1 week
 
     mapping(address => uint256) internal supplyIndex;              // gauge    => index
     mapping(address => uint256) public claimable;                  // gauge    => claimable $the
@@ -675,7 +675,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         IERC20Upgradeable(base).safeTransferFrom(msg.sender, address(this), amount);
 
 
-        uint256 _totalWeight = totalWeightAt(epochTimestamp() - 1 weeks);   // minter call notify after updates active_period, loads votes - 1 week
+        uint256 _totalWeight = totalWeightAt(epochTimestamp() - EPOCH_DURATION);   // minter call notify after updates active_period, loads votes - 1 week
 
         uint256 _ratio = 0;
 
