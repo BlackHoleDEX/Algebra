@@ -301,8 +301,8 @@ contract veNFTAPI is Initializable {
 
         address t0 = _pairApi.token0;
         address t1 = _pairApi.token1;
-        uint256 _feeToken0 = IBribeAPI(_pairApi.internal_bribe_address).earned(id, t0);
-        uint256 _feeToken1 = IBribeAPI(_pairApi.internal_bribe_address).earned(id, t1);
+        uint256 _feeToken0 = IBribeAPI(_pairApi.internal_bribes.bribeAddress).earned(id, t0);
+        uint256 _feeToken1 = IBribeAPI(_pairApi.internal_bribes.bribeAddress).earned(id, t1);
 
         
 
@@ -314,7 +314,7 @@ contract veNFTAPI is Initializable {
                 token: t0,
                 symbol: IERC20(t0).symbol(),
                 decimals: IERC20(t0).decimals(),
-                fee: _pairApi.internal_bribe_address,
+                fee: _pairApi.internal_bribes.bribeAddress,
                 bribe: address(0)
             });
         }
@@ -328,7 +328,7 @@ contract veNFTAPI is Initializable {
                 token: t1,
                 symbol: IERC20(t1).symbol(),
                 decimals: IERC20(t1).decimals(),
-                fee: _pairApi.internal_bribe_address,
+                fee: _pairApi.internal_bribes.bribeAddress,
                 bribe: address(0)
             });
         }

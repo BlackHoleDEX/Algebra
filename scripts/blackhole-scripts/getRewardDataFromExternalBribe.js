@@ -2,6 +2,7 @@ const { ethers  } = require('hardhat');
 const { gaugeFactoryV2Abi, gaugeFactoryV2Address } = require('./gaugeConstants/gauge-factory-v2');
 // const { routerV2Address } = require('./gaugeConstants/')
 const { gaugeV2Abi } = require('./gaugeConstants/gaugeV2-constants');
+const { votingEscrowAbi } = require('./gaugeConstants/voting-escrow');
 const { minterUpgradableAbi } = require('./gaugeConstants/minter-upgradable');
 const { bribeAbi } = require('./gaugeConstants/bribe')
 const { tokenThree, tokenFour, tokenOne, tokenAbi } = require("../V1/dexAbi");
@@ -15,7 +16,6 @@ async function main () {
     const gaugeFactoryContract = await ethers.getContractAt(gaugeFactoryV2Abi, gaugeFactoryV2Address);
     const getAllGauge = await gaugeFactoryContract.gauges();
     for(const gauge of getAllGauge){
-        // console.log("gauge", gauge)
         if(gauge === ZERO_ADDRESS)
             continue;
 
@@ -23,17 +23,22 @@ async function main () {
         const ExternalBribeAddress = await gaugeV2Contract.external_bribe();
         const ExternalBribeContract = await ethers.getContractAt(bribeAbi, ExternalBribeAddress);
 
-        const approvalAmountString = (BigInt(1000000) * BigInt(10 ** 18)).toString();
-        const tokenContract = await ethers.getContractAt(tokenAbi, tokenThree);
-        await tokenContract.approve("0xA0239C5FdC4b2BDE8eaB3DE711Fa2aE5430fC50d", approvalAmountString);
+        const votingEscrowContract = await ethers.getContractAt(votingEscrowAbi, "0x7351A464aaa5A90378fd608d967E2A152251dE32");
+        const owner = await votingEscrowContract.ownerOf("1");
+        console.log("owner", owner)
 
-        await ExternalBribeContract.addRewardToken(tokenThree);
-        const p = await ExternalBribeContract.isRewardToken(tokenThree);
-        // const x = await tokenContract.balanceOf("0x8ec18CcA7E8d40861dc07C217a6426f60005A661");
-        console.log("p ", p);
-        const bribeAmount = BigNumber.from("20000").mul(BigNumber.from("1000000000000000000"));
 
-        await ExternalBribeContract.notifyRewardAmount(tokenThree, bribeAmount);
+        // const MinterUpgradableContract = await ethers.getContractAt(minterUpgradableAbi, "0xcE9F683915B591c19529Bb82bE302ccFfcf69c95");
+        // const activeP = await MinterUpgradableContract.active_period();
+        // const epochTime = await ExternalBribeContract.getEpochStart();
+        // const epochTimeNumber = Number(epochTime); // Convert the string to a number
+        // const updatedEpochTime = epochTimeNumber + 1800; // Add 1800
+        // const balance = await ExternalBribeContract.balanceOf(tokenThree);
+        // console.log("externalBribeAddress ", ExternalBribeContract.address, balance)
+        // const rewradData = await ExternalBribeContract.rewardData(tokenThree, updatedEpochTime);
+        // const userTimeStamp = await ExternalBribeContract.userTimestamp(tokenThree, updatedEpochTime);
+        
+        // console.log("epoch and reward data", activeP, updatedEpochTime, rewradData)
     }
     console.log("getAllGauge", getAllGauge)
 }

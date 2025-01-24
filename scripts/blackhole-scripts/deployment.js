@@ -305,17 +305,16 @@ const setVoterV3InVotingEscrow = async(voterV3Address, votingEscrowAddress) => {
     }
 }
 
-const deployveNFT = async (voterV3Address, rewardsDistributorAddress, blackHolePairApiV2ProxyAddress) => {
+const deployveNFT = async (voterV3Address, rewardsDistributorAddress, blackholeV2AbiAddress) => {
     try {
         data = await ethers.getContractFactory("veNFTAPI");
-        input = [voterV3Address, rewardsDistributorAddress, blackHolePairApiV2ProxyAddress] // 
+        input = [voterV3Address, rewardsDistributorAddress, blackholeV2AbiAddress] // 
         veNFTAPI = await upgrades.deployProxy(data, input, {initializer: 'initialize'});
         txDeployed = await veNFTAPI.deployed();
         console.log('deployed venftapi address: ', veNFTAPI.address)
     } catch (error) {
         console.log('deployed venftapi error ', veNFTAPI.address)
     }
-    
 }
 
 async function main () {
@@ -383,19 +382,21 @@ async function main () {
     // deploy epoch controller here.
     const epochControllerAddress = await deployEpochController(voterV3Address, minterUpgradableAddress);
 
+    //add thena to user Address
+    await addThenaToUserAddress(minterUpgradableAddress);
+
+    //deploy veNFT
+    await deployveNFT(voterV3Address, rewardsDistributorAddress, blackholeV2AbiAddress);
+
+    //set voterV3 in voting escrow
+    await setVoterV3InVotingEscrow(voterV3Address, votingEscrowAddress);
+
     //createPairs two by default
     await addLiquidity(routerV2Address, tokenOne, tokenTwo);
     await addLiquidity(routerV2Address, tokenTwo, tokenThree);
 
     //create Gauges
     await createGauges(voterV3Address, blackholeV2AbiAddress);
-
-    //add thena to user Address
-    await addThenaToUserAddress(minterUpgradableAddress);
-
-    await deployveNFT(voterV3Address, rewardsDistributorAddress, blackholeV2AbiAddress);
-
-    await setVoterV3InVotingEscrow(voterV3Address, votingEscrowAddress);
 }
 
 main()

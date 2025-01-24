@@ -215,7 +215,27 @@ contract BlackholePairAPIV2 is Initializable {
     }
 
     function getPair(address _pair, address _account) external view returns(pairInfo memory _pairInfo){
-        return _pairAddressToInfo(_pair, _account);
+        pairInfo memory pairInformation =  _pairAddressToInfo(_pair, _account);
+        uint claim0;
+        uint claim1;
+        address feeAddress; 
+        uint tokenCurrentFees0;     
+        uint tokenCurrentFees1; 
+
+        (claim0, claim1) = getClaimable(_account, _pair);
+        pairInformation.claimable0 = claim0;
+        pairInformation.claimable1 = claim1;
+
+        (tokenCurrentFees0, tokenCurrentFees1, feeAddress) = getCurrentFees(_pair, pairInformation.token0, pairInformation.token1);
+        pairInformation.feeAddress = feeAddress;
+        pairInformation.token0_fees = tokenCurrentFees0;
+        pairInformation.token1_fees = tokenCurrentFees1;  
+
+        Bribes[] memory bribes;
+        bribes = _getBribes(_pair);
+        pairInformation.internal_bribes = bribes[1];
+        pairInformation.external_bribes = bribes[0];
+        return pairInformation;
     }
 
     function _pairAddressToInfo(address _pair, address _account) internal view returns(pairInfo memory _pairInfo) {

@@ -12,12 +12,10 @@ async function main () {
         const offset = BigNumber.from("0")
         const id = BigNumber.from("1")
         const rewards = await veNFTContract.allPairRewards(amount, offset, id);
-        console.log("rewatdsList", rewards)
+        console.log("rewatdsList", rewards[0].rewards, rewards[1].rewards)
     } catch (error) {
-        console.log("error ", error)
+        console.log("error in fetching rewards", error)
     }
-    
-    
 }
 
 main()
