@@ -42,9 +42,7 @@ interface IPairAPI {
 
         // pairs gauge
         address gauge; 				    // pair gauge address
-        uint gauge_total_supply; 		// pair staked tokens (less/eq than/to pair total supply)
-        address internal_bribe_address; // pair fees contract address
-        address external_bribe_address; // pair bribes contract address
+        uint gauge_total_supply;               // pair staked tokens (less/eq than/to pair total supply)
         uint emissions; 			    // pair emissions (per second)
         address emissions_token; 		// pair emissions token address
         uint emissions_token_decimals; 	// pair emissions token decimals
@@ -70,6 +68,7 @@ interface IPairAPI {
     }
 
     struct Bribes {
+        address bribeAddress;
         address[] tokens;
         string[] symbols;
         uint[] decimals;
@@ -285,7 +284,7 @@ contract veNFTAPI is Initializable {
         
         IPairAPI.pairInfo memory _pairApi = IPairAPI(pairAPI).getPair(_pair, address(0));
                
-        address externalBribe = _pairApi.external_bribe_address;
+        address externalBribe = _pairApi.external_bribes.bribeAddress;
         
         uint256 totBribeTokens = (externalBribe == address(0)) ? 0 : IBribeAPI(externalBribe).rewardsListLength();
         
