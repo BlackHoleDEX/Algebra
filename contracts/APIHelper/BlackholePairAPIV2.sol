@@ -190,7 +190,7 @@ contract BlackholePairAPIV2 is Initializable {
 
         for(i; i < _offset + _amounts; i++){
             // if totalPairs is reached, break.
-            if(i == totPairs) {
+            if(i >= totPairs) {
                 hasNext = false;
                 break;
             }
@@ -208,7 +208,7 @@ contract BlackholePairAPIV2 is Initializable {
 
             bribes = _getBribes(_pair);
             pairs[i - _offset].internal_bribes = bribes[0];
-            pairs[i - _offset].external_bribes = bribes[0];  
+            pairs[i - _offset].external_bribes = bribes[1];  
         }
 
 
@@ -233,8 +233,8 @@ contract BlackholePairAPIV2 is Initializable {
 
         Bribes[] memory bribes;
         bribes = _getBribes(_pair);
-        pairInformation.internal_bribes = bribes[1];
-        pairInformation.external_bribes = bribes[0];
+        pairInformation.internal_bribes = bribes[0];
+        pairInformation.external_bribes = bribes[1];
         return pairInformation;
     }
 
