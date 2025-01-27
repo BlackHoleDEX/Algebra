@@ -39,7 +39,9 @@ async function main () {
         // const userTimeStamp = await ExternalBribeContract.userTimestamp(tokenThree, updatedEpochTime);
         
         // console.log("epoch and reward data", activeP, updatedEpochTime, rewradData)
-    }
+        const earnedAmount = await ExternalBribeContract.earned(BigNumber.from("1"), tokenThree);
+        console.log("earnedAmount ", earnedAmount);
+      }
     console.log("getAllGauge", getAllGauge)
 }
 
