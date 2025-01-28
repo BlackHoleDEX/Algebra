@@ -27,15 +27,4 @@ const generateConstantFile = (contract, address) => {
 
 }
 
-async function main () {
-    generateConstantFile("BribeFactoryV3", "627890");
-}
-  
-main()
-    .then(() => process.exit(0))
-    .catch((error) => {
-      console.error(error);
-      process.exit(1);
-});
-
 module.exports = { generateConstantFile };

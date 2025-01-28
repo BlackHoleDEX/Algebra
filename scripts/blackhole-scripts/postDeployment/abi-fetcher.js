@@ -42,15 +42,4 @@ const fetchAbi  = (contract) =>  {
     // console.log("data : ", filePath, abi);
 }
 
-async function main () {
-  await fetchAbi("BribeFactoryV3", "72323")
-}
-
-main()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-});
-
 module.exports = { fetchAbi };
