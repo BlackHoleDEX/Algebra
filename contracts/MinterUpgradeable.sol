@@ -64,7 +64,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
 
 
         active_period = ((block.timestamp + (2 * WEEK)) / WEEK) * WEEK;
-        weekly = 10_000 * 1e18; // represents a starting weekly emission of 2.6M THENA (THENA has 18 decimals)
+        weekly = 10_000 * 1e18; // represents a starting weekly emission of 2.6M BLACK (BLACK has 18 decimals)
         isFirstMint = true;
 
     }
@@ -194,7 +194,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     }
 
     function transfer(address _to, uint _amount) external {
-        _thena.transfer(_to, _amount);
+        _black.transfer(_to, _amount);
     }
 
     function check() external view returns(bool){
