@@ -41,13 +41,6 @@ async function main () {
     txDeployed = await GaugeFactoryV2.deployed();
     console.log("GaugeFactoryV2: ", GaugeFactoryV2.address)
 
-    // GAUGE FACTORY _ CL
-    data = await ethers.getContractFactory("GaugeFactoryV2_CL");
-    input = [PermissionsRegistry.address, '0x993Ae2b514677c7AC52bAeCd8871d2b362A9D693']
-    GaugeFactoryV2_CL = await upgrades.deployProxy(data,input, {initializer: 'initialize'});
-    txDeployed = await GaugeFactoryV2_CL.deployed();
-    console.log("GaugeFactoryV2_CL: ", GaugeFactoryV2_CL.address)
-
 
     // VOTER
     data = await ethers.getContractFactory("VoterV3");
