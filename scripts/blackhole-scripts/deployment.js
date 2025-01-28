@@ -319,9 +319,9 @@ const deployveNFT = async (voterV3Address, rewardsDistributorAddress, blackholeV
     }
 }
 
-const pushDefaultRewardToken = async (bribeFactoryV3Address, thenaAddress) => {
+const pushDefaultRewardToken = async (bribeFactoryV3Address, blackAddress) => {
     const BribeFactoryV3Contract = await ethers.getContractAt(bribeFactoryV3Abi, bribeFactoryV3Address);
-    await BribeFactoryV3Contract.pushDefaultRewardToken(thenaAddress);
+    await BribeFactoryV3Contract.pushDefaultRewardToken(blackAddress);
 }
 
 async function main () {
@@ -405,7 +405,7 @@ async function main () {
     //create Gauges
     await createGauges(voterV3Address, blackholeV2AbiAddress);
 
-    await pushDefaultRewardToken(bribeV3Address, thenaAddress);
+    await pushDefaultRewardToken(bribeV3Address, blackAddress);
 }
 
 main()

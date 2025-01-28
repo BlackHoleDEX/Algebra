@@ -34,9 +34,9 @@ async function main () {
         // console.log("balance ", activeP);
 
 
-        /*  check balance of thena for minterupgradable  */
-        // const ThenaContract = await ethers.getContractAt(thenaAbi, thenaAddress);
-        // const activeP = await ThenaContract.balanceOf("0xcE9F683915B591c19529Bb82bE302ccFfcf69c95");
+        /*  check balance of black for minterupgradable  */
+        // const BlackContract = await ethers.getContractAt(blackAbi, blackAddress);
+        // const activeP = await BlackContract.balanceOf("0xcE9F683915B591c19529Bb82bE302ccFfcf69c95");
         // console.log("balance ", activeP);
 
 
