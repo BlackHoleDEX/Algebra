@@ -23,7 +23,8 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     uint public teamRate;
     uint public constant MAX_TEAM_RATE = 50; // 5%
 
-    uint public constant WEEK = 1800; // allows minting once per week (reset every Thursday 00:00 UTC)
+    //BlackHole:: temperory value need to chage it back to 7 days
+    uint public constant WEEK = 1800; // BlackHole:: temo value allows minting once per week (reset every Thursday 00:00 UTC)
     uint public weekly; // represents a starting weekly emission of 2.6M THENA (THENA has 18 decimals)
     uint public active_period;
     uint public constant LOCK = 86400 * 7 * 52 * 2;
@@ -53,7 +54,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
 
         teamRate = 40; // 300 bps = 3%
 
-        EMISSION = 1000;
+        EMISSION = 990; //BlackHole:: 
         TAIL_EMISSION = 2;
         REBASEMAX = 300;
 
@@ -64,7 +65,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
 
 
         active_period = ((block.timestamp + (2 * WEEK)) / WEEK) * WEEK;
-        weekly = 10_000 * 1e18; // represents a starting weekly emission of 2.6M THENA (THENA has 18 decimals)
+        weekly = 10_000 * 1e18; //BlackHole:: temp value represents a starting weekly emission of 2.6M THENA (THENA has 18 decimals)
         isFirstMint = true;
 
     }
