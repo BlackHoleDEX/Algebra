@@ -11,6 +11,7 @@ import '../interfaces/IPairFactory.sol';
 import '../interfaces/IVoter.sol';
 import '../interfaces/IVotingEscrow.sol';
 import '../interfaces/IRewardsDistributor.sol';
+import './IVoterV3.sol';
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
@@ -41,9 +42,7 @@ interface IPairAPI {
 
         // pairs gauge
         address gauge; 				    // pair gauge address
-        uint gauge_total_supply; 		// pair staked tokens (less/eq than/to pair total supply)
-        address fee; 				    // pair fees contract address
-        address bribe; 				    // pair bribes contract address
+        uint gauge_total_supply;               // pair staked tokens (less/eq than/to pair total supply)
         uint emissions; 			    // pair emissions (per second)
         address emissions_token; 		// pair emissions token address
         uint emissions_token_decimals; 	// pair emissions token decimals
@@ -54,6 +53,30 @@ interface IPairAPI {
         uint account_token1_balance; 	// account 2nd token balance
         uint account_gauge_balance;     // account pair staked in gauge balance
         uint account_gauge_earned; 		// account earned emissions for this pair
+
+        // votes
+        uint votes;
+
+        // fees
+        address feeAddress; 
+        uint token0_fees;      // token 0 fees accumulated till now
+        uint token1_fees;      // token 1 fees accumulated till now
+
+        // bribes
+        Bribes internal_bribes;
+        Bribes external_bribes;
+    }
+
+    struct Bribes {
+        address bribeAddress;
+        address[] tokens;
+        string[] symbols;
+        uint[] decimals;
+        uint[] amounts;
+    }
+
+    struct Rewards {
+        Bribes[] bribes;
     }
 
     function getPair(address _pair, address _account) external view returns(pairInfo memory _pairInfo);
@@ -105,8 +128,10 @@ contract veNFTAPI is Initializable {
    
     uint256 constant public MAX_RESULTS = 1000;
     uint256 constant public MAX_PAIRS = 30;
+    uint256 public constant WEEK = 7 days; 
 
     IVoter public voter;
+    IVoterV3 public voterV3;
     address public underlyingToken;
     
 
@@ -131,6 +156,7 @@ contract veNFTAPI is Initializable {
 
         pairAPI = _pairApi;
         voter = IVoter(_voter);
+        voterV3 = IVoterV3(_voter);
         rewardDisitributor = IRewardsDistributor(_rewarddistro);
 
         require(rewardDisitributor.voting_escrow() == voter._ve(), 've!=ve');
@@ -215,14 +241,15 @@ contract veNFTAPI is Initializable {
         venft.voting_amount = ve.balanceOfNFT(id);
         venft.rebase_amount = rewardDisitributor.claimable(id);
         venft.lockEnd = _lockedBalance.end;
-        venft.vote_ts = voter.lastVoted(id);
+        venft.vote_ts = voterV3.lastVotedTimestamp(id);
         venft.votes = votes;
         venft.token = ve.token();
         venft.tokenSymbol =  IERC20( ve.token() ).symbol();
         venft.tokenDecimals = IERC20( ve.token() ).decimals();
-        venft.voted = ve.voted(id);
+        // venft.voted = ve.voted(id);
         venft.attachments = ve.attachments(id);
-      
+
+        venft.voted = (voterV3.epochTimestamp() < venft.vote_ts) && (venft.vote_ts < voterV3.epochTimestamp() + WEEK);
     }
 
     // used only for sAMM and vAMM    
@@ -257,7 +284,7 @@ contract veNFTAPI is Initializable {
         
         IPairAPI.pairInfo memory _pairApi = IPairAPI(pairAPI).getPair(_pair, address(0));
                
-        address externalBribe = _pairApi.bribe;
+        address externalBribe = _pairApi.external_bribes.bribeAddress;
         
         uint256 totBribeTokens = (externalBribe == address(0)) ? 0 : IBribeAPI(externalBribe).rewardsListLength();
         
@@ -274,8 +301,8 @@ contract veNFTAPI is Initializable {
 
         address t0 = _pairApi.token0;
         address t1 = _pairApi.token1;
-        uint256 _feeToken0 = IBribeAPI(_pairApi.fee).earned(id, t0);
-        uint256 _feeToken1 = IBribeAPI(_pairApi.fee).earned(id, t1);
+        uint256 _feeToken0 = IBribeAPI(_pairApi.internal_bribes.bribeAddress).earned(id, t0);
+        uint256 _feeToken1 = IBribeAPI(_pairApi.internal_bribes.bribeAddress).earned(id, t1);
 
         
 
@@ -287,7 +314,7 @@ contract veNFTAPI is Initializable {
                 token: t0,
                 symbol: IERC20(t0).symbol(),
                 decimals: IERC20(t0).decimals(),
-                fee: _pairApi.fee,
+                fee: _pairApi.internal_bribes.bribeAddress,
                 bribe: address(0)
             });
         }
@@ -301,7 +328,7 @@ contract veNFTAPI is Initializable {
                 token: t1,
                 symbol: IERC20(t1).symbol(),
                 decimals: IERC20(t1).decimals(),
-                fee: _pairApi.fee,
+                fee: _pairApi.internal_bribes.bribeAddress,
                 bribe: address(0)
             });
         }

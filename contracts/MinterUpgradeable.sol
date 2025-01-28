@@ -53,7 +53,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
 
         teamRate = 40; // 300 bps = 3%
 
-        EMISSION = 990;
+        EMISSION = 1000;
         TAIL_EMISSION = 2;
         REBASEMAX = 300;
 
@@ -64,7 +64,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
 
 
         active_period = ((block.timestamp + (2 * WEEK)) / WEEK) * WEEK;
-        weekly = 2_600_000 * 1e18; // represents a starting weekly emission of 2.6M BLACK (BLACK has 18 decimals)
+        weekly = 10_000 * 1e18; // represents a starting weekly emission of 2.6M THENA (THENA has 18 decimals)
         isFirstMint = true;
 
     }
@@ -191,6 +191,10 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
             emit Mint(msg.sender, weekly, circulating_supply(), circulating_emission());
         }
         return _period;
+    }
+
+    function transfer(address _to, uint _amount) external {
+        _thena.transfer(_to, _amount);
     }
 
     function check() external view returns(bool){

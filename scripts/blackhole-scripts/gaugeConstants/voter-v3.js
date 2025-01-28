@@ -423,19 +423,6 @@ const voterV3Abi = [
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "_epochTimestamp",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "address[]",
@@ -743,6 +730,19 @@ const voterV3Abi = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "epochTimestamp",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -1015,6 +1015,25 @@ const voterV3Abi = [
       }
     ],
     "name": "lastVoted",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "lastVotedTimestamp",
     "outputs": [
       {
         "internalType": "uint256",
