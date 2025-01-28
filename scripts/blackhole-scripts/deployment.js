@@ -325,7 +325,6 @@ const pushDefaultRewardToken = async (bribeFactoryV3Address, thenaAddress) => {
 }
 
 async function main () {
-
     accounts = await ethers.getSigners();
     owner = accounts[0];
     const ownerAddress = owner.address;
@@ -410,7 +409,8 @@ async function main () {
 }
 
 main()
-  .then(() => process.exit(0))
+  .then(
+    () => process.exit(0))
   .catch((error) => {
     console.error(error);
     process.exit(1);
