@@ -14,7 +14,7 @@ import '../interfaces/IPairFactory.sol';
 import '../interfaces/IVoter.sol';
 import '../interfaces/IVotingEscrow.sol';
 import '../../contracts/Pair.sol';
-import './IVoterV3.sol';
+import '../interfaces/IVoterV3.sol';
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
