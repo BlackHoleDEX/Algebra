@@ -1,6 +1,6 @@
-const thenaAddress = "0x777e0DaD702c1eA6B2eE9D4f1B6d264909442283";
+const blackAddress = "0x68b8220c62513493777563943037Ea919ba0b24C";
 
-const thenaAbi = [
+const blackAbi = [
     {
       "inputs": [],
       "stateMutability": "nonpayable",
@@ -306,4 +306,4 @@ const thenaAbi = [
     }
   ]
 
-module.exports = { thenaAbi, thenaAddress };
+module.exports = { blackAbi, blackAddress };

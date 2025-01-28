@@ -5,7 +5,7 @@ const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants.js");
 const { blackHolePairApiV2Abi } = require('./pairApiConstants');
 const { voterV3Abi } = require('./gaugeConstants/voter-v3')
 const { minterUpgradableAbi } = require('./gaugeConstants/minter-upgradable')
-const { thenaAbi } = require('./gaugeConstants/thena')
+const { blackAbi } = require('./gaugeConstants/black')
 const { votingEscrowAbi } = require('./gaugeConstants/voting-escrow')
 const { rewardsDistributorAbi, rewardsDistributorAddress } = require('./gaugeConstants/reward-distributor')
 const { addLiquidity } = require('./addLiquidity')
@@ -13,15 +13,15 @@ const { BigNumber } = require("ethers");
 const { pairFactoryAbi, tokenOne, tokenTwo, tokenThree, tokenFour, tokenFive, tokenSix, tokenSeven, tokenEight, tokenNine, tokenTen } = require("../V1/dexAbi");
 const { generateConstantFile } = require('./postDeployment/generator');
 
-const deployThena = async () =>{
+const deployBlack = async () =>{
     try {
-        const thenaContract = await ethers.getContractFactory("Thena");
-        const thenaFactory = await thenaContract.deploy();
-        txDeployed = await thenaFactory.deployed();
-        console.log("thenaFactory address ", thenaFactory.address)
-        return thenaFactory.address;
+        const blackContract = await ethers.getContractFactory("Black");
+        const blackFactory = await blackContract.deploy();
+        txDeployed = await blackFactory.deployed();
+        console.log("blackFactory address ", blackFactory.address)
+        return blackFactory.address;
     } catch (error) {
-        console.log("error in deploying Thena: ", error)
+        console.log("error in deploying Black: ", error)
     }
 }
 
@@ -106,7 +106,7 @@ const setPermissionRegistryRoles = async (permissionRegistryAddress, ownerAddres
 };
 
 
-const deployVotingEscrow = async(thenaAddress) =>{
+const deployVotingEscrow = async(blackAddress) =>{
     try {
         const VeArtProxyUpgradeableContract = await ethers.getContractFactory("VeArtProxyUpgradeable");
         const veArtProxy = await upgrades.deployProxy(VeArtProxyUpgradeableContract,[], {initializer: 'initialize'});
@@ -114,10 +114,10 @@ const deployVotingEscrow = async(thenaAddress) =>{
         console.log("veArtProxy Address: ", veArtProxy.address)
 
         const VotingEscrowContract = await ethers.getContractFactory("VotingEscrow");
-        const veThena = await VotingEscrowContract.deploy(thenaAddress, veArtProxy.address);
-        txDeployed = await veThena.deployed();
-        console.log("veThena Address: ", veThena.address);
-        return veThena.address;
+        const veBlack = await VotingEscrowContract.deploy(blackAddress, veArtProxy.address);
+        txDeployed = await veBlack.deployed();
+        console.log("veBlack Address: ", veBlack.address);
+        return veBlack.address;
     } catch (error) {
         console.log("error in deploying veArtProxy: ", error)
     }
@@ -237,10 +237,10 @@ const setMinterUpgradableInVoterV3 = async(voterV3Address, minterUpgradableAddre
     console.log('set minter in voterV3Contract');
 }
 
-const setMinterInThena = async(minterUpgradableAddress, thenaAddress) => {
-    const thenaContract = await ethers.getContractAt(thenaAbi, thenaAddress);
-    await thenaContract.setMinter(minterUpgradableAddress);
-    console.log('set minter in Thena');
+const setMinterInBlack = async(minterUpgradableAddress, blackAddress) => {
+    const blackContract = await ethers.getContractAt(blackAbi, blackAddress);
+    await blackContract.setMinter(minterUpgradableAddress);
+    console.log('set minter in Black');
 }
 
 const setMinterInRewardDistributer = async(minterUpgradableAddress, rewardsDistributorAddress) => {
@@ -262,7 +262,7 @@ const initializeMinter = async (minterUpgradableAddress) => {
         await initializingTx.wait();
         console.log("Done initializing minter post deployment")
     } catch (error) {
-        console.log("error in initializing thena value ", error)
+        console.log("error in initializing black value ", error)
     }
 }
 
@@ -285,7 +285,7 @@ const deployEpochController = async(voterV3Address, minterUpgradableAddress) =>{
     }
 }
 
-const addThenaToUserAddress = async (minterUpgradableAddress) => {
+const addBlackToUserAddress = async (minterUpgradableAddress) => {
     try {
         const minterContract = await ethers.getContractAt(minterUpgradableAbi, minterUpgradableAddress);
         const amountAdd = BigNumber.from("5000").mul(BigNumber.from("1000000000000000000"));
@@ -319,9 +319,9 @@ const deployveNFT = async (voterV3Address, rewardsDistributorAddress, blackholeV
     }
 }
 
-const pushDefaultRewardToken = async (bribeFactoryV3Address, thenaAddress) => {
+const pushDefaultRewardToken = async (bribeFactoryV3Address, blackAddress) => {
     const BribeFactoryV3Contract = await ethers.getContractAt(bribeFactoryV3Abi, bribeFactoryV3Address);
-    await BribeFactoryV3Contract.pushDefaultRewardToken(thenaAddress);
+    await BribeFactoryV3Contract.pushDefaultRewardToken(blackAddress);
 }
 
 async function main () {
@@ -329,8 +329,8 @@ async function main () {
     owner = accounts[0];
     const ownerAddress = owner.address;
 
-    //deploy Thena
-    const thenaAddress = await deployThena();
+    //deploy Black
+    const blackAddress = await deployBlack();
 
     //deploy pairFactory
     const pairFactoryAddress = await deployPairFactory();
@@ -345,7 +345,7 @@ async function main () {
     const permissionRegistryAddress = await deployPermissionRegistry();
 
     //deploy voting  escrow
-    const votingEscrowAddress = await deployVotingEscrow(thenaAddress);
+    const votingEscrowAddress = await deployVotingEscrow(blackAddress);
 
     //set owner roles in permission registry
     await setPermissionRegistryRoles(permissionRegistryAddress, ownerAddress);
@@ -376,8 +376,8 @@ async function main () {
     //set MinterUpgradable in VoterV3
     await setMinterUpgradableInVoterV3(voterV3Address, minterUpgradableAddress);
 
-    //set minter in thena
-    await setMinterInThena(minterUpgradableAddress, thenaAddress);
+    //set minter in black
+    await setMinterInBlack(minterUpgradableAddress, blackAddress);
 
     // call _initialize
     await initializeMinter(minterUpgradableAddress);
@@ -388,8 +388,8 @@ async function main () {
     // deploy epoch controller here.
     const epochControllerAddress = await deployEpochController(voterV3Address, minterUpgradableAddress);
 
-    //add thena to user Address
-    await addThenaToUserAddress(minterUpgradableAddress);
+    //add black to user Address
+    await addBlackToUserAddress(minterUpgradableAddress);
 
     //deploy veNFT
     await deployveNFT(voterV3Address, rewardsDistributorAddress, blackholeV2AbiAddress);
@@ -405,7 +405,7 @@ async function main () {
     //create Gauges
     await createGauges(voterV3Address, blackholeV2AbiAddress);
 
-    await pushDefaultRewardToken(bribeV3Address, thenaAddress);
+    await pushDefaultRewardToken(bribeV3Address, blackAddress);
 }
 
 main()

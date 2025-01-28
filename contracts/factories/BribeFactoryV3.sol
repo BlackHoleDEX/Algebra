@@ -41,7 +41,7 @@ contract BribeFactoryV3 is OwnableUpgradeable {
         // defaultRewardToken.push(address(0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56));   // $busd
         // defaultRewardToken.push(address(0x55d398326f99059fF775485246999027B3197955));   // $usdt
 
-        // defaultRewardToken.push(address(0x68b8220c62513493777563943037Ea919ba0b24C)); // THENA address
+        defaultRewardToken.push(address(0x68b8220c62513493777563943037Ea919ba0b24C)); // BLACK address
 
         // registry to check accesses
         permissionsRegistry = IPermissionsRegistry(_permissionsRegistry);
@@ -50,7 +50,7 @@ contract BribeFactoryV3 is OwnableUpgradeable {
 
 
     /// @notice create a bribe contract
-    /// @dev    _owner must be thenaTeamMultisig
+    /// @dev    _owner must be blackTeamMultisig
     function createBribe(address _owner,address _token0,address _token1, string memory _type) external returns (address) {
         require(msg.sender == voter || msg.sender == owner(), 'only voter');
 

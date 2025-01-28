@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.8.13;
 
-import "./interfaces/IThena.sol";
+import "./interfaces/IBlack.sol";
 
-contract Thena is IThena {
+contract Black is IBlack {
 
     string public constant name = "BLACKHOLE";
     string public constant symbol = "$BLACK";
