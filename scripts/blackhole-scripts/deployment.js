@@ -27,8 +27,8 @@ const deployBlack = async () =>{
 
 const deployPairFactory = async () => {
     try {
-        const pairFactoryContract = await ethers.getContractFactory("PairFactory");
-        const pairFactory = await pairFactoryContract.deploy();
+        const pairFactoryContract = await ethers.getContractFactory("PairFactoryUpgradeable");
+        const pairFactory = await upgrades.deployProxy(pairFactoryContract,[],{initializer: 'initialize'});
         txDeployed = await pairFactory.deployed();
         console.log("pairFactory: ", pairFactory.address)
         generateConstantFile("PairFactory", pairFactory.address);
