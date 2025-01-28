@@ -31,7 +31,7 @@ const deployPairFactory = async () => {
         const pairFactory = await pairFactoryContract.deploy();
         txDeployed = await pairFactory.deployed();
         console.log("pairFactory: ", pairFactory.address)
-        generateConstantFile(PairFactory, pairFactory.address);
+        generateConstantFile("PairFactory", pairFactory.address);
         return pairFactory.address;
     } catch (error) {
         console.log("error in deploying pairFactory: ", error)
