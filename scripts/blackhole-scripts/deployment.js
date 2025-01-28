@@ -11,6 +11,7 @@ const { rewardsDistributorAbi, rewardsDistributorAddress } = require('./gaugeCon
 const { addLiquidity } = require('./addLiquidity')
 const { BigNumber } = require("ethers");
 const { pairFactoryAbi, tokenOne, tokenTwo, tokenThree, tokenFour, tokenFive, tokenSix, tokenSeven, tokenEight, tokenNine, tokenTen } = require("../V1/dexAbi");
+const { generateConstantFile } = require('./postDeployment/generator');
 
 const deployThena = async () =>{
     try {
@@ -30,6 +31,7 @@ const deployPairFactory = async () => {
         const pairFactory = await pairFactoryContract.deploy();
         txDeployed = await pairFactory.deployed();
         console.log("pairFactory: ", pairFactory.address)
+        generateConstantFile(PairFactory, pairFactory.address);
         return pairFactory.address;
     } catch (error) {
         console.log("error in deploying pairFactory: ", error)
