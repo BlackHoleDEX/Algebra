@@ -10,7 +10,7 @@ const { votingEscrowAbi } = require('./gaugeConstants/voting-escrow')
 const { rewardsDistributorAbi, rewardsDistributorAddress } = require('./gaugeConstants/reward-distributor')
 const { addLiquidity } = require('./addLiquidity')
 const { BigNumber } = require("ethers");
-const { pairFactoryAbi, tokenOne, tokenTwo, tokenThree, tokenFour, tokenFive, tokenSix, tokenSeven, tokenEight, tokenNine, tokenTen } = require("../V1/dexAbi");
+const { pairFactoryAbi, tokenOne, tokenTwo, tokenThree, tokenFour, tokenFive, tokenSix, tokenSeven, tokenEight, tokenNine, tokenTen } = require("./dexAbi");
 const { generateConstantFile } = require('./postDeployment/generator');
 
 const deployBlack = async () =>{

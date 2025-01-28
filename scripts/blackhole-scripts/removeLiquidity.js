@@ -1,6 +1,6 @@
 const { ethers  } = require('hardhat');
 const { pairAbi, tokenAbi, tokenOne, tokenTwo, routerV2Abi, routerV2Address } = require("./dexAbi");
-const {deployedPairs} = require("./../../constants/pairs");
+const {deployedPairs} = require("../../constants/pairs");
 
 async function main(){
     accounts = await ethers.getSigners();

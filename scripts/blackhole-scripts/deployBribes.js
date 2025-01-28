@@ -1,5 +1,5 @@
 const { ethers  } = require('hardhat');
-const { tokenOne, tokenTwo } = require('./dexAbi');
+const { tokenOne, tokenTwo } = require('../V1/dexAbi');
 const { bribeFactoryV3Address, bribeFactoryV3Abi, bribeTypeEnum } = require('./bribesAbi');
 
 async function main () {
