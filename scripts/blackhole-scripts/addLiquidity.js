@@ -3,12 +3,12 @@ const { pairFactoryAbi, routerV2Abi, tokenOne, tokenTwo, tokenAbi, tokenFive, to
 
 
 
-async function addLiquidity(routerV2Address, tokenOne, TokenTwo) {
+async function addLiquidity(routerV2Address, tokenOne, tokenTwo) {
     accounts = await ethers.getSigners();
     owner = accounts[0]
     const selfAddress = "0xa7243fc6FB83b0490eBe957941a339be4Db11c29";
     const tokenA = tokenOne;
-    const tokenB = TokenTwo;
+    const tokenB = tokenTwo;
     const tokenAAmount = 100;
     const tokenBAmount = 98;
     const approvalAmount = Math.max(tokenAAmount, tokenBAmount)

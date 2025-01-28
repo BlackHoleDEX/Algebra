@@ -53,7 +53,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
 
         teamRate = 40; // 300 bps = 3%
 
-        EMISSION = 1000;
+        EMISSION = 990; //BlackHole:: 
         TAIL_EMISSION = 2;
         REBASEMAX = 300;
 

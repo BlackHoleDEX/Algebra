@@ -3348,8 +3348,8 @@ const pairAbi = [
   }
 ];
 
-const pairFactoryAddress = "0x02b14Bc0dF9f899E98080c110851AF15cd5ab571";
-const routerV2Address = "0x54288B8889a99D4fa0134B5dD2ff5E982ed2D806";
+const pairFactoryAddress = "0x230eae94B401fe9AD3fcCe612436e6C28DBAE78D";
+const routerV2Address = "0x2F7D47e7A17bD47DD4739f8E6C603B30e819077C";
 const tokenOne = "0x635a8c9fda481482cd83969709cc9f46114032f7";
 const tokenTwo = "0x30816e127553dd03f0318bfab72ba9f3c452a92a";
 const tokenThree = "0x230819d91ccad0da03c4b32c9cc79a058c293552";

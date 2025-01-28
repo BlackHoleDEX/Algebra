@@ -3,7 +3,7 @@ const { bribeFactoryV3Abi } = require('./gaugeConstants/bribe-factory-v3')
 const { permissionRegistryAbi } = require('./gaugeConstants/permissions-registry')
 const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants.js");
 const { blackHolePairApiV2Abi } = require('./pairApiConstants');
-const { voterV3Abi, voterV3Address } = require('./gaugeConstants/voter-v3')
+const { voterV3Abi } = require('./gaugeConstants/voter-v3')
 const { minterUpgradableAbi } = require('./gaugeConstants/minter-upgradable')
 const { blackAbi } = require('./gaugeConstants/black')
 const { votingEscrowAbi } = require('./gaugeConstants/voting-escrow')
@@ -319,6 +319,11 @@ const deployveNFT = async (voterV3Address, rewardsDistributorAddress, blackholeV
     }
 }
 
+const pushDefaultRewardToken = async (bribeFactoryV3Address, thenaAddress) => {
+    const BribeFactoryV3Contract = await ethers.getContractAt(bribeFactoryV3Abi, bribeFactoryV3Address);
+    await BribeFactoryV3Contract.pushDefaultRewardToken(thenaAddress);
+}
+
 async function main () {
 
     accounts = await ethers.getSigners();
@@ -396,9 +401,12 @@ async function main () {
     //createPairs two by default
     await addLiquidity(routerV2Address, tokenOne, tokenTwo);
     await addLiquidity(routerV2Address, tokenTwo, tokenThree);
+    await addLiquidity(routerV2Address, tokenFour, tokenSeven);
 
     //create Gauges
     await createGauges(voterV3Address, blackholeV2AbiAddress);
+
+    await pushDefaultRewardToken(bribeV3Address, thenaAddress);
 }
 
 main()

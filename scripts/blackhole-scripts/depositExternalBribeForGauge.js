@@ -23,17 +23,19 @@ async function main () {
         const ExternalBribeAddress = await gaugeV2Contract.external_bribe();
         const ExternalBribeContract = await ethers.getContractAt(bribeAbi, ExternalBribeAddress);
 
-        const approvalAmountString = (BigInt(1000000) * BigInt(10 ** 18)).toString();
-        const tokenContract = await ethers.getContractAt(tokenAbi, tokenThree);
-        await tokenContract.approve("0xA0239C5FdC4b2BDE8eaB3DE711Fa2aE5430fC50d", approvalAmountString);
-
         await ExternalBribeContract.addRewardToken(tokenThree);
-        const p = await ExternalBribeContract.isRewardToken(tokenThree);
-        // const x = await tokenContract.balanceOf("0x8ec18CcA7E8d40861dc07C217a6426f60005A661");
-        console.log("p ", p);
-        const bribeAmount = BigNumber.from("20000").mul(BigNumber.from("1000000000000000000"));
 
-        await ExternalBribeContract.notifyRewardAmount(tokenThree, bribeAmount);
+        // const approvalAmountString = (BigInt(1000000) * BigInt(10 ** 18)).toString();
+        // const tokenContract = await ethers.getContractAt(tokenAbi, tokenThree);
+        // await tokenContract.approve("0x523B93f757fA2184B0257aF98247275c7a028155", approvalAmountString);
+
+        
+        // const p = await ExternalBribeContract.isRewardToken(tokenThree);
+        // // const x = await tokenContract.balanceOf("0x8ec18CcA7E8d40861dc07C217a6426f60005A661");
+        // console.log("p ", p);
+        // const bribeAmount = BigNumber.from("25000").mul(BigNumber.from("1000000000000000000"));
+
+        // await ExternalBribeContract.notifyRewardAmount(tokenThree, bribeAmount);
     }
     console.log("getAllGauge", getAllGauge)
 }
