@@ -7,6 +7,7 @@ import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Recei
 import {IERC20} from "./interfaces/IERC20.sol";
 import {IVeArtProxy} from "./interfaces/IVeArtProxy.sol";
 import {IVotingEscrow} from "./interfaces/IVotingEscrow.sol";
+import {IVoterV3} from "./APIHelper/IVoterV3.sol";
 
 /// @title Voting Escrow
 /// @notice veNFT implementation that escrows ERC-20 tokens in the form of an ERC-721 NFT
@@ -803,6 +804,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         require(_locked.end > block.timestamp, 'Cannot add to expired lock. Withdraw');
 
         _deposit_for(_tokenId, _value, 0, _locked, DepositType.INCREASE_LOCK_AMOUNT);
+
+        // poke for the gained voting power 
+        IVoterV3(voter).poke(_tokenId);
     }
 
     /// @notice Extend the unlock time for `_tokenId`
@@ -819,6 +823,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         require(unlock_time <= block.timestamp + MAXTIME, 'Voting lock can be 2 years max');
 
         _deposit_for(_tokenId, 0, unlock_time, _locked, DepositType.INCREASE_UNLOCK_TIME);
+
+        // poke for the updated voting power -- nabeel
+        IVoterV3(voter).poke(_tokenId);
     }
 
     /// @notice Withdraw all tokens for `_tokenId`
