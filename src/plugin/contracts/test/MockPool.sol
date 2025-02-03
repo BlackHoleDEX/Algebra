@@ -71,6 +71,8 @@ contract MockPool is IAlgebraPoolActions, IAlgebraPoolPermissionedActions, IAlge
   mapping(bytes32 => Position) public override positions;
 
   address owner;
+  uint24 public overrideFee;
+  uint24 public pluginFee;
 
   /// @inheritdoc IAlgebraPoolState
   function getCommunityFeePending() external pure override returns (uint128, uint128) {
@@ -172,7 +174,7 @@ contract MockPool is IAlgebraPoolActions, IAlgebraPoolPermissionedActions, IAlge
   function swapToTick(int24 targetTick) external {
     IAlgebraPlugin _plugin = IAlgebraPlugin(plugin);
     if (globalState.pluginConfig & Plugins.BEFORE_SWAP_FLAG != 0) {
-      _plugin.beforeSwap(msg.sender, msg.sender, true, 0, 0, false, '');
+      (, overrideFee, pluginFee) = _plugin.beforeSwap(msg.sender, msg.sender, true, 0, 0, false, '');
     }
 
     globalState.price = TickMath.getSqrtRatioAtTick(targetTick);

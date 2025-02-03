@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat';
 import { MockFactory, MockPool, MockTimeAlgebraBasePluginV1, MockTimeAlgebraBasePluginV2, MockTimeDSFactoryV2, MockTimeDSFactory, BasePluginV1Factory, BasePluginV2Factory } from '../../typechain';
-
+import { AlgebraFeeDiscountPlugin, FeeDiscountPluginFactory, FeeDiscountRegistry } from '../../typechain';
 type Fixture<T> = () => Promise<T>;
 interface MockFactoryFixture {
   mockFactory: MockFactory;
@@ -98,5 +98,41 @@ export const pluginFixtureV2: Fixture<PluginFixture> = async function (): Promis
     mockPluginFactory,
     mockPool,
     mockFactory,
+  };
+};
+
+interface FeeDiscountPluginFixture extends MockFactoryFixture {
+  plugin: AlgebraFeeDiscountPlugin;
+  pluginFactory: FeeDiscountPluginFactory;
+  mockPool: MockPool;
+  registry: FeeDiscountRegistry;
+}
+
+export const feeDiscountPluginFixture: Fixture<FeeDiscountPluginFixture> = async function (): Promise<FeeDiscountPluginFixture> {
+  const { mockFactory } = await mockFactoryFixture();
+  //const { token0, token1, token2 } = await tokensFixture()
+
+  const pluginFactoryFactory = await ethers.getContractFactory('FeeDiscountPluginFactory');
+  const pluginFactory = (await pluginFactoryFactory.deploy(mockFactory)) as any as FeeDiscountPluginFactory;
+
+  const mockPoolFactory = await ethers.getContractFactory('MockPool');
+  const mockPool = (await mockPoolFactory.deploy()) as any as MockPool;
+
+  const registryFactory = await ethers.getContractFactory('FeeDiscountRegistry');
+  const registry = (await registryFactory.deploy(mockFactory)) as any as FeeDiscountRegistry;
+
+  await pluginFactory.setFeeDiscountRegistry(registry)
+  await mockFactory.beforeCreatePoolHook(pluginFactory, mockPool);
+  const pluginAddress = await pluginFactory.pluginByPool(mockPool);
+
+  const pluginContractFactory = await ethers.getContractFactory('AlgebraFeeDiscountPlugin');
+  const plugin = pluginContractFactory.attach(pluginAddress) as any as AlgebraFeeDiscountPlugin;
+
+  return {
+    plugin,
+    pluginFactory,
+    mockPool,
+    registry,
+    mockFactory
   };
 };
