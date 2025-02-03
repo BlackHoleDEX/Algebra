@@ -50,7 +50,7 @@ contract AlgebraFeeDiscountPlugin is DynamicFeePlugin, FarmingProxyPlugin, Volat
     _writeTimepoint();
     uint88 volatilityAverage = _getAverageVolatilityLast();
     uint24 fee = _getCurrentFee(volatilityAverage);
-    fee = _applyFeeDiscount(fee);
+    fee = _applyFeeDiscount(msg.sender, tx.origin, fee);
     return (IAlgebraPlugin.beforeSwap.selector, fee, 0);
   }
 
