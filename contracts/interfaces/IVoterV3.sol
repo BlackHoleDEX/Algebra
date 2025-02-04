@@ -13,5 +13,6 @@ interface IVoterV3 {
     function weightsAt(address _pool, uint _time) external view returns(uint);
     function totalWeight() external view returns(uint);
     function totalWeightAt(uint _time) external view returns(uint);
+    function poke(uint256 _tokenId) external;
     function epochTimestamp() external view returns(uint);
 }
