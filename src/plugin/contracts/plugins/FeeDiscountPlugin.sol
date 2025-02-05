@@ -19,8 +19,8 @@ abstract contract FeeDiscountPlugin is BasePlugin, IFeeDiscountPlugin {
 
   address public override feeDiscountRegistry;
 
-  function _applyFeeDiscount(address pool, address user, uint24 fee) internal returns (uint24 updatedFee) {
-    uint24 feeDiscount = IFeeDiscountRegistry(feeDiscountRegistry).feeDiscounts(pool, user);
+  function _applyFeeDiscount(address user, address pool, uint24 fee) internal returns (uint24 updatedFee) {
+    uint24 feeDiscount = IFeeDiscountRegistry(feeDiscountRegistry).feeDiscounts(user, pool);
     updatedFee = uint24((uint256(fee) * (FEE_DISCOUNT_DENOMINATOR - feeDiscount)) / FEE_DISCOUNT_DENOMINATOR);
   }
 

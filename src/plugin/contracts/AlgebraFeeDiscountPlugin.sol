@@ -9,6 +9,7 @@ import './plugins/DynamicFeePlugin.sol';
 import './plugins/FarmingProxyPlugin.sol';
 import './plugins/FeeDiscountPlugin.sol';
 import './plugins/VolatilityOraclePlugin.sol';
+import 'hardhat/console.sol';
 
 /// @title Algebra Integral 1.2 discount fee plugin
 contract AlgebraFeeDiscountPlugin is DynamicFeePlugin, FarmingProxyPlugin, VolatilityOraclePlugin, FeeDiscountPlugin {
@@ -50,7 +51,7 @@ contract AlgebraFeeDiscountPlugin is DynamicFeePlugin, FarmingProxyPlugin, Volat
     _writeTimepoint();
     uint88 volatilityAverage = _getAverageVolatilityLast();
     uint24 fee = _getCurrentFee(volatilityAverage);
-    fee = _applyFeeDiscount(msg.sender, tx.origin, fee);
+    fee = _applyFeeDiscount(tx.origin, msg.sender, fee);
     return (IAlgebraPlugin.beforeSwap.selector, fee, 0);
   }
 
