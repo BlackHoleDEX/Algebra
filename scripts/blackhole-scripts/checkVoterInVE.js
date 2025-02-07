@@ -1,5 +1,5 @@
 const { ethers } = require("hardhat")
-const { thenaAddress } = require('./gaugeConstants/thena');
+const { blackAddress } = require('./gaugeConstants/black');
 const { VeArtProxyUpgradeableAddress } = require('./gaugeConstants/ve-art-proxy-upgradeable')
 const { voterV3Abi, voterV3Address } = require('./gaugeConstants/voter-v3')
 const { votingEscrowAbi, votingEscrowAddress } = require('./gaugeConstants/voting-escrow')

@@ -22,17 +22,6 @@ async function main () {
     const txApprovalTwo = await tokenTwoContract.approve(routerV2Address, approvalAmountString);
     await txApprovalTwo.wait();
     const routerV2Contract = await ethers.getContractAt(routerV2Abi, routerV2Address);
-    /**
-     *  address tokenA,
-        address tokenB,
-        bool stable,
-        uint amountADesired,
-        uint amountBDesired,
-        uint amountAMin,
-        uint amountBMin,
-        address to,
-        uint deadline
-     */
     const stable = false;
     const amountADesired = (BigInt(tokenAAmount) * BigInt(10 ** 18)).toString();
     const amountBDesired = (BigInt(tokenBAmount) * BigInt(10 ** 18)).toString();
@@ -70,22 +59,7 @@ async function main () {
     });
     console.log('tx', tx)
     const awaitedTx = await tx.wait();
-    console.log("awwaitedTex", awaitedTx);
-
-    // const parameters = {
-    //     tokenIn: usdc.address,
-    //     tokenOut: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
-    //     recipient: impersonator,
-    //     deadline: 1681727850,
-    //     amountIn: ethers.utils.parseEther("0.5"),
-    //     amountOutMinimum: ethers.utils.parseEther("0"),
-    //     limitSqrtPrice: 0
-    // }
-    
-
-    // await algebrarouter.exactInputSingle(parameters)   
-
-
+    console.log("awwaitedTex", awaitedTx);  
 }
 
 main()

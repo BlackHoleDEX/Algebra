@@ -10,10 +10,10 @@ async function main () {
     console.log('Deploying Contract...');
     
     
-    data = await ethers.getContractFactory("Thena");
-    thena = await data.deploy();
-    txDeployed = await thena.deployed();
-    console.log("thena Address: ", thena.address)
+    data = await ethers.getContractFactory("Black");
+    black = await data.deploy();
+    txDeployed = await black.deployed();
+    console.log("black Address: ", black.address)
 
     data = await ethers.getContractFactory("VeArtProxy");
     veArtProxy = await data.deploy();
@@ -21,12 +21,12 @@ async function main () {
     console.log("veArtProxy Address: ", veArtProxy.address)
 
     data = await ethers.getContractFactory("VotingEscrow");
-    veThena = await data.deploy(thena.address, veArtProxy.address);
-    txDeployed = await veThena.deployed();
-    console.log("veThena Address: ", veThena.address)
+    veBlack = await data.deploy(black.address, veArtProxy.address);
+    txDeployed = await veBlack.deployed();
+    console.log("veBlack Address: ", veBlack.address)
 
     data = await ethers.getContractFactory("RewardsDistributor");
-    RewardsDistributor = await data.deploy(veThena.address);
+    RewardsDistributor = await data.deploy(veBlack.address);
     txDeployed = await RewardsDistributor.deployed();
     console.log("RewardsDistributor Address: ", RewardsDistributor.address)
 

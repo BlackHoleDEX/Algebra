@@ -45,7 +45,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     uint256 internal constant DURATION = 7 days;                   // rewards are released over 7 days
     uint256 public VOTE_DELAY;                                     // delay between votes in seconds
     uint256 public constant MAX_VOTE_DELAY = 7 days;               // Max vote delay allowed
-
+    uint public constant EPOCH_DURATION = 1800; //BlackHole:: Current duration need to change 1 week
 
     mapping(address => uint256) internal supplyIndex;              // gauge    => index
     mapping(address => uint256) public claimable;                  // gauge    => claimable $the
@@ -58,7 +58,8 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     mapping(uint256 => address[]) public poolVote;                 // nft      => pools
     mapping(uint256 => mapping(address => uint256)) internal weightsPerEpoch; // timestamp => pool => weights
     mapping(uint256 => uint256) internal totalWeightsPerEpoch;         // timestamp => total weights
-    mapping(uint256 => uint256) public lastVoted;                     // nft      => timestamp of last vote
+    mapping(uint256 => uint256) public lastVoted;                     // nft      => timestamp of last vote (this is shifted to thursday of that epoc)
+    mapping(uint256 => uint256) public lastVotedTimestamp;            // nft      => timestamp of last vote
     mapping(address => bool) public isGauge;                    // gauge    => boolean [is a gauge?]
     mapping(address => bool) public isWhitelisted;              // token    => boolean [is an allowed token?]
     mapping(address => bool) public isAlive;                    // gauge    => boolean [is the gauge alive?]
@@ -313,7 +314,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         isAlive[_gauge] = false;
         claimable[_gauge] = 0;
 
-        uint _time = _epochTimestamp();
+        uint _time = epochTimestamp();
         totalWeightsPerEpoch[_time] -= weightsPerEpoch[_time][poolForGauge[_gauge]]; 
 
 
@@ -344,14 +345,15 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         require(IVotingEscrow(_ve).isApprovedOrOwner(msg.sender, _tokenId), "!approved/Owner");
         _reset(_tokenId);
         IVotingEscrow(_ve).abstain(_tokenId);
-        lastVoted[_tokenId] = _epochTimestamp() + 1;
+        lastVoted[_tokenId] = epochTimestamp() + 1;
+        lastVotedTimestamp[_tokenId] = block.timestamp;
     }
 
     function _reset(uint256 _tokenId) internal {
         address[] storage _poolVote = poolVote[_tokenId];
         uint256 _poolVoteCnt = _poolVote.length;
         uint256 _totalWeight = 0;
-        uint256 _time = _epochTimestamp();
+        uint256 _time = epochTimestamp();
 
         for (uint256 i = 0; i < _poolVoteCnt; i ++) {
             address _pool = _poolVote[i];
@@ -395,7 +397,8 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         }
 
         _vote(_tokenId, _poolVote, _weights);
-        lastVoted[_tokenId] = _epochTimestamp() + 1;
+        lastVoted[_tokenId] = epochTimestamp() + 1;
+        lastVotedTimestamp[_tokenId] = block.timestamp;
     }
 
     
@@ -408,7 +411,8 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         require(IVotingEscrow(_ve).isApprovedOrOwner(msg.sender, _tokenId), "!approved/Owner");
         require(_poolVote.length == _weights.length, "Pool/Weights length !=");
         _vote(_tokenId, _poolVote, _weights);
-        lastVoted[_tokenId] = _epochTimestamp() + 1;
+        lastVoted[_tokenId] = epochTimestamp() + 1;
+        lastVotedTimestamp[_tokenId] = block.timestamp;
     }
     
     function _vote(uint256 _tokenId, address[] memory _poolVote, uint256[] memory _weights) internal {
@@ -418,7 +422,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         uint256 _totalVoteWeight = 0;
         uint256 _totalWeight = 0;
         uint256 _usedWeight = 0;
-        uint256 _time = _epochTimestamp();
+        uint256 _time = epochTimestamp();
 
 
 
@@ -563,7 +567,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
             //isPair = false;
         }
 
-        // gov can create for any pool, even non-Thena pairs
+        // gov can create for any pool, even non-Black pairs
         if (!IPermissionsRegistry(permissionRegistry).hasRole("GOVERNANCE",msg.sender)) { 
             require(isPair, "!_pool");
             require(isWhitelisted[tokenA] && isWhitelisted[tokenB], "!whitelisted");
@@ -571,11 +575,11 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         }
 
         // create internal and external bribe
-        address _owner = IPermissionsRegistry(permissionRegistry).thenaTeamMultisig();
-        string memory _type =  string.concat("Thena LP Fees: ", IERC20(_pool).symbol() );
+        address _owner = IPermissionsRegistry(permissionRegistry).blackTeamMultisig();
+        string memory _type =  string.concat("Black LP Fees: ", IERC20(_pool).symbol() );
         _internal_bribe = IBribeFactory(bribefactory).createBribe(_owner, tokenA, tokenB, _type);
 
-        _type = string.concat("Thena Bribes: ", IERC20(_pool).symbol() );
+        _type = string.concat("Black Bribes: ", IERC20(_pool).symbol() );
         _external_bribe = IBribeFactory(bribefactory).createBribe(_owner, tokenA, tokenB, _type);
 
         // create gauge
@@ -635,7 +639,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     }
 
     function weights(address _pool) public view returns(uint256) {
-        uint256 _time = _epochTimestamp();
+        uint256 _time = epochTimestamp();
         return weightsPerEpoch[_time][_pool];
     }
 
@@ -644,7 +648,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     }
 
     function totalWeight() public view returns(uint256) {
-        uint256 _time = _epochTimestamp();
+        uint256 _time = epochTimestamp();
         return totalWeightsPerEpoch[_time];
     }
 
@@ -652,7 +656,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         return totalWeightsPerEpoch[_time];
     }
 
-    function _epochTimestamp() public view returns(uint256) {
+    function epochTimestamp() public view returns(uint256) {
         return IMinter(minter).active_period();
     }
     /* -----------------------------------------------------------------------------
@@ -671,7 +675,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         IERC20Upgradeable(base).safeTransferFrom(msg.sender, address(this), amount);
 
 
-        uint256 _totalWeight = totalWeightAt(_epochTimestamp() - 1 weeks);   // minter call notify after updates active_period, loads votes - 1 week
+        uint256 _totalWeight = totalWeightAt(epochTimestamp() - EPOCH_DURATION);   // minter call notify after updates active_period, loads votes - 1 week
 
         uint256 _ratio = 0;
 
@@ -684,17 +688,28 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     }
 
 
-    /// @notice distribute the LP Fees to the internal bribes
-    /// @param  _gauges  gauge address where to claim the fees 
-    /// @dev    the gauge is the owner of the LPs so it has to claim
-    function distributeFees(address[] memory _gauges) external {
-        for (uint256 i = 0; i < _gauges.length; i++) {
-            if (isGauge[_gauges[i]] && isAlive[_gauges[i]]){
-                IGauge(_gauges[i]).claimFees();
+    // / @notice distribute the LP Fees to the internal bribes
+    // / @param  _gauges  gauge address where to claim the fees 
+    // / @dev    the gauge is the owner of the LPs so it has to claim
+    
+    // function distributeFees(address[] memory _gauges) external {
+    //     for (uint256 i = 0; i < _gauges.length; i++) {
+    //         if (isGauge[_gauges[i]] && isAlive[_gauges[i]]){
+    //             IGauge(_gauges[i]).claimFees();
+    //         }
+    //     }
+    // }
+
+    function distributeFees() external {
+        uint256 i = 0;
+        uint256 poolsLength = pools.length;
+        for (i; i < poolsLength; i++) {
+            
+            if (isGauge[gauges[pools[i]]] && isAlive[gauges[pools[i]]]){
+                IGauge(gauges[pools[i]]).claimFees();
             }
         }
     }
-
     
     /// @notice Distribute the emission for ALL gauges 
     function distributeAll() external nonReentrant {
@@ -732,7 +747,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     function _distribute(address _gauge) internal {
 
         uint256 lastTimestamp = gaugesDistributionTimestmap[_gauge];
-        uint256 currentTimestamp = _epochTimestamp();
+        uint256 currentTimestamp = epochTimestamp();
         if(lastTimestamp < currentTimestamp){
             _updateForAfterDistribution(_gauge); // should set claimable to 0 if killed
 
@@ -762,7 +777,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     /// @dev    this function track the gauge index to emit the correct $the amount after the distribution
     function _updateForAfterDistribution(address _gauge) private {
         address _pool = poolForGauge[_gauge];
-        uint256 _time = _epochTimestamp() - 604800;
+        uint256 _time = epochTimestamp() - 1800;
         uint256 _supplied = weightsPerEpoch[_time][_pool];
 
         if (_supplied > 0) {

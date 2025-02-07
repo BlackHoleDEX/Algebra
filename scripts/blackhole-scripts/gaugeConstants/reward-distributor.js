@@ -389,6 +389,6 @@ const rewardsDistributorAbi = [
     }
   ]
 
-const rewardsDistributorAddress = "0x620c939019087B906cE7D195A8E4b2FB6A2F4A2b";
+const rewardsDistributorAddress = "0xC87ddD557f64F64f0a3Ae9F3aF0f8ed610cfaA5c";
 
 module.exports = { rewardsDistributorAbi, rewardsDistributorAddress };

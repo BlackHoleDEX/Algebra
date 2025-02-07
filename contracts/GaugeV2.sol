@@ -36,7 +36,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     address public internal_bribe;
     address public external_bribe;
 
-    uint256 public immutable DURATION;
+    uint256 public DURATION;
     uint256 internal _periodFinish;
     uint256 public rewardRate;
     uint256 public lastUpdateTime;
@@ -83,7 +83,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
         VE = _ve;                               // vested
         TOKEN = IERC20(_token);                 // underlying (LP)
         DISTRIBUTION = _distribution;           // distro address (voter)
-        DURATION = 7 days;                      // distro time
+        DURATION = 1800;                      // BlachHole:: temperory value need to chage it back to 7 days
 
         internal_bribe = _internal_bribe;       // lp fees goes here
         external_bribe = _external_bribe;       // bribe fees goes here
@@ -316,6 +316,10 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     --------------------------------------------------------------------------------
     ----------------------------------------------------------------------------- */
 
+    /// BLACKHOLE: need to change duration for testing purpose currently 20 minutes
+    function setRewardDuration(uint256 _duration) external {
+        DURATION = _duration;
+    }
 
     /// @dev Receive rewards from distribution
 
