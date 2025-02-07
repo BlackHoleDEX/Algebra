@@ -1,6 +1,8 @@
-const tokens = require("../../token-constants/deploying-tokens.json");
 const { ethers } = require("hardhat")
 const fs = require("fs");
+
+const jsonPath = path.resolve(__dirname, "../../token-constants/deploying-tokens.json");
+let tokens = require(jsonPath);
 
 async function main() {
     const customTokenContract = await ethers.getContractFactory("CustomToken");
