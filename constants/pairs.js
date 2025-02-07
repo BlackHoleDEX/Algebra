@@ -1,4 +1,4 @@
-import { tokenEight, tokenNine, tokenOne, tokenTen, tokenThree, tokenTwo } from "../scripts/V1/dexAbi";
+import { tokenEight, tokenNine, tokenOne, tokenTen, tokenThree, tokenTwo } from "../scripts/blackhole-scripts/dexAbi";
 
 export const deployedPairs = [
     {

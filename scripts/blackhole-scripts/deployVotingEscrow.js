@@ -1,5 +1,5 @@
   const { ethers } = require("hardhat")
-  const { thenaAddress } = require('./gaugeConstants/thena');
+  const { blackAddress } = require('./gaugeConstants/black');
   const { VeArtProxyUpgradeableAddress } = require('./gaugeConstants/ve-art-proxy-upgradeable')
   const { voterV3Abi, voterV3Address } = require('./gaugeConstants/voter-v3')
   async function main () {
@@ -11,7 +11,7 @@
 
       //deployment of VotingEscrow
       data = await ethers.getContractFactory("VotingEscrow");
-      const votingEscrow = await data.deploy(thenaAddress, VeArtProxyUpgradeableAddress);
+      const votingEscrow = await data.deploy(blackAddress, VeArtProxyUpgradeableAddress);
       txDeployed = await votingEscrow.deployed();
       console.log('votingEscrow ', votingEscrow.address)
       await votingEscrow.setVoter(voterV3Address)

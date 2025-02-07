@@ -1,10 +1,6 @@
 const { ethers } = require("hardhat")
-const { blackHolePairApiV2Abi, blackHolePairApiV2ProxyAddress } = require('./pairApiConstants');
-const { minterUpgradableAddress, minterUpgradableAbi } = require('./gaugeConstants/minter-upgradable');
-const { voterV3Address, voterV3Abi } = require("./gaugeConstants/voter-v3");
-const { votingEscrowAddress, votingEscrowAbi } = require("./gaugeConstants/voting-escrow");
-const { bribeAbi } = require("./gaugeConstants/bribe");
-const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants.js");
+const { minterUpgradableAbi } = require('./gaugeConstants/minter-upgradable');
+const { BigNumber } = require("ethers");
 
 // function _initialize(
 //     address[] memory claimants,
@@ -13,11 +9,12 @@ const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants.js");
 // ) external {
 
 async function main () {
-    const minter = await ethers.getContractAt(minterUpgradableAbi, minterUpgradableAddress);
+    const minter = await ethers.getContractAt(minterUpgradableAbi, "0xE3406768E4bcBF8796B0Fa520d4997b85F81ae45");
+    const mintAmount = BigNumber.from("100000").mul(BigNumber.from("1000000000000000000"));
     const initializingTx = await minter._initialize(
         [],
         [],
-        0
+        mintAmount
     );
     await initializingTx.wait();
     console.log("Done initializing minter post deployment")

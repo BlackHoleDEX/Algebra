@@ -14,7 +14,7 @@ import '../interfaces/IPairFactory.sol';
 import '../interfaces/IVoter.sol';
 import '../interfaces/IVotingEscrow.sol';
 import '../../contracts/Pair.sol';
-import './IVoterV3.sol';
+import '../interfaces/IVoterV3.sol';
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
@@ -56,8 +56,6 @@ contract BlackholePairAPIV2 is Initializable {
         // pairs gauge
         address gauge; 				    // pair gauge address
         uint gauge_total_supply; 		// pair staked tokens (less/eq than/to pair total supply)
-        address internal_bribe_address; // pair fees contract address
-        address external_bribe_address; // pair bribes contract address
         uint emissions; 			    // pair emissions (per second)
         address emissions_token; 		// pair emissions token address
         uint emissions_token_decimals; 	// pair emissions token decimals
@@ -74,12 +72,13 @@ contract BlackholePairAPIV2 is Initializable {
 
         // fees
         address feeAddress; 
-        uint token_current_fees_0;      // token 0 fees accumulated till now
-        uint token_current_fees_1;      // token 1 fees accumulated till now
-        uint token_last_epoch_fees_0;   // token 0 fees from staked of last epoch
-        uint token_last_epoch_fees_1;   // token 1 fees from staked of last epoch
-    }
+        uint token0_fees;      // token 0 fees accumulated till now
+        uint token1_fees;      // token 1 fees accumulated till now
 
+        // bribes
+        Bribes internal_bribes;
+        Bribes external_bribes;
+    }
 
     struct tokenBribe {
         address token;
@@ -94,6 +93,18 @@ contract BlackholePairAPIV2 is Initializable {
         uint256 totalVotes;
         address pair;
         tokenBribe[] bribes;
+    }
+
+    struct Bribes {
+        address bribeAddress;
+        address[] tokens;
+        string[] symbols;
+        uint[] decimals;
+        uint[] amounts;
+    }
+
+    struct Rewards {
+        Bribes[] bribes;
     }
 
     uint256 public constant MAX_PAIRS = 1000;
@@ -129,7 +140,6 @@ contract BlackholePairAPIV2 is Initializable {
         underlyingToken = IVotingEscrow(voter._ve()).token();
 
         algebraFactory = IAlgebraFactory(address(0x306F06C147f064A010530292A1EB6737c3e378e4));
-        
     }
 
     function getClaimable(address _account, address _pair) internal view returns(uint claimable0, uint claimable1){
@@ -175,10 +185,12 @@ contract BlackholePairAPIV2 is Initializable {
         address feeAddress; 
         uint tokenCurrentFees0;     
         uint tokenCurrentFees1; 
+        Bribes[] memory bribes;
+
 
         for(i; i < _offset + _amounts; i++){
             // if totalPairs is reached, break.
-            if(i == totPairs) {
+            if(i >= totPairs) {
                 hasNext = false;
                 break;
             }
@@ -191,15 +203,39 @@ contract BlackholePairAPIV2 is Initializable {
 
             (tokenCurrentFees0, tokenCurrentFees1, feeAddress) = getCurrentFees(_pair, pairs[i - _offset].token0, pairs[i - _offset].token1);
             pairs[i - _offset].feeAddress = feeAddress;
-            pairs[i - _offset].token_current_fees_0 = tokenCurrentFees0;
-            pairs[i - _offset].token_current_fees_1 = tokenCurrentFees1;   
+            pairs[i - _offset].token0_fees = tokenCurrentFees0;
+            pairs[i - _offset].token1_fees = tokenCurrentFees1;  
+
+            bribes = _getBribes(_pair);
+            pairs[i - _offset].internal_bribes = bribes[0];
+            pairs[i - _offset].external_bribes = bribes[1];  
         }
 
 
     }
 
     function getPair(address _pair, address _account) external view returns(pairInfo memory _pairInfo){
-        return _pairAddressToInfo(_pair, _account);
+        pairInfo memory pairInformation =  _pairAddressToInfo(_pair, _account);
+        uint claim0;
+        uint claim1;
+        address feeAddress; 
+        uint tokenCurrentFees0;     
+        uint tokenCurrentFees1; 
+
+        (claim0, claim1) = getClaimable(_account, _pair);
+        pairInformation.claimable0 = claim0;
+        pairInformation.claimable1 = claim1;
+
+        (tokenCurrentFees0, tokenCurrentFees1, feeAddress) = getCurrentFees(_pair, pairInformation.token0, pairInformation.token1);
+        pairInformation.feeAddress = feeAddress;
+        pairInformation.token0_fees = tokenCurrentFees0;
+        pairInformation.token1_fees = tokenCurrentFees1;  
+
+        Bribes[] memory bribes;
+        bribes = _getBribes(_pair);
+        pairInformation.internal_bribes = bribes[0];
+        pairInformation.external_bribes = bribes[1];
+        return pairInformation;
     }
 
     function _pairAddressToInfo(address _pair, address _account) internal view returns(pairInfo memory _pairInfo) {
@@ -271,11 +307,7 @@ contract BlackholePairAPIV2 is Initializable {
         _pairInfo.gauge_total_supply = gaugeTotalSupply;
         _pairInfo.emissions = emissions;
         _pairInfo.emissions_token = underlyingToken;
-        _pairInfo.emissions_token_decimals = IERC20(underlyingToken).decimals();
-        
-        // external address
-        _pairInfo.internal_bribe_address = voter.internal_bribes(address(_gauge)); 				    
-        _pairInfo.external_bribe_address = voter.external_bribes(address(_gauge)); 				    
+        _pairInfo.emissions_token_decimals = IERC20(underlyingToken).decimals();			    
 
         // Account Info
         _pairInfo.account_lp_balance = IERC20(_pair).balanceOf(_account);
@@ -286,6 +318,61 @@ contract BlackholePairAPIV2 is Initializable {
 
         // votes
         _pairInfo.votes = voterV3.weights(_pair);     
+    }
+
+    // read all the bribe available for a pair
+    function _getBribes(address pair) internal view returns(Bribes[] memory){
+
+        address _gaugeAddress;
+        address _bribeAddress;
+
+        Bribes[] memory _tempReward = new Bribes[](2);
+
+        // get external
+        _gaugeAddress = voter.gauges(pair);
+
+        {
+            if(address(_gaugeAddress) != address(0)){
+                
+                _bribeAddress = voter.external_bribes(_gaugeAddress);
+                _tempReward[0] = _getNextEpochRewards(_bribeAddress);
+                
+                // get internal
+                _bribeAddress = voter.internal_bribes(_gaugeAddress);
+                _tempReward[1] = _getNextEpochRewards(_bribeAddress);
+            }
+        }
+
+        return _tempReward;
+            
+    }
+
+    function _getNextEpochRewards(address _bribeAddress) internal view returns(Bribes memory _rewards){
+        uint totTokens = IBribeAPI(_bribeAddress).rewardsListLength();
+        uint[] memory _amounts = new uint[](totTokens);
+        address[] memory _tokens = new address[](totTokens);
+        string[] memory _symbol = new string[](totTokens);
+        uint[] memory _decimals = new uint[](totTokens);
+        uint ts = IBribeAPI(_bribeAddress).getNextEpochStart();
+        uint i = 0;
+        address _token;
+        IBribeAPI.Reward memory _reward;
+
+        for(i; i < totTokens; i++){
+            _token = IBribeAPI(_bribeAddress).rewardTokens(i);
+            _tokens[i] = _token;
+            _symbol[i] = IERC20(_token).symbol();
+            _decimals[i] = IERC20(_token).decimals();
+            _reward = IBribeAPI(_bribeAddress).rewardData(_token, ts);
+            _amounts[i] = _reward.rewardsPerEpoch;
+            
+        }
+
+        _rewards.bribeAddress = _bribeAddress;
+        _rewards.tokens = _tokens;
+        _rewards.amounts = _amounts;
+        _rewards.symbols = _symbol;
+        _rewards.decimals = _decimals;
     }
 
     function getCurrentFees(address _pair, address token_0, address token_1)  internal view returns(uint _tokenFees0, uint _tokenFees1, address _feesAddress) {

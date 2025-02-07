@@ -15,13 +15,13 @@ const minterAddress = ethers.utils.getAddress("0x86069feb223ee303085a1a505892c9d
 const algebraFactoryAddress = ethers.utils.getAddress("0x306F06C147f064A010530292A1EB6737c3e378e4")
 const algebraRouterAddress = ethers.utils.getAddress("0x327Dd3208f0bCF590A66110aCB6e5e6941A4EfA0")
 const usdcusdtPoolV3Address = ethers.utils.getAddress("0x1b9a1120a17617D8eC4dC80B921A9A1C50Caef7d")
-const thenaDeployer = ethers.utils.getAddress("0x993Ae2b514677c7AC52bAeCd8871d2b362A9D693")
+const blackDeployer = ethers.utils.getAddress("0x993Ae2b514677c7AC52bAeCd8871d2b362A9D693")
 
 // users
 const BigHolder = ethers.utils.getAddress("0x8894E0a0c962CB723c1976a4421c95949bE2D4E3") //used to add liquidity and swaps
 
 
-describe("Thena - Deployment Section", function () {
+describe("Black - Deployment Section", function () {
    
     beforeEach(async () => {
         await ethers.provider.send('evm_increaseTime', [5]);
@@ -45,7 +45,7 @@ describe("Thena - Deployment Section", function () {
         PermissionsRegistry = await data.deploy();
         txDeployed = await PermissionsRegistry.deployed();
 
-        expect(await PermissionsRegistry.thenaTeamMultisig()).to.equal(owner.address);
+        expect(await PermissionsRegistry.blackTeamMultisig()).to.equal(owner.address);
 
         await PermissionsRegistry.setRoleFor(owner.address, "GOVERNANCE")
         expect(await PermissionsRegistry.hasRole(await PermissionsRegistry.__helper_stringToBytes("GOVERNANCE"), owner.address)).to.equal(true)

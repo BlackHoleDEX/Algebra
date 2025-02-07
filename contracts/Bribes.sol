@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 contract Bribe is ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    uint256 public constant WEEK = 7 days; // rewards are released over 7 days
+    uint256 public WEEK = 1800; // BlackHole:: temperory value need to changed it back to 7 days
     uint256 public firstBribeTimestamp;
 
     /* ========== STATE VARIABLES ========== */
@@ -118,7 +118,7 @@ contract Bribe is ReentrancyGuard {
     function earned(uint256 tokenId, address _rewardToken) public view returns(uint256){
         uint256 k = 0;
         uint256 reward = 0;
-        uint256 _endTimestamp = IMinter(minter).active_period(); // claim until current epoch
+        uint256 _endTimestamp = IMinter(minter).active_period() + WEEK; // claim until current epoch
         address _owner = IVotingEscrow(ve).ownerOf(tokenId);
         uint256 _userLastTime = userTimestamp[_owner][_rewardToken];
         
@@ -131,7 +131,8 @@ contract Bribe is ReentrancyGuard {
             _userLastTime = firstBribeTimestamp - WEEK;
         }
 
-        for(k; k < 50; k++){
+        //BlackHole:: the 500 value is due to fact the epoch time we kept is 30 minutes
+        for(k; k < 500; k++){
             if(_userLastTime == _endTimestamp){
                 // if we reach the current epoch, exit
                 break;
@@ -326,8 +327,12 @@ contract Bribe is ReentrancyGuard {
         }
     }
 
-    /// @notice Notify a bribe amount
-    /// @dev    Rewards are saved into NEXT EPOCH mapping. 
+    /// BLACKHOLE: need to change duration for testing purpose currently 20 minutes
+    function setRewardDuration(uint256 _duration) external {
+        WEEK = _duration;
+    }
+
+    /// @dev Rewards are saved into NEXT EPOCH mapping. 
     function notifyRewardAmount(address _rewardsToken, uint256 reward) external nonReentrant {
         require(isRewardToken[_rewardsToken], "reward token not verified");
         IERC20(_rewardsToken).safeTransferFrom(msg.sender,address(this),reward);
