@@ -1,0 +1,65 @@
+[
+  {
+    "name": "Quantum Byte",
+    "ticker": "QBT",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens/8453/0xeb6d78148f001f3aa2f588997c5e102e489ad341/logo.svg",
+    "decimal": 18,
+    "address": "0xaD575C3E43e01191085438E48002e5c8C8E6ab86"
+  },
+  {
+    "name": "Solaris Token",
+    "ticker": "SLR",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens/8453/0x833589fcd6edb6e08f4c7c32d4f71b54bda02913/logo.svg",
+    "decimal": 18,
+    "address": "0x204cb8D8E9eBA545B60864eAAf39aCCcCf778f20"
+  },
+  {
+    "name": "EternaX",
+    "ticker": "ETX",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens/8453/0x940181a94a35a4569e4529a3cdfb74e38fd98631/logo.svg",
+    "decimal": 18,
+    "address": "0x25c94831c881f0b5886f7A1EFc7ac7C2A907A62D"
+  },
+  {
+    "name": "LunarFlare",
+    "ticker": "LNF",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens/8453/0x4f9fd6be4a90f2620860d680c0d4d5fb53d1a825/logo.svg",
+    "decimal": 18,
+    "address": "0x3b50aeBd0127C15edA595140d3e93E9DC71fadeF"
+  },
+  {
+    "name": "HyperChain",
+    "ticker": "HPC",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens/8453/0xbc45647ea894030a4e9801ec03479739fa2485f0/logo.svg",
+    "decimal": 18,
+    "address": "0x9c1df469514964E2A8e07d414cA753144Be75d06"
+  },
+  {
+    "name": "Vertex Protocol",
+    "ticker": "VTX",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens/8453/0x2a06a17cbc6d0032cac2c6696da90f29d39a1a29/logo.svg",
+    "decimal": 18,
+    "address": "0x6e8d23A627B3085942109917dB0981Da09105d53"
+  },
+  {
+    "name": "Stellar Forge",
+    "ticker": "SFG",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0xecaf81eb42cd30014eb44130b89bcd6d4ad98b92/logo.svg",
+    "decimal": 18,
+    "address": "0x75A6AD0d7188A8bD8D0A0C08c89CDb9c923B4fbE"
+  },
+  {
+    "name": "AetheriumX",
+    "ticker": "AEX",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens/8453/0xcacf1ca03983ce6c7e235fb20c70acc70ed13509/logo.svg",
+    "decimal": 18,
+    "address": "0xC0Ebdd5775c01057CC68A5780AB7909F69404ccc"
+  },
+  {
+    "name": "Nova Genesis",
+    "ticker": "NVG",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens/8453/0x9d5a383581882750ce27f84c72f017b378edb736/logo.svg",
+    "decimal": 18,
+    "address": "0xF760DeB85c692A00c6e4C99c34c8A324722F6ad9"
+  }
+]

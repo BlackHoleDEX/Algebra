@@ -7,7 +7,7 @@ import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Recei
 import {IERC20} from "./interfaces/IERC20.sol";
 import {IVeArtProxy} from "./interfaces/IVeArtProxy.sol";
 import {IVotingEscrow} from "./interfaces/IVotingEscrow.sol";
-import {IVoterV3} from "./APIHelper/IVoterV3.sol";
+import {IVoterV3} from "./interfaces/IVoterV3.sol";
 
 /// @title Voting Escrow
 /// @notice veNFT implementation that escrows ERC-20 tokens in the form of an ERC-721 NFT
@@ -521,9 +521,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
     mapping(uint => int128) public slope_changes; // time -> signed slope change
     uint public supply;
 
-    uint internal constant WEEK = 1 weeks;
-    uint internal constant MAXTIME = 2 * 365 * 86400;
-    int128 internal constant iMAXTIME = 2 * 365 * 86400;
+    uint internal constant WEEK = 30*60;
+    uint internal constant MAXTIME = 4 * 365 * 86400;
+    int128 internal constant iMAXTIME = 4 * 365 * 86400;
     uint internal constant MULTIPLIER = 1 ether;
 
     /*//////////////////////////////////////////////////////////////

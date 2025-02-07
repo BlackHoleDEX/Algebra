@@ -5,12 +5,13 @@ const path = require('path');
 const dirPath = './generated'
 
 const generateConstantFile = (contract, address) => {
-    const abi = fetchAbi(contract);
-
-    const contractData = 
-    `const ${contract}Address = "${address}";\n\nconst ${contract}Abi = ${JSON.stringify(abi, null, 2)};\n\nmodule.exports = {${contract}Address, ${contract}Abi};`;
 
     try {
+        const abi = fetchAbi(contract);
+
+        const contractCamelCase = contract.charAt(0).toLowerCase() + contract.slice(1);
+        const contractData = 
+        `const ${contractCamelCase}Address = "${address}";\n\nconst ${contractCamelCase}Abi = ${JSON.stringify(abi, null, 2)};\n\nmodule.exports = {${contractCamelCase}Address, ${contractCamelCase}Abi};`;
 
         if (!fs.existsSync(dirPath)) {
             fs.mkdirSync(dirPath, { recursive: true });
