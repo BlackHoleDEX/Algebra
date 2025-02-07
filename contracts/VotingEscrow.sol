@@ -7,7 +7,7 @@ import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Recei
 import {IERC20} from "./interfaces/IERC20.sol";
 import {IVeArtProxy} from "./interfaces/IVeArtProxy.sol";
 import {IVotingEscrow} from "./interfaces/IVotingEscrow.sol";
-import {IVoterV3} from "./APIHelper/IVoterV3.sol";
+import {IVoterV3} from "./interfaces/IVoterV3.sol";
 
 /// @title Voting Escrow
 /// @notice veNFT implementation that escrows ERC-20 tokens in the form of an ERC-721 NFT
@@ -29,6 +29,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
     struct LockedBalance {
         int128 amount;
         uint end;
+        bool isPermanent;
     }
 
     struct Point {
@@ -36,6 +37,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         int128 slope; // # -dweight / dt
         uint ts;
         uint blk; // block
+        uint permanent;
     }
     /* We cannot really do block numbers per se b/c slope is per time, not per block
      * and per block could be fairly bad b/c Ethereum changes blocktimes.
@@ -60,6 +62,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         uint ts
     );
     event Withdraw(address indexed provider, uint tokenId, uint value, uint ts);
+    event LockPermanent(address indexed _owner, uint256 indexed _tokenId, uint256 amount, uint256 _ts);
+    event UnlockPermanent(address indexed _owner, uint256 indexed _tokenId, uint256 amount, uint256 _ts);
     event Supply(uint prevSupply, uint supply);
 
     /*//////////////////////////////////////////////////////////////
@@ -286,7 +290,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
     ) internal {
         require(attachments[_tokenId] == 0 && !voted[_tokenId], "attached");
         // Check requirements
-        require(_isApprovedOrOwner(_sender, _tokenId));
+        require(_isApprovedOrOwner(_sender, _tokenId), "caller is not owner nor approved");
         // Clear approval. Throws if `_from` is not the current owner
         _clearApproval(_from, _tokenId);
         // Remove NFT. Throws if `_tokenId` is not a valid NFT
@@ -517,6 +521,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
     mapping(uint => uint) public user_point_epoch;
     mapping(uint => Point[1000000000]) public user_point_history; // user -> Point[user_epoch]
     mapping(uint => LockedBalance) public locked;
+    uint public permanentLockBalance;
     uint public epoch;
     mapping(uint => int128) public slope_changes; // time -> signed slope change
     uint public supply;
@@ -569,6 +574,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         uint _epoch = epoch;
 
         if (_tokenId != 0) {
+            u_new.permanent = new_locked.isPermanent ? uint(int256(new_locked.amount)) : 0;
             // Calculate slopes and biases
             // Kept at zero when they have to
             if (old_locked.end > block.timestamp && old_locked.amount > 0) {
@@ -593,7 +599,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
             }
         }
 
-        Point memory last_point = Point({bias: 0, slope: 0, ts: block.timestamp, blk: block.number});
+        Point memory last_point = Point({bias: 0, slope: 0, ts: block.timestamp, blk: block.number, permanent: 0});
         if (_epoch > 0) {
             last_point = point_history[_epoch];
         }
@@ -659,6 +665,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
             if (last_point.bias < 0) {
                 last_point.bias = 0;
             }
+            lastPoint.permanent = permanentLockBalance;
         }
 
         // Record the changed point into history
@@ -712,11 +719,16 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
 
         supply = supply_before + _value;
         LockedBalance memory old_locked;
-        (old_locked.amount, old_locked.end) = (_locked.amount, _locked.end);
+        (old_locked.amount, old_locked.end, old_locked.isPermanent) = (_locked.amount, _locked.end, _locked.isPermanent);
         // Adding to existing lock, or if a lock is expired - creating a new one
         _locked.amount += int128(int256(_value));
-        if (unlock_time != 0) {
-            _locked.end = unlock_time;
+        
+        if (old_locked.isPermanent) {
+            permanentLockBalance += _value;
+        } else {    
+            if (unlock_time != 0) {
+                _locked.end = unlock_time;
+            }
         }
         locked[_tokenId] = _locked;
 
@@ -795,14 +807,15 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
     /// @notice Deposit `_value` additional tokens for `_tokenId` without modifying the unlock time
     /// @param _value Amount of tokens to deposit and add to the lock
     function increase_amount(uint _tokenId, uint _value) external nonreentrant {
-        assert(_isApprovedOrOwner(msg.sender, _tokenId));
+        assert(_isApprovedOrOwner(msg.sender, _tokenId), "caller is not owner nor approved");
 
         LockedBalance memory _locked = locked[_tokenId];
 
         assert(_value > 0); // dev: need non-zero value
         require(_locked.amount > 0, 'No existing lock found');
-        require(_locked.end > block.timestamp, 'Cannot add to expired lock. Withdraw');
-
+        require(_locked.end > block.timestamp || _locked.isPermanent, 'Cannot add to expired lock. Withdraw');
+        
+        if (_locked.isPermanent) permanentLockBalance += _value;
         _deposit_for(_tokenId, _value, 0, _locked, DepositType.INCREASE_LOCK_AMOUNT);
 
         // poke for the gained voting power 
@@ -812,7 +825,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
     /// @notice Extend the unlock time for `_tokenId`
     /// @param _lock_duration New number of seconds until tokens unlock
     function increase_unlock_time(uint _tokenId, uint _lock_duration) external nonreentrant {
-        assert(_isApprovedOrOwner(msg.sender, _tokenId));
+        assert(_isApprovedOrOwner(msg.sender, _tokenId), "caller is not owner nor approved");
 
         LockedBalance memory _locked = locked[_tokenId];
         uint unlock_time = (block.timestamp + _lock_duration) / WEEK * WEEK; // Locktime is rounded down to weeks
@@ -831,7 +844,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
     /// @notice Withdraw all tokens for `_tokenId`
     /// @dev Only possible if the lock has expired
     function withdraw(uint _tokenId) external nonreentrant {
-        assert(_isApprovedOrOwner(msg.sender, _tokenId));
+        assert(_isApprovedOrOwner(msg.sender, _tokenId), "caller is not owner nor approved");
         require(attachments[_tokenId] == 0 && !voted[_tokenId], "attached");
 
         LockedBalance memory _locked = locked[_tokenId];
@@ -855,6 +868,46 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         emit Withdraw(msg.sender, _tokenId, value, block.timestamp);
         emit Supply(supply_before, supply_before - value);
     }
+
+    function lockPermanent(uint _tokenId) external {
+        address sender = msg.sender;
+        require(_isApprovedOrOwner(sender, _tokenId), "caller is not owner nor approved");
+        
+        LockedBalance memory _newLocked = locked[_tokenId];
+        require(!_newLocked.isPermanent, "already permanent locked");
+        require(_newLocked.end > block.timestamp, "lock expired");
+        require(_newLocked.amount > 0, "no lock found");
+
+        uint _amount = uint(int256(_newLocked.amount));
+        permanentLockBalance += _amount;
+        _newLocked.end = 0;
+        _newLocked.isPermanent = true;
+        _checkpoint(_tokenId, locked[_tokenId], _newLocked);
+        locked[_tokenId] = _newLocked;
+
+        emit LockPermanent(sender, _tokenId, _amount, block.timestamp);
+    }
+
+    /// @inheritdoc IVotingEscrow
+    function unlockPermanent(uint _tokenId) external {
+        address sender = msg.sender;
+        require(_isApprovedOrOwner(msg.sender, _tokenId), "caller is not owner nor approved");
+
+        require(attachments[_tokenId] == 0 && !voted[_tokenId], "attached");
+        LockedBalance memory _newLocked = locked[_tokenId];
+        require(_newLocked.isPermanent, "not permanent locked");
+
+        uint _amount = uint(int256(_newLocked.amount));
+        permanentLockBalance -= _amount;
+        _newLocked.end = ((block.timestamp + MAXTIME) / WEEK) * WEEK;
+        _newLocked.isPermanent = false;
+        //_delegate(_tokenId, 0);
+        _checkpoint(_tokenId, locked[_tokenId], _newLocked);
+        locked[_tokenId] = _newLocked;
+
+        emit UnlockPermanent(sender, _tokenId, _amount, block.timestamp);
+    }
+
 
     /*///////////////////////////////////////////////////////////////
                            GAUGE VOTING STORAGE
@@ -898,11 +951,15 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
             return 0;
         } else {
             Point memory last_point = user_point_history[_tokenId][_epoch];
-            last_point.bias -= last_point.slope * int128(int256(_t) - int256(last_point.ts));
-            if (last_point.bias < 0) {
-                last_point.bias = 0;
+            if (lastPoint.permanent != 0) {
+                return lastPoint.permanent;
+            } else {
+                last_point.bias -= last_point.slope * int128(int256(_t) - int256(last_point.ts));
+                if (last_point.bias < 0) {
+                    last_point.bias = 0;
+                }
+                return uint(int256(last_point.bias));
             }
-            return uint(int256(last_point.bias));
         }
     }
 
@@ -1022,7 +1079,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         if (last_point.bias < 0) {
             last_point.bias = 0;
         }
-        return uint(uint128(last_point.bias));
+        return uint(uint128(last_point.bias)) + last_point.permanent;
     }
 
     function totalSupply() external view returns (uint) {
@@ -1073,16 +1130,20 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
     function merge(uint _from, uint _to) external {
         require(attachments[_from] == 0 && !voted[_from], "attached");
         require(_from != _to);
-        require(_isApprovedOrOwner(msg.sender, _from));
-        require(_isApprovedOrOwner(msg.sender, _to));
+        require(_isApprovedOrOwner(msg.sender, _from), "caller is not owner nor approved");
+        require(_isApprovedOrOwner(msg.sender, _to), "caller is not owner nor approved");
 
         LockedBalance memory _locked0 = locked[_from];
         LockedBalance memory _locked1 = locked[_to];
+        
+        require(!_locked0.isPermanent,"permanent locked");
+
+
         uint value0 = uint(int256(_locked0.amount));
         uint end = _locked0.end >= _locked1.end ? _locked0.end : _locked1.end;
 
-        locked[_from] = LockedBalance(0, 0);
-        _checkpoint(_from, _locked0, LockedBalance(0, 0));
+        locked[_from] = LockedBalance(0, 0, false);
+        _checkpoint(_from, _locked0, LockedBalance(0, 0, false));
         _burn(_from);
         _deposit_for(_to, value0, end, _locked1, DepositType.MERGE_TYPE);
     }
@@ -1097,7 +1158,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         
         // check permission and vote
         require(attachments[_tokenId] == 0 && !voted[_tokenId], "attached");
-        require(_isApprovedOrOwner(msg.sender, _tokenId));
+        require(_isApprovedOrOwner(msg.sender, _tokenId), "caller is not owner nor approved");
 
         // save old data and totalWeight
         address _to = idToOwner[_tokenId];

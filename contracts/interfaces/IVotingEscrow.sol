@@ -8,11 +8,13 @@ interface IVotingEscrow {
         int128 slope; // # -dweight / dt
         uint256 ts;
         uint256 blk; // block
+        uint256 permanent;
     }
 
     struct LockedBalance {
         int128 amount;
         uint end;
+        bool isPermanent;
     }
 
     function create_lock_for(uint _value, uint _lock_duration, address _to) external returns (uint);
@@ -25,6 +27,7 @@ interface IVotingEscrow {
     function epoch() external view returns (uint);
     function point_history(uint loc) external view returns (Point memory);
     function user_point_history(uint tokenId, uint loc) external view returns (Point memory);
+    function permanentLockBalance() external view returns (uint256);
     function user_point_epoch(uint tokenId) external view returns (uint);
 
     function ownerOf(uint) external view returns (address);
@@ -48,4 +51,9 @@ interface IVotingEscrow {
 
 
     function decimals() external view returns(uint8);
+
+
+    function lockPermanent(uint256 _tokenId) external;
+
+    function unlockPermanent(uint256 _tokenId) external;
 }
