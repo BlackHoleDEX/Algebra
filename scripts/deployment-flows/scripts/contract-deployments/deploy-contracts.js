@@ -1,18 +1,28 @@
 const { ethers } = require("hardhat")
-const { bribeFactoryV3Abi } = require('./gaugeConstants/bribe-factory-v3')
-const { permissionRegistryAbi } = require('./gaugeConstants/permissions-registry')
+const { bribeFactoryV3Abi } = require('../../../blackhole-scripts/gaugeConstants/bribe-factory-v3')
+const { permissionRegistryAbi } = require('../../../blackhole-scripts/gaugeConstants/permissions-registry')
 const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants.js");
-const { blackHolePairApiV2Abi } = require('./pairApiConstants');
-const { voterV3Abi } = require('./gaugeConstants/voter-v3')
-const { minterUpgradableAbi } = require('./gaugeConstants/minter-upgradable')
-const { blackAbi } = require('./gaugeConstants/black')
-const { votingEscrowAbi } = require('./gaugeConstants/voting-escrow')
-const { rewardsDistributorAbi, rewardsDistributorAddress } = require('./gaugeConstants/reward-distributor')
-const { addLiquidity } = require('./addLiquidity')
+const { blackHolePairApiV2Abi } = require('../../../blackhole-scripts/pairApiConstants');
+const { voterV3Abi } = require('../../../blackhole-scripts/gaugeConstants/voter-v3')
+const { minterUpgradableAbi } = require('../../../blackhole-scripts/gaugeConstants/minter-upgradable')
+const { blackAbi } = require('../../../blackhole-scripts/gaugeConstants/black')
+const { votingEscrowAbi } = require('../../../blackhole-scripts/gaugeConstants/voting-escrow')
+const { rewardsDistributorAbi } = require('../../../blackhole-scripts/gaugeConstants/reward-distributor')
+const { addLiquidity } = require('../../../blackhole-scripts/addLiquidity')
 const { BigNumber } = require("ethers");
-const { pairFactoryAbi, tokenOne, tokenTwo, tokenThree, tokenFour, tokenFive, tokenSix, tokenSeven, tokenEight, tokenNine, tokenTen } = require("./dexAbi");
-const { generateConstantFile } = require('./postDeployment/generator');
-const tokens = require("../../token-constants/deployed-tokens.json")
+const { pairFactoryAbi } = require("../../../blackhole-scripts/dexAbi");
+const { generateConstantFile } = require('../../../blackhole-scripts/postDeployment/generator');
+const fs = require('fs');
+const path = require('path');
+
+// Load the JSON file
+const jsonFilePath = path.join(__dirname, '../../token-constants/deploying-tokens.json'); // Adjust the path
+const jsonData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8'));
+// Extract addresses
+const addresses = jsonData.map(obj => obj.address);
+const deployedTokens = require('../../token-constants/deployed-tokens.json');
+const blackAddress = deployedTokens[0].address;
+console.log("Extracted Addresses: ", addresses);
 
 const deployPairFactory = async () => {
     try {
@@ -120,7 +130,7 @@ const deployVoterV3AndSetInit = async (votingEscrowAddress, permissionRegistryAd
         const VoterV3 = await upgrades.deployProxy(voterV3ContractFactory, inputs, {initializer: 'initialize'});
         const txDeployed = await VoterV3.deployed();
         console.log('VoterV3 address: ', VoterV3.address)
-        const listOfTokens = [tokenOne, tokenTwo, tokenThree, tokenFour, tokenFive, tokenSix, tokenSeven, tokenEight, tokenNine, tokenTen];
+        const listOfTokens = addresses;
         const initializeVoter = await VoterV3._init(listOfTokens, permissionRegistryAddress, ownerAddress)
         return VoterV3.address;
     } catch (error) {
@@ -318,7 +328,6 @@ async function main () {
     owner = accounts[0];
     const ownerAddress = owner.address;
 
-    const blackAddress = tokens[0].address;
     console.log("Black token address is: ", blackAddress);
 
     //deploy pairFactory
@@ -387,9 +396,9 @@ async function main () {
     await setVoterV3InVotingEscrow(voterV3Address, votingEscrowAddress);
 
     //createPairs two by default
-    await addLiquidity(routerV2Address, tokenOne, tokenTwo);
-    await addLiquidity(routerV2Address, tokenTwo, tokenThree);
-    await addLiquidity(routerV2Address, tokenFour, tokenSeven);
+    await addLiquidity(routerV2Address, addresses[0], addresses[1]);
+    await addLiquidity(routerV2Address, addresses[1], addresses[2]);
+    await addLiquidity(routerV2Address, addresses[2], addresses[3]);
 
     //create Gauges
     await createGauges(voterV3Address, blackholeV2AbiAddress);

@@ -1,16 +1,16 @@
 [
-    {
-        "name": "Blachole",
-        "ticker": "$BLACK",
-        "logo": "need to be uploaded to github or ipfs",
-        "decimal": 18,
-        "address": ""
-    },
-    {
-        "name": "USDC",
-        "ticker": "USDC",
-        "logo": "needs to be fetched from someplace",
-        "decimal": 6,
-        "address": "0x036CbD53842c5426634e7929541eC2318f3dCF7e"
-    }
+  {
+    "name": "Blachole",
+    "ticker": "$BLACK",
+    "logo": "need to be uploaded to github or ipfs",
+    "decimal": 18,
+    "address": "0x05019f7F5D5825acEfE277B5E68Ab45f266FcE9C"
+  },
+  {
+    "name": "USDC",
+    "ticker": "USDC",
+    "logo": "needs to be fetched from someplace",
+    "decimal": 6,
+    "address": "0x036CbD53842c5426634e7929541eC2318f3dCF7e"
+  }
 ]
