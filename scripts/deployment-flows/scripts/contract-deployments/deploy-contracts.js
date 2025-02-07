@@ -45,6 +45,7 @@ const deployRouterV2 = async(pairFactoryAddress) => {
         const routerV2 = await routerV2Contract.deploy(pairFactoryAddress, wETH);
         txDeployed = await routerV2.deployed();
         console.log("routerV2 address: ", routerV2.address)
+        generateConstantFile("RouterV2", routerV2.address);
         return routerV2.address;
     } catch (error) {
         console.log("error in deploying routerV2: ", error)
@@ -69,6 +70,7 @@ const deployPermissionRegistry = async() =>{
         const permissionsRegistry = await permissionRegistryContract.deploy();
         const txDeployed = await permissionsRegistry.deployed();
         console.log("permissionsRegistry: ", permissionsRegistry.address)
+        generateConstantFile("PermissionsRegistry", permissionsRegistry.address);
         return permissionsRegistry.address;
     } catch (error) {
         console.log("error in deploying permissionRegistry: ", error)
@@ -82,6 +84,7 @@ const deployBloackholeV2Abi = async(voterV3Address)=>{
         const blackHolePairAPIV2Factory = await upgrades.deployProxy(blackholePairAbiV2Contract, input, {initializer: 'initialize'});
         txDeployed = await blackHolePairAPIV2Factory.deployed();
         console.log('BlackHolePairAPIV2Factory : ', blackHolePairAPIV2Factory.address)
+        generateConstantFile("BlackholePairAPIV2", blackHolePairAPIV2Factory.address);
         return blackHolePairAPIV2Factory.address;
     } catch (error) {
         console.log("error in deploying deployBloackholeV2Abi: ", error)
@@ -111,11 +114,13 @@ const deployVotingEscrow = async(blackAddress) =>{
         const veArtProxy = await upgrades.deployProxy(VeArtProxyUpgradeableContract,[], {initializer: 'initialize'});
         txDeployed = await veArtProxy.deployed();
         console.log("veArtProxy Address: ", veArtProxy.address)
+        generateConstantFile("VeArtProxyUpgradeable", veArtProxy.address);
 
         const VotingEscrowContract = await ethers.getContractFactory("VotingEscrow");
         const veBlack = await VotingEscrowContract.deploy(blackAddress, veArtProxy.address);
         txDeployed = await veBlack.deployed();
         console.log("veBlack Address: ", veBlack.address);
+        generateConstantFile("VotingEscrow", veBlack.address);
         return veBlack.address;
     } catch (error) {
         console.log("error in deploying veArtProxy: ", error)
@@ -132,6 +137,7 @@ const deployVoterV3AndSetInit = async (votingEscrowAddress, permissionRegistryAd
         console.log('VoterV3 address: ', VoterV3.address)
         const listOfTokens = [...addresses, blackAddress];
         const initializeVoter = await VoterV3._init(listOfTokens, permissionRegistryAddress, ownerAddress)
+        generateConstantFile("VoterV3", VoterV3.address);
         return VoterV3.address;
     } catch (error) {
         console.log("error in deploying voterV3: ", error);
@@ -155,6 +161,7 @@ const deployRewardsDistributor = async(votingEscrowAddress) => {
         const rewardsDistributor = await rewardsDistributorContractFactory.deploy(votingEscrowAddress);
         const txDeployed = await rewardsDistributor.deployed();
         console.log('RewardsDistributor address: ', rewardsDistributor.address)
+        generateConstantFile("RewardsDistributor", rewardsDistributor.address);
         return rewardsDistributor.address;
     } catch (error) {
         console.log("error in deploying rewardsDiastributer: ", error);
@@ -169,6 +176,7 @@ const deployMinterUpgradeable = async(votingEscrowAddress, voterV3Address, rewar
         const minterUpgradeable = await upgrades.deployProxy(minterUpgradableContractFactory, inputs, {initializer: 'initialize'});
         const txDeployed = await minterUpgradeable.deployed();
         console.log('minterUpgradeable address: ', minterUpgradeable.address)
+        generateConstantFile("MinterUpgradeable", minterUpgradeable.address);
         return minterUpgradeable.address;
     } catch (error) {
         console.log("error in deploying minterUpgradeable: ", error);
@@ -198,7 +206,6 @@ const createGauges = async(voterV3Address, blackholeV2AbiAddress) => {
             const createGaugeTx = await voterV3Contract.createGauge(currentAddress, BigInt(0), {
                 gasLimit: 21000000
             });
-            console.log('createdgaugetx', createGaugeTx);
         }
     }
     console.log('done creation of gauge tx')
@@ -211,6 +218,7 @@ const deployBribeV3Factory = async (permissionRegistryAddress) => {
         const BribeFactoryV3 = await upgrades.deployProxy(bribeContractFactory, input, {initializer: 'initialize'});
         const txDeployed = await BribeFactoryV3.deployed();
         console.log('deployed bribefactory v3: ', BribeFactoryV3.address)
+        generateConstantFile("BribeFactoryV3", BribeFactoryV3.address);
         return BribeFactoryV3.address;
     } catch (error) {
         console.log("error in deploying bribeV3: ", error);
@@ -223,7 +231,8 @@ const deployGaugeV2Factory = async (permissionRegistryAddress) => {
         const input = [permissionRegistryAddress]
         const GaugeFactoryV2 = await upgrades.deployProxy(gaugeContractFactory, input, {initializer: 'initialize'});
         const txDeployed = await GaugeFactoryV2.deployed();
-        console.log('deployed GaugeFactoryV2: ', GaugeFactoryV2.address)
+        console.log('deployed GaugeFactoryV2: ', GaugeFactoryV2.address);
+        generateConstantFile("GaugeFactoryV2", GaugeFactoryV2.address);
         return GaugeFactoryV2.address
     } catch (error) {
         console.log("error in deploying gaugeV2: ", error)
@@ -270,7 +279,9 @@ const deployEpochController = async(voterV3Address, minterUpgradableAddress) =>{
         data = await ethers.getContractFactory("EpochController");
         const EpochController = await upgrades.deployProxy(data, [], {initializer: 'initialize'});
         txDeployed = await EpochController.deployed();
+        generateConstantFile("EpochController", EpochController.address);
         console.log('deployed EpochController: ', EpochController.address);
+
         await EpochController.setVoter(voterV3Address);
         console.log('Voter set in EpochController');
         await EpochController.setMinter(minterUpgradableAddress);
@@ -312,6 +323,8 @@ const deployveNFT = async (voterV3Address, rewardsDistributorAddress, blackholeV
         input = [voterV3Address, rewardsDistributorAddress, blackholeV2AbiAddress] // 
         veNFTAPI = await upgrades.deployProxy(data, input, {initializer: 'initialize'});
         txDeployed = await veNFTAPI.deployed();
+
+        generateConstantFile("veNFTAPI", veNFTAPI.address);
         console.log('deployed venftapi address: ', veNFTAPI.address)
     } catch (error) {
         console.log('deployed venftapi error ', veNFTAPI.address)

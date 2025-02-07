@@ -1,6 +1,6 @@
-const BribeFactoryV3Address = "627890";
+const bribeFactoryV3Address = "0xf8358600B33b9EC6981522A55481312802e256C7";
 
-const BribeFactoryV3Abi = [
+const bribeFactoryV3Abi = [
   {
     "inputs": [],
     "stateMutability": "nonpayable",
@@ -407,4 +407,4 @@ const BribeFactoryV3Abi = [
   }
 ];
 
-module.exports = {BribeFactoryV3Address, BribeFactoryV3Abi};
+module.exports = {bribeFactoryV3Address, bribeFactoryV3Abi};

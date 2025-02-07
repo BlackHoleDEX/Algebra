@@ -1,6 +1,6 @@
-const PairFactoryAddress = "0x1Ba57094c6cceE6FE4828e8957A67B36AD16320D";
+const pairFactoryAddress = "0xD77918a5DE296fcCD593E11D901eCfc15f271CC1";
 
-const PairFactoryAbi = [
+const pairFactoryAbi = [
   {
     "inputs": [],
     "stateMutability": "nonpayable",
@@ -501,4 +501,4 @@ const PairFactoryAbi = [
   }
 ];
 
-module.exports = {PairFactoryAddress, PairFactoryAbi};
+module.exports = {pairFactoryAddress, pairFactoryAbi};
