@@ -2,8 +2,8 @@ const fs = require("fs");
 const path = require("path");
 const { ethers } = require("hardhat");
 
-const jsonPath = path.resolve(__dirname, "../../token-constants/deployed-tokens.json");
-
+const deployedTokensPath = path.resolve(__dirname, "../../token-constants/deployed-tokens.json");
+const deployedTokens = require(deployedTokensPath);
 const deployBlack = async () => {
     try {
         const blackContract = await ethers.getContractFactory("Black");
@@ -28,18 +28,13 @@ async function main() {
         process.exit(1);
     }
 
-    // Read the existing JSON file
-    let deployedTokens = {};
-    if (fs.existsSync(jsonPath)) {
-        const fileData = fs.readFileSync(jsonPath, "utf8");
-        deployedTokens = JSON.parse(fileData);
-    }
-
     // Update or add the Black token address
     deployedTokens[0].address = blackAddress;
 
+    console.log("deployedTokens" , deployedTokensPath, JSON.stringify(deployedTokens, null, 2));
+
     // Write the updated JSON back to the file
-    fs.writeFileSync(jsonPath, JSON.stringify(deployedTokens, null, 2));
+    fs.writeFileSync(deployedTokensPath, JSON.stringify(deployedTokens, null, 2));
 
     console.log("Updated deployed-tokens.json with Black token address!");
 }

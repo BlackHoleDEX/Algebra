@@ -130,7 +130,7 @@ const deployVoterV3AndSetInit = async (votingEscrowAddress, permissionRegistryAd
         const VoterV3 = await upgrades.deployProxy(voterV3ContractFactory, inputs, {initializer: 'initialize'});
         const txDeployed = await VoterV3.deployed();
         console.log('VoterV3 address: ', VoterV3.address)
-        const listOfTokens = addresses;
+        const listOfTokens = [...addresses, blackAddress];
         const initializeVoter = await VoterV3._init(listOfTokens, permissionRegistryAddress, ownerAddress)
         return VoterV3.address;
     } catch (error) {
