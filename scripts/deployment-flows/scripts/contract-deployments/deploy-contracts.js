@@ -1,16 +1,17 @@
 const { ethers } = require("hardhat")
-const { bribeFactoryV3Abi } = require('../../../blackhole-scripts/gaugeConstants/bribe-factory-v3')
-const { permissionRegistryAbi } = require('../../../blackhole-scripts/gaugeConstants/permissions-registry')
+const { bribeFactoryV3Abi } = require('../../../../generated/bribe-factory-v3')
+const { permissionsRegistryAbi } = require('../../../../generated/permissions-registry')
 const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants.js");
-const { blackHolePairApiV2Abi } = require('../../../blackhole-scripts/pairApiConstants');
-const { voterV3Abi } = require('../../../blackhole-scripts/gaugeConstants/voter-v3')
-const { minterUpgradableAbi } = require('../../../blackhole-scripts/gaugeConstants/minter-upgradable')
+const { blackholePairAPIV2Abi } = require('../../../../generated/blackhole-pair-apiv2');
+const { voterV3Abi } = require('../../../../generated/voter-v3');
+const { minterUpgradeableAbi } = require('../../../../generated/minter-upgradeable');
 const { blackAbi } = require('../../../blackhole-scripts/gaugeConstants/black')
-const { votingEscrowAbi } = require('../../../blackhole-scripts/gaugeConstants/voting-escrow')
-const { rewardsDistributorAbi } = require('../../../blackhole-scripts/gaugeConstants/reward-distributor')
+const { votingEscrowAbi } = require('../../../../generated/voting-escrow');
+const { rewardsDistributorAbi } = require('../../../../generated/rewards-distributor');
 const { addLiquidity } = require('../../../blackhole-scripts/addLiquidity')
 const { BigNumber } = require("ethers");
-const { pairFactoryAbi } = require("../../../blackhole-scripts/dexAbi");
+const { pairFactoryAbi } = require('../../../../generated/pair-factory');
+
 const { generateConstantFile } = require('../../../blackhole-scripts/postDeployment/generator');
 const fs = require('fs');
 const path = require('path');
@@ -92,7 +93,7 @@ const deployBloackholeV2Abi = async(voterV3Address)=>{
 }
 
 const setPermissionRegistryRoles = async (permissionRegistryAddress, ownerAddress) => {
-    const permissionRegistryContract = await ethers.getContractAt(permissionRegistryAbi, permissionRegistryAddress);
+    const permissionRegistryContract = await ethers.getContractAt(permissionsRegistryAbi, permissionRegistryAddress);
     const permissionRegistryRolesInStringFormat = await permissionRegistryContract.rolesToString();
 
     for (const element of permissionRegistryRolesInStringFormat) {
@@ -186,7 +187,7 @@ const deployMinterUpgradeable = async(votingEscrowAddress, voterV3Address, rewar
 const createGauges = async(voterV3Address, blackholeV2AbiAddress) => {
 
     // creating gauge for pair bwn - token one and token two - basic volatile pool
-    const blackHoleAllPairContract =  await ethers.getContractAt(blackHolePairApiV2Abi, blackholeV2AbiAddress);
+    const blackHoleAllPairContract =  await ethers.getContractAt(blackholePairAPIV2Abi, blackholeV2AbiAddress);
     console.log("blackHoleAllPairContract fetched");
     const allPairs = await blackHoleAllPairContract.getAllPair(owner.address, BigInt(100), BigInt(0));
     console.log("All pairs fetched");
@@ -206,6 +207,7 @@ const createGauges = async(voterV3Address, blackholeV2AbiAddress) => {
             const createGaugeTx = await voterV3Contract.createGauge(currentAddress, BigInt(0), {
                 gasLimit: 21000000
             });
+
         }
     }
     console.log('done creation of gauge tx')
@@ -259,7 +261,7 @@ const setMinterInRewardDistributer = async(minterUpgradableAddress, rewardsDistr
 
 const initializeMinter = async (minterUpgradableAddress) => {
     try {
-        const minterContract = await ethers.getContractAt(minterUpgradableAbi, minterUpgradableAddress);
+        const minterContract = await ethers.getContractAt(minterUpgradeableAbi, minterUpgradableAddress);
         const mintAmount = BigNumber.from("100000").mul(BigNumber.from("1000000000000000000"));
         console.log("mintAmount ", mintAmount)
         const initializingTx = await minterContract._initialize(
@@ -297,7 +299,7 @@ const deployEpochController = async(voterV3Address, minterUpgradableAddress) =>{
 
 const addBlackToUserAddress = async (minterUpgradableAddress) => {
     try {
-        const minterContract = await ethers.getContractAt(minterUpgradableAbi, minterUpgradableAddress);
+        const minterContract = await ethers.getContractAt(minterUpgradeableAbi, minterUpgradableAddress);
         const amountAdd = BigNumber.from("5000").mul(BigNumber.from("1000000000000000000"));
         await minterContract.transfer("0xa7243fc6FB83b0490eBe957941a339be4Db11c29", amountAdd);
         console.log("transfer token successfully");
