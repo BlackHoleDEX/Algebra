@@ -415,10 +415,10 @@ async function main () {
     await addLiquidity(routerV2Address, addresses[1], addresses[2]);
     await addLiquidity(routerV2Address, addresses[2], addresses[3]);
 
+    await pushDefaultRewardToken(bribeV3Address, blackAddress);
+
     //create Gauges
     await createGauges(voterV3Address, blackholeV2AbiAddress);
-
-    await pushDefaultRewardToken(bribeV3Address, blackAddress);
 }
 
 main()
