@@ -753,7 +753,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
 
     /// @notice Record global data to checkpoint
     function checkpoint() external {
-        _checkpoint(0, LockedBalance(0, 0), LockedBalance(0, 0));
+        _checkpoint(0, LockedBalance(0, 0, false), LockedBalance(0, 0, false));
     }
 
     /// @notice Deposit `_value` tokens for `_tokenId` and add to the lock
@@ -851,14 +851,14 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         require(block.timestamp >= _locked.end, "The lock didn't expire");
         uint value = uint(int256(_locked.amount));
 
-        locked[_tokenId] = LockedBalance(0,0);
+        locked[_tokenId] = LockedBalance(0, 0, false);
         uint supply_before = supply;
         supply = supply_before - value;
 
         // old_locked can have either expired <= timestamp or zero end
         // _locked has only 0 end
         // Both can have >= 0 amount
-        _checkpoint(_tokenId, _locked, LockedBalance(0,0));
+        _checkpoint(_tokenId, _locked, LockedBalance(0, 0, false));
 
         assert(IERC20(token).transfer(msg.sender, value));
 
@@ -1177,8 +1177,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         }
 
         // remove old data
-        locked[_tokenId] = LockedBalance(0, 0);
-        _checkpoint(_tokenId, _locked, LockedBalance(0, 0));
+        locked[_tokenId] = LockedBalance(0, 0, false);
+        _checkpoint(_tokenId, _locked, LockedBalance(0, 0, false));
         _burn(_tokenId);
 
         // save end
