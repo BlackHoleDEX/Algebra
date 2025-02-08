@@ -558,6 +558,10 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         return locked[_tokenId].end;
     }
 
+    function locked(uint256 _tokenId) external view returns (LockedBalance memory) {
+        return locked[_tokenId];
+    }
+
     /// @notice Record global and per-user data to checkpoint
     /// @param _tokenId NFT token ID. No user checkpoint if 0
     /// @param old_locked Pevious locked amount / end lock time for the user
