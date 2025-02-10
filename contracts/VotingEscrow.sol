@@ -542,8 +542,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
     uint public supply;
 
     uint internal constant WEEK = 1 weeks;
-    uint internal constant MAXTIME = 2 * 365 * 86400;
-    int128 internal constant iMAXTIME = 2 * 365 * 86400;
+    uint internal constant MAXTIME = 4 * 365 * 86400;
+    int128 internal constant iMAXTIME = 4 * 365 * 86400;
     uint internal constant MULTIPLIER = 1 ether;
 
     /*//////////////////////////////////////////////////////////////

@@ -24,7 +24,7 @@ contract SimpleAirdrop {
 
     address[] public users;
 
-    uint256 public constant MAX_PERIOD = 86400 * 365 * 2;
+    uint256 public constant MAX_PERIOD = 86400 * 365 * 4;
     uint256 public amountPerUser;
 
     modifier onlyOwner {
