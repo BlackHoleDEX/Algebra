@@ -73,6 +73,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
     );
     
     event MetadataUpdate(uint256 _tokenId);
+    event BatchMetadataUpdate(uint256 _fromTokenId, uint256 _toTokenId);
+
     event Withdraw(address indexed provider, uint tokenId, uint value, uint ts);
     event LockPermanent(address indexed _owner, uint256 indexed _tokenId, uint256 amount, uint256 _ts);
     event UnlockPermanent(address indexed _owner, uint256 indexed _tokenId, uint256 amount, uint256 _ts);
@@ -157,6 +159,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
     function setArtProxy(address _proxy) external {
         require(msg.sender == team);
         artProxy = _proxy;
+        emit BatchMetadataUpdate(0, type(uint256).max);
     }
 
     /// @dev Returns current token URI metadata
@@ -847,7 +850,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
 
     /// @notice Extend the unlock time for `_tokenId`
     /// @param _lock_duration New number of seconds until tokens unlock
-    function increase_unlock_time(uint _tokenId, uint _lock_duration) external nonreentrant {
+    function increase_unlock_time(uint _tokenId, uint _lock_duration, bool isSMNFT) external nonreentrant {
         assert(_isApprovedOrOwner(msg.sender, _tokenId));
 
         LockedBalance memory _locked = locked[_tokenId];
@@ -860,10 +863,16 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         require(unlock_time > _locked.end, 'Can only increase lock duration');
         require(unlock_time <= block.timestamp + MAXTIME, 'Voting lock can be 2 years max');
 
+        if(isSMNFT) {
+            _locked.isPermanent = true;
+            _locked.isSMNFT = true;
+        }
+
         _deposit_for(_tokenId, 0, unlock_time, _locked, DepositType.INCREASE_UNLOCK_TIME);
 
         // poke for the updated voting power -- nabeel
         IVoterV3(voter).poke(_tokenId);
+        emit MetadataUpdate(_tokenId);
     }
 
     /// @notice Withdraw all tokens for `_tokenId`
