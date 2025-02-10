@@ -71,9 +71,8 @@ contract BlackholePairAPIV2 is Initializable {
         uint votes;
 
         // fees
-        address feeAddress; 
-        uint token0_fees;      // token 0 fees accumulated till now
-        uint token1_fees;      // token 1 fees accumulated till now
+        uint staked_token0_fees;      // staked token 0 fees accumulated till now
+        uint staked_token1_fees;      // staked token 1 fees accumulated till now
 
         // bribes
         Bribes internal_bribes;
@@ -144,6 +143,10 @@ contract BlackholePairAPIV2 is Initializable {
 
     function getClaimable(address _account, address _pair) internal view returns(uint claimable0, uint claimable1){
 
+        if(address(_account) == address(0)){
+            return (0,0);
+        }
+        
         Pair pair = Pair(_pair);
 
         uint _supplied = pair.balanceOf(_account); // get LP balance of `_user`
@@ -182,11 +185,9 @@ contract BlackholePairAPIV2 is Initializable {
         address _pair;
         uint claim0;
         uint claim1;
-        address feeAddress; 
-        uint tokenCurrentFees0;     
-        uint tokenCurrentFees1; 
+        uint stakedToken0Fees;     
+        uint stakedToken1Fees; 
         Bribes[] memory bribes;
-
 
         for(i; i < _offset + _amounts; i++){
             // if totalPairs is reached, break.
@@ -201,10 +202,9 @@ contract BlackholePairAPIV2 is Initializable {
             pairs[i - _offset].claimable0 = claim0;
             pairs[i - _offset].claimable1 = claim1;
 
-            (tokenCurrentFees0, tokenCurrentFees1, feeAddress) = getCurrentFees(_pair, pairs[i - _offset].token0, pairs[i - _offset].token1);
-            pairs[i - _offset].feeAddress = feeAddress;
-            pairs[i - _offset].token0_fees = tokenCurrentFees0;
-            pairs[i - _offset].token1_fees = tokenCurrentFees1;  
+            (stakedToken0Fees, stakedToken1Fees) = getClaimable(pairs[i - _offset].gauge, _pair);
+            pairs[i - _offset].staked_token0_fees = stakedToken0Fees;
+            pairs[i - _offset].staked_token1_fees = stakedToken1Fees;  
 
             bribes = _getBribes(_pair);
             pairs[i - _offset].internal_bribes = bribes[0];
@@ -218,18 +218,16 @@ contract BlackholePairAPIV2 is Initializable {
         pairInfo memory pairInformation =  _pairAddressToInfo(_pair, _account);
         uint claim0;
         uint claim1;
-        address feeAddress; 
-        uint tokenCurrentFees0;     
-        uint tokenCurrentFees1; 
+        uint stakedToken0Fees;     
+        uint stakedToken1Fees; 
 
         (claim0, claim1) = getClaimable(_account, _pair);
         pairInformation.claimable0 = claim0;
         pairInformation.claimable1 = claim1;
 
-        (tokenCurrentFees0, tokenCurrentFees1, feeAddress) = getCurrentFees(_pair, pairInformation.token0, pairInformation.token1);
-        pairInformation.feeAddress = feeAddress;
-        pairInformation.token0_fees = tokenCurrentFees0;
-        pairInformation.token1_fees = tokenCurrentFees1;  
+        (stakedToken0Fees, stakedToken1Fees) = getClaimable(pairInformation.gauge, _pair);
+        pairInformation.staked_token0_fees = stakedToken0Fees;
+        pairInformation.staked_token1_fees = stakedToken1Fees;  
 
         Bribes[] memory bribes;
         bribes = _getBribes(_pair);

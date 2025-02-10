@@ -58,9 +58,8 @@ interface IPairAPI {
         uint votes;
 
         // fees
-        address feeAddress; 
-        uint token0_fees;      // token 0 fees accumulated till now
-        uint token1_fees;      // token 1 fees accumulated till now
+        uint staked_token0_fees;      // staked token 0 fees accumulated till now
+        uint staked_token1_fees;      // staked token 1 fees accumulated till now
 
         // bribes
         Bribes internal_bribes;

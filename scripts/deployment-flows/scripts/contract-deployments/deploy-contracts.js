@@ -323,13 +323,13 @@ const deployveNFT = async (voterV3Address, rewardsDistributorAddress, blackholeV
     try {
         data = await ethers.getContractFactory("veNFTAPI");
         input = [voterV3Address, rewardsDistributorAddress, blackholeV2AbiAddress] // 
-        veNFTAPI = await upgrades.deployProxy(data, input, {initializer: 'initialize'});
+        const veNFTAPI = await upgrades.deployProxy(data, input, {initializer: 'initialize', gasLimit:210000000});
         txDeployed = await veNFTAPI.deployed();
 
         generateConstantFile("veNFTAPI", veNFTAPI.address);
         console.log('deployed venftapi address: ', veNFTAPI.address)
     } catch (error) {
-        console.log('deployed venftapi error ', veNFTAPI.address)
+        console.log('deployed venftapi error ', error)
     }
 }
 
@@ -375,7 +375,7 @@ async function main () {
     //setVoter in bribe factory
     await setVoterBribeV3(voterV3Address, bribeV3Address);
 
-    //blackholeV2Abi deployment
+    // blackholeV2Abi deployment
     const blackholeV2AbiAddress = await deployBloackholeV2Abi(voterV3Address);
 
     //deploy rewardsDistributor
