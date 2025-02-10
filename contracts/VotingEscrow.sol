@@ -913,8 +913,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         require(_isApprovedOrOwner(sender, _tokenId), "caller is not owner nor approved");
         
         LockedBalance memory _newLocked = locked[_tokenId];
-        require(!_newLocked.isPermanent, "already permanent locked");
         require(!_newLocked.isSMNFT, "cant change permanent lock for SM NFT");
+        require(!_newLocked.isPermanent, "already permanent locked");
         require(_newLocked.end > block.timestamp, "lock expired");
         require(_newLocked.amount > 0, "no lock found");
 
@@ -935,8 +935,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
 
         require(attachments[_tokenId] == 0 && !voted[_tokenId], "attached");
         LockedBalance memory _newLocked = locked[_tokenId];
-        require(_newLocked.isPermanent, "not permanent locked");
         require(!_newLocked.isSMNFT, "cant change permanent lock for SM NFT");
+        require(_newLocked.isPermanent, "not permanent locked");
         uint _amount = uint(int256(_newLocked.amount));
         permanentLockBalance -= _amount;
         _newLocked.end = ((block.timestamp + MAXTIME) / WEEK) * WEEK;
@@ -1177,9 +1177,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         LockedBalance memory _locked0 = locked[_from];
         LockedBalance memory _locked1 = locked[_to];
         require(_locked1.end > block.timestamp ||  _locked1.isPermanent,"lock expired");
-        require(!_locked0.isPermanent,"permanent locked");
         require(!_locked0.isSMNFT,"supper massive NFT");
-
+        require(!_locked0.isPermanent,"permanent locked");
+        
         uint value0 = uint(int256(_locked0.amount));
         uint end = _locked0.end >= _locked1.end ? _locked0.end : _locked1.end;
 
