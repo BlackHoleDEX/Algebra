@@ -1176,23 +1176,20 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         _checkpoint(_from, _locked0, LockedBalance(0, 0, false, false));
 
         LockedBalance memory newLockedTo;
+        newLockedTo.isPermanent = _locked1.isPermanent;
+        newLockedTo.isSMNFT = _locked1.isSMNFT;
         
-        if(_locked1.isSMNFT) {
+        if(newLockedTo.isSMNFT) {
+            assert(IERC20(token).burnFrom(address(this), value0));
             newLockedTo.amount = _locked1.amount + ((110*_locked0.amount)/100);
         } else {
             newLockedTo.amount = _locked1.amount + _locked0.amount;
         }
         
-        newLockedTo.isPermanent = _locked1.isPermanent;
-        newLockedTo.isSMNFT = _locked1.isSMNFT;
         if (newLockedTo.isPermanent) {
             permanentLockBalance += value0;
         } else {
             newLockedTo.end = end;
-        }
-
-        if(newLockedTo.isSMNFT) {
-            assert(IERC20(token).burnFrom(address(this), value0));
         }
 
         //_checkpointDelegatee(_delegates[_to], value0, true);
