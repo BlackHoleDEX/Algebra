@@ -4,7 +4,7 @@ const { permissionsRegistryAbi } = require('../../../../generated/permissions-re
 const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants.js");
 const { blackholePairAPIV2Abi } = require('../../../../generated/blackhole-pair-apiv2');
 const { voterV3Abi } = require('../../../../generated/voter-v3');
-const { minterUpgradeableAbi } = require('../../../../generated/minter-upgradeable');
+const { minterUpgradeableAbi, minterUpgradeableAddress } = require('../../../../generated/minter-upgradeable');
 const { blackAbi } = require('../../../blackhole-scripts/gaugeConstants/black')
 const { votingEscrowAbi } = require('../../../../generated/voting-escrow');
 const { rewardsDistributorAbi } = require('../../../../generated/rewards-distributor');
@@ -338,6 +338,11 @@ const pushDefaultRewardToken = async (bribeFactoryV3Address, blackAddress) => {
     await BribeFactoryV3Contract.pushDefaultRewardToken(blackAddress);
 }
 
+const logActivePeriod = async () => {
+    const minter = await ethers.getContractAt(minterUpgradeableAbi, minterUpgradeableAddress);
+    console.log("active period rgt now  is : ", await minter.active_period());
+}
+
 async function main () {
     accounts = await ethers.getSigners();
     owner = accounts[0];
@@ -392,8 +397,14 @@ async function main () {
     //set minter in black
     await setMinterInBlack(minterUpgradableAddress, blackAddress);
 
+    // console.log("BEFORE INITIALIZING MINTER: ")
+    // await logActivePeriod();
+
     // call _initialize
     await initializeMinter(minterUpgradableAddress);
+
+    // console.log("AFTER INITIALIZING MINTER: ")
+    // await logActivePeriod();
 
     //set minter in reward distributer in depositer
     await setMinterInRewardDistributer(minterUpgradableAddress, rewardsDistributorAddress); //set as depositor
