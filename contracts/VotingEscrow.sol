@@ -21,9 +21,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         DEPOSIT_FOR_TYPE,
         CREATE_LOCK_TYPE,
         INCREASE_LOCK_AMOUNT,
-        INCREASE_UNLOCK_TIME,
-        MERGE_TYPE,
-        SPLIT_TYPE
+        INCREASE_UNLOCK_TIME
     }
 
     struct LockedBalance {
@@ -749,8 +747,12 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         _checkpoint(_tokenId, old_locked, _locked);
 
         address from = msg.sender;
-        if (_value != 0 && deposit_type != DepositType.MERGE_TYPE && deposit_type != DepositType.SPLIT_TYPE ) {
-            assert(IERC20(token).transferFrom(from, address(this), _value));
+        if (_value != 0) {
+            if(old_locked.isSMNFT) {
+                assert(IERC20(token).burnFrom(from, _value));
+            } else {
+                assert(IERC20(token).transferFrom(from, address(this), _value));
+            }
         }
 
         emit Deposit(from, _tokenId, _value, _locked.end, deposit_type, block.timestamp);
@@ -845,6 +847,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         assert(_isApprovedOrOwner(msg.sender, _tokenId));
 
         LockedBalance memory _locked = locked[_tokenId];
+        require(!_locked.isSMNFT, "super massive nft");
         require(!_locked.isPermanent, "permanent locked");
         uint unlock_time = (block.timestamp + _lock_duration) / WEEK * WEEK; // Locktime is rounded down to weeks
 
@@ -866,6 +869,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         require(attachments[_tokenId] == 0 && !voted[_tokenId], "attached");
 
         LockedBalance memory _locked = locked[_tokenId];
+        require(!_locked.isSMNFT, "super massive nft");
         require(!_locked.isPermanent, "permanent locked");
         require(block.timestamp >= _locked.end, "The lock didn't expire");
         uint value = uint(int256(_locked.amount));
@@ -1158,7 +1162,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         LockedBalance memory _locked1 = locked[_to];
         require(_locked1.end > block.timestamp ||  _locked1.isPermanent,"lock expired");
         require(!_locked0.isPermanent,"permanent locked");
-
+        require(!_locked0.isSMNFT,"supper massive NFT");
 
         uint value0 = uint(int256(_locked0.amount));
         uint end = _locked0.end >= _locked1.end ? _locked0.end : _locked1.end;
@@ -1176,6 +1180,11 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         } else {
             newLockedTo.end = end;
         }
+
+        if(newLockedTo.isSMNFT) {
+            assert(IERC20(token).burnFrom(address(this), value0));
+        }
+
         //_checkpointDelegatee(_delegates[_to], value0, true);
         _checkpoint(_to, _locked1, newLockedTo);
         locked[_to] = newLockedTo;
