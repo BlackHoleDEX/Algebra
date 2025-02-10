@@ -10,10 +10,7 @@ interface IERC20 {
     function transferFrom(address sender, address recipient, uint amount) external returns (bool);
     function allowance(address owner, address spender) external view returns (uint);
     function approve(address spender, uint value) external returns (bool);
-    
-    function burn(uint256 value) external returns (bool);
-    function burnFrom(address, uint) external returns (bool);
-    
+
     event Transfer(address indexed from, address indexed to, uint value);
     event Approval(address indexed owner, address indexed spender, uint value);
 }

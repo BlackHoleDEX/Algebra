@@ -15,7 +15,7 @@ contract Black is IBlack {
 
     bool public initialMinted;
     address public minter;
-    
+
     event Transfer(address indexed from, address indexed to, uint value);
     event Approval(address indexed owner, address indexed spender, uint value);
 
@@ -29,6 +29,7 @@ contract Black is IBlack {
         require(msg.sender == minter);
         minter = _minter;
     }
+
 
     // Initial mint: total 50M    
     function initialMint(address _recipient) external {
@@ -49,15 +50,6 @@ contract Black is IBlack {
             balanceOf[_to] += _amount;
         }
         emit Transfer(address(0x0), _to, _amount);
-        return true;
-    }
-
-    function _burn(address _from, uint _amount) internal returns (bool) {
-        totalSupply -= _amount;
-        unchecked {
-            balanceOf[_from] -= _amount;
-        }
-        emit Transfer(_from, address(0x0), _amount);
         return true;
     }
 
@@ -85,20 +77,6 @@ contract Black is IBlack {
     function mint(address account, uint amount) external returns (bool) {
         require(msg.sender == minter, 'not allowed');
         _mint(account, amount);
-        return true;
-    }
-
-    function burn(uint256 value) external returns (bool) {
-        _burn(msg.sender, value);
-        return true;
-    }
-
-    function burnFrom(address _from, uint _value) external returns (bool) {
-        uint allowed_from = allowance[_from][msg.sender];
-        if (allowed_from != type(uint).max) {
-            allowance[_from][msg.sender] -= _value;
-        }
-        _burn(_from, _value);
         return true;
     }
 

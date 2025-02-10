@@ -537,6 +537,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
     mapping(uint => Point[1000000000]) public user_point_history; // user -> Point[user_epoch]
     mapping(uint => LockedBalance) public locked;
     uint public permanentLockBalance;
+    uint public smNFTBalance;
     uint public epoch;
     mapping(uint => int128) public slope_changes; // time -> signed slope change
     uint public supply;
@@ -680,7 +681,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
             if (last_point.bias < 0) {
                 last_point.bias = 0;
             }
-            last_point.permanent = permanentLockBalance;
+            last_point.permanent = permanentLockBalance + smNFTBalance;
         }
 
         // Record the changed point into history
@@ -755,11 +756,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
 
         address from = msg.sender;
         if (_value != 0) {
-            if(old_locked.isSMNFT) {
-                assert(IERC20(token).burnFrom(from, _value));
-            } else {
-                assert(IERC20(token).transferFrom(from, address(this), _value));
-            }
+            assert(IERC20(token).transferFrom(from, address(this), _value));
         }
 
         emit Deposit(from, _tokenId, _value, _locked.end, deposit_type, block.timestamp);
@@ -841,7 +838,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         require(_locked.amount > 0, 'No existing lock found');
         require(_locked.end > block.timestamp || _locked.isPermanent, 'Cannot add to expired lock. Withdraw');
         
-        if (_locked.isPermanent) permanentLockBalance += _value;
+        if (_locked.isSMNFT) smNFTBalance += _value;
+        else if (_locked.isPermanent) permanentLockBalance += _value;
         _deposit_for(_tokenId, _value, 0, _locked, DepositType.INCREASE_LOCK_AMOUNT);
 
         // poke for the gained voting power 
@@ -868,7 +866,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
             _locked.isPermanent = true;
             _locked.isSMNFT = true;
             uint _amount = uint(int256(_locked.amount));
-            permanentLockBalance += _amount;
+            smNFTBalance += _amount;
             _locked.end = 0;
             unlock_time=0;
         }
@@ -1194,14 +1192,16 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         newLockedTo.isSMNFT = _locked1.isSMNFT;
         
         if(newLockedTo.isSMNFT) {
-            assert(IERC20(token).burn(value0));
             newLockedTo.amount = _locked1.amount + ((110*_locked0.amount)/100);
+            smNFTBalance += value0;
         } else {
             newLockedTo.amount = _locked1.amount + _locked0.amount;
         }
         
         if (newLockedTo.isPermanent) {
-            permanentLockBalance += value0;
+            if(!newLockedTo.isSMNFT) {
+                permanentLockBalance += value0;
+            }
         } else {
             newLockedTo.end = end;
         }
