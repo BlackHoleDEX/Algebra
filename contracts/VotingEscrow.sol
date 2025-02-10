@@ -30,6 +30,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         int128 amount;
         uint end;
         bool isPermanent;
+        bool isSMNFT;
     }
 
     struct Point {
@@ -61,6 +62,19 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         DepositType deposit_type,
         uint ts
     );
+
+    event Merge(
+        address indexed _sender,
+        uint256 indexed _from,
+        uint256 indexed _to,
+        uint256 _amountFrom,
+        uint256 _amountTo,
+        uint256 _amountFinal,
+        uint256 _locktime,
+        uint256 _ts
+    );
+    
+    event MetadataUpdate(uint256 _tokenId);
     event Withdraw(address indexed provider, uint tokenId, uint value, uint ts);
     event LockPermanent(address indexed _owner, uint256 indexed _tokenId, uint256 amount, uint256 _ts);
     event UnlockPermanent(address indexed _owner, uint256 indexed _tokenId, uint256 amount, uint256 _ts);
@@ -152,7 +166,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
     function tokenURI(uint _tokenId) external view returns (string memory) {
         require(idToOwner[_tokenId] != address(0), "Query for nonexistent token");
         LockedBalance memory _locked = locked[_tokenId];
-        return IVeArtProxy(artProxy)._tokenURI(_tokenId,_balanceOfNFT(_tokenId, block.timestamp),_locked.end,uint(int256(_locked.amount)));
+        return IVeArtProxy(artProxy)._tokenURI(_tokenId,_balanceOfNFT(_tokenId, block.timestamp),_locked.end,uint(int256(_locked.amount)), _locked.isSMNFT);
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -558,10 +572,6 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         return locked[_tokenId].end;
     }
 
-    function locked(uint256 _tokenId) external view returns (LockedBalance memory) {
-        return locked[_tokenId];
-    }
-
     /// @notice Record global and per-user data to checkpoint
     /// @param _tokenId NFT token ID. No user checkpoint if 0
     /// @param old_locked Pevious locked amount / end lock time for the user
@@ -669,7 +679,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
             if (last_point.bias < 0) {
                 last_point.bias = 0;
             }
-            lastPoint.permanent = permanentLockBalance;
+            last_point.permanent = permanentLockBalance;
         }
 
         // Record the changed point into history
@@ -723,16 +733,12 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
 
         supply = supply_before + _value;
         LockedBalance memory old_locked;
-        (old_locked.amount, old_locked.end, old_locked.isPermanent) = (_locked.amount, _locked.end, _locked.isPermanent);
+        (old_locked.amount, old_locked.end, old_locked.isPermanent, old_locked.isSMNFT) = (_locked.amount, _locked.end, _locked.isPermanent, _locked.isSMNFT);
         // Adding to existing lock, or if a lock is expired - creating a new one
         _locked.amount += int128(int256(_value));
-        
-        if (old_locked.isPermanent) {
-            permanentLockBalance += _value;
-        } else {    
-            if (unlock_time != 0) {
-                _locked.end = unlock_time;
-            }
+           
+        if (unlock_time != 0) {
+            _locked.end = unlock_time;
         }
         locked[_tokenId] = _locked;
 
@@ -757,7 +763,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
 
     /// @notice Record global data to checkpoint
     function checkpoint() external {
-        _checkpoint(0, LockedBalance(0, 0, false), LockedBalance(0, 0, false));
+        _checkpoint(0, LockedBalance(0, 0, false, false), LockedBalance(0, 0, false, false));
     }
 
     /// @notice Deposit `_value` tokens for `_tokenId` and add to the lock
@@ -778,7 +784,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
     /// @param _value Amount to deposit
     /// @param _lock_duration Number of seconds to lock tokens for (rounded down to nearest week)
     /// @param _to Address to deposit
-    function _create_lock(uint _value, uint _lock_duration, address _to) internal returns (uint) {
+    function _create_lock(uint _value, uint _lock_duration, address _to, bool isSMNFT) internal returns (uint) {
         uint unlock_time = (block.timestamp + _lock_duration) / WEEK * WEEK; // Locktime is rounded down to weeks
 
         require(_value > 0); // dev: need non-zero value
@@ -789,29 +795,35 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         uint _tokenId = tokenId;
         _mint(_to, _tokenId);
 
-        _deposit_for(_tokenId, _value, unlock_time, locked[_tokenId], DepositType.CREATE_LOCK_TYPE);
+        LockedBalance memory _locked = locked[_tokenId];
+        if(isSMNFT) {
+            _locked.isPermanent = true;
+            _locked.isSMNFT = true;
+        }
+
+        _deposit_for(_tokenId, _value, unlock_time, _locked, DepositType.CREATE_LOCK_TYPE);
         return _tokenId;
     }
 
     /// @notice Deposit `_value` tokens for `msg.sender` and lock for `_lock_duration`
     /// @param _value Amount to deposit
     /// @param _lock_duration Number of seconds to lock tokens for (rounded down to nearest week)
-    function create_lock(uint _value, uint _lock_duration) external nonreentrant returns (uint) {
-        return _create_lock(_value, _lock_duration, msg.sender);
+    function create_lock(uint _value, uint _lock_duration, bool isSMNFT) external nonreentrant returns (uint) {
+        return _create_lock(_value, _lock_duration, msg.sender, isSMNFT);
     }
 
     /// @notice Deposit `_value` tokens for `_to` and lock for `_lock_duration`
     /// @param _value Amount to deposit
     /// @param _lock_duration Number of seconds to lock tokens for (rounded down to nearest week)
     /// @param _to Address to deposit
-    function create_lock_for(uint _value, uint _lock_duration, address _to) external nonreentrant returns (uint) {
-        return _create_lock(_value, _lock_duration, _to);
+    function create_lock_for(uint _value, uint _lock_duration, address _to, bool isSMNFT) external nonreentrant returns (uint) {
+        return _create_lock(_value, _lock_duration, _to, isSMNFT);
     }
 
     /// @notice Deposit `_value` additional tokens for `_tokenId` without modifying the unlock time
     /// @param _value Amount of tokens to deposit and add to the lock
     function increase_amount(uint _tokenId, uint _value) external nonreentrant {
-        assert(_isApprovedOrOwner(msg.sender, _tokenId), "caller is not owner nor approved");
+        assert(_isApprovedOrOwner(msg.sender, _tokenId));
 
         LockedBalance memory _locked = locked[_tokenId];
 
@@ -824,14 +836,16 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
 
         // poke for the gained voting power 
         IVoterV3(voter).poke(_tokenId);
+        emit MetadataUpdate(_tokenId);
     }
 
     /// @notice Extend the unlock time for `_tokenId`
     /// @param _lock_duration New number of seconds until tokens unlock
     function increase_unlock_time(uint _tokenId, uint _lock_duration) external nonreentrant {
-        assert(_isApprovedOrOwner(msg.sender, _tokenId), "caller is not owner nor approved");
+        assert(_isApprovedOrOwner(msg.sender, _tokenId));
 
         LockedBalance memory _locked = locked[_tokenId];
+        require(!_locked.isPermanent, "permanent locked");
         uint unlock_time = (block.timestamp + _lock_duration) / WEEK * WEEK; // Locktime is rounded down to weeks
 
         require(_locked.end > block.timestamp, 'Lock expired');
@@ -848,21 +862,22 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
     /// @notice Withdraw all tokens for `_tokenId`
     /// @dev Only possible if the lock has expired
     function withdraw(uint _tokenId) external nonreentrant {
-        assert(_isApprovedOrOwner(msg.sender, _tokenId), "caller is not owner nor approved");
+        assert(_isApprovedOrOwner(msg.sender, _tokenId));
         require(attachments[_tokenId] == 0 && !voted[_tokenId], "attached");
 
         LockedBalance memory _locked = locked[_tokenId];
+        require(!_locked.isPermanent, "permanent locked");
         require(block.timestamp >= _locked.end, "The lock didn't expire");
         uint value = uint(int256(_locked.amount));
 
-        locked[_tokenId] = LockedBalance(0, 0, false);
+        locked[_tokenId] = LockedBalance(0, 0, false, false);
         uint supply_before = supply;
         supply = supply_before - value;
 
         // old_locked can have either expired <= timestamp or zero end
         // _locked has only 0 end
         // Both can have >= 0 amount
-        _checkpoint(_tokenId, _locked, LockedBalance(0, 0, false));
+        _checkpoint(_tokenId, _locked, LockedBalance(0, 0, false, false));
 
         assert(IERC20(token).transfer(msg.sender, value));
 
@@ -879,6 +894,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         
         LockedBalance memory _newLocked = locked[_tokenId];
         require(!_newLocked.isPermanent, "already permanent locked");
+        require(!_newLocked.isSMNFT, "cant change permanent lock for SM NFT");
         require(_newLocked.end > block.timestamp, "lock expired");
         require(_newLocked.amount > 0, "no lock found");
 
@@ -890,9 +906,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         locked[_tokenId] = _newLocked;
 
         emit LockPermanent(sender, _tokenId, _amount, block.timestamp);
+        emit MetadataUpdate(_tokenId);
     }
 
-    /// @inheritdoc IVotingEscrow
     function unlockPermanent(uint _tokenId) external {
         address sender = msg.sender;
         require(_isApprovedOrOwner(msg.sender, _tokenId), "caller is not owner nor approved");
@@ -900,7 +916,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         require(attachments[_tokenId] == 0 && !voted[_tokenId], "attached");
         LockedBalance memory _newLocked = locked[_tokenId];
         require(_newLocked.isPermanent, "not permanent locked");
-
+        require(!_newLocked.isSMNFT, "cant change permanent lock for SM NFT");
         uint _amount = uint(int256(_newLocked.amount));
         permanentLockBalance -= _amount;
         _newLocked.end = ((block.timestamp + MAXTIME) / WEEK) * WEEK;
@@ -910,6 +926,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         locked[_tokenId] = _newLocked;
 
         emit UnlockPermanent(sender, _tokenId, _amount, block.timestamp);
+        emit MetadataUpdate(_tokenId);
     }
 
 
@@ -955,8 +972,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
             return 0;
         } else {
             Point memory last_point = user_point_history[_tokenId][_epoch];
-            if (lastPoint.permanent != 0) {
-                return lastPoint.permanent;
+            if (last_point.permanent != 0) {
+                return last_point.permanent;
             } else {
                 last_point.bias -= last_point.slope * int128(int256(_t) - int256(last_point.ts));
                 if (last_point.bias < 0) {
@@ -1131,25 +1148,49 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         attachments[_tokenId] = attachments[_tokenId] - 1;
     }
 
-    function merge(uint _from, uint _to) external {
+    function merge(uint _from, uint _to) external nonreentrant {
         require(attachments[_from] == 0 && !voted[_from], "attached");
-        require(_from != _to);
+        require(_from != _to, "same nft");
         require(_isApprovedOrOwner(msg.sender, _from), "caller is not owner nor approved");
         require(_isApprovedOrOwner(msg.sender, _to), "caller is not owner nor approved");
 
         LockedBalance memory _locked0 = locked[_from];
         LockedBalance memory _locked1 = locked[_to];
-        
+        require(_locked1.end > block.timestamp ||  _locked1.isPermanent,"lock expired");
         require(!_locked0.isPermanent,"permanent locked");
 
 
         uint value0 = uint(int256(_locked0.amount));
         uint end = _locked0.end >= _locked1.end ? _locked0.end : _locked1.end;
 
-        locked[_from] = LockedBalance(0, 0, false);
-        _checkpoint(_from, _locked0, LockedBalance(0, 0, false));
         _burn(_from);
-        _deposit_for(_to, value0, end, _locked1, DepositType.MERGE_TYPE);
+        locked[_from] = LockedBalance(0, 0, false, false);
+        _checkpoint(_from, _locked0, LockedBalance(0, 0, false, false));
+
+        LockedBalance memory newLockedTo;
+        newLockedTo.amount = _locked1.amount + _locked0.amount;
+        newLockedTo.isPermanent = _locked1.isPermanent;
+        newLockedTo.isSMNFT = _locked1.isSMNFT;
+        if (newLockedTo.isPermanent) {
+            permanentLockBalance += value0;
+        } else {
+            newLockedTo.end = end;
+        }
+        //_checkpointDelegatee(_delegates[_to], value0, true);
+        _checkpoint(_to, _locked1, newLockedTo);
+        locked[_to] = newLockedTo;
+
+        emit Merge(
+            msg.sender,
+            _from,
+            _to,
+            uint(int256(_locked0.amount)),
+            uint(int256(_locked1.amount)),
+            uint(int256(newLockedTo.amount)),
+            newLockedTo.end,
+            block.timestamp
+        );
+        emit MetadataUpdate(_to);
     }
 
 
@@ -1159,7 +1200,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
      * @param _tokenId  NFTs ID
      */
     function split(uint[] memory amounts, uint _tokenId) external {
-        
+        //Not supporting split
+        /*
         // check permission and vote
         require(attachments[_tokenId] == 0 && !voted[_tokenId], "attached");
         require(_isApprovedOrOwner(msg.sender, _tokenId), "caller is not owner nor approved");
@@ -1170,6 +1212,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         uint end = _locked.end;
         uint value = uint(int256(_locked.amount));
         require(value > 0); // dev: need non-zero value
+        require(!_locked.isSMNFT, "can not split a SM NFT");
+        require(_locked.end > block.timestamp ||  _locked.isPermanent,"lock expired");
         
         // reset supply, _deposit_for increase it
         supply = supply - value;
@@ -1181,8 +1225,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         }
 
         // remove old data
-        locked[_tokenId] = LockedBalance(0, 0, false);
-        _checkpoint(_tokenId, _locked, LockedBalance(0, 0, false));
+        locked[_tokenId] = LockedBalance(0, 0, false, false);
+        _checkpoint(_tokenId, _locked, LockedBalance(0, 0, false, false));
         _burn(_tokenId);
 
         // save end
@@ -1198,7 +1242,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
             _mint(_to, _tokenId);
             _value = value * amounts[i] / totalWeight;
             _deposit_for(_tokenId, _value, unlock_time, locked[_tokenId], DepositType.SPLIT_TYPE);
-        }     
+        }
+        */     
 
     }
 

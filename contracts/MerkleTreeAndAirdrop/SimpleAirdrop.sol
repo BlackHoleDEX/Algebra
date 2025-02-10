@@ -54,7 +54,7 @@ contract SimpleAirdrop {
             _user = users[i];
             IERC20(black).approve(ve, 0);
             IERC20(black).approve(ve, amountPerUser);
-            IVotingEscrow(ve).create_lock_for(amountPerUser, MAX_PERIOD, _user);
+            IVotingEscrow(ve).create_lock_for(amountPerUser, MAX_PERIOD, _user, false);
         }
     }
 
@@ -65,7 +65,7 @@ contract SimpleAirdrop {
             _user = __users[i];
             IERC20(black).approve(ve, 0);
             IERC20(black).approve(ve, amountPerUser);
-            IVotingEscrow(ve).create_lock_for(amountPerUser, MAX_PERIOD, _user);
+            IVotingEscrow(ve).create_lock_for(amountPerUser, MAX_PERIOD, _user, false);
         }
     }
 

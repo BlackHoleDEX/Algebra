@@ -15,9 +15,10 @@ interface IVotingEscrow {
         int128 amount;
         uint end;
         bool isPermanent;
+        bool isSMNFT;
     }
 
-    function create_lock_for(uint _value, uint _lock_duration, address _to) external returns (uint);
+    function create_lock_for(uint _value, uint _lock_duration, address _to, bool isSMSFT) external returns (uint);
 
     function locked(uint id) external view returns(LockedBalance memory);
     function tokenOfOwnerByIndex(address _owner, uint _tokenIndex) external view returns (uint);
@@ -53,7 +54,7 @@ interface IVotingEscrow {
     function decimals() external view returns(uint8);
 
 
-    function lockPermanent(uint256 _tokenId) external;
+    function lockPermanent(uint _tokenId) external;
 
-    function unlockPermanent(uint256 _tokenId) external;
+    function unlockPermanent(uint _tokenId) external;
 }

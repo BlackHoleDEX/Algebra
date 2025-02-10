@@ -79,7 +79,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
             _black.mint(address(this), max);
             _black.approve(address(_ve), type(uint).max);
             for (uint i = 0; i < claimants.length; i++) {
-                _ve.create_lock_for(amounts[i], LOCK, claimants[i]);
+                _ve.create_lock_for(amounts[i], LOCK, claimants[i], false);
             }
         }
 
