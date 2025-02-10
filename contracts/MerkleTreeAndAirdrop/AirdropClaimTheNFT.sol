@@ -47,7 +47,7 @@ contract AirdropClaimTheNFT is ReentrancyGuard {
         owner = msg.sender;
         token = IERC20(_token);
         ve = _ve;
-        LOCK_PERIOD = 2 * 364 * 86400;
+        LOCK_PERIOD = 4 * 364 * 86400;
         VE_SHARE = 400;
 
     }

@@ -26,7 +26,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     uint public constant WEEK = 1800; // allows minting once per week (reset every Thursday 00:00 UTC)
     uint public weekly; // represents a starting weekly emission of 2.6M BLACK (BLACK has 18 decimals)
     uint public active_period;
-    uint public constant LOCK = 86400 * 7 * 52 * 2;
+    uint public constant LOCK = 86400 * 7 * 52 * 4;
 
     address internal _initializer;
     address public team;
