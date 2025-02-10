@@ -1189,7 +1189,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         newLockedTo.isSMNFT = _locked1.isSMNFT;
         
         if(newLockedTo.isSMNFT) {
-            assert(IERC20(token).burnFrom(address(this), value0));
+            assert(IERC20(token).burn(value0));
             newLockedTo.amount = _locked1.amount + ((110*_locked0.amount)/100);
         } else {
             newLockedTo.amount = _locked1.amount + _locked0.amount;
