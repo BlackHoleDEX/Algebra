@@ -42,10 +42,12 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
 
     uint256 internal index;                                        // gauge index
+    uint256 public maxVotingNum;
     uint256 internal constant DURATION = 7 days;                   // rewards are released over 7 days
     uint256 public VOTE_DELAY;                                     // delay between votes in seconds
     uint256 public constant MAX_VOTE_DELAY = 7 days;               // Max vote delay allowed
     uint public constant EPOCH_DURATION = 1800; //BlackHole:: Current duration need to change 1 week
+     uint256 internal constant MIN_OF_MAX_VOTING_NUM = 10;
 
     mapping(address => uint256) internal supplyIndex;              // gauge    => index
     mapping(address => uint256) public claimable;                  // gauge    => claimable $the
@@ -104,6 +106,8 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
         minter = msg.sender;
         permissionRegistry = msg.sender;
+
+        maxVotingNum = 30;
 
         VOTE_DELAY = 0;
         initflag = false;
@@ -215,8 +219,11 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         emit SetBribeFor(false, internal_bribes[_gauge], _external, _gauge);
         external_bribes[_gauge] = _external;
     }
-    
- 
+
+    function setMaxVotingNum(uint256 _maxVotingNum) external VoterAdmin {
+        require (_maxVotingNum >= MIN_OF_MAX_VOTING_NUM, "To0 low voting num");
+        maxVotingNum = _maxVotingNum;
+    }
     
     function addFactory(address _pairFactory, address _gaugeFactory) external VoterAdmin {
         require(_pairFactory != address(0), 'addr0');
