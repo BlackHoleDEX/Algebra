@@ -5,6 +5,7 @@ const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants.js");
 const { blackholePairAPIV2Abi } = require('../../../../generated/blackhole-pair-apiv2');
 const { voterV3Abi } = require('../../../../generated/voter-v3');
 const { minterUpgradeableAbi } = require('../../../../generated/minter-upgradeable');
+const { epochControllerAbi } = require('../../../../generated/epoch-controller')
 const { blackAbi } = require('../../../blackhole-scripts/gaugeConstants/black')
 const { votingEscrowAbi } = require('../../../../generated/voting-escrow');
 const { rewardsDistributorAbi } = require('../../../../generated/rewards-distributor');
@@ -288,12 +289,23 @@ const deployEpochController = async(voterV3Address, minterUpgradableAddress) =>{
         console.log('Voter set in EpochController');
         await EpochController.setMinter(minterUpgradableAddress);
         console.log('minter set in EpochController');
-        chainlinkAutomationRegistryAddress = "0x91D4a4C3D448c7f3CB477332B1c7D420a5810aC3";
+        chainlinkAutomationRegistryAddress = "0xcFeff04DB8740Ab58EC2CF6926Fe9aE53A675743";
         await EpochController.setAutomationRegistry(chainlinkAutomationRegistryAddress);
         console.log('registry set in EpochController');
         return EpochController.address;
     } catch (error) {
         console.log("error in deploying EpochController: ", error)
+    }
+}
+
+const setChainLinkAddress = async (epocControllerAddress) => {
+    try{
+        const epochController = await ethers.getContractAt(epochControllerAbi, epocControllerAddress);
+        chainlinkAutomationRegistryAddress = "0xcFeff04DB8740Ab58EC2CF6926Fe9aE53A675743";
+        await epochController.setAutomationRegistry(chainlinkAutomationRegistryAddress);
+        console.log("setChainLinkAddress succes: ", error);
+    } catch(error){
+        console.log("setChainLinkAddress failed: ", error);
     }
 }
 

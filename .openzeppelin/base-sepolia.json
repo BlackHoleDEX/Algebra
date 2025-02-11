@@ -1514,6 +1514,16 @@
       "address": "0xBC281B6664Faa8bB9b26aF5eCDE0E07Bed727fE1",
       "txHash": "0xa57ce08a9071d2df6715801ac09f8e1a16d64b464409f13c2ef9abf0764f2bde",
       "kind": "transparent"
+    },
+    {
+      "address": "0xc56CEbc7539E92f74846769447dFECD849d6E3F4",
+      "txHash": "0x4bdfe6c9200d7caebaec3bf3aa92f5757f0061db14ba942b61e50531cdb119f5",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xbC1978D22B07001Baf4ab00944df64c73af6c565",
+      "txHash": "0x6322fa681157c15f76ed06f3b55dcb2e699f4c7a1b2e063e705360a0e61e6d21",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -16521,6 +16531,111 @@
           },
           "t_contract(IVotingEscrow)8010": {
             "label": "contract IVotingEscrow",
+            "numberOfBytes": "20"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "25d97cd4b55875eb9b517fd44f865f45f2e8f06e5c64faf8fbdb08df77d92a85": {
+      "address": "0xc243424e51c31648d405EDaBA694895866669407",
+      "txHash": "0x47ad6a5821ba8a67c0891fae50fcf62dd5f5d4b585b9b7e2ce85e4dedf612dd0",
+      "layout": {
+        "solcVersion": "0.8.13",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "pairFactory",
+            "offset": 2,
+            "slot": "0",
+            "type": "t_contract(IPairFactory)6389",
+            "contract": "BlackholePairAPIV2",
+            "src": "contracts/APIHelper/BlackholePairAPIV2.sol:115"
+          },
+          {
+            "label": "algebraFactory",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_contract(IAlgebraFactory)538",
+            "contract": "BlackholePairAPIV2",
+            "src": "contracts/APIHelper/BlackholePairAPIV2.sol:116"
+          },
+          {
+            "label": "voter",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_contract(IVoter)6540",
+            "contract": "BlackholePairAPIV2",
+            "src": "contracts/APIHelper/BlackholePairAPIV2.sol:117"
+          },
+          {
+            "label": "voterV3",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_contract(IVoterV3)6622",
+            "contract": "BlackholePairAPIV2",
+            "src": "contracts/APIHelper/BlackholePairAPIV2.sol:118"
+          },
+          {
+            "label": "underlyingToken",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_address",
+            "contract": "BlackholePairAPIV2",
+            "src": "contracts/APIHelper/BlackholePairAPIV2.sol:120"
+          },
+          {
+            "label": "owner",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_address",
+            "contract": "BlackholePairAPIV2",
+            "src": "contracts/APIHelper/BlackholePairAPIV2.sol:122"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IAlgebraFactory)538": {
+            "label": "contract IAlgebraFactory",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IPairFactory)6389": {
+            "label": "contract IPairFactory",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IVoter)6540": {
+            "label": "contract IVoter",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IVoterV3)6622": {
+            "label": "contract IVoterV3",
             "numberOfBytes": "20"
           },
           "t_uint8": {

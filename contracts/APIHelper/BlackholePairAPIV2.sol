@@ -207,8 +207,8 @@ contract BlackholePairAPIV2 is Initializable {
             pairs[i - _offset].staked_token1_fees = stakedToken1Fees;  
 
             bribes = _getBribes(_pair);
-            pairs[i - _offset].internal_bribes = bribes[0];
-            pairs[i - _offset].external_bribes = bribes[1];  
+            pairs[i - _offset].external_bribes = bribes[0];
+            pairs[i - _offset].internal_bribes = bribes[1];  
         }
 
 
@@ -231,8 +231,8 @@ contract BlackholePairAPIV2 is Initializable {
 
         Bribes[] memory bribes;
         bribes = _getBribes(_pair);
-        pairInformation.internal_bribes = bribes[0];
-        pairInformation.external_bribes = bribes[1];
+        pairInformation.external_bribes = bribes[0];
+        pairInformation.internal_bribes = bribes[1];
         return pairInformation;
     }
 
