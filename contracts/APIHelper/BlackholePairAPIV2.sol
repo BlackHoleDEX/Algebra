@@ -290,14 +290,14 @@ contract BlackholePairAPIV2 is Initializable {
         _pairInfo.token0_decimals = IERC20(token_0).decimals();
         _pairInfo.token0_symbol = IERC20(token_0).symbol();
         _pairInfo.reserve0 = r0;
-        _pairInfo.claimable0 = _type == false ? 0 : ipair.claimable0(_account);
+        _pairInfo.claimable0 = _type == false || _account == address(0) ? 0 : ipair.claimable0(_account);
 
         // Token1 Info
         _pairInfo.token1 = token_1;
         _pairInfo.token1_decimals = IERC20(token_1).decimals();
         _pairInfo.token1_symbol = IERC20(token_1).symbol();
         _pairInfo.reserve1 = r1;
-        _pairInfo.claimable1 = _type == false ? 0 : ipair.claimable1(_account);
+        _pairInfo.claimable1 = _type == false || _account == address(0) ? 0 : ipair.claimable1(_account);
 
         
         // Pair's gauge Info
@@ -308,9 +308,9 @@ contract BlackholePairAPIV2 is Initializable {
         _pairInfo.emissions_token_decimals = IERC20(underlyingToken).decimals();			    
 
         // Account Info
-        _pairInfo.account_lp_balance = IERC20(_pair).balanceOf(_account);
-        _pairInfo.account_token0_balance = IERC20(token_0).balanceOf(_account);
-        _pairInfo.account_token1_balance = IERC20(token_1).balanceOf(_account);
+        _pairInfo.account_lp_balance = _account == address(0) ? 0 : IERC20(_pair).balanceOf(_account);
+        _pairInfo.account_token0_balance = _account == address(0) ? 0 : IERC20(token_0).balanceOf(_account);
+        _pairInfo.account_token1_balance = _account == address(0) ? 0 : IERC20(token_1).balanceOf(_account);
         _pairInfo.account_gauge_balance = accountGaugeLPAmount;
         _pairInfo.account_gauge_earned = earned;
 
