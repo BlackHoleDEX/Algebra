@@ -59,10 +59,10 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     mapping(uint256 => mapping(address => uint256)) public votes;  // nft      => pool     => votes
     mapping(uint256 => address[]) public poolVote;                 // nft      => pools
 
-    mapping(uint256 => mapping(address => uint256)) internal weightsPerEpoch; // timestamp => pool => weights
+    //mapping(uint256 => mapping(address => uint256)) internal weightsPerEpoch; // timestamp => pool => weights
     mapping(address => uint256) public weights;
 
-    mapping(uint256 => uint256) internal totalWeightsPerEpoch;         // timestamp => total weights
+    //mapping(uint256 => uint256) internal totalWeightsPerEpoch;         // timestamp => total weights
     uint256 public totalWeight;
 
     mapping(uint256 => uint256) public lastVoted;                     // nft      => timestamp of last vote (this is shifted to thursday of that epoc)
@@ -327,7 +327,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         claimable[_gauge] = 0;
 
         uint _time = epochTimestamp();
-        totalWeightsPerEpoch[_time] -= weightsPerEpoch[_time][poolForGauge[_gauge]]; 
+        //totalWeightsPerEpoch[_time] -= weightsPerEpoch[_time][poolForGauge[_gauge]]; 
 
 
         emit GaugeKilled(_gauge);
@@ -471,7 +471,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
             }
         }
         if (_usedWeight > 0) IVotingEscrow(_ve).voting(_tokenId);
-        totalWeightsPerEpoch[_time] += _totalWeight;
+        //totalWeightsPerEpoch[_time] += _totalWeight;
         totalWeight += _totalWeight;
     }
 
@@ -656,24 +656,23 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     }
 
     function weightsForPool(address _pool) public view returns(uint256) {
-        uint256 _time = epochTimestamp();
+        //uint256 _time = epochTimestamp();
         return weights[_pool];
         //return weightsPerEpoch[_time][_pool];
     }
 
-    function weightsAt(address _pool, uint256 _time) public view returns(uint256) {
+    /*function weightsAt(address _pool, uint256 _time) public view returns(uint256) {
         return weightsPerEpoch[_time][_pool];
-    }
+    }*/
 
-    function totalWeight() public view returns(uint256) {
-        return totalWeight;
+    /*function totalWeight() public view returns(uint256) {
         uint256 _time = epochTimestamp();
         return totalWeightsPerEpoch[_time];
-    }
+    }*/
 
-    function totalWeightAt(uint256 _time) public view returns(uint256) {
+    /*function totalWeightAt(uint256 _time) public view returns(uint256) {
         return totalWeightsPerEpoch[_time];
-    }
+    }*/
 
     function epochTimestamp() public view returns(uint256) {
         return IMinter(minter).active_period();
