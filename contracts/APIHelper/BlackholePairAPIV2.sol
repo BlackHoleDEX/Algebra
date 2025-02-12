@@ -499,7 +499,7 @@ contract BlackholePairAPIV2 is Initializable {
     
     }
 
-    function getAmountOut(uint amountIn, address tokenIn, address tokenOut) external view returns (uint amountOut, IRouter01.route[] memory routes, TempData memory temp1) {
+    function getAmountOut(uint amountIn, address tokenIn, address tokenOut) external view returns (uint amountOut, IRouter01.route[] memory routes) {
 
         TempData memory temp;
         (temp.amountOut, temp.stable) = routerV2.getAmountOut(amountIn, tokenIn, tokenOut);
@@ -508,7 +508,7 @@ contract BlackholePairAPIV2 is Initializable {
             routes = new IRouter01.route[](1);
             routes[0] = _createRoute(tokenIn, tokenOut, temp.stable);
             amountOut = temp.amountOut;
-            return (amountOut, routes, temp);
+            return (amountOut, routes);
         }
 
         routes = new IRouter01.route[](2);
@@ -573,10 +573,10 @@ contract BlackholePairAPIV2 is Initializable {
         }
 
         if(temp.foundPath == false){
-            temp.amountOut = 111;
+            temp.amountOut = 0;
         }
 
-        return (temp.amountOut, routes, temp);
+        return (temp.amountOut, routes);
     }
 
     function getAmountViaHopping(uint amountIn, address tokenIn, address tokenMid, address tokenOut) external view returns (uint amountOut){
