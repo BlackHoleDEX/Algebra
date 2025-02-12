@@ -149,16 +149,11 @@ contract veNFTAPI is Initializable {
 
     function getNFTFromAddress(address _user) external view returns(veNFT[] memory venft){
 
-        if(_user == address(0)){
-            venft = new veNFT[](0);
-            return venft;
-        }
-
-        uint256 i=0;
-        uint256 _id;
-        uint256 totNFTs = ve.balanceOf(_user);
+        uint256 totNFTs = (_user != address(0)) ? ve.balanceOf(_user) : 0;
 
         venft = new veNFT[](totNFTs);
+        uint256 i=0;
+        uint256 _id;
 
         for(i; i < totNFTs; i++){
             _id = ve.tokenOfOwnerByIndex(_user, i);
@@ -166,6 +161,8 @@ contract veNFTAPI is Initializable {
                 venft[i] = _getNFTFromId(_id, _user);
             }
         }
+
+        return venft;
     }
 
     function _getNFTFromId(uint256 id, address _owner) internal view returns(veNFT memory venft){
