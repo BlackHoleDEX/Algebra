@@ -58,8 +58,13 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     mapping(address => address) public external_bribes;         // gauge    => external bribe (real bribes)
     mapping(uint256 => mapping(address => uint256)) public votes;  // nft      => pool     => votes
     mapping(uint256 => address[]) public poolVote;                 // nft      => pools
+
     mapping(uint256 => mapping(address => uint256)) internal weightsPerEpoch; // timestamp => pool => weights
+    mapping(address => uint256) public weights;
+
     mapping(uint256 => uint256) internal totalWeightsPerEpoch;         // timestamp => total weights
+    uint256 public totalWeight;
+
     mapping(uint256 => uint256) public lastVoted;                     // nft      => timestamp of last vote (this is shifted to thursday of that epoc)
     mapping(uint256 => uint256) public lastVotedTimestamp;            // nft      => timestamp of last vote
     mapping(address => bool) public isGauge;                    // gauge    => boolean [is a gauge?]
@@ -360,7 +365,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         address[] storage _poolVote = poolVote[_tokenId];
         uint256 _poolVoteCnt = _poolVote.length;
         uint256 _totalWeight = 0;
-        uint256 _time = epochTimestamp();
+        //uint256 _time = epochTimestamp();
 
         for (uint256 i = 0; i < _poolVoteCnt; i ++) {
             address _pool = _poolVote[i];
@@ -369,7 +374,8 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
             if (_votes != 0) {
 
                 // if user last vote is < than epochTimestamp then votes are 0! IF not underflow occur
-                if(lastVoted[_tokenId] > _time) weightsPerEpoch[_time][_pool] -= _votes;
+                //if(lastVoted[_tokenId] > _time) weightsPerEpoch[_time][_pool] -= _votes;
+                weights[_pool] -= _votes;
 
                 votes[_tokenId][_pool] -= _votes;
                 
@@ -385,9 +391,10 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
         
         // if user last vote is < than epochTimestamp then _totalWeight is 0! IF not underflow occur
-        if(lastVoted[_tokenId] < _time) _totalWeight = 0;
+        //if(lastVoted[_tokenId] < _time) _totalWeight = 0;
         
-        totalWeightsPerEpoch[_time] -= _totalWeight;
+        //totalWeightsPerEpoch[_time] -= _totalWeight;
+        totalWeight -= _totalWeight;
         delete poolVote[_tokenId];
     }
 
@@ -449,7 +456,9 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
                 require(_poolWeight != 0);
 
                 poolVote[_tokenId].push(_pool);
-                weightsPerEpoch[_time][_pool] += _poolWeight;
+                
+                //weightsPerEpoch[_time][_pool] += _poolWeight;
+                weights[_pool] += _poolWeight;
 
                 votes[_tokenId][_pool] += _poolWeight;
 
@@ -463,6 +472,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         }
         if (_usedWeight > 0) IVotingEscrow(_ve).voting(_tokenId);
         totalWeightsPerEpoch[_time] += _totalWeight;
+        totalWeight += _totalWeight;
     }
 
     /// @notice claim LP gauge rewards
@@ -645,9 +655,10 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         return _gaugeFactories.length;
     }
 
-    function weights(address _pool) public view returns(uint256) {
+    function weightsForPool(address _pool) public view returns(uint256) {
         uint256 _time = epochTimestamp();
-        return weightsPerEpoch[_time][_pool];
+        return weights[_pool];
+        //return weightsPerEpoch[_time][_pool];
     }
 
     function weightsAt(address _pool, uint256 _time) public view returns(uint256) {
@@ -655,6 +666,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     }
 
     function totalWeight() public view returns(uint256) {
+        return totalWeight;
         uint256 _time = epochTimestamp();
         return totalWeightsPerEpoch[_time];
     }
@@ -681,12 +693,9 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         require(msg.sender == minter, "!minter");
         IERC20Upgradeable(base).safeTransferFrom(msg.sender, address(this), amount);
 
-
-        uint256 _totalWeight = totalWeightAt(epochTimestamp() - EPOCH_DURATION);   // minter call notify after updates active_period, loads votes - 1 week
-
         uint256 _ratio = 0;
 
-        if(_totalWeight > 0) _ratio = amount * 1e18 / _totalWeight;     // 1e18 adjustment is removed during claim
+        if(totalWeight > 0) _ratio = amount * 1e18 / Math.max(totalWeight, 1);     // 1e18 adjustment is removed during claim
         if (_ratio > 0) {
             index += _ratio;
         }
@@ -785,7 +794,8 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     function _updateForAfterDistribution(address _gauge) private {
         address _pool = poolForGauge[_gauge];
         uint256 _time = epochTimestamp() - 1800;
-        uint256 _supplied = weightsPerEpoch[_time][_pool];
+        //uint256 _supplied = weightsPerEpoch[_time][_pool];
+        uint256 _supplied = weights[_pool];
 
         if (_supplied > 0) {
             uint256 _supplyIndex = supplyIndex[_gauge];
