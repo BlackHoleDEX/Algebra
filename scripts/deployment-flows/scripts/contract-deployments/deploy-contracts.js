@@ -24,7 +24,7 @@ const jsonData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8'));
 const addresses = jsonData.map(obj => obj.address);
 const deployedTokens = require('../../token-constants/deployed-tokens.json');
 const blackAddress = deployedTokens[0].address;
-console.log("Extracted Addresses: ", addresses);
+// console.log("Extracted Addresses: ", addresses);
 
 const deployPairFactory = async () => {
     try {
@@ -79,10 +79,10 @@ const deployPermissionRegistry = async() =>{
     }
 }
 
-const deployBloackholeV2Abi = async(voterV3Address)=>{
+const deployBloackholeV2Abi = async(voterV3Address, routerV2Address)=>{
     try {
         const blackholePairAbiV2Contract = await ethers.getContractFactory("BlackholePairAPIV2");
-        const input = [voterV3Address]
+        const input = [voterV3Address, routerV2Address]
         const blackHolePairAPIV2Factory = await upgrades.deployProxy(blackholePairAbiV2Contract, input, {initializer: 'initialize'});
         txDeployed = await blackHolePairAPIV2Factory.deployed();
         console.log('BlackHolePairAPIV2Factory : ', blackHolePairAPIV2Factory.address)
@@ -384,7 +384,7 @@ async function main () {
     await setVoterBribeV3(voterV3Address, bribeV3Address);
 
     // blackholeV2Abi deployment
-    const blackholeV2AbiAddress = await deployBloackholeV2Abi(voterV3Address);
+    const blackholeV2AbiAddress = await deployBloackholeV2Abi(voterV3Address, routerV2Address);
 
     //deploy rewardsDistributor
     const rewardsDistributorAddress = await deployRewardsDistributor(votingEscrowAddress);

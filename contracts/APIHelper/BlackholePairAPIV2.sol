@@ -15,6 +15,7 @@ import '../interfaces/IVoter.sol';
 import '../interfaces/IVotingEscrow.sol';
 import '../../contracts/Pair.sol';
 import '../interfaces/IVoterV3.sol';
+import '../interfaces/IRouter01.sol';
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
@@ -106,6 +107,17 @@ contract BlackholePairAPIV2 is Initializable {
         Bribes[] bribes;
     }
 
+    struct TempData {
+        uint amountOut;
+        bool stable;
+        address _pair1;
+        address _pair2;
+        address token_0;
+        address token_1;
+        uint tempAmount;
+        bool foundPath;
+    }
+
     uint256 public constant MAX_PAIRS = 1000;
     uint256 public constant MAX_EPOCHS = 200;
     uint256 public constant MAX_REWARDS = 16;
@@ -116,6 +128,7 @@ contract BlackholePairAPIV2 is Initializable {
     IAlgebraFactory public algebraFactory;
     IVoter public voter;
     IVoterV3 public voterV3;
+    IRouter01 public routerV2;
 
     address public underlyingToken;
 
@@ -128,12 +141,14 @@ contract BlackholePairAPIV2 is Initializable {
 
     constructor() {}
 
-    function initialize(address _voter) initializer public {
+    function initialize(address _voter, address _router) initializer public {
   
         owner = msg.sender;
 
         voter = IVoter(_voter);
         voterV3 = IVoterV3(_voter);
+
+        routerV2 = IRouter01(_router);
 
         pairFactory = IPairFactory(voter.factories()[0]);
         underlyingToken = IVotingEscrow(voter._ve()).token();
@@ -484,5 +499,107 @@ contract BlackholePairAPIV2 is Initializable {
     
     }
 
+    function getAmountOut(uint amountIn, address tokenIn, address tokenOut) external view returns (uint amountOut, IRouter01.route[] memory routes, TempData memory temp1) {
 
+        TempData memory temp;
+        (temp.amountOut, temp.stable) = routerV2.getAmountOut(amountIn, tokenIn, tokenOut);
+
+        if (temp.amountOut > 0) {
+            routes = new IRouter01.route[](1);
+            routes[0] = _createRoute(tokenIn, tokenOut, temp.stable);
+            amountOut = temp.amountOut;
+            return (amountOut, routes, temp);
+        }
+
+        routes = new IRouter01.route[](2);
+        uint totPairs = pairFactory.allPairsLength();
+
+        temp.amountOut = type(uint256).max;
+        temp.foundPath = false;
+
+        for(uint i=0; i < totPairs; i++){
+            temp._pair1 = pairFactory.allPairs(i);
+
+            IPair ipair = IPair(temp._pair1); 
+            temp.token_0 = ipair.token0();
+            temp.token_1 = ipair.token1();
+
+            if(temp.token_0 == tokenIn){
+                temp._pair2 = pairFactory.getPair(temp.token_1, tokenOut, true);
+                if(temp._pair2 != address(0)){
+                    temp.tempAmount = _getAmountViaHopping(amountIn, tokenIn, temp.token_1, tokenOut);
+                    if(temp.tempAmount != 0 && temp.tempAmount < temp.amountOut){
+                        temp.amountOut = temp.tempAmount;
+                        temp.foundPath = true;
+                        routes[0] = _createRoute(tokenIn, temp.token_1, ipair.isStable());
+                        routes[1] = _createRoute(temp.token_1, tokenOut, true);
+                    }
+                }
+                
+                temp._pair2 = pairFactory.getPair(temp.token_1, tokenOut, false);
+                if(temp._pair2 != address(0)){
+                    temp.tempAmount = _getAmountViaHopping(amountIn, tokenIn, temp.token_1, tokenOut);
+                    if(temp.tempAmount != 0 && temp.tempAmount < temp.amountOut){
+                        temp.amountOut = temp.tempAmount;
+                        temp.foundPath = true;
+                        routes[0] = _createRoute(tokenIn, temp.token_1, ipair.isStable());
+                        routes[1] = _createRoute(temp.token_1, tokenOut, false);
+                    }
+                }
+            }
+            else if(temp.token_1 == tokenIn){
+                temp._pair2 = pairFactory.getPair(temp.token_0, tokenOut, true);
+                if(temp._pair2 != address(0)){
+                    temp.tempAmount = _getAmountViaHopping(amountIn, tokenIn, temp.token_0, tokenOut);
+                    if(temp.tempAmount != 0 && temp.tempAmount < temp.amountOut){
+                        temp.amountOut = temp.tempAmount;
+                        temp.foundPath = true;
+                        routes[0] = _createRoute(tokenIn, temp.token_0, ipair.isStable());
+                        routes[1] = _createRoute(temp.token_0, tokenOut, true);
+                    }
+                }
+                
+                temp._pair2 = pairFactory.getPair(temp.token_0, tokenOut, false);
+                if(temp._pair2 != address(0)){
+                    temp.tempAmount = _getAmountViaHopping(amountIn, tokenIn, temp.token_0, tokenOut);
+                    if(temp.tempAmount != 0 && temp.tempAmount < temp.amountOut){
+                        temp.amountOut = temp.tempAmount;
+                        temp.foundPath = true;
+                        routes[0] = _createRoute(tokenIn, temp.token_0, ipair.isStable());
+                        routes[1] = _createRoute(temp.token_0, tokenOut, true);
+                    }
+                }
+            }
+        }
+
+        if(temp.foundPath == false){
+            temp.amountOut = 111;
+        }
+
+        return (temp.amountOut, routes, temp);
+    }
+
+    function getAmountViaHopping(uint amountIn, address tokenIn, address tokenMid, address tokenOut) external view returns (uint amountOut){
+        return _getAmountViaHopping(amountIn, tokenIn, tokenMid, tokenOut);
+    }
+
+
+    function _getAmountViaHopping(uint amountIn, address tokenIn, address tokenMid, address tokenOut) internal view returns (uint amountOut){
+        uint amount1 = 0;
+        uint amount2 = 0;
+        bool stable;
+        
+        (amount1, stable) = routerV2.getAmountOut(amountIn, tokenIn, tokenMid);
+        (amount2, stable) = routerV2.getAmountOut(amount1, tokenMid, tokenOut);
+
+        return amount2;
+    }
+
+    function _createRoute(address from, address to, bool stable) internal pure returns (IRouter01.route memory) {
+        return IRouter01.route({
+            from: from,
+            to: to,
+            stable: stable
+        });
+    }
 }
