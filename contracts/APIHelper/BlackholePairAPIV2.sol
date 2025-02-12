@@ -71,9 +71,8 @@ contract BlackholePairAPIV2 is Initializable {
         uint votes;
 
         // fees
-        address feeAddress; 
-        uint token0_fees;      // token 0 fees accumulated till now
-        uint token1_fees;      // token 1 fees accumulated till now
+        uint staked_token0_fees;      // staked token 0 fees accumulated till now
+        uint staked_token1_fees;      // staked token 1 fees accumulated till now
 
         // bribes
         Bribes internal_bribes;
@@ -144,6 +143,10 @@ contract BlackholePairAPIV2 is Initializable {
 
     function getClaimable(address _account, address _pair) internal view returns(uint claimable0, uint claimable1){
 
+        if(address(_account) == address(0)){
+            return (0,0);
+        }
+        
         Pair pair = Pair(_pair);
 
         uint _supplied = pair.balanceOf(_account); // get LP balance of `_user`
@@ -182,11 +185,9 @@ contract BlackholePairAPIV2 is Initializable {
         address _pair;
         uint claim0;
         uint claim1;
-        address feeAddress; 
-        uint tokenCurrentFees0;     
-        uint tokenCurrentFees1; 
+        uint stakedToken0Fees;     
+        uint stakedToken1Fees; 
         Bribes[] memory bribes;
-
 
         for(i; i < _offset + _amounts; i++){
             // if totalPairs is reached, break.
@@ -201,14 +202,13 @@ contract BlackholePairAPIV2 is Initializable {
             pairs[i - _offset].claimable0 = claim0;
             pairs[i - _offset].claimable1 = claim1;
 
-            (tokenCurrentFees0, tokenCurrentFees1, feeAddress) = getCurrentFees(_pair, pairs[i - _offset].token0, pairs[i - _offset].token1);
-            pairs[i - _offset].feeAddress = feeAddress;
-            pairs[i - _offset].token0_fees = tokenCurrentFees0;
-            pairs[i - _offset].token1_fees = tokenCurrentFees1;  
+            (stakedToken0Fees, stakedToken1Fees) = getClaimable(pairs[i - _offset].gauge, _pair);
+            pairs[i - _offset].staked_token0_fees = stakedToken0Fees;
+            pairs[i - _offset].staked_token1_fees = stakedToken1Fees;  
 
             bribes = _getBribes(_pair);
-            pairs[i - _offset].internal_bribes = bribes[0];
-            pairs[i - _offset].external_bribes = bribes[1];  
+            pairs[i - _offset].external_bribes = bribes[0];
+            pairs[i - _offset].internal_bribes = bribes[1];  
         }
 
 
@@ -218,23 +218,21 @@ contract BlackholePairAPIV2 is Initializable {
         pairInfo memory pairInformation =  _pairAddressToInfo(_pair, _account);
         uint claim0;
         uint claim1;
-        address feeAddress; 
-        uint tokenCurrentFees0;     
-        uint tokenCurrentFees1; 
+        uint stakedToken0Fees;     
+        uint stakedToken1Fees; 
 
         (claim0, claim1) = getClaimable(_account, _pair);
         pairInformation.claimable0 = claim0;
         pairInformation.claimable1 = claim1;
 
-        (tokenCurrentFees0, tokenCurrentFees1, feeAddress) = getCurrentFees(_pair, pairInformation.token0, pairInformation.token1);
-        pairInformation.feeAddress = feeAddress;
-        pairInformation.token0_fees = tokenCurrentFees0;
-        pairInformation.token1_fees = tokenCurrentFees1;  
+        (stakedToken0Fees, stakedToken1Fees) = getClaimable(pairInformation.gauge, _pair);
+        pairInformation.staked_token0_fees = stakedToken0Fees;
+        pairInformation.staked_token1_fees = stakedToken1Fees;  
 
         Bribes[] memory bribes;
         bribes = _getBribes(_pair);
-        pairInformation.internal_bribes = bribes[0];
-        pairInformation.external_bribes = bribes[1];
+        pairInformation.external_bribes = bribes[0];
+        pairInformation.internal_bribes = bribes[1];
         return pairInformation;
     }
 
@@ -292,14 +290,14 @@ contract BlackholePairAPIV2 is Initializable {
         _pairInfo.token0_decimals = IERC20(token_0).decimals();
         _pairInfo.token0_symbol = IERC20(token_0).symbol();
         _pairInfo.reserve0 = r0;
-        _pairInfo.claimable0 = _type == false ? 0 : ipair.claimable0(_account);
+        _pairInfo.claimable0 = _type == false || _account == address(0) ? 0 : ipair.claimable0(_account);
 
         // Token1 Info
         _pairInfo.token1 = token_1;
         _pairInfo.token1_decimals = IERC20(token_1).decimals();
         _pairInfo.token1_symbol = IERC20(token_1).symbol();
         _pairInfo.reserve1 = r1;
-        _pairInfo.claimable1 = _type == false ? 0 : ipair.claimable1(_account);
+        _pairInfo.claimable1 = _type == false || _account == address(0) ? 0 : ipair.claimable1(_account);
 
         
         // Pair's gauge Info
@@ -310,9 +308,9 @@ contract BlackholePairAPIV2 is Initializable {
         _pairInfo.emissions_token_decimals = IERC20(underlyingToken).decimals();			    
 
         // Account Info
-        _pairInfo.account_lp_balance = IERC20(_pair).balanceOf(_account);
-        _pairInfo.account_token0_balance = IERC20(token_0).balanceOf(_account);
-        _pairInfo.account_token1_balance = IERC20(token_1).balanceOf(_account);
+        _pairInfo.account_lp_balance = _account == address(0) ? 0 : IERC20(_pair).balanceOf(_account);
+        _pairInfo.account_token0_balance = _account == address(0) ? 0 : IERC20(token_0).balanceOf(_account);
+        _pairInfo.account_token1_balance = _account == address(0) ? 0 : IERC20(token_1).balanceOf(_account);
         _pairInfo.account_gauge_balance = accountGaugeLPAmount;
         _pairInfo.account_gauge_earned = earned;
 

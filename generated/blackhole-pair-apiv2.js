@@ -1,4 +1,4 @@
-const blackholePairAPIV2Address = "0xa5154455f2eD06BBb90fa81756580f7965B5D1D7";
+const blackholePairAPIV2Address = "0xbfDf1B1905A883629206dEccB437BA72F7592616";
 
 const blackholePairAPIV2Abi = [
   {
@@ -309,18 +309,13 @@ const blackholePairAPIV2Abi = [
             "type": "uint256"
           },
           {
-            "internalType": "address",
-            "name": "feeAddress",
-            "type": "address"
-          },
-          {
             "internalType": "uint256",
-            "name": "token0_fees",
+            "name": "staked_token0_fees",
             "type": "uint256"
           },
           {
             "internalType": "uint256",
-            "name": "token1_fees",
+            "name": "staked_token1_fees",
             "type": "uint256"
           },
           {
@@ -549,18 +544,13 @@ const blackholePairAPIV2Abi = [
             "type": "uint256"
           },
           {
-            "internalType": "address",
-            "name": "feeAddress",
-            "type": "address"
-          },
-          {
             "internalType": "uint256",
-            "name": "token0_fees",
+            "name": "staked_token0_fees",
             "type": "uint256"
           },
           {
             "internalType": "uint256",
-            "name": "token1_fees",
+            "name": "staked_token1_fees",
             "type": "uint256"
           },
           {

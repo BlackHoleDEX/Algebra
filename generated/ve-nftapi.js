@@ -1,4 +1,4 @@
-const veNFTAPIAddress = "0xbB5c8D242E1A9C034981B75A914fE0F5d046Bef6";
+const veNFTAPIAddress = "0xCAC9068FC4Ef59718897193f22bFb6E42Cabdee9";
 
 const veNFTAPIAbi = [
   {
@@ -128,11 +128,6 @@ const veNFTAPIAbi = [
               },
               {
                 "internalType": "address",
-                "name": "fee",
-                "type": "address"
-              },
-              {
-                "internalType": "address",
                 "name": "bribe",
                 "type": "address"
               },
@@ -257,6 +252,111 @@ const veNFTAPIAbi = [
         ],
         "internalType": "struct veNFTAPI.veNFT[]",
         "name": "_veNFT",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amounts",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_offset",
+        "type": "uint256"
+      }
+    ],
+    "name": "getAllPairRewards",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "totNFTs",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "hasNext",
+        "type": "bool"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "id",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint128",
+            "name": "lockedAmount",
+            "type": "uint128"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "pair",
+                "type": "address"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "uint256",
+                    "name": "id",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "amount",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "uint8",
+                    "name": "decimals",
+                    "type": "uint8"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "pair",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "token",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "address",
+                    "name": "bribe",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "symbol",
+                    "type": "string"
+                  }
+                ],
+                "internalType": "struct veNFTAPI.Reward[]",
+                "name": "votingRewards",
+                "type": "tuple[]"
+              }
+            ],
+            "internalType": "struct veNFTAPI.PairReward[]",
+            "name": "pairRewards",
+            "type": "tuple[]"
+          }
+        ],
+        "internalType": "struct veNFTAPI.LockReward[]",
+        "name": "_lockReward",
         "type": "tuple[]"
       }
     ],
@@ -649,11 +749,6 @@ const veNFTAPIAbi = [
           {
             "internalType": "address",
             "name": "token",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
-            "name": "fee",
             "type": "address"
           },
           {
