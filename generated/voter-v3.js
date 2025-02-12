@@ -1,4 +1,4 @@
-const voterV3Address = "0xf04f96115E51D35767ff569909D9487E3BCA0a0f";
+const voterV3Address = "0xdAaD4751214f46E6b915C738B140a483a4489d68";
 
 const voterV3Abi = [
   {
@@ -1073,6 +1073,19 @@ const voterV3Abi = [
   },
   {
     "inputs": [],
+    "name": "maxVotingNum",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "minter",
     "outputs": [
       {
@@ -1331,6 +1344,19 @@ const voterV3Abi = [
       }
     ],
     "name": "setInternalBribeFor",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_maxVotingNum",
+        "type": "uint256"
+      }
+    ],
+    "name": "setMaxVotingNum",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
