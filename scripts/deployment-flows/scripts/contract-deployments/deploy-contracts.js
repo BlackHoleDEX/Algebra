@@ -289,19 +289,15 @@ const deployEpochController = async(voterV3Address, minterUpgradableAddress) =>{
         console.log('Voter set in EpochController');
         await EpochController.setMinter(minterUpgradableAddress);
         console.log('minter set in EpochController');
-        chainlinkAutomationRegistryAddress = "0xcFeff04DB8740Ab58EC2CF6926Fe9aE53A675743";
-        await EpochController.setAutomationRegistry(chainlinkAutomationRegistryAddress);
-        console.log('registry set in EpochController');
         return EpochController.address;
     } catch (error) {
         console.log("error in deploying EpochController: ", error)
     }
 }
 
-const setChainLinkAddress = async (epocControllerAddress) => {
+const setChainLinkAddress = async (epocControllerAddress, chainlinkAutomationRegistryAddress) => {
     try{
         const epochController = await ethers.getContractAt(epochControllerAbi, epocControllerAddress);
-        chainlinkAutomationRegistryAddress = "0xcFeff04DB8740Ab58EC2CF6926Fe9aE53A675743";
         await epochController.setAutomationRegistry(chainlinkAutomationRegistryAddress);
         console.log("setChainLinkAddress succes: ", error);
     } catch(error){
@@ -412,6 +408,9 @@ async function main () {
 
     // deploy epoch controller here.
     const epochControllerAddress = await deployEpochController(voterV3Address, minterUpgradableAddress);
+
+    //set chainlink address
+    await setChainLinkAddress(epochControllerAddress, "0xcFeff04DB8740Ab58EC2CF6926Fe9aE53A675743");
 
     //add black to user Address
     await addBlackToUserAddress(minterUpgradableAddress);
