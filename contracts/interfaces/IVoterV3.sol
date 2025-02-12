@@ -9,10 +9,10 @@ interface IVoterV3 {
     function factoryLength() external view returns(uint);
     function gaugeFactories() external view returns(address[] memory);
     function gaugeFactoriesLength() external view returns(uint);
-    function weights(address _pool) external view returns(uint);
-    function weightsAt(address _pool, uint _time) external view returns(uint);
-    function totalWeight() external view returns(uint);
-    function totalWeightAt(uint _time) external view returns(uint);
+    function weightsForPool(address _pool) external view returns(uint);
+    //function weightsAt(address _pool, uint _time) external view returns(uint);
+    //function totalWeight() external view returns(uint);
+    //function totalWeightAt(uint _time) external view returns(uint);
     function poke(uint256 _tokenId) external;
     function epochTimestamp() external view returns(uint);
 }
