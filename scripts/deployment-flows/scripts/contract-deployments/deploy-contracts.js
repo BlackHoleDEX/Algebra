@@ -5,6 +5,7 @@ const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants.js");
 const { blackholePairAPIV2Abi } = require('../../../../generated/blackhole-pair-apiv2');
 const { voterV3Abi } = require('../../../../generated/voter-v3');
 const { minterUpgradeableAbi } = require('../../../../generated/minter-upgradeable');
+const { epochControllerAbi } = require('../../../../generated/epoch-controller')
 const { blackAbi } = require('../../../blackhole-scripts/gaugeConstants/black')
 const { votingEscrowAbi } = require('../../../../generated/voting-escrow');
 const { rewardsDistributorAbi } = require('../../../../generated/rewards-distributor');
@@ -288,12 +289,19 @@ const deployEpochController = async(voterV3Address, minterUpgradableAddress) =>{
         console.log('Voter set in EpochController');
         await EpochController.setMinter(minterUpgradableAddress);
         console.log('minter set in EpochController');
-        chainlinkAutomationRegistryAddress = "0x91D4a4C3D448c7f3CB477332B1c7D420a5810aC3";
-        await EpochController.setAutomationRegistry(chainlinkAutomationRegistryAddress);
-        console.log('registry set in EpochController');
         return EpochController.address;
     } catch (error) {
         console.log("error in deploying EpochController: ", error)
+    }
+}
+
+const setChainLinkAddress = async (epocControllerAddress, chainlinkAutomationRegistryAddress) => {
+    try{
+        const epochController = await ethers.getContractAt(epochControllerAbi, epocControllerAddress);
+        await epochController.setAutomationRegistry(chainlinkAutomationRegistryAddress);
+        console.log("setChainLinkAddress succes: ", error);
+    } catch(error){
+        console.log("setChainLinkAddress failed: ", error);
     }
 }
 
@@ -323,13 +331,13 @@ const deployveNFT = async (voterV3Address, rewardsDistributorAddress, blackholeV
     try {
         data = await ethers.getContractFactory("veNFTAPI");
         input = [voterV3Address, rewardsDistributorAddress, blackholeV2AbiAddress] // 
-        veNFTAPI = await upgrades.deployProxy(data, input, {initializer: 'initialize'});
+        const veNFTAPI = await upgrades.deployProxy(data, input, {initializer: 'initialize', gasLimit:210000000});
         txDeployed = await veNFTAPI.deployed();
 
         generateConstantFile("veNFTAPI", veNFTAPI.address);
         console.log('deployed venftapi address: ', veNFTAPI.address)
     } catch (error) {
-        console.log('deployed venftapi error ', veNFTAPI.address)
+        console.log('deployed venftapi error ', error)
     }
 }
 
@@ -375,7 +383,7 @@ async function main () {
     //setVoter in bribe factory
     await setVoterBribeV3(voterV3Address, bribeV3Address);
 
-    //blackholeV2Abi deployment
+    // blackholeV2Abi deployment
     const blackholeV2AbiAddress = await deployBloackholeV2Abi(voterV3Address);
 
     //deploy rewardsDistributor
@@ -400,6 +408,9 @@ async function main () {
 
     // deploy epoch controller here.
     const epochControllerAddress = await deployEpochController(voterV3Address, minterUpgradableAddress);
+
+    //set chainlink address
+    await setChainLinkAddress(epochControllerAddress, "0xcFeff04DB8740Ab58EC2CF6926Fe9aE53A675743");
 
     //add black to user Address
     await addBlackToUserAddress(minterUpgradableAddress);
