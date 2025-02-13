@@ -19,6 +19,21 @@ const HIGHEST_OPTIMIZER_COMPILER_SETTINGS: SolcUserConfig = {
   },
 };
 
+const HIGH_COMPILER_SETTINGS: SolcUserConfig = {
+  version: '0.8.20',
+  settings: {
+    evmVersion: 'paris',
+    optimizer: {
+      enabled: true,
+      runs: 5000,
+    },
+    metadata: {
+      bytecodeHash: 'none',
+    },
+  },
+};
+
+
 const DEFAULT_COMPILER_SETTINGS: SolcUserConfig = {
   version: '0.8.20',
   settings: {
@@ -75,7 +90,8 @@ export default {
     compilers: [HIGHEST_OPTIMIZER_COMPILER_SETTINGS],
     overrides: {
       'contracts/BasePluginV4Factory.sol': DEFAULT_COMPILER_SETTINGS,
-      'contracts/tests/MockBasePluginV4Factory.sol': DEFAULT_COMPILER_SETTINGS
+      'contracts/tests/MockBasePluginV4Factory.sol': DEFAULT_COMPILER_SETTINGS,
+      'contracts/CamelotBasePluginFactory.sol': HIGH_COMPILER_SETTINGS
     },
   },
   docgen: {
