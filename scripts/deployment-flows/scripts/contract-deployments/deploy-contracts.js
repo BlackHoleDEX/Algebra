@@ -299,7 +299,7 @@ const setChainLinkAddress = async (epocControllerAddress, chainlinkAutomationReg
     try{
         const epochController = await ethers.getContractAt(epochControllerAbi, epocControllerAddress);
         await epochController.setAutomationRegistry(chainlinkAutomationRegistryAddress);
-        console.log("setChainLinkAddress succes: ", error);
+        console.log("setChainLinkAddress succes");
     } catch(error){
         console.log("setChainLinkAddress failed: ", error);
     }
