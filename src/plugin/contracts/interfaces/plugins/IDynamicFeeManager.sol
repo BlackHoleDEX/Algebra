@@ -13,10 +13,14 @@ interface IDynamicFeeManager is IAlgebraDynamicFeePlugin {
   /// @dev See the AdaptiveFee struct for more details
   event FeeConfiguration(AlgebraFeeConfiguration feeConfig);
 
+  event DynamicFeeStatus(bool isEnabled);
+
   /// @notice Current dynamic fee configuration
   /// @dev See the AdaptiveFee struct for more details
   function feeConfig() external view returns (uint16 alpha1, uint16 alpha2, uint32 beta1, uint32 beta2, uint16 gamma1, uint16 gamma2, uint16 baseFee);
 
   /// @notice Changes fee configuration for the pool
   function changeFeeConfiguration(AlgebraFeeConfiguration calldata feeConfig) external;
+
+  function changeDynamicFeeStatus(bool isEnable) external;
 }

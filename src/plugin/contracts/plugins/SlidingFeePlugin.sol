@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity =0.8.20;
 
 import {IAlgebraFactory} from '@cryptoalgebra/integral-core/contracts/interfaces/IAlgebraFactory.sol';
@@ -23,6 +23,7 @@ abstract contract SlidingFeePlugin is BasePlugin, ISlidingFeePlugin {
 
   uint16 public s_priceChangeFactor = 500;
   uint16 public s_baseFee = 3000;
+  bool public slidingFeeEnabled;
 
   constructor() {
     FeeFactors memory feeFactors = FeeFactors(uint128(1 << FEE_FACTOR_SHIFT), uint128(1 << FEE_FACTOR_SHIFT));
@@ -69,6 +70,12 @@ abstract contract SlidingFeePlugin is BasePlugin, ISlidingFeePlugin {
 
     s_baseFee = newBaseFee;
     emit BaseFee(newBaseFee);
+  }
+
+  function changeSlidingFeeStatus(bool _isEnabled) external override {
+    require(msg.sender == pluginFactory || IAlgebraFactory(factory).hasRoleOrOwner(ALGEBRA_BASE_PLUGIN_MANAGER, msg.sender));
+    slidingFeeEnabled = _isEnabled;
+    emit SlidingFeeStatus(_isEnabled);
   }
 
   function _calculateFeeFactors(int24 currentTick, int24 lastTick, uint16 priceChangeFactor) internal view returns (FeeFactors memory feeFactors) {

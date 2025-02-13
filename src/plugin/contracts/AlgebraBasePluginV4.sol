@@ -74,6 +74,8 @@ contract AlgebraBasePluginV4 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
     bool,
     bytes calldata
   ) external override onlyPool returns (bytes4, uint24, uint24) {
+    uint16 newFee;
+    bool _dynamicFeeEnabled = dynamicFeeEnabled;
     /// security plugin check
     _checkStatus();
     /// get ticks for slidiing fee calculation
@@ -82,10 +84,14 @@ contract AlgebraBasePluginV4 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
     /// write timepoint to oracle
     _writeTimepoint();
     /// calculate volatility and dynamic fee
-    uint88 volatilityAverage = _getAverageVolatilityLast();
-    uint16 newFee = _getCurrentFee(volatilityAverage);
+    if (_dynamicFeeEnabled) {
+      uint88 volatilityAverage = _getAverageVolatilityLast();
+      newFee = _getCurrentFee(volatilityAverage);
+    }
     /// calcucalate sliding fee based on dynamic fee
-    newFee = _getFeeAndUpdateFactors(zeroToOne, currentTick, lastTick, true, newFee);
+    if (slidingFeeEnabled) {
+      newFee = _getFeeAndUpdateFactors(zeroToOne, currentTick, lastTick, _dynamicFeeEnabled, newFee);
+    }
     return (IAlgebraPlugin.beforeSwap.selector, newFee, 0);
   }
 

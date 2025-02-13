@@ -23,6 +23,7 @@ abstract contract DynamicFeePlugin is BasePlugin, IDynamicFeeManager {
 
   /// @dev AlgebraFeeConfiguration struct packed in uint144
   AlgebraFeeConfigurationU144 internal _feeConfig;
+  bool public dynamicFeeEnabled;
 
   /// @inheritdoc IDynamicFeeManager
   function feeConfig()
@@ -46,6 +47,12 @@ abstract contract DynamicFeePlugin is BasePlugin, IDynamicFeeManager {
 
     _feeConfig = _config.pack(); // pack struct to uint144 and write in storage
     emit FeeConfiguration(_config);
+  }
+
+  function changeDynamicFeeStatus(bool _isEnable) external override {
+    require(msg.sender == pluginFactory || IAlgebraFactory(factory).hasRoleOrOwner(ALGEBRA_BASE_PLUGIN_MANAGER, msg.sender));
+    dynamicFeeEnabled = _isEnable;
+    emit DynamicFeeStatus(_isEnable);
   }
 
   function _getCurrentFee(uint88 volatilityAverage) internal view returns (uint16 fee) {
