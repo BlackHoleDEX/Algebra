@@ -1,4 +1,4 @@
-const blackholePairAPIV2Address = "0xf40361E2e8d784756Ae678Ed6b6E1a23A54a6568";
+const blackholePairAPIV2Address = "0x66B26dD3dfABB49048a5803922E3D72af826D1C7";
 
 const blackholePairAPIV2Abi = [
   {
@@ -420,6 +420,11 @@ const blackholePairAPIV2Abi = [
         "components": [
           {
             "internalType": "address",
+            "name": "pair",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
             "name": "from",
             "type": "address"
           },
@@ -432,9 +437,14 @@ const blackholePairAPIV2Abi = [
             "internalType": "bool",
             "name": "stable",
             "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amountOut",
+            "type": "uint256"
           }
         ],
-        "internalType": "struct IRouter01.route[]",
+        "internalType": "struct BlackholePairAPIV2.route[]",
         "name": "routes",
         "type": "tuple[]"
       }
@@ -469,7 +479,12 @@ const blackholePairAPIV2Abi = [
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "amountOut",
+        "name": "amount1",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount2",
         "type": "uint256"
       }
     ],

@@ -107,6 +107,14 @@ contract BlackholePairAPIV2 is Initializable {
         Bribes[] bribes;
     }
 
+    struct route {
+        address pair;
+        address from;
+        address to;
+        bool stable;
+        uint amountOut;
+    }
+
     struct TempData {
         uint amountOut;
         bool stable;
@@ -114,7 +122,8 @@ contract BlackholePairAPIV2 is Initializable {
         address _pair2;
         address token_0;
         address token_1;
-        uint tempAmount;
+        uint amount1;
+        uint amount2;
         bool foundPath;
     }
 
@@ -499,19 +508,20 @@ contract BlackholePairAPIV2 is Initializable {
     
     }
 
-    function getAmountOut(uint amountIn, address tokenIn, address tokenOut) external view returns (uint amountOut, IRouter01.route[] memory routes) {
+    function getAmountOut(uint amountIn, address tokenIn, address tokenOut) external view returns (uint amountOut, route[] memory routes) {
 
         TempData memory temp;
         (temp.amountOut, temp.stable) = routerV2.getAmountOut(amountIn, tokenIn, tokenOut);
 
         if (temp.amountOut > 0) {
-            routes = new IRouter01.route[](1);
-            routes[0] = _createRoute(tokenIn, tokenOut, temp.stable);
+            temp._pair1 = pairFactory.getPair(tokenIn, tokenOut, temp.stable);
+            routes = new route[](1);
+            routes[0] = _createRoute(temp._pair1, tokenIn, tokenOut, temp.stable, temp.amountOut);
             amountOut = temp.amountOut;
             return (amountOut, routes);
         }
 
-        routes = new IRouter01.route[](2);
+        routes = new route[](2);
         uint totPairs = pairFactory.allPairsLength();
 
         temp.amountOut = type(uint256).max;
@@ -527,46 +537,46 @@ contract BlackholePairAPIV2 is Initializable {
             if(temp.token_0 == tokenIn){
                 temp._pair2 = pairFactory.getPair(temp.token_1, tokenOut, true);
                 if(temp._pair2 != address(0)){
-                    temp.tempAmount = _getAmountViaHopping(amountIn, tokenIn, temp.token_1, tokenOut);
-                    if(temp.tempAmount != 0 && temp.tempAmount < temp.amountOut){
-                        temp.amountOut = temp.tempAmount;
+                    (temp.amount1, temp.amount2) = _getAmountViaHopping(amountIn, tokenIn, temp.token_1, tokenOut);
+                    if(temp.amount2 != 0 && temp.amount2 < temp.amountOut){
+                        temp.amountOut = temp.amount2;
                         temp.foundPath = true;
-                        routes[0] = _createRoute(tokenIn, temp.token_1, ipair.isStable());
-                        routes[1] = _createRoute(temp.token_1, tokenOut, true);
+                        routes[0] = _createRoute(temp._pair1, tokenIn, temp.token_1, ipair.isStable(), temp.amount1);
+                        routes[1] = _createRoute(temp._pair2, temp.token_1, tokenOut, true, temp.amount2);
                     }
                 }
                 
                 temp._pair2 = pairFactory.getPair(temp.token_1, tokenOut, false);
                 if(temp._pair2 != address(0)){
-                    temp.tempAmount = _getAmountViaHopping(amountIn, tokenIn, temp.token_1, tokenOut);
-                    if(temp.tempAmount != 0 && temp.tempAmount < temp.amountOut){
-                        temp.amountOut = temp.tempAmount;
+                    (temp.amount1, temp.amount2) = _getAmountViaHopping(amountIn, tokenIn, temp.token_1, tokenOut);
+                    if(temp.amount2 != 0 && temp.amount2 < temp.amountOut){
+                        temp.amountOut = temp.amount2;
                         temp.foundPath = true;
-                        routes[0] = _createRoute(tokenIn, temp.token_1, ipair.isStable());
-                        routes[1] = _createRoute(temp.token_1, tokenOut, false);
+                        routes[0] = _createRoute(temp._pair1, tokenIn, temp.token_1, ipair.isStable(), temp.amount1);
+                        routes[1] = _createRoute(temp._pair2, temp.token_1, tokenOut, false, temp.amount2);
                     }
                 }
             }
             else if(temp.token_1 == tokenIn){
                 temp._pair2 = pairFactory.getPair(temp.token_0, tokenOut, true);
                 if(temp._pair2 != address(0)){
-                    temp.tempAmount = _getAmountViaHopping(amountIn, tokenIn, temp.token_0, tokenOut);
-                    if(temp.tempAmount != 0 && temp.tempAmount < temp.amountOut){
-                        temp.amountOut = temp.tempAmount;
+                    (temp.amount1, temp.amount2) = _getAmountViaHopping(amountIn, tokenIn, temp.token_0, tokenOut);
+                    if(temp.amount2 != 0 && temp.amount2 < temp.amountOut){
+                        temp.amountOut = temp.amount2;
                         temp.foundPath = true;
-                        routes[0] = _createRoute(tokenIn, temp.token_0, ipair.isStable());
-                        routes[1] = _createRoute(temp.token_0, tokenOut, true);
+                        routes[0] = _createRoute(temp._pair1, tokenIn, temp.token_0, ipair.isStable(), temp.amount1);
+                        routes[1] = _createRoute(temp._pair2, temp.token_0, tokenOut, true, temp.amount2);
                     }
                 }
                 
                 temp._pair2 = pairFactory.getPair(temp.token_0, tokenOut, false);
                 if(temp._pair2 != address(0)){
-                    temp.tempAmount = _getAmountViaHopping(amountIn, tokenIn, temp.token_0, tokenOut);
-                    if(temp.tempAmount != 0 && temp.tempAmount < temp.amountOut){
-                        temp.amountOut = temp.tempAmount;
+                    (temp.amount1, temp.amount2) = _getAmountViaHopping(amountIn, tokenIn, temp.token_0, tokenOut);
+                    if(temp.amount2 != 0 && temp.amount2 < temp.amountOut){
+                        temp.amountOut = temp.amount2;
                         temp.foundPath = true;
-                        routes[0] = _createRoute(tokenIn, temp.token_0, ipair.isStable());
-                        routes[1] = _createRoute(temp.token_0, tokenOut, true);
+                        routes[0] = _createRoute(temp._pair1, tokenIn, temp.token_0, ipair.isStable(), temp.amount1);
+                        routes[1] = _createRoute(temp._pair2, temp.token_0, tokenOut, true, temp.amount2);
                     }
                 }
             }
@@ -579,27 +589,27 @@ contract BlackholePairAPIV2 is Initializable {
         return (temp.amountOut, routes);
     }
 
-    function getAmountViaHopping(uint amountIn, address tokenIn, address tokenMid, address tokenOut) external view returns (uint amountOut){
+    function getAmountViaHopping(uint amountIn, address tokenIn, address tokenMid, address tokenOut) external view returns (uint amount1, uint amount2){
         return _getAmountViaHopping(amountIn, tokenIn, tokenMid, tokenOut);
     }
 
 
-    function _getAmountViaHopping(uint amountIn, address tokenIn, address tokenMid, address tokenOut) internal view returns (uint amountOut){
-        uint amount1 = 0;
-        uint amount2 = 0;
+    function _getAmountViaHopping(uint amountIn, address tokenIn, address tokenMid, address tokenOut) internal view returns (uint amount1, uint amount2){
         bool stable;
         
         (amount1, stable) = routerV2.getAmountOut(amountIn, tokenIn, tokenMid);
         (amount2, stable) = routerV2.getAmountOut(amount1, tokenMid, tokenOut);
 
-        return amount2;
+        return (amount1, amount2);
     }
 
-    function _createRoute(address from, address to, bool stable) internal pure returns (IRouter01.route memory) {
-        return IRouter01.route({
+    function _createRoute(address pair, address from, address to, bool stable, uint amountOut) internal pure returns (route memory) {
+        return route({
+            pair: pair,
             from: from,
             to: to,
-            stable: stable
+            stable: stable,
+            amountOut: amountOut
         });
     }
 }
