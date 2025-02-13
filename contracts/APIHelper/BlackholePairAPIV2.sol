@@ -315,7 +315,7 @@ contract BlackholePairAPIV2 is Initializable {
         _pairInfo.account_gauge_earned = earned;
 
         // votes
-        _pairInfo.votes = voterV3.weightsForPool(_pair);     
+        _pairInfo.votes = voterV3.weights(_pair);     
     }
 
     // read all the bribe available for a pair

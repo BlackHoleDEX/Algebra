@@ -655,12 +655,6 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         return _gaugeFactories.length;
     }
 
-    function weightsForPool(address _pool) public view returns(uint256) {
-        //uint256 _time = epochTimestamp();
-        return weights[_pool];
-        //return weightsPerEpoch[_time][_pool];
-    }
-
     /*function weightsAt(address _pool, uint256 _time) public view returns(uint256) {
         return weightsPerEpoch[_time][_pool];
     }*/
