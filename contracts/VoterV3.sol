@@ -41,7 +41,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     uint256 internal constant DURATION = 7 days;                   // rewards are released over 7 days
     uint256 public VOTE_DELAY;                                     // delay between votes in seconds
     uint256 public constant MAX_VOTE_DELAY = 7 days;               // Max vote delay allowed
-    uint public constant EPOCH_DURATION = 1800; //BlackHole:: Current duration need to change 1 week
+    uint public constant EPOCH_DURATION = 3600; //BlackHole:: Current duration need to change 1 week
      uint256 internal constant MIN_OF_MAX_VOTING_NUM = 10;
 
     mapping(address => uint256) internal supplyIndex;              // gauge    => index
@@ -785,7 +785,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     /// @dev    this function track the gauge index to emit the correct $the amount after the distribution
     function _updateForAfterDistribution(address _gauge) private {
         address _pool = poolForGauge[_gauge];
-        uint256 _time = epochTimestamp() - 1800;
+        uint256 _time = epochTimestamp() - EPOCH_DURATION;
         uint256 _supplied = weightsPerEpoch[_time][_pool];
 
         if (_supplied > 0) {
