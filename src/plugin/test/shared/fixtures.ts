@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat';
-import { MockFactory, MockPool, AlgebraSecurityPlugin, SecurityRegistry, MockTimeAlgebraBasePluginV1, MockTimeAlgebraBasePluginV2, MockTimeDSFactoryV2, SecurityPluginFactory, MockTimeDSFactory, BasePluginV1Factory, BasePluginV2Factory } from '../../typechain';
+import { MockFactory, MockPool, AlgebraSecurityPlugin, SecurityRegistry, MockTimeAlgebraBasePluginV1, MockTimeAlgebraBasePluginV2, MockTimeDSFactoryV2, SecurityPluginFactory, MockTimeDSFactory, BasePluginV1Factory, BasePluginV2Factory, CamelotBasePlugin, CamelotBasePluginFactory } from '../../typechain';
 import { MockTimeDSFactoryV4, MockTimeAlgebraBasePluginV4 } from '../../typechain';
-
+import {MockTimeCamelotBasePlugin, MockTimeDSCamelotFactory} from '../../typechain';
 type Fixture<T> = () => Promise<T>;
 interface MockFactoryFixture {
   mockFactory: MockFactory;
@@ -164,5 +164,34 @@ export const securityPluginFixture: Fixture<SecurityPluginFixture> = async funct
     mockPool,
     registry,
     mockFactory
+  };
+};
+
+interface CamelotPluginFixture extends MockFactoryFixture {
+  plugin: MockTimeCamelotBasePlugin;
+  mockPluginFactory: MockTimeDSCamelotFactory;
+  mockPool: MockPool;
+}
+
+export const camelotPluginFixture: Fixture<CamelotPluginFixture> = async function (): Promise<CamelotPluginFixture> {
+  const { mockFactory } = await mockFactoryFixture();
+  //const { token0, token1, token2 } = await tokensFixture()
+
+  const mockPluginFactoryFactory = await ethers.getContractFactory('MockTimeDSCamelotFactory');
+  const mockPluginFactory = (await mockPluginFactoryFactory.deploy(mockFactory)) as any as MockTimeDSCamelotFactory;
+
+  const mockPoolFactory = await ethers.getContractFactory('MockPool');
+  const mockPool = (await mockPoolFactory.deploy()) as any as MockPool;
+
+  await mockPluginFactory.beforeCreatePoolHook(mockPool, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, '0x');
+  const pluginAddress = await mockPluginFactory.pluginByPool(mockPool);
+
+  const mockDSOperatorFactory = await ethers.getContractFactory('MockTimeCamelotBasePlugin');
+  const plugin = mockDSOperatorFactory.attach(pluginAddress) as any as MockTimeCamelotBasePlugin;
+
+  return {
+    plugin,
+    mockPluginFactory,
+    mockPool
   };
 };

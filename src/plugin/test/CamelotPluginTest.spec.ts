@@ -3,22 +3,19 @@ import { ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import checkTimepointEquals from './shared/checkTimepointEquals';
 import { expect } from './shared/expect';
-import { TEST_POOL_START_TIME, pluginFixture, pluginFixtureV4 } from './shared/fixtures';
+import { TEST_POOL_START_TIME, camelotPluginFixture } from './shared/fixtures';
 import { PLUGIN_FLAGS, encodePriceSqrt, expandTo18Decimals, getMaxTick, getMinTick } from './shared/utilities';
 
-import { MockPool, MockTimeCamelotBasePlugin.sol, MockTimeDSFactory, MockTimeVirtualPool } from '../typechain';
+import { MockPool, MockTimeCamelotBasePlugin, MockTimeDSCamelotFactory} from '../typechain';
 
 import snapshotGasCost from './shared/snapshotGasCost';
 
-describe('CamelotBasePlugin.sol', () => {
+describe('CamelotBasePlugin', () => {
   let wallet: Wallet, other: Wallet;
 
-  let plugin: MockTimeCamelotBasePlugin.sol; // modified plugin
+  let plugin: MockTimeCamelotBasePlugin; // modified plugin
   let mockPool: MockPool; // mock of AlgebraPool
-  let mockPluginFactory: MockTimeDSFactory; // modified plugin factory
-
-  let minTick = getMinTick(60);
-  let maxTick = getMaxTick(60);
+  let mockPluginFactory: MockTimeDSCamelotFactory; // modified plugin factory
 
   async function initializeAtZeroTick(pool: MockPool) {
     await pool.initialize(encodePriceSqrt(1, 1));
@@ -28,8 +25,10 @@ describe('CamelotBasePlugin.sol', () => {
     [wallet, other] = await (ethers as any).getSigners();
   });
 
-  beforeEach('deploy test CamelotBasePlugin.sol', async () => {
-    ({ plugin, mockPool, mockPluginFactory } = await loadFixture(pluginFixtureV4));
+  beforeEach('deploy test CamelotBasePlugin', async () => {
+    ({ plugin, mockPluginFactory, mockPool  } = await loadFixture(camelotPluginFixture));
+    await plugin.changeSlidingFeeStatus(true);
+    await plugin.changeDynamicFeeStatus(true);
   });
 
   describe('#Initialize', async () => {
@@ -360,6 +359,7 @@ describe('CamelotBasePlugin.sol', () => {
       beforeEach('initialize pool', async () => {
         await mockPool.setPlugin(plugin);
         await initializeAtZeroTick(mockPool);
+        await plugin.changeSlidingFeeStatus(false)
         mint = async (recipient: string, tickLower: number, tickUpper: number, liquidityDesired: number) => {
           await mockPool.mint(recipient, recipient, tickLower, tickUpper, liquidityDesired, '0x');
         };
@@ -469,7 +469,7 @@ describe('CamelotBasePlugin.sol', () => {
         expect(stats).to.matchSnapshot('fee stats after spike');
       });
 
-      it.only('single huge spike after initialization', async () => {
+      it('single huge spike after initialization', async () => {
         await mint(wallet.address, -24000, 24000, liquidity * 1000000000n);
 
         await plugin.advanceTime(60);
@@ -538,7 +538,7 @@ describe('CamelotBasePlugin.sol', () => {
     });
   });
 
-  describe('CamelotBasePlugin.sol external methods', () => {
+  describe('CamelotBasePlugin external methods', () => {
     describe('#changeFeeConfiguration', () => {
       const configuration = {
         alpha1: 3002,
