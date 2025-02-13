@@ -12,18 +12,13 @@ import './interfaces/IPairInfo.sol';
 import './interfaces/IPairFactory.sol';
 import './interfaces/IVotingEscrow.sol';
 import './interfaces/IPermissionsRegistry.sol';
-import './interfaces/IAlgebraFactory.sol';
+// import './interfaces/IAlgebraFactory.sol';
 import "hardhat/console.sol";
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-
-
-interface IHypervisor {
-    function pool() external view returns(address);
-}
 
 contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
@@ -565,9 +560,10 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
             isPair = IPairFactory(_factory).isPair(_pool);
         } 
         if(_gaugeType == 1) {
-            address _pool_factory = IAlgebraFactory(_factory).poolByPair(tokenA, tokenB);
-            address _pool_hyper = IHypervisor(_pool).pool();
-            require(_pool_hyper == _pool_factory, 'wrong tokens');    
+            // removed due to code size
+            // address _pool_factory = IAlgebraFactory(_factory).poolByPair(tokenA, tokenB);
+            // address _pool_hyper = IHypervisor(_pool).pool();
+            // require(_pool_hyper == _pool_factory, 'wrong tokens');    
             isPair = true;
         } else {
             //update
@@ -666,6 +662,11 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     function epochTimestamp() public view returns(uint256) {
         return IMinter(minter).active_period();
     }
+
+    function getNextEpochStart() public view returns(uint256){
+        return epochTimestamp() + EPOCH_DURATION;
+    }
+
     /* -----------------------------------------------------------------------------
     --------------------------------------------------------------------------------
     --------------------------------------------------------------------------------

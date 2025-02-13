@@ -12,5 +12,5 @@ interface IRouter01 {
     function addLiquidity(address tokenA,address tokenB,bool stable,uint amountADesired,uint amountBDesired,uint amountAMin,uint amountBMin,address to,uint deadline) external returns (uint amountA, uint amountB, uint liquidity);
     function isPair(address pair) external view returns (bool);
     function getReserves(address tokenA, address tokenB, bool stable) external view returns (uint reserveA, uint reserveB);
-
+    function getAmountOut(uint amountIn, address tokenIn, address tokenOut) external view returns (uint amount, bool stable);
 }
