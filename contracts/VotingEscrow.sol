@@ -806,7 +806,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         _deposit_for(_tokenId, _value, 0, _locked, DepositType.INCREASE_LOCK_AMOUNT);
 
         // poke for the gained voting power 
+        // if(IVoterV3(voter).lastVoted(_tokenId)!=0) {
         IVoterV3(voter).poke(_tokenId);
+        // }
     }
 
     /// @notice Extend the unlock time for `_tokenId`
@@ -824,8 +826,10 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
 
         _deposit_for(_tokenId, 0, unlock_time, _locked, DepositType.INCREASE_UNLOCK_TIME);
 
-        // poke for the updated voting power -- nabeel
+        // poke for the gained voting power 
+        // if(IVoterV3(voter).lastVoted(_tokenId)!=0) {
         IVoterV3(voter).poke(_tokenId);
+        // }
     }
 
     /// @notice Withdraw all tokens for `_tokenId`
