@@ -9,7 +9,7 @@ async function main() {
     const customTokenContract = await ethers.getContractFactory("CustomToken");
     const millionTokens = "1000000000000000000000000000000000";
 
-    console.log("Custom Token Contract:", customTokenContract);
+    // console.log("Custom Token Contract:", customTokenContract);
 
     // Deploy tokens sequentially using a for...of loop
     for (let i = 0; i < tokens.length; i++) {

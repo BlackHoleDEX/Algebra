@@ -4,62 +4,62 @@
     "ticker": "WETH",
     "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x4200000000000000000000000000000000000006/logo.svg",
     "decimal": 18,
-    "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+    "address": "0xa63Fe72AdE0A4e5eD762B2ECF9CaD3a58664001A"
   },
   {
     "name": "USDC",
     "ticker": "USDC",
     "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x833589fcd6edb6e08f4c7c32d4f71b54bda02913/logo.svg",
     "decimal": 18,
-    "address": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
+    "address": "0x349ddcfda1855c82123FD63aaA49F9bee949C752"
   },
   {
     "name": "CHAMP",
     "ticker": "CHAMP",
     "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens/8453/0xeb6d78148f001f3aa2f588997c5e102e489ad341/logo.svg",
     "decimal": 18,
-    "address": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"
+    "address": "0xc41b8BEeE9f9AeD4558d226da38f67891B474731"
   },
   {
     "name": "SUPER",
     "ticker": "SUPER",
     "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens/8453/0xdbfefd2e8460a6ee4955a68582f85708baea60a3/logo.svg",
     "decimal": 18,
-    "address": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9"
+    "address": "0x0E49e5C82Dc287404892A43D5bef4172aFDcdE3C"
   },
   {
     "name": "XAI",
     "ticker": "XAI",
     "logo": "https://coin-images.coingecko.com/coins/images/34258/large/round_icon_2048_px.png?1719523838",
     "decimal": 18,
-    "address": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9"
+    "address": "0x2b9ba91D776Ef9b5fF95C394342E7C9235925D1D"
   },
   {
     "name": "VIRTUALS",
     "ticker": "VIRTUALS",
     "logo": "https://coin-images.coingecko.com/coins/images/34057/large/LOGOMARK.png?1708356054",
     "decimal": 18,
-    "address": "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707"
+    "address": "0xB29FdbB3c46EE85884dA523971a79F5e9a22bC83"
   },
   {
     "name": "YGG",
     "ticker": "YGG",
     "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens/8453/0xaac78d1219c08aecc8e37e03858fe885f5ef1799/logo.svg",
     "decimal": 18,
-    "address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+    "address": "0xa6aC8d860Ca8e99943C9460216C1ecF5F298025c"
   },
   {
     "name": "cbBTC",
     "ticker": "cbBTC",
     "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens/8453/0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf/logo.svg",
     "decimal": 18,
-    "address": "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853"
+    "address": "0x1E41278C59147Bcac04E45744EE04945daA7ac88"
   },
   {
     "name": "DAI",
     "ticker": "DAI",
     "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens/8453/0x50c5725949a6f0c72e6c4a641f24049a917db0cb/logo.svg",
     "decimal": 18,
-    "address": "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6"
+    "address": "0xe185EC9cFA90FaEB88A396Dc86aA5a79Fb653F88"
   }
 ]
