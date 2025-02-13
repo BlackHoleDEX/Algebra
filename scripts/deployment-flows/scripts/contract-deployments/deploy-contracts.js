@@ -32,7 +32,7 @@ const deployPairFactory = async () => {
         const pairFactory = await upgrades.deployProxy(pairFactoryContract,[],{initializer: 'initialize'});
         txDeployed = await pairFactory.deployed();
         console.log("pairFactory: ", pairFactory.address)
-        generateConstantFile("PairFactory", pairFactory.address);
+        generateConstantFile("PairFactoryUpgradeable", pairFactory.address);
         return pairFactory.address;
     } catch (error) {
         console.log("error in deploying pairFactory: ", error)
