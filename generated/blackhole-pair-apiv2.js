@@ -1,4 +1,4 @@
-const blackholePairAPIV2Address = "0x66B26dD3dfABB49048a5803922E3D72af826D1C7";
+const blackholePairAPIV2Address = "0x4Cf907775217e5E1cFb1d96c3DE52ECd049cE16E";
 
 const blackholePairAPIV2Abi = [
   {
