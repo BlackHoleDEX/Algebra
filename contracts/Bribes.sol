@@ -19,12 +19,6 @@ contract Bribe is ReentrancyGuard {
 
     /* ========== STATE VARIABLES ========== */
 
-    struct Reward {
-        uint256 periodFinish;
-        uint256 rewardsPerEpoch;
-        uint256 lastUpdateTime; 
-    }
-
     struct Checkpoint {
         uint256 timestamp;
         uint256 balanceOf;
@@ -74,19 +68,6 @@ contract Bribe is ReentrancyGuard {
         owner = _owner;
         TYPE = _type;
     }
-
-    
-
-    /// @notice get the current epoch 
-    function getEpochStart() public view returns(uint256){
-        return IMinter(minter).active_period();
-    }
-
-    /// @notice get next epoch (where bribes are saved)
-    function getNextEpochStart() public view returns(uint256){
-        return getEpochStart() + WEEK;
-    }
-
 
     /* ========== VIEWS ========== */
 
