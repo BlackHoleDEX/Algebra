@@ -6,8 +6,7 @@ import './interfaces/IBribe.sol';
 import './interfaces/IBribeFactory.sol';
 import './interfaces/IGauge.sol';
 import './interfaces/IGaugeFactory.sol';
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import './interfaces/IERC20.sol';
 import './interfaces/IMinter.sol';
 import './interfaces/IPairInfo.sol';
 import './interfaces/IPairFactory.sol';
@@ -22,7 +21,6 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeab
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 
 contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
-    using SafeERC20 for IERC20;
     using SafeERC20Upgradeable for IERC20Upgradeable;
     
     bool internal initflag;
@@ -57,6 +55,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
     mapping(address => uint256) public weights;
     uint256 public totalWeight;
+    mapping(uint256 => uint256) public usedWeights;
 
     mapping(uint256 => uint256) public lastVoted;                     // nft      => timestamp of last vote (this is shifted to thursday of that epoc)
     mapping(uint256 => uint256) public lastVotedTimestamp;            // nft      => timestamp of last vote
@@ -321,7 +320,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         // Return claimable back to minter
         uint256 _claimable = claimable[_gauge];
         if (_claimable > 0) {
-            IERC20(base).safeTransfer(minter, _claimable);
+            IERC20Upgradeable(base).safeTransfer(minter, _claimable);
         }
         claimable[_gauge] = 0;
 
@@ -369,9 +368,6 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
             uint256 _votes = votes[_tokenId][_pool];
 
             if (_votes != 0) {
-
-                // if user last vote is < than epochTimestamp then votes are 0! IF not underflow occur
-                //if(lastVoted[_tokenId] > _time) weightsPerEpoch[_time][_pool] -= _votes;
                 weights[_pool] -= _votes;
 
                 votes[_tokenId][_pool] -= _votes;
@@ -385,13 +381,8 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
                 emit Abstained(_tokenId, _votes);
             }
         }
-
-        
-        // if user last vote is < than epochTimestamp then _totalWeight is 0! IF not underflow occur
-        //if(lastVoted[_tokenId] < _time) _totalWeight = 0;
-        
-        //totalWeightsPerEpoch[_time] -= _totalWeight;
         totalWeight -= _totalWeight;
+        usedWeights[_tokenId] = 0;
         delete poolVote[_tokenId];
     }
 
@@ -470,6 +461,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         if (_usedWeight > 0) IVotingEscrow(_ve).voting(_tokenId);
         //totalWeightsPerEpoch[_time] += _totalWeight;
         totalWeight += _totalWeight;
+        usedWeights[_tokenId] = _usedWeight;
     }
 
     /// @notice claim LP gauge rewards
