@@ -1,4 +1,4 @@
-const blackholePairAPIV2Address = "0xe487cF8Ce781826379918FC7ca4Bb9B279222A68";
+const blackholePairAPIV2Address = "0x4Cf907775217e5E1cFb1d96c3DE52ECd049cE16E";
 
 const blackholePairAPIV2Abi = [
   {
@@ -309,18 +309,13 @@ const blackholePairAPIV2Abi = [
             "type": "uint256"
           },
           {
-            "internalType": "address",
-            "name": "feeAddress",
-            "type": "address"
-          },
-          {
             "internalType": "uint256",
-            "name": "token0_fees",
+            "name": "staked_token0_fees",
             "type": "uint256"
           },
           {
             "internalType": "uint256",
-            "name": "token1_fees",
+            "name": "staked_token1_fees",
             "type": "uint256"
           },
           {
@@ -391,6 +386,106 @@ const blackholePairAPIV2Abi = [
         "internalType": "struct BlackholePairAPIV2.pairInfo[]",
         "name": "pairs",
         "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amountIn",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "tokenIn",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "tokenOut",
+        "type": "address"
+      }
+    ],
+    "name": "getAmountOut",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "amountOut",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "pair",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "from",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "to",
+            "type": "address"
+          },
+          {
+            "internalType": "bool",
+            "name": "stable",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amountOut",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct BlackholePairAPIV2.route[]",
+        "name": "routes",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amountIn",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "tokenIn",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "tokenMid",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "tokenOut",
+        "type": "address"
+      }
+    ],
+    "name": "getAmountViaHopping",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount1",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount2",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -549,18 +644,13 @@ const blackholePairAPIV2Abi = [
             "type": "uint256"
           },
           {
-            "internalType": "address",
-            "name": "feeAddress",
-            "type": "address"
-          },
-          {
             "internalType": "uint256",
-            "name": "token0_fees",
+            "name": "staked_token0_fees",
             "type": "uint256"
           },
           {
             "internalType": "uint256",
-            "name": "token1_fees",
+            "name": "staked_token1_fees",
             "type": "uint256"
           },
           {
@@ -715,6 +805,11 @@ const blackholePairAPIV2Abi = [
         "internalType": "address",
         "name": "_voter",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_router",
+        "type": "address"
       }
     ],
     "name": "initialize",
@@ -765,6 +860,19 @@ const blackholePairAPIV2Abi = [
     "outputs": [
       {
         "internalType": "contract IPairFactory",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "routerV2",
+    "outputs": [
+      {
+        "internalType": "contract IRouter01",
         "name": "",
         "type": "address"
       }

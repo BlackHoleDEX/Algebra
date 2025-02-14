@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 contract Bribe is ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    uint256 public WEEK = 1800; // BlackHole:: temperory value need to changed it back to 7 days
+    uint256 public WEEK = 3600; // BlackHole:: temperory value need to changed it back to 7 days
     uint256 public firstBribeTimestamp;
 
     /* ========== STATE VARIABLES ========== */
