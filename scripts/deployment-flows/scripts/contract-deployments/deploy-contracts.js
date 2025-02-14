@@ -79,10 +79,10 @@ const deployPermissionRegistry = async() =>{
     }
 }
 
-const deployBloackholeV2Abi = async(voterV3Address)=>{
+const deployBloackholeV2Abi = async(voterV3Address, routerV2Address)=>{
     try {
         const blackholePairAbiV2Contract = await ethers.getContractFactory("BlackholePairAPIV2");
-        const input = [voterV3Address]
+        const input = [voterV3Address, routerV2Address]
         const blackHolePairAPIV2Factory = await upgrades.deployProxy(blackholePairAbiV2Contract, input, {initializer: 'initialize'});
         txDeployed = await blackHolePairAPIV2Factory.deployed();
         console.log('BlackHolePairAPIV2Factory : ', blackHolePairAPIV2Factory.address)
@@ -384,7 +384,7 @@ async function main () {
     await setVoterBribeV3(voterV3Address, bribeV3Address);
 
     // blackholeV2Abi deployment
-    const blackholeV2AbiAddress = await deployBloackholeV2Abi(voterV3Address);
+    const blackholeV2AbiAddress = await deployBloackholeV2Abi(voterV3Address, routerV2Address);
 
     //deploy rewardsDistributor
     const rewardsDistributorAddress = await deployRewardsDistributor(votingEscrowAddress);
@@ -400,8 +400,14 @@ async function main () {
     //set minter in black
     await setMinterInBlack(minterUpgradableAddress, blackAddress);
 
+    // console.log("BEFORE INITIALIZING MINTER: ")
+    // await logActivePeriod();
+
     // call _initialize
     await initializeMinter(minterUpgradableAddress);
+
+    // console.log("AFTER INITIALIZING MINTER: ")
+    // await logActivePeriod();
 
     //set minter in reward distributer in depositer
     await setMinterInRewardDistributer(minterUpgradableAddress, rewardsDistributorAddress); //set as depositor

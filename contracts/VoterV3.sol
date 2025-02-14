@@ -12,18 +12,13 @@ import './interfaces/IPairInfo.sol';
 import './interfaces/IPairFactory.sol';
 import './interfaces/IVotingEscrow.sol';
 import './interfaces/IPermissionsRegistry.sol';
-import './interfaces/IAlgebraFactory.sol';
+// import './interfaces/IAlgebraFactory.sol';
 import "hardhat/console.sol";
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-
-
-interface IHypervisor {
-    function pool() external view returns(address);
-}
 
 contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
@@ -46,7 +41,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     uint256 internal constant DURATION = 7 days;                   // rewards are released over 7 days
     uint256 public VOTE_DELAY;                                     // delay between votes in seconds
     uint256 public constant MAX_VOTE_DELAY = 7 days;               // Max vote delay allowed
-    uint public constant EPOCH_DURATION = 1800; //BlackHole:: Current duration need to change 1 week
+    uint public constant EPOCH_DURATION = 3600; //BlackHole:: Current duration need to change 1 week
      uint256 internal constant MIN_OF_MAX_VOTING_NUM = 10;
 
     mapping(address => uint256) internal supplyIndex;              // gauge    => index
@@ -575,9 +570,10 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
             isPair = IPairFactory(_factory).isPair(_pool);
         } 
         if(_gaugeType == 1) {
-            address _pool_factory = IAlgebraFactory(_factory).poolByPair(tokenA, tokenB);
-            address _pool_hyper = IHypervisor(_pool).pool();
-            require(_pool_hyper == _pool_factory, 'wrong tokens');    
+            // removed due to code size
+            // address _pool_factory = IAlgebraFactory(_factory).poolByPair(tokenA, tokenB);
+            // address _pool_hyper = IHypervisor(_pool).pool();
+            // require(_pool_hyper == _pool_factory, 'wrong tokens');    
             isPair = true;
         } else {
             //update
@@ -671,6 +667,11 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     function epochTimestamp() public view returns(uint256) {
         return IMinter(minter).active_period();
     }
+
+    function getNextEpochStart() public view returns(uint256){
+        return epochTimestamp() + EPOCH_DURATION;
+    }
+
     /* -----------------------------------------------------------------------------
     --------------------------------------------------------------------------------
     --------------------------------------------------------------------------------
@@ -786,7 +787,6 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     /// @dev    this function track the gauge index to emit the correct $the amount after the distribution
     function _updateForAfterDistribution(address _gauge) private {
         address _pool = poolForGauge[_gauge];
-        uint256 _time = epochTimestamp() - 1800;
         //uint256 _supplied = weightsPerEpoch[_time][_pool];
         uint256 _supplied = weights[_pool];
 

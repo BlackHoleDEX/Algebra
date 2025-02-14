@@ -15,4 +15,5 @@ interface IVoterV3 {
     //function totalWeightAt(uint _time) external view returns(uint);
     function poke(uint256 _tokenId) external;
     function epochTimestamp() external view returns(uint);
+    function lastVoted(uint tokenId) external view returns(uint);
 }
