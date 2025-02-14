@@ -25,6 +25,9 @@ contract CamelotBasePluginFactory is ICamelotBasePluginFactory {
   bool public override slidingFeeStatus;
 
   /// @inheritdoc ICamelotBasePluginFactory
+  address public override securityRegistry;
+
+  /// @inheritdoc ICamelotBasePluginFactory
   mapping(address poolAddress => address pluginAddress) public override pluginByPool;
 
   modifier onlyAdministrator() {
@@ -65,6 +68,7 @@ contract CamelotBasePluginFactory is ICamelotBasePluginFactory {
     address plugin = address(new CamelotBasePlugin(pool, algebraFactory, address(this)));
     IDynamicFeeManager(plugin).changeFeeConfiguration(defaultFeeConfiguration);
     IDynamicFeeManager(plugin).changeDynamicFeeStatus(dynamicFeeStatus);
+    ISecurityPlugin(plugin).setSecurityRegistry(securityRegistry);
     ISlidingFeePlugin(plugin).changeSlidingFeeStatus(slidingFeeStatus);
     pluginByPool[pool] = plugin;
     return plugin;
@@ -89,5 +93,12 @@ contract CamelotBasePluginFactory is ICamelotBasePluginFactory {
     require(status != slidingFeeStatus);
     slidingFeeStatus = status;
     emit SlidingFeeStatus(status);
+  }
+
+  /// @inheritdoc ICamelotBasePluginFactory
+  function setSecurityRegistry(address _securityRegistry) external override onlyAdministrator {
+    require(securityRegistry != _securityRegistry);
+    securityRegistry = _securityRegistry;
+    emit SecurityRegistry(_securityRegistry);
   }
 }

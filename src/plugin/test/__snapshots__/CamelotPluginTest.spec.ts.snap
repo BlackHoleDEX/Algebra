@@ -120,4 +120,4 @@ Array [
 ]
 `;
 
-exports[`CamelotBasePlugin CamelotBasePlugin external methods #changeFeeConfiguration feeConfig getter gas cost [ @skip-on-coverage ] 1`] = `23752`;
+exports[`CamelotBasePlugin CamelotBasePlugin external methods #changeFeeConfiguration feeConfig getter gas cost [ @skip-on-coverage ] 1`] = `23730`;

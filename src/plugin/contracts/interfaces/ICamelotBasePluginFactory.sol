@@ -14,9 +14,17 @@ interface ICamelotBasePluginFactory is IAlgebraPluginFactory {
   /// @dev See the AdaptiveFee library for more details
   event DefaultFeeConfiguration(AlgebraFeeConfiguration newConfig);
 
+  /// @notice Emitted when the dynamic fee status is changed
+  /// @param isEnabled Dynamic fee new status
   event DynamicFeeStatus(bool isEnabled);
 
+  /// @notice Emitted when the sliding fee status is changed
+  /// @param isEnabled Sliding fee new status
   event SlidingFeeStatus(bool isEnabled);
+
+  /// @notice Emitted when the security registry address is changed
+  /// @param securityRegistry The security registry address after the address was changed
+  event SecurityRegistry(address securityRegistry);
 
   /// @notice The hash of 'ALGEBRA_BASE_PLUGIN_FACTORY_ADMINISTRATOR' used as role
   /// @dev allows to change settings of BasePluginV1Factory
@@ -26,9 +34,17 @@ interface ICamelotBasePluginFactory is IAlgebraPluginFactory {
   /// @return The AlgebraFactory contract address
   function algebraFactory() external view returns (address);
 
+  /// @notice Returns the status of the sliding fee
+  /// @return The status of the sliding fee
   function slidingFeeStatus() external view returns (bool);
 
+  /// @notice Returns the status of the dynamic fee
+  /// @return The status of the dynamic fee
   function dynamicFeeStatus() external view returns (bool);
+
+  /// @notice Returns current securityRegistry address
+  /// @return The securityRegistry contract address
+  function securityRegistry() external view returns (address);
 
   /// @notice Current default dynamic fee configuration
   /// @dev See the AdaptiveFee struct for more details about params.
@@ -55,7 +71,15 @@ interface ICamelotBasePluginFactory is IAlgebraPluginFactory {
   /// @param newConfig new default fee configuration. See the #AdaptiveFee.sol library for details
   function setDefaultFeeConfiguration(AlgebraFeeConfiguration calldata newConfig) external;
 
+  /// @notice Changes dynamic fee status
+  /// @param status New status of dynamic fee
   function setDynamicFeeStatus(bool status) external;
 
+  /// @notice Changes sliding fee status
+  /// @param status New status of sliding fee
   function setSlidingFeeStatus(bool status) external;
+
+  /// @dev updates securoty registry address on the factory
+  /// @param newSecurityRegistry The new security registry contract address
+  function setSecurityRegistry(address newSecurityRegistry) external;
 }

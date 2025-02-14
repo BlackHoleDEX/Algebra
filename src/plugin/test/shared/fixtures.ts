@@ -171,6 +171,7 @@ interface CamelotPluginFixture extends MockFactoryFixture {
   plugin: MockTimeCamelotBasePlugin;
   mockPluginFactory: MockTimeDSCamelotFactory;
   mockPool: MockPool;
+  registry: SecurityRegistry;
 }
 
 export const camelotPluginFixture: Fixture<CamelotPluginFixture> = async function (): Promise<CamelotPluginFixture> {
@@ -183,15 +184,22 @@ export const camelotPluginFixture: Fixture<CamelotPluginFixture> = async functio
   const mockPoolFactory = await ethers.getContractFactory('MockPool');
   const mockPool = (await mockPoolFactory.deploy()) as any as MockPool;
 
+  const registryFactory = await ethers.getContractFactory('SecurityRegistry');
+  const registry = (await registryFactory.deploy(mockFactory)) as any as SecurityRegistry;
+
+  await mockPluginFactory.setSecurityRegistry(registry)
+
   await mockPluginFactory.beforeCreatePoolHook(mockPool, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, '0x');
   const pluginAddress = await mockPluginFactory.pluginByPool(mockPool);
 
   const mockDSOperatorFactory = await ethers.getContractFactory('MockTimeCamelotBasePlugin');
   const plugin = mockDSOperatorFactory.attach(pluginAddress) as any as MockTimeCamelotBasePlugin;
+  await plugin.setSecurityRegistry(registry)
 
   return {
     plugin,
     mockPluginFactory,
-    mockPool
+    mockPool,
+    registry
   };
 };

@@ -16,6 +16,15 @@ async function main() {
 
     await dsFactory.changeDynamicFeeStatus(true);
     
+    const securityRegistryFactory = await hre.ethers.getContractFactory("SecurityRegistry");
+    const securityRegistry = await securityRegistryFactory.deploy(deploysData.factory);
+
+    await securityRegistry.waitForDeployment()
+
+    console.log("SecurityRegistry to:", securityRegistry.target);
+
+    await dsFactory.setSecurityRegistry(securityRegistry.target);
+    
     const factory = await hre.ethers.getContractAt('IAlgebraFactory', deploysData.factory)
 
     await factory.setDefaultPluginFactory(dsFactory.target)

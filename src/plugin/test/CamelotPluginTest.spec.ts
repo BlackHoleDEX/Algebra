@@ -6,7 +6,7 @@ import { expect } from './shared/expect';
 import { TEST_POOL_START_TIME, camelotPluginFixture } from './shared/fixtures';
 import { PLUGIN_FLAGS, encodePriceSqrt, expandTo18Decimals, getMaxTick, getMinTick } from './shared/utilities';
 
-import { MockPool, MockTimeCamelotBasePlugin, MockTimeDSCamelotFactory} from '../typechain';
+import { MockPool, MockTimeCamelotBasePlugin, MockTimeDSCamelotFactory, SecurityRegistry} from '../typechain';
 
 import snapshotGasCost from './shared/snapshotGasCost';
 
@@ -16,6 +16,7 @@ describe('CamelotBasePlugin', () => {
   let plugin: MockTimeCamelotBasePlugin; // modified plugin
   let mockPool: MockPool; // mock of AlgebraPool
   let mockPluginFactory: MockTimeDSCamelotFactory; // modified plugin factory
+  let registry: SecurityRegistry;
 
   async function initializeAtZeroTick(pool: MockPool) {
     await pool.initialize(encodePriceSqrt(1, 1));
@@ -26,7 +27,7 @@ describe('CamelotBasePlugin', () => {
   });
 
   beforeEach('deploy test CamelotBasePlugin', async () => {
-    ({ plugin, mockPluginFactory, mockPool  } = await loadFixture(camelotPluginFixture));
+    ({ plugin, mockPluginFactory, mockPool, registry  } = await loadFixture(camelotPluginFixture));
     await plugin.changeSlidingFeeStatus(true);
     await plugin.changeDynamicFeeStatus(true);
   });
@@ -89,13 +90,6 @@ describe('CamelotBasePlugin', () => {
         await mockPool.setPlugin(plugin);
       });
 
-      it('resets config after beforeModifyPosition', async () => {
-        await mockPool.initialize(encodePriceSqrt(1, 1));
-        await mockPool.setPluginConfig(PLUGIN_FLAGS.BEFORE_POSITION_MODIFY_FLAG);
-        expect((await mockPool.globalState()).pluginConfig).to.be.eq(PLUGIN_FLAGS.BEFORE_POSITION_MODIFY_FLAG);
-        await mockPool.mint(wallet.address, wallet.address, 0, 60, 100, '0x');
-        expect((await mockPool.globalState()).pluginConfig).to.be.eq(defaultConfig);
-      });
 
       it('resets config after afterModifyPosition', async () => {
         await mockPool.initialize(encodePriceSqrt(1, 1));
@@ -105,12 +99,6 @@ describe('CamelotBasePlugin', () => {
         expect((await mockPool.globalState()).pluginConfig).to.be.eq(defaultConfig);
       });
 
-      it('resets config after beforeFlash', async () => {
-        await mockPool.setPluginConfig(PLUGIN_FLAGS.BEFORE_FLASH_FLAG);
-        expect((await mockPool.globalState()).pluginConfig).to.be.eq(PLUGIN_FLAGS.BEFORE_FLASH_FLAG);
-        await mockPool.flash(wallet.address, 100, 100, '0x');
-        expect((await mockPool.globalState()).pluginConfig).to.be.eq(defaultConfig);
-      });
 
       it('resets config after afterFlash', async () => {
         await mockPool.setPluginConfig(PLUGIN_FLAGS.AFTER_FLASH_FLAG);
@@ -120,6 +108,49 @@ describe('CamelotBasePlugin', () => {
       });
     });
   });
+
+  describe('#SecurityPlugin', () => {
+    let defaultConfig: bigint;
+
+    beforeEach('initialize pool', async () => {
+      defaultConfig = await plugin.defaultPluginConfig();
+      await mockPool.setPlugin(plugin);
+      await mockPool.initialize(encodePriceSqrt(1, 1));
+    });
+
+    describe('ENABLE status', async () => {
+      it('works correct', async () => {
+        await expect(mockPool.swapToTick(10)).to.not.be.reverted;
+        await expect(mockPool.mint(wallet.address, wallet.address, 0, 60, 100, '0x')).not.to.be.reverted;
+        await expect(mockPool.burn(0, 60, 1000, '0x')).not.to.be.reverted; 
+        await expect(mockPool.flash(wallet.address, 100, 100, '0x')).not.to.be.reverted; 
+        expect((await mockPool.globalState()).pluginConfig).to.be.eq(defaultConfig);
+      });
+    });
+
+    describe('BURN_ONLY status', async () => {
+      it('works correct', async () => {
+        await registry.setGlobalStatus(1)
+        await expect(mockPool.swapToTick(10)).to.be.revertedWithCustomError(plugin,'BurnOnly'); 
+        await expect(mockPool.mint(wallet.address, wallet.address, 0, 60, 100, '0x')).to.be.revertedWithCustomError(plugin,'BurnOnly'); 
+        await expect(mockPool.burn(0, 60, 1000, '0x')).to.not.be.reverted;
+        await expect(mockPool.flash(wallet.address, 100, 100, '0x')).to.be.revertedWithCustomError(plugin,'BurnOnly'); 
+        expect((await mockPool.globalState()).pluginConfig).to.be.eq(defaultConfig);
+      });
+    });
+
+    describe('DISABLED status', async () => {
+      it('works correct', async () => {
+        await registry.setGlobalStatus(2)
+        await expect(mockPool.swapToTick(10)).to.be.revertedWithCustomError(plugin,'PoolDisabled');
+        await expect(mockPool.mint(wallet.address, wallet.address, 0, 60, 100, '0x')).to.be.revertedWithCustomError(plugin,'PoolDisabled');
+        await expect(mockPool.burn(0, 60, 1000, '0x')).to.be.revertedWithCustomError(plugin,'PoolDisabled');
+        await expect(mockPool.flash(wallet.address, 100, 100, '0x')).to.be.revertedWithCustomError(plugin,'PoolDisabled');
+        expect((await mockPool.globalState()).pluginConfig).to.be.eq(defaultConfig);
+
+      });
+    });
+  })
 
   describe('#VolatilityOracle', () => {
     beforeEach('connect plugin to pool', async () => {

@@ -7,13 +7,22 @@ import '@cryptoalgebra/integral-core/contracts/interfaces/plugin/IAlgebraPlugin.
 import './plugins/DynamicFeePlugin.sol';
 import './plugins/VolatilityOraclePlugin.sol';
 import './plugins/SlidingFeePlugin.sol';
+import './plugins/SecurityPlugin.sol';
 
-/// @title Algebra Integral 1.2 plugin. Contains adaptive + sliding fee and twap oracle
-contract CamelotBasePlugin is DynamicFeePlugin, VolatilityOraclePlugin, SlidingFeePlugin {
+/// @title Algebra Integral 1.2 plugin. Contains adaptive + sliding fee, safety switch and twap oracle
+contract CamelotBasePlugin is DynamicFeePlugin, VolatilityOraclePlugin, SlidingFeePlugin, SecurityPlugin {
   using Plugins for uint8;
 
   /// @inheritdoc IAlgebraPlugin
-  uint8 public constant override defaultPluginConfig = uint8(Plugins.AFTER_INIT_FLAG | Plugins.BEFORE_SWAP_FLAG | Plugins.DYNAMIC_FEE);
+  uint8 public constant override defaultPluginConfig =
+    uint8(
+      Plugins.BEFORE_POSITION_MODIFY_FLAG |
+        Plugins.AFTER_INIT_FLAG |
+        Plugins.BEFORE_SWAP_FLAG |
+        Plugins.AFTER_SWAP_FLAG |
+        Plugins.DYNAMIC_FEE |
+        Plugins.BEFORE_FLASH_FLAG
+    );
 
   constructor(address _pool, address _factory, address _pluginFactory) BasePlugin(_pool, _factory, _pluginFactory) {}
 
@@ -32,8 +41,19 @@ contract CamelotBasePlugin is DynamicFeePlugin, VolatilityOraclePlugin, SlidingF
   }
 
   /// @dev unused
-  function beforeModifyPosition(address, address, int24, int24, int128, bytes calldata) external override onlyPool returns (bytes4, uint24) {
-    _updatePluginConfigInPool(defaultPluginConfig); // should not be called, reset config
+  function beforeModifyPosition(
+    address,
+    address,
+    int24,
+    int24,
+    int128 liquidity,
+    bytes calldata
+  ) external override onlyPool returns (bytes4, uint24) {
+    if (liquidity < 0) {
+      _checkStatusOnBurn();
+    } else {
+      _checkStatus();
+    }
     return (IAlgebraPlugin.beforeModifyPosition.selector, 0);
   }
 
@@ -54,6 +74,8 @@ contract CamelotBasePlugin is DynamicFeePlugin, VolatilityOraclePlugin, SlidingF
   ) external override onlyPool returns (bytes4, uint24, uint24) {
     uint16 newFee;
     bool _dynamicFeeEnabled = dynamicFeeEnabled;
+    /// security plugin check
+    _checkStatus();
     /// get ticks for slidiing fee calculation
     (, int24 currentTick, uint16 fee, ) = _getPoolState();
     int24 lastTick = _getLastTick();
@@ -82,7 +104,7 @@ contract CamelotBasePlugin is DynamicFeePlugin, VolatilityOraclePlugin, SlidingF
 
   /// @dev unused
   function beforeFlash(address, address, uint256, uint256, bytes calldata) external override onlyPool returns (bytes4) {
-    _updatePluginConfigInPool(defaultPluginConfig); // should not be called, reset config
+    _checkStatus();
     return IAlgebraPlugin.beforeFlash.selector;
   }
 

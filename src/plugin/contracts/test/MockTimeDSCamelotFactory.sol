@@ -25,6 +25,9 @@ contract MockTimeDSCamelotFactory is ICamelotBasePluginFactory {
   /// @inheritdoc ICamelotBasePluginFactory
   bool public override slidingFeeStatus;
 
+  /// @inheritdoc ICamelotBasePluginFactory
+  address public override securityRegistry;
+
   constructor(address _algebraFactory) {
     algebraFactory = _algebraFactory;
     defaultFeeConfiguration = AdaptiveFee.initialFeeConfiguration();
@@ -82,5 +85,12 @@ contract MockTimeDSCamelotFactory is ICamelotBasePluginFactory {
     require(status != slidingFeeStatus);
     slidingFeeStatus = status;
     emit SlidingFeeStatus(status);
+  }
+
+  /// @inheritdoc ICamelotBasePluginFactory
+  function setSecurityRegistry(address _securityRegistry) external override {
+    require(securityRegistry != _securityRegistry);
+    securityRegistry = _securityRegistry;
+    emit SecurityRegistry(_securityRegistry);
   }
 }
