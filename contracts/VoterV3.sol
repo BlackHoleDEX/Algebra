@@ -6,7 +6,8 @@ import './interfaces/IBribe.sol';
 import './interfaces/IBribeFactory.sol';
 import './interfaces/IGauge.sol';
 import './interfaces/IGaugeFactory.sol';
-import './interfaces/IERC20.sol';
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import './interfaces/IMinter.sol';
 import './interfaces/IPairInfo.sol';
 import './interfaces/IPairFactory.sol';
@@ -21,7 +22,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeab
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 
 contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
-
+    using SafeERC20 for IERC20;
     using SafeERC20Upgradeable for IERC20Upgradeable;
     
     bool internal initflag;
@@ -54,10 +55,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     mapping(uint256 => mapping(address => uint256)) public votes;  // nft      => pool     => votes
     mapping(uint256 => address[]) public poolVote;                 // nft      => pools
 
-    //mapping(uint256 => mapping(address => uint256)) internal weightsPerEpoch; // timestamp => pool => weights
     mapping(address => uint256) public weights;
-
-    //mapping(uint256 => uint256) internal totalWeightsPerEpoch;         // timestamp => total weights
     uint256 public totalWeight;
 
     mapping(uint256 => uint256) public lastVoted;                     // nft      => timestamp of last vote (this is shifted to thursday of that epoc)
@@ -319,12 +317,16 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     function killGauge(address _gauge) external Governance {
         require(isAlive[_gauge], "killed");
         isAlive[_gauge] = false;
+
+        // Return claimable back to minter
+        uint256 _claimable = claimable[_gauge];
+        if (_claimable > 0) {
+            IERC20(base).safeTransfer(minter, _claimable);
+        }
         claimable[_gauge] = 0;
 
-        uint _time = epochTimestamp();
-        //totalWeightsPerEpoch[_time] -= weightsPerEpoch[_time][poolForGauge[_gauge]]; 
-
-
+        // Do we need to decrease totalWeight also. For now It's being commented out. 
+        //totalWeight = totalWeight - weights[poolForGauge[_gauge]];
         emit GaugeKilled(_gauge);
     }
 
@@ -651,19 +653,6 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         return _gaugeFactories.length;
     }
 
-    /*function weightsAt(address _pool, uint256 _time) public view returns(uint256) {
-        return weightsPerEpoch[_time][_pool];
-    }*/
-
-    /*function totalWeight() public view returns(uint256) {
-        uint256 _time = epochTimestamp();
-        return totalWeightsPerEpoch[_time];
-    }*/
-
-    /*function totalWeightAt(uint256 _time) public view returns(uint256) {
-        return totalWeightsPerEpoch[_time];
-    }*/
-
     function epochTimestamp() public view returns(uint256) {
         return IMinter(minter).active_period();
     }
@@ -696,19 +685,6 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
         emit NotifyReward(msg.sender, base, amount);
     }
-
-
-    // / @notice distribute the LP Fees to the internal bribes
-    // / @param  _gauges  gauge address where to claim the fees 
-    // / @dev    the gauge is the owner of the LPs so it has to claim
-    
-    // function distributeFees(address[] memory _gauges) external {
-    //     for (uint256 i = 0; i < _gauges.length; i++) {
-    //         if (isGauge[_gauges[i]] && isAlive[_gauges[i]]){
-    //             IGauge(_gauges[i]).claimFees();
-    //         }
-    //     }
-    // }
 
     function distributeFees() external {
         uint256 i = 0;

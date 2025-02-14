@@ -35,7 +35,6 @@ contract Bribe is ReentrancyGuard {
         uint256 supply;
     }
 
-    // mapping(address => mapping(uint256 => Reward)) public rewardData;  // token -> startTimestamp -> Reward
     mapping(address => mapping(uint256 => uint256)) public tokenRewardsPerEpoch; // token -> startTimestamp -> rewardBalance
     mapping(address => bool) public isRewardToken;
     address[] public rewardTokens;
@@ -47,15 +46,10 @@ contract Bribe is ReentrancyGuard {
 
     string public TYPE;
 
-    // owner -> reward token -> lastTime
     mapping(address => mapping(address => uint256)) public userRewardPerTokenPaid;
     mapping(address => mapping(address => uint256)) public userTimestamp;
 
-    //uint256 private _totalSupply;
-    // mapping(uint256 => uint256) private _totalSupply;
     uint256 public totalSupply;
-
-    // mapping(address => mapping(uint256 => uint256)) private _balances; //owner -> timestamp -> amount
     mapping(uint256 => uint256) public balanceOf;
 
     mapping(address => mapping(uint256 => uint256)) public lastEarn;
@@ -101,42 +95,6 @@ contract Bribe is ReentrancyGuard {
         return rewardTokens.length;
     }
 
-    /// @notice get the last totalSupply (total votes for a pool)
-    // function totalSupply() external view returns (uint256) {
-    //     uint256 _currentEpochStart = IMinter(minter).active_period(); // claim until current epoch
-    //     return _totalSupply[_currentEpochStart];
-    // }
-
-    /// @notice get a totalSupply given a timestamp
-    // function totalSupplyAt(uint256 _timestamp) external view returns (uint256) {
-    //     return _totalSupply[_timestamp];
-    // }
-
-    /// @notice read the balanceOf the tokenId at a given timestamp
-    // function balanceOfAt(uint256 tokenId, uint256 _timestamp) public view returns (uint256) {
-    //     address _owner = IVotingEscrow(ve).ownerOf(tokenId);
-    //     return _balances[_owner][_timestamp];
-    // }
-
-
-    /// @notice get last deposit available given a tokenID
-    // function balanceOf(uint256 tokenId) public view returns (uint256) {
-    //     uint256 _timestamp = getNextEpochStart();
-    //     address _owner = IVotingEscrow(ve).ownerOf(tokenId);
-    //     return _balances[_owner][_timestamp];
-    // }
-
-    /// @notice get the balance of an owner in the current epoch
-    // function balanceOfOwner(address _owner) public view returns (uint256) {
-    //     uint256 _timestamp = getNextEpochStart();
-    //     return _balances[_owner][_timestamp];
-    // }
-
-    /// @notice get the balance of an owner given a timestamp
-    // function balanceOfOwnerAt(address _owner, uint256 _timestamp) public view returns (uint256) {
-    //     return _balances[_owner][_timestamp];
-    // }
-
 
     /// @notice Read earned amount given a tokenID and _rewardToken
     function earned(uint256 tokenId, address _rewardToken) public view returns(uint256){
@@ -168,33 +126,7 @@ contract Bribe is ReentrancyGuard {
                 reward += (cp0.balanceOf * tokenRewardsPerEpoch[_rewardToken][_currTs]) / _supply;
                 _currTs += WEEK;
             }
-        }
-
-        // uint256 k = 0;
-        // uint256 reward = 0;
-        // uint256 _endTimestamp = IMinter(minter).active_period() + WEEK; // claim until current epoch
-        // address _owner = IVotingEscrow(ve).ownerOf(tokenId);
-        // uint256 _userLastTime = userTimestamp[_owner][_rewardToken];
-        
-        // if(_endTimestamp == _userLastTime){
-        //     return 0;
-        // }
-
-        // // if user first time then set it to first bribe - week to avoid any timestamp problem
-        // if(_userLastTime < firstBribeTimestamp){
-        //     _userLastTime = firstBribeTimestamp - WEEK;
-        // }
-
-        // //BlackHole:: the 500 value is due to fact the epoch time we kept is 30 minutes
-        // for(k; k < 500; k++){
-        //     if(_userLastTime == _endTimestamp){
-        //         // if we reach the current epoch, exit
-        //         break;
-        //     }
-        //     reward += _earned(_owner, _rewardToken, _userLastTime);
-        //     _userLastTime += WEEK;   
-                     
-        // }  
+        } 
         return reward;  
     }
 
@@ -263,82 +195,6 @@ contract Bribe is ReentrancyGuard {
         }
         return lower;
     }
-
-
-    /// @notice read earned amounts given an address and the reward token
-    // function earned(address _owner, address _rewardToken) public view returns(uint256){
-    //     uint256 k = 0;
-    //     uint256 reward = 0;
-    //     uint256 _endTimestamp = IMinter(minter).active_period(); // claim until current epoch
-    //     uint256 _userLastTime = userTimestamp[_owner][_rewardToken];
-        
-    //     if(_endTimestamp == _userLastTime){
-    //         return 0;
-    //     }
-
-    //     // if user first time then set it to first bribe - week to avoid any timestamp problem
-    //     if(_userLastTime < firstBribeTimestamp){
-    //         _userLastTime = firstBribeTimestamp - WEEK;
-    //     }
-
-    //     for(k; k < 50; k++){
-    //         if(_userLastTime == _endTimestamp){
-    //             // if we reach the current epoch, exit
-    //             break;
-    //         }
-    //         reward += _earned(_owner, _rewardToken, _userLastTime);
-    //         _userLastTime += WEEK;   
-                     
-    //     }  
-    //     return reward;  
-    // }
-
-    /// @notice Read earned amount given address and reward token, returns the rewards and the last user timestamp (used in case user do not claim since 50+epochs)
-    // function earnedWithTimestamp(address _owner, address _rewardToken) private view returns(uint256,uint256){
-    //     uint256 k = 0;
-    //     uint256 reward = 0;
-    //     uint256 _endTimestamp = IMinter(minter).active_period(); // claim until current epoch
-    //     uint256 _userLastTime = userTimestamp[_owner][_rewardToken];
-        
-        
-    //     // if user first time then set it to first bribe - week to avoid any timestamp problem
-    //     if(_userLastTime < firstBribeTimestamp){
-    //         _userLastTime = firstBribeTimestamp - WEEK;
-    //     }
-
-    //     for(k; k < 50; k++){
-    //         if(_userLastTime == _endTimestamp){
-    //             // if we reach the current epoch, exit
-    //             break;
-    //         }
-    //         reward += _earned(_owner, _rewardToken, _userLastTime);
-    //         _userLastTime += WEEK;   
-                     
-    //     }  
-    //     return (reward, _userLastTime);  
-    // }
-
-    /// @notice get the earned rewards
-    // function _earned(address _owner, address _rewardToken, uint256 _timestamp) internal view returns (uint256) {
-    //     uint256 _balance = balanceOfOwnerAt(_owner, _timestamp);
-    //     if(_balance == 0){
-    //         return 0;
-    //     } else {
-    //         uint256 _rewardPerToken = rewardPerToken(_rewardToken, _timestamp);
-    //         uint256 _rewards = _rewardPerToken * _balance / 1e18;
-    //         return _rewards;
-    //     }
-    // }
-
-    /// @notice get the rewards for token
-    // function rewardPerToken(address _rewardsToken, uint256 _timestamp) public view returns (uint256) {
-    //      if (_totalSupply[_timestamp] == 0) {
-    //          return rewardData[_rewardsToken][_timestamp].rewardsPerEpoch;
-    //      }
-    //      return rewardData[_rewardsToken][_timestamp].rewardsPerEpoch * 1e18 / _totalSupply[_timestamp];
-    //     return 0;
-    // }
-
  
     /* ========== MUTATIVE FUNCTIONS ========== */
 
@@ -349,15 +205,7 @@ contract Bribe is ReentrancyGuard {
     function deposit(uint256 amount, uint256 tokenId) external nonReentrant {
         require(amount > 0, "Cannot stake 0");
         require(msg.sender == voter);
-        // uint256 _startTimestamp = IMinter(minter).active_period() + WEEK;
-        // uint256 _oldSupply = _totalSupply[_startTimestamp]; 
-        // address _owner = IVotingEscrow(ve).ownerOf(tokenId);
-        // uint256 _lastBalance = _balances[_owner][_startTimestamp]; 
-
-        // _totalSupply[_startTimestamp] =  _oldSupply + amount;
         totalSupply += amount;
-
-        // _balances[_owner][_startTimestamp] = _lastBalance + amount;
         balanceOf[tokenId] += amount;
 
         _writeCheckpoint(tokenId, balanceOf[tokenId]);
@@ -404,18 +252,6 @@ contract Bribe is ReentrancyGuard {
     function withdraw(uint256 amount, uint256 tokenId) external nonReentrant {
         require(amount > 0, "Cannot withdraw 0");
         require(msg.sender == voter);
-        // uint256 _startTimestamp = IMinter(minter).active_period() + WEEK; 
-        // address _owner = IVotingEscrow(ve).ownerOf(tokenId);
-
-        // incase of bribe contract reset in gauge proxy
-        // if (amount <= _balances[_owner][_startTimestamp]) {
-        //     uint256 _oldSupply = _totalSupply[_startTimestamp]; 
-        //     uint256 _oldBalance = _balances[_owner][_startTimestamp];
-        //     _totalSupply[_startTimestamp] =  _oldSupply - amount;
-        //     _balances[_owner][_startTimestamp] =  _oldBalance - amount;
-        //     emit Withdrawn(tokenId, amount);
-        // }
-
         if (amount <= balanceOf[tokenId]) {
             totalSupply -= amount;
             balanceOf[tokenId] -= amount;
@@ -432,76 +268,11 @@ contract Bribe is ReentrancyGuard {
          address _owner = IVotingEscrow(ve).ownerOf(tokenId);
         uint256 _length = tokens.length;
         for (uint256 i = 0; i < _length; i++) {
-            uint256 _reward = earned(tokens[i], tokenId);
+            uint256 _reward = earned(tokenId, tokens[i]);
             lastEarn[tokens[i]][tokenId] = block.timestamp;
             if (_reward > 0) IERC20(tokens[i]).safeTransfer(_owner, _reward);
         }
-        // uint256 _userLastTime;
-        // uint256 reward = 0;
-        // address _owner = IVotingEscrow(ve).ownerOf(tokenId);
-        
-        // for (uint256 i = 0; i < tokens.length; i++) {
-        //     address _rewardToken = tokens[i];
-        //     (reward, _userLastTime) = earnedWithTimestamp(_owner, _rewardToken);          
-        //     if (reward > 0) {
-        //         IERC20(_rewardToken).safeTransfer(_owner, reward);
-        //         emit RewardPaid(_owner, _rewardToken, reward);
-        //     }
-        //     userTimestamp[_owner][_rewardToken] = _userLastTime;
-        // }
     }
-
-    /// @notice Claim the rewards given msg.sender
-    // function getReward(address[] memory tokens) external nonReentrant  {
-    //     uint256 _userLastTime;
-    //     uint256 reward = 0;
-    //     address _owner = msg.sender;
-        
-    //     for (uint256 i = 0; i < tokens.length; i++) {
-    //         address _rewardToken = tokens[i];
-    //         (reward, _userLastTime) = earnedWithTimestamp(_owner, _rewardToken);          
-    //         if (reward > 0) {
-    //             IERC20(_rewardToken).safeTransfer(_owner, reward);
-    //             emit RewardPaid(_owner, _rewardToken, reward);
-    //         }
-    //         userTimestamp[_owner][_rewardToken] = _userLastTime;
-    //     }
-    // }
-
-    /// @notice Claim rewards from voter
-    // function getRewardForOwner(uint256 tokenId, address[] memory tokens) public nonReentrant  {
-    //     require(msg.sender == voter);
-    //     uint256 _userLastTime;
-    //     uint256 reward = 0;
-    //     address _owner = IVotingEscrow(ve).ownerOf(tokenId);
-
-    //     for (uint256 i = 0; i < tokens.length; i++) {
-    //         address _rewardToken = tokens[i];
-    //         (reward, _userLastTime) = earnedWithTimestamp(_owner, _rewardToken);    
-    //         if (reward > 0) {
-    //             IERC20(_rewardToken).safeTransfer(_owner, reward);
-    //             emit RewardPaid(_owner, _rewardToken, reward);
-    //         }
-    //         userTimestamp[_owner][_rewardToken] = _userLastTime;
-    //     }
-    // }
-
-    /// @notice Claim rewards from voter
-    // function getRewardForAddress(address _owner, address[] memory tokens) public nonReentrant  {
-    //     require(msg.sender == voter);
-    //     uint256 _userLastTime;
-    //     uint256 reward = 0;
-
-    //     for (uint256 i = 0; i < tokens.length; i++) {
-    //         address _rewardToken = tokens[i];
-    //         (reward, _userLastTime) = earnedWithTimestamp(_owner, _rewardToken);    
-    //         if (reward > 0) {
-    //             IERC20(_rewardToken).safeTransfer(_owner, reward);
-    //             emit RewardPaid(_owner, _rewardToken, reward);
-    //         }
-    //         userTimestamp[_owner][_rewardToken] = _userLastTime;
-    //     }
-    // }
 
     /// BLACKHOLE: need to change duration for testing purpose currently 20 minutes
     function setRewardDuration(uint256 _duration) external {
@@ -515,17 +286,6 @@ contract Bribe is ReentrancyGuard {
 
         uint256 epochStart = BlackTimeLibrary.epochStart(block.timestamp);
         tokenRewardsPerEpoch[_rewardsToken][epochStart] += reward;
-        
-        // uint256 _startTimestamp = IMinter(minter).active_period() + WEEK; //period points to the current thursday. Bribes are distributed from next epoch (thursday)
-        // if(firstBribeTimestamp == 0){
-        //     firstBribeTimestamp = _startTimestamp;
-        // }
-
-        // uint256 _lastReward = rewardData[_rewardsToken][_startTimestamp].rewardsPerEpoch;
-        
-        // rewardData[_rewardsToken][_startTimestamp].rewardsPerEpoch = _lastReward + reward;
-        // rewardData[_rewardsToken][_startTimestamp].lastUpdateTime = block.timestamp;
-        // rewardData[_rewardsToken][_startTimestamp].periodFinish = _startTimestamp + WEEK;
         emit RewardAdded(_rewardsToken, reward, epochStart);
     }
 
@@ -559,11 +319,6 @@ contract Bribe is ReentrancyGuard {
         uint256 _startTimestamp = IMinter(minter).active_period() + WEEK;
         uint256 _lastReward = tokenRewardsPerEpoch[tokenAddress][_startTimestamp];
         tokenRewardsPerEpoch[tokenAddress][_startTimestamp] = _lastReward - tokenAmount;
-
-        // uint256 _startTimestamp = IMinter(minter).active_period() + WEEK;
-        // uint256 _lastReward = rewardData[tokenAddress][_startTimestamp].rewardsPerEpoch;
-        // rewardData[tokenAddress][_startTimestamp].rewardsPerEpoch = _lastReward - tokenAmount;
-        // rewardData[tokenAddress][_startTimestamp].lastUpdateTime = block.timestamp;
         IERC20(tokenAddress).safeTransfer(owner, tokenAmount);
         emit Recovered(tokenAddress, tokenAmount);
     }
