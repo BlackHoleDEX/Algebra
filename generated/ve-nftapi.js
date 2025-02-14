@@ -1,4 +1,4 @@
-const veNFTAPIAddress = "0xfA032A020147f054303be769F01c4922d2F4c9E6";
+const veNFTAPIAddress = "0x7056e50e381196F264730E3F2b8B4a4df40a36f7";
 
 const veNFTAPIAbi = [
   {
@@ -175,6 +175,11 @@ const veNFTAPIAbi = [
           {
             "internalType": "bool",
             "name": "voted",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "hasVotedForEpoch",
             "type": "bool"
           },
           {
@@ -386,6 +391,11 @@ const veNFTAPIAbi = [
             "type": "bool"
           },
           {
+            "internalType": "bool",
+            "name": "hasVotedForEpoch",
+            "type": "bool"
+          },
+          {
             "internalType": "uint256",
             "name": "attachments",
             "type": "uint256"
@@ -486,6 +496,11 @@ const veNFTAPIAbi = [
           {
             "internalType": "bool",
             "name": "voted",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "hasVotedForEpoch",
             "type": "bool"
           },
           {

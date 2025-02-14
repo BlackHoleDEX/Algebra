@@ -2214,6 +2214,11 @@
       "address": "0xfA032A020147f054303be769F01c4922d2F4c9E6",
       "txHash": "0xaeefac04f8158364e9429505c0fd6323cdee63a5771ed5b5ef8307315b80c1f8",
       "kind": "transparent"
+    },
+    {
+      "address": "0x7056e50e381196F264730E3F2b8B4a4df40a36f7",
+      "txHash": "0xe72808fd010932306d144a72df5660f851fb1ff541a1cf4e2384136babb2aeff",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -21171,6 +21176,131 @@
             "numberOfBytes": "20"
           },
           "t_contract(IVotingEscrow)18071": {
+            "label": "contract IVotingEscrow",
+            "numberOfBytes": "20"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "7e2639bc9c581ddba3216351dabd518f21db354964bfc270c07c660352a10384": {
+      "address": "0xC385A4E23CB7e89c25d5463CcC3593265f6D49De",
+      "txHash": "0xd9891e127e1d97bd67545a4a6f1184045eaa467ca4be6b8c2ae5ab6a92417721",
+      "layout": {
+        "solcVersion": "0.8.13",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "voter",
+            "offset": 2,
+            "slot": "0",
+            "type": "t_contract(IVoter)2422",
+            "contract": "veNFTAPI",
+            "src": "contracts/APIHelper/veNFTAPI.sol:93"
+          },
+          {
+            "label": "voterV3",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_contract(IVoterV3)2511",
+            "contract": "veNFTAPI",
+            "src": "contracts/APIHelper/veNFTAPI.sol:94"
+          },
+          {
+            "label": "underlyingToken",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_address",
+            "contract": "veNFTAPI",
+            "src": "contracts/APIHelper/veNFTAPI.sol:95"
+          },
+          {
+            "label": "ve",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_contract(IVotingEscrow)2694",
+            "contract": "veNFTAPI",
+            "src": "contracts/APIHelper/veNFTAPI.sol:98"
+          },
+          {
+            "label": "rewardDisitributor",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_contract(IRewardsDistributor)2311",
+            "contract": "veNFTAPI",
+            "src": "contracts/APIHelper/veNFTAPI.sol:99"
+          },
+          {
+            "label": "pairAPI",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_address",
+            "contract": "veNFTAPI",
+            "src": "contracts/APIHelper/veNFTAPI.sol:101"
+          },
+          {
+            "label": "pairFactory",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_contract(IPairFactory)2290",
+            "contract": "veNFTAPI",
+            "src": "contracts/APIHelper/veNFTAPI.sol:102"
+          },
+          {
+            "label": "owner",
+            "offset": 0,
+            "slot": "7",
+            "type": "t_address",
+            "contract": "veNFTAPI",
+            "src": "contracts/APIHelper/veNFTAPI.sol:105"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IPairFactory)2290": {
+            "label": "contract IPairFactory",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IRewardsDistributor)2311": {
+            "label": "contract IRewardsDistributor",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IVoter)2422": {
+            "label": "contract IVoter",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IVoterV3)2511": {
+            "label": "contract IVoterV3",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IVotingEscrow)2694": {
             "label": "contract IVotingEscrow",
             "numberOfBytes": "20"
           },

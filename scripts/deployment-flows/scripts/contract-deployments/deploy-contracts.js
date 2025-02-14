@@ -416,7 +416,7 @@ async function main () {
     const epochControllerAddress = await deployEpochController(voterV3Address, minterUpgradableAddress);
 
     //set chainlink address
-    await setChainLinkAddress("0xB69668fC5CC118FF71cd3D2D275c6e866f192A9c", "0xb2C2f24FcC2478f279B6B566419a739FA53c70D3");
+    await setChainLinkAddress(epochControllerAddress, "0xb2C2f24FcC2478f279B6B566419a739FA53c70D3");
 
     //add black to user Address
     await addBlackToUserAddress(minterUpgradableAddress);
