@@ -14,6 +14,7 @@ import './interfaces/IVotingEscrow.sol';
 import './interfaces/IPermissionsRegistry.sol';
 // import './interfaces/IAlgebraFactory.sol';
 import "hardhat/console.sol";
+import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
@@ -61,6 +62,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     mapping(uint256 => uint256) public lastVotedTimestamp;            // nft      => timestamp of last vote
     mapping(address => bool) public isGauge;                    // gauge    => boolean [is a gauge?]
     mapping(address => bool) public isWhitelisted;              // token    => boolean [is an allowed token?]
+    mapping(uint256 => bool) public isWhitelistedNFT;
     mapping(address => bool) public isAlive;                    // gauge    => boolean [is the gauge alive?]
     mapping(address => bool) public isFactory;                  // factory  => boolean [the pair factory exists?]
     mapping(address => bool) public isGaugeFactory;             // g.factory=> boolean [the gauge factory exists?]
@@ -74,6 +76,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     event DistributeReward(address indexed sender, address indexed gauge, uint256 amount);
     event Whitelisted(address indexed whitelister, address indexed token);
     event Blacklisted(address indexed blacklister, address indexed token);
+    event WhitelistedNFT(address indexed whitelister, uint256 tokenId);
 
     event SetMinter(address indexed old, address indexed latest);
     event SetBribeFactory(address indexed old, address indexed latest);
@@ -311,6 +314,11 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         emit Blacklisted(msg.sender, _token);
     }
 
+    function whitelistNFT(uint256 _tokenId, bool _bool) external Governance() {
+        isWhitelistedNFT[_tokenId] = _bool;
+        emit WhitelistedNFT(msg.sender, _tokenId);
+    }
+
      /// @notice Kill a malicious gauge 
     /// @param  _gauge gauge to kill
     function killGauge(address _gauge) external Governance {
@@ -348,8 +356,8 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
     
     /// @notice Reset the votes of a given TokenID
-    function reset(uint256 _tokenId) external nonReentrant {
-        _voteDelay(_tokenId);
+    function reset(uint256 _tokenId) external onlyNewEpoch(_tokenId) nonReentrant {
+        //_voteDelay(_tokenId);
         require(IVotingEscrow(_ve).isApprovedOrOwner(msg.sender, _tokenId), "!approved/Owner");
         _reset(_tokenId);
         IVotingEscrow(_ve).abstain(_tokenId);
@@ -388,7 +396,10 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
     /// @notice Recast the saved votes of a given TokenID
     function poke(uint256 _tokenId) external nonReentrant {
-        _voteDelay(_tokenId);
+        // _voteDelay(_tokenId);
+        if (block.timestamp <= BlackTimeLibrary.epochVoteStart(block.timestamp)){
+            revert("Distribution Window");
+        }
         require(IVotingEscrow(_ve).isApprovedOrOwner(msg.sender, _tokenId), "!approved/Owner");
         address[] memory _poolVote = poolVote[_tokenId];
         uint256 _poolCnt = _poolVote.length;
@@ -408,10 +419,15 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     /// @param  _tokenId    veNFT tokenID used to vote
     /// @param  _poolVote   array of LPs addresses to vote  (eg.: [sAMM usdc-usdt   , sAMM busd-usdt, vAMM wbnb-the ,...])
     /// @param  _weights    array of weights for each LPs   (eg.: [10               , 90            , 45             ,...])  
-    function vote(uint256 _tokenId, address[] calldata _poolVote, uint256[] calldata _weights) external nonReentrant {
-        _voteDelay(_tokenId);
+    function vote(uint256 _tokenId, address[] calldata _poolVote, uint256[] calldata _weights) 
+        external onlyNewEpoch(_tokenId) nonReentrant {
+        //_voteDelay(_tokenId);
         require(IVotingEscrow(_ve).isApprovedOrOwner(msg.sender, _tokenId), "!approved/Owner");
         require(_poolVote.length == _weights.length, "Pool/Weights length !=");
+        uint256 _timestamp = block.timestamp;
+        if ((_timestamp > BlackTimeLibrary.epochVoteEnd(_timestamp)) && !isWhitelistedNFT[_tokenId]){
+            revert("Not Whitelisted Token");
+        }
         _vote(_tokenId, _poolVote, _weights);
         lastVoted[_tokenId] = epochTimestamp() + 1;
         lastVotedTimestamp[_tokenId] = block.timestamp;
@@ -503,10 +519,16 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
   
     /// @notice check if user can vote
-    function _voteDelay(uint256 _tokenId) internal view {
-        require(block.timestamp > lastVoted[_tokenId] + VOTE_DELAY, "ERR: VOTE_DELAY");
-    }
+    // function _voteDelay(uint256 _tokenId) internal view {
+    //     require(block.timestamp > lastVoted[_tokenId] + VOTE_DELAY, "ERR: VOTE_DELAY");
+    // }
 
+    modifier onlyNewEpoch(uint256 _tokenId) {
+        // ensure new epoch since last vote
+        if (BlackTimeLibrary.epochStart(block.timestamp) <= lastVoted[_tokenId]) revert("Already Voted in current Epoch");
+        if (block.timestamp <= BlackTimeLibrary.epochVoteStart(block.timestamp)) revert("Distribution Window");
+        _;
+    }
 
 
      /* -----------------------------------------------------------------------------
