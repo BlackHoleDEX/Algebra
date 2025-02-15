@@ -164,10 +164,11 @@ contract Pair is IPair {
         // get referral fee
         address _dibs = PairFactory(factory).dibs();
         uint256 _maxRef = PairFactory(factory).MAX_REFERRAL_FEE();
-        uint256 _referralFee = amount * _maxRef / 10000;
-        _safeTransfer(token0, _dibs, _referralFee); // transfer the fees out to PairFees
-        amount -= _referralFee;
-        
+        uint256 _referralFee = (_dibs != address(0)) ? (amount * _maxRef / 10000) : 0;
+        if (_referralFee > 0) {
+            _safeTransfer(token0, _dibs, _referralFee); // Transfer referral fees
+            amount -= _referralFee;
+        }
         // get lp and staking fee
         uint256 _stakingNftFee =  amount * PairFactory(factory).stakingNFTFee() / 10000;
         PairFees(fees).processStakingFees(_stakingNftFee, true);
@@ -188,10 +189,11 @@ contract Pair is IPair {
         // get referral fee
         address _dibs = PairFactory(factory).dibs();
         uint256 _maxRef = PairFactory(factory).MAX_REFERRAL_FEE();
-        uint256 _referralFee = amount * _maxRef / 10000;
-        _safeTransfer(token1, _dibs, _referralFee); // transfer the fees out to PairFees
-        amount -= _referralFee;
-
+        uint256 _referralFee = (_dibs != address(0)) ? (amount * _maxRef / 10000) : 0;
+         if (_referralFee > 0) {
+             _safeTransfer(token1, _dibs, _referralFee); // transfer the fees out to PairFees
+            amount -= _referralFee;
+         }
         // get lp and staking fee
         uint256 _stakingNftFee =  amount * PairFactory(factory).stakingNFTFee() / 10000;
         PairFees(fees).processStakingFees(_stakingNftFee, false);
