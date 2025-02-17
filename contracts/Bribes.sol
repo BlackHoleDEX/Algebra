@@ -176,7 +176,7 @@ contract Bribe is ReentrancyGuard {
     function earnedWithTimestamp(address _owner, address _rewardToken) private view returns(uint256,uint256){
         uint256 k = 0;
         uint256 reward = 0;
-        uint256 _endTimestamp = IMinter(minter).active_period(); // claim until current epoch
+        uint256 _endTimestamp = IMinter(minter).active_period() + WEEK; // claim until current epoch
         uint256 _userLastTime = userTimestamp[_owner][_rewardToken];
         
         

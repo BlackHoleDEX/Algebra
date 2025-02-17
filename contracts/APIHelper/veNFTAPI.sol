@@ -44,6 +44,7 @@ contract veNFTAPI is Initializable {
         uint8 decimals;
         
         bool voted;
+        bool hasVotedForEpoch;
         uint256 attachments;
 
         uint256 id;
@@ -204,10 +205,10 @@ contract veNFTAPI is Initializable {
         venft.token = ve.token();
         venft.tokenSymbol =  IERC20( ve.token() ).symbol();
         venft.tokenDecimals = IERC20( ve.token() ).decimals();
-        // venft.voted = ve.voted(id);
         venft.attachments = ve.attachments(id);
 
-        venft.voted = (voterV3.epochTimestamp() < venft.vote_ts) && (venft.vote_ts < voterV3.epochTimestamp() + WEEK);
+        venft.voted = ve.voted(id);
+        venft.hasVotedForEpoch = (voterV3.epochTimestamp() < venft.vote_ts) && (venft.vote_ts < voterV3.epochTimestamp() + WEEK);
     }
 
     // used only for sAMM and vAMM    

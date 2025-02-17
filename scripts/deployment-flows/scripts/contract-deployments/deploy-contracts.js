@@ -11,7 +11,7 @@ const { votingEscrowAbi } = require('../../../../generated/voting-escrow');
 const { rewardsDistributorAbi } = require('../../../../generated/rewards-distributor');
 const { addLiquidity } = require('../../../blackhole-scripts/addLiquidity')
 const { BigNumber } = require("ethers");
-const { pairFactoryAbi } = require('../../../../generated/pair-factory');
+const { pairFactoryUpgradeableAbi } = require('../../../../generated/pair-factory-upgradeable');
 
 const { generateConstantFile } = require('../../../blackhole-scripts/postDeployment/generator');
 const fs = require('fs');
@@ -32,7 +32,7 @@ const deployPairFactory = async () => {
         const pairFactory = await upgrades.deployProxy(pairFactoryContract,[],{initializer: 'initialize'});
         txDeployed = await pairFactory.deployed();
         console.log("pairFactory: ", pairFactory.address)
-        generateConstantFile("PairFactory", pairFactory.address);
+        generateConstantFile("PairFactoryUpgradeable", pairFactory.address);
         return pairFactory.address;
     } catch (error) {
         console.log("error in deploying pairFactory: ", error)
@@ -58,7 +58,7 @@ const deployRouterV2 = async(pairFactoryAddress) => {
 const setDibs = async (pairFactoryAddress) =>{
    try {
         const owner = await ethers.getSigners();
-        const PairFactoryContract = await ethers.getContractAt(pairFactoryAbi, pairFactoryAddress);
+        const PairFactoryContract = await ethers.getContractAt(pairFactoryUpgradeableAbi, pairFactoryAddress);
         const tx = await PairFactoryContract.setDibs(owner[0].address);
         await tx.wait();
    } catch (error) {
@@ -299,7 +299,7 @@ const setChainLinkAddress = async (epocControllerAddress, chainlinkAutomationReg
     try{
         const epochController = await ethers.getContractAt(epochControllerAbi, epocControllerAddress);
         await epochController.setAutomationRegistry(chainlinkAutomationRegistryAddress);
-        console.log("setChainLinkAddress succes: ", error);
+        console.log("setChainLinkAddress succes");
     } catch(error){
         console.log("setChainLinkAddress failed: ", error);
     }
@@ -416,7 +416,7 @@ async function main () {
     const epochControllerAddress = await deployEpochController(voterV3Address, minterUpgradableAddress);
 
     //set chainlink address
-    await setChainLinkAddress(epochControllerAddress, "0xcFeff04DB8740Ab58EC2CF6926Fe9aE53A675743");
+    await setChainLinkAddress(epochControllerAddress, "0xb2C2f24FcC2478f279B6B566419a739FA53c70D3");
 
     //add black to user Address
     await addBlackToUserAddress(minterUpgradableAddress);
@@ -428,9 +428,9 @@ async function main () {
     await setVoterV3InVotingEscrow(voterV3Address, votingEscrowAddress);
 
     //createPairs two by default
-    await addLiquidity(routerV2Address, addresses[0], addresses[1]);
-    await addLiquidity(routerV2Address, addresses[1], addresses[2]);
-    await addLiquidity(routerV2Address, addresses[2], addresses[3]);
+    await addLiquidity(routerV2Address, addresses[0], addresses[1], 100, 100);
+    await addLiquidity(routerV2Address, addresses[1], addresses[2], 100, 100);
+    await addLiquidity(routerV2Address, addresses[2], addresses[3], 100, 100);
 
     await pushDefaultRewardToken(bribeV3Address, blackAddress);
 

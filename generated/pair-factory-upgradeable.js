@@ -1,10 +1,42 @@
-const pairFactoryAddress = "0xa1d3ff5B1F7e4a1Fc9B02110f902DCc68Ea6Cd38";
+const pairFactoryUpgradeableAddress = "0x693E0F078c1e08A9e302C7A9f9D20282E1f300a5";
 
-const pairFactoryAbi = [
+const pairFactoryUpgradeableAbi = [
   {
     "inputs": [],
     "stateMutability": "nonpayable",
     "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "version",
+        "type": "uint8"
+      }
+    ],
+    "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
   },
   {
     "anonymous": false,
@@ -72,13 +104,6 @@ const pairFactoryAbi = [
   {
     "inputs": [],
     "name": "acceptFeeManager",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "acceptPauser",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -242,6 +267,13 @@ const pairFactoryAbi = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -275,6 +307,19 @@ const pairFactoryAbi = [
   },
   {
     "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "pairCodeHash",
     "outputs": [
       {
@@ -301,19 +346,6 @@ const pairFactoryAbi = [
   },
   {
     "inputs": [],
-    "name": "pauser",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "pendingFeeManager",
     "outputs": [
       {
@@ -327,15 +359,9 @@ const pairFactoryAbi = [
   },
   {
     "inputs": [],
-    "name": "pendingPauser",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -391,19 +417,6 @@ const pairFactoryAbi = [
       }
     ],
     "name": "setPause",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_pauser",
-        "type": "address"
-      }
-    ],
-    "name": "setPauser",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -487,6 +500,19 @@ const pairFactoryAbi = [
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "volatileFee",
     "outputs": [
@@ -501,4 +527,4 @@ const pairFactoryAbi = [
   }
 ];
 
-module.exports = {pairFactoryAddress, pairFactoryAbi};
+module.exports = {pairFactoryUpgradeableAddress, pairFactoryUpgradeableAbi};
