@@ -144,7 +144,6 @@ contract Bribe is ReentrancyGuard {
         return lower;
     }
 
-
     function getPriorSupplyIndex(uint256 timestamp) public view returns (uint256) {
         uint256 nCheckpoints = supplyNumCheckpoints;
         if (nCheckpoints == 0) {
