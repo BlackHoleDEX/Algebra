@@ -42,7 +42,7 @@ const deployPairFactory = async () => {
 
 const deployRouterV2 = async(pairFactoryAddress) => {
     try {
-        const wETH = '0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9'
+        const wETH = '0x4200000000000000000000000000000000000006'
         const routerV2Contract = await ethers.getContractFactory("RouterV2");
         const routerV2 = await routerV2Contract.deploy(pairFactoryAddress, wETH);
         txDeployed = await routerV2.deployed();
