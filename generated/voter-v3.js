@@ -1,4 +1,4 @@
-const voterV3Address = "0xdAaD4751214f46E6b915C738B140a483a4489d68";
+const voterV3Address = "0xb827f6f8ec8d1c7De4bcd8D53Eef1691c3760420";
 
 const voterV3Abi = [
   {
@@ -855,6 +855,19 @@ const voterV3Abi = [
       }
     ],
     "name": "gaugesDistributionTimestmap",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getNextEpochStart",
     "outputs": [
       {
         "internalType": "uint256",
