@@ -13,7 +13,7 @@ import './interfaces/IPairFactory.sol';
 import './interfaces/IVotingEscrow.sol';
 import './interfaces/IPermissionsRegistry.sol';
 // import './interfaces/IAlgebraFactory.sol';
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -221,7 +221,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     }
 
     function setMaxVotingNum(uint256 _maxVotingNum) external VoterAdmin {
-        require (_maxVotingNum >= MIN_OF_MAX_VOTING_NUM, "To0 low voting num");
+        require (_maxVotingNum >= MIN_OF_MAX_VOTING_NUM, "low voting");
         maxVotingNum = _maxVotingNum;
     }
     
@@ -423,10 +423,10 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         external onlyNewEpoch(_tokenId) nonReentrant {
         //_voteDelay(_tokenId);
         require(IVotingEscrow(_ve).isApprovedOrOwner(msg.sender, _tokenId), "!approved/Owner");
-        require(_poolVote.length == _weights.length, "Pool/Weights length !=");
+        require(_poolVote.length == _weights.length, "weights length !=");
         uint256 _timestamp = block.timestamp;
         if ((_timestamp > BlackTimeLibrary.epochVoteEnd(_timestamp)) && !isWhitelistedNFT[_tokenId]){
-            revert("Not Whitelisted Token");
+            revert("not whitelisted");
         }
         _vote(_tokenId, _poolVote, _weights);
         lastVoted[_tokenId] = epochTimestamp() + 1;
@@ -440,9 +440,6 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         uint256 _totalVoteWeight = 0;
         uint256 _totalWeight = 0;
         uint256 _usedWeight = 0;
-        uint256 _time = epochTimestamp();
-
-
 
         for (uint i = 0; i < _poolCnt; i++) {
 
@@ -503,19 +500,19 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         }
     }
 
-    /// @notice claim bribes rewards given an address
-    function claimBribes(address[] memory _bribes, address[][] memory _tokens) external {
-        for (uint256 i = 0; i < _bribes.length; i++) {
-            IBribe(_bribes[i]).getRewardForAddress(msg.sender, _tokens[i]);
-        }
-    }
+    // /// @notice claim bribes rewards given an address
+    // function claimBribes(address[] memory _bribes, address[][] memory _tokens) external {
+    //     for (uint256 i = 0; i < _bribes.length; i++) {
+    //         IBribe(_bribes[i]).getRewardForAddress(msg.sender, _tokens[i]);
+    //     }
+    // }
 
     /// @notice claim fees rewards given an address
-    function claimFees(address[] memory _bribes, address[][] memory _tokens) external {
-        for (uint256 i = 0; i < _bribes.length; i++) {
-            IBribe(_bribes[i]).getRewardForAddress(msg.sender, _tokens[i]);
-        }
-    }    
+    // function claimFees(address[] memory _bribes, address[][] memory _tokens) external {
+    //     for (uint256 i = 0; i < _bribes.length; i++) {
+    //         IBribe(_bribes[i]).getRewardForAddress(msg.sender, _tokens[i]);
+    //     }
+    // }    
 
   
     /// @notice check if user can vote
@@ -525,8 +522,8 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
     modifier onlyNewEpoch(uint256 _tokenId) {
         // ensure new epoch since last vote
-        if (BlackTimeLibrary.epochStart(block.timestamp) <= lastVoted[_tokenId]) revert("Already Voted in current Epoch");
-        if (block.timestamp <= BlackTimeLibrary.epochVoteStart(block.timestamp)) revert("Distribution Window");
+        if (BlackTimeLibrary.epochStart(block.timestamp) <= lastVoted[_tokenId]) revert("voted");
+        if (block.timestamp <= BlackTimeLibrary.epochVoteStart(block.timestamp)) revert("dw");
         _;
     }
 
@@ -540,7 +537,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     ----------------------------------------------------------------------------- */
     /// @notice create multiple gauges
     function createGauges(address[] memory _pool, uint256[] memory _gaugeTypes) external nonReentrant returns(address[] memory, address[] memory, address[] memory)  {
-        require(_pool.length == _gaugeTypes.length, "len mismatch");
+        require(_pool.length == _gaugeTypes.length, "mismatch");
         require(_pool.length <= 10, "max 10");
         address[] memory _gauge = new address[](_pool.length);
         address[] memory _int = new address[](_pool.length);
@@ -719,17 +716,6 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         uint256 x = 0;
         uint256 stop = pools.length;
         for (x; x < stop; x++) {
-            _distribute(gauges[pools[x]]);
-        }
-    }
-
-    /// @notice distribute the emission for N gauges
-    /// @param  start   start index point of the pools array
-    /// @param  finish  finish index point of the pools array
-    /// @dev    this function is used in case we have too many pools and gasLimit is reached
-    function distribute(uint256 start, uint256 finish) public nonReentrant {
-        IMinter(minter).update_period();
-        for (uint256 x = start; x < finish; x++) {
             _distribute(gauges[pools[x]]);
         }
     }
