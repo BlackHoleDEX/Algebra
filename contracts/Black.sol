@@ -30,7 +30,6 @@ contract Black is IBlack {
         minter = _minter;
     }
 
-
     // Initial mint: total 50M    
     function initialMint(address _recipient) external {
         require(msg.sender == minter && !initialMinted);
