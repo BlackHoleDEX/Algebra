@@ -1,4 +1,4 @@
-const voterV3Address = "0xb827f6f8ec8d1c7De4bcd8D53Eef1691c3760420";
+const voterV3Address = "0xA607cC87D2Ee50EcC4bF443d6B37efaf298D88b3";
 
 const voterV3Abi = [
   {
@@ -398,6 +398,25 @@ const voterV3Abi = [
     "type": "event"
   },
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "whitelister",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "WhitelistedNFT",
+    "type": "event"
+  },
+  {
     "inputs": [],
     "name": "EPOCH_DURATION",
     "outputs": [
@@ -543,24 +562,6 @@ const voterV3Abi = [
     "inputs": [
       {
         "internalType": "address[]",
-        "name": "_bribes",
-        "type": "address[]"
-      },
-      {
-        "internalType": "address[][]",
-        "name": "_tokens",
-        "type": "address[][]"
-      }
-    ],
-    "name": "claimBribes",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address[]",
         "name": "_fees",
         "type": "address[]"
       },
@@ -573,24 +574,6 @@ const voterV3Abi = [
         "internalType": "uint256",
         "name": "_tokenId",
         "type": "uint256"
-      }
-    ],
-    "name": "claimFees",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address[]",
-        "name": "_bribes",
-        "type": "address[]"
-      },
-      {
-        "internalType": "address[][]",
-        "name": "_tokens",
-        "type": "address[][]"
       }
     ],
     "name": "claimFees",
@@ -704,24 +687,6 @@ const voterV3Abi = [
         "internalType": "address[]",
         "name": "_gauges",
         "type": "address[]"
-      }
-    ],
-    "name": "distribute",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "start",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "finish",
-        "type": "uint256"
       }
     ],
     "name": "distribute",
@@ -1010,6 +975,25 @@ const voterV3Abi = [
       }
     ],
     "name": "isWhitelisted",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "isWhitelistedNFT",
     "outputs": [
       {
         "internalType": "bool",
@@ -1452,25 +1436,6 @@ const voterV3Abi = [
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "_time",
-        "type": "uint256"
-      }
-    ],
-    "name": "totalWeightAt",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "newOwner",
         "type": "address"
@@ -1479,6 +1444,25 @@ const voterV3Abi = [
     "name": "transferOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "usedWeights",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1532,35 +1516,11 @@ const voterV3Abi = [
     "inputs": [
       {
         "internalType": "address",
-        "name": "_pool",
+        "name": "",
         "type": "address"
       }
     ],
     "name": "weights",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_pool",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_time",
-        "type": "uint256"
-      }
-    ],
-    "name": "weightsAt",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1580,6 +1540,24 @@ const voterV3Abi = [
       }
     ],
     "name": "whitelist",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "_bool",
+        "type": "bool"
+      }
+    ],
+    "name": "whitelistNFT",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
