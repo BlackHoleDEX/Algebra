@@ -34,7 +34,7 @@ contract Black is IBlack {
     function initialMint(address _recipient) external {
         require(msg.sender == minter && !initialMinted);
         initialMinted = true;
-        _mint(_recipient, 50 * 1e6 * 1e18);
+        _mint(_recipient, 500 * 1e6 * 1e18);
     }
 
     function approve(address _spender, uint _value) external returns (bool) {
