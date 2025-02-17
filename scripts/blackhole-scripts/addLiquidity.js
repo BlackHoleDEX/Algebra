@@ -26,7 +26,7 @@ async function addLiquidity(routerV2Address, tokenA, tokenB, tokenAAmount, token
     const amountBMin = "0";
     const to = selfAddress;
 
-    const deadline = Math.floor(Date.now() / 1000) + 718080;;
+    const deadline = Math.floor(Date.now() / 1000) + 718080;
     console.log(deadline);
     
     const parameters = {

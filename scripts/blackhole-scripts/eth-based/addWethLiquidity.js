@@ -1,54 +1,67 @@
-const wethAddress = "0x4200000000000000000000000000000000000006";
-
 const { ethers } = require("hardhat");
 
+const wethAddress = "0x4200000000000000000000000000000000000006";
 const { routerV2Abi, routerV2Address } = require("../../../generated/router-v2");
-const deployedTokens = require("../../deployment-flows/token-constants/deploying-tokens.json")
-console.log("deployed tokens", deployedTokens);
-const { abi: wethAbi } = require("./weth-abi");
+const deployedTokens = require("../../deployment-flows/token-constants/deploying-tokens.json");
+const { abi: wethAbi } = require("./weth-abi.json");
 const { tokenAbi } = require("../dexAbi");
-console.log("abi: ", wethAbi)
-async function main () {
-    // function addLiquidityETH(
-    //     address token,
-    //     bool stable,
-    //     uint amountTokenDesired,
-    //     uint amountTokenMin,
-    //     uint amountETHMin,
-    //     address to,
-    //     uint deadline
-    // )
+const { default: BigNumber } = require("bignumber.js");
 
-    accounts = await ethers.getSigners();
-    owner = accounts[0];
-    const ownerAddress = owner.address;
-    // const wethErc20 = await ethers.getContractAt(tokenAbi, wethAddress);
-    // console.log("weth balance before depositing: ",await  wethErc20.balanceOf(ownerAddress));
+async function main() {
+    try {
+        const accounts = await ethers.getSigners();
+        const owner = accounts[1];
+        const ownerAddress = owner.address; // primarily uses 0th index itself for transactions
+        const signerAddress = accounts[0].address;
+        console.log("Owner address:", ownerAddress);
 
-    const wethContract = await ethers.getContractAt(wethAbi, wethAddress)
-    const depositTx = await wethContract.deposit({ value: BigInt(1), gasLimit: 21000000 }); // have to add a transfer of eth as well
-    await depositTx.wait();
+        const wethErc20 = await ethers.getContractAt(wethAbi, wethAddress);
+        console.log("WETH balance before depositing:", await wethErc20.balanceOf(ownerAddress));
 
-    console.log("weth balance after depositing: ", await wethErc20.balanceOf(ownerAddress));
+        // Ensure deposit amount is properly formatted
+        const depositTx = await wethErc20.deposit({
+            value: "10000000000000", // Sending 0.0001 ETH instead of 100000 wei
+            gasLimit: 2000000
+        });
+        console.log("deposited tx, now gonna wait", depositTx)
+        await depositTx.wait();
+        console.log("Deposit successful.");
 
-    const novaToken = deployedTokens.find((elm) => elm.name === 'Nova Genesis');
-    const routerV2Contract = await ethers.getContractAt(routerV2Abi, routerV2Address);
-    const stable = false;
+        console.log("WETH balance after depositing:", await wethErc20.balanceOf(ownerAddress));
+        
+        const champToken = deployedTokens.find((elm) => elm.name === 'CHAMP');
+        const champAddress = champToken.address
+
+        const champTokenContract = await ethers.getContractAt(tokenAbi, champAddress);
+        const routerV2Contract = await ethers.getContractAt(routerV2Abi, routerV2Address);
+        const stable = false;
 
 
-    // const 
-    
-    // await routerV2Contract.addLiquidityETH(
-    //     novaToken.address,
-    //     stable,
-
-    // )
+        const champBalance = await champTokenContract.balanceOf(signerAddress);
+        console.log("champ balance", champBalance);
+        const champApprovalTx = await champTokenContract.approve(routerV2Address, BigNumber(1).multipliedBy(1e18).toString()); 
+        await champApprovalTx.wait();
+        const amountDesired = BigNumber(1).multipliedBy(1e14).toString();
+        const deadline = Math.floor(Date.now() / 1000) + 718080;
+        const addLiqTx = await routerV2Contract.addLiquidityETH(
+            champAddress,
+            stable,
+            amountDesired,
+            BigNumber(amountDesired).multipliedBy(0.85).toString(),
+            amountDesired,
+            signerAddress,
+            deadline,
+            {
+                value: amountDesired,
+                gasLimit: 21000000
+            }
+        )
+        await addLiqTx.wait();
+    } catch (error) {
+        console.error("Error during execution:", error);
+    } finally {
+        process.exit(0);
+    }
 }
 
-main()
-  .then(
-    () => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-});
+main();
