@@ -1,4 +1,4 @@
-const blackholePairAPIV2Address = "0xDA1Cba717b00cD0B26a33947b7841fF1783d57F7";
+const blackholePairAPIV2Address = "0x2C41cbb835e2e70275ce1Df6420C308AB7282cfd";
 
 const blackholePairAPIV2Abi = [
   {
@@ -729,79 +729,6 @@ const blackholePairAPIV2Abi = [
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "_amounts",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_offset",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "_pair",
-        "type": "address"
-      }
-    ],
-    "name": "getPairBribe",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "epochTimestamp",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "totalVotes",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "pair",
-            "type": "address"
-          },
-          {
-            "components": [
-              {
-                "internalType": "address",
-                "name": "token",
-                "type": "address"
-              },
-              {
-                "internalType": "uint8",
-                "name": "decimals",
-                "type": "uint8"
-              },
-              {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-              },
-              {
-                "internalType": "string",
-                "name": "symbol",
-                "type": "string"
-              }
-            ],
-            "internalType": "struct BlackholePairAPIV2.tokenBribe[]",
-            "name": "bribes",
-            "type": "tuple[]"
-          }
-        ],
-        "internalType": "struct BlackholePairAPIV2.pairBribeEpoch[]",
-        "name": "_pairEpoch",
-        "type": "tuple[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "_voter",
         "type": "address"
@@ -815,30 +742,6 @@ const blackholePairAPIV2Abi = [
     "name": "initialize",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_pair",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_token",
-        "type": "address"
-      }
-    ],
-    "name": "left",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "_rewPerEpoch",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {

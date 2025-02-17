@@ -69,6 +69,15 @@ contract Bribe is ReentrancyGuard {
         TYPE = _type;
     }
 
+    function getEpochStart() public view returns(uint256){
+        return IMinter(minter).active_period();
+    }
+
+    /// @notice get next epoch (where bribes are saved)
+    function getNextEpochStart() public view returns(uint256){
+        return BlackTimeLibrary.epochNext(block.timestamp);
+    }
+
     /* ========== VIEWS ========== */
 
     /// @notice get the length of the reward tokens
