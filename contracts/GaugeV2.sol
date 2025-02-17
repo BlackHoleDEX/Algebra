@@ -83,7 +83,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
         VE = _ve;                               // vested
         TOKEN = IERC20(_token);                 // underlying (LP)
         DISTRIBUTION = _distribution;           // distro address (voter)
-        DURATION = 3600;                      // BlachHole:: temperory value need to chage it back to 7 days
+        DURATION = 1200;                      // BlachHole:: temperory value need to chage it back to 7 days
 
         internal_bribe = _internal_bribe;       // lp fees goes here
         external_bribe = _external_bribe;       // bribe fees goes here
