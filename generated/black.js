@@ -218,35 +218,9 @@ const blackAbi = [
           "type": "address"
         }
       ],
-      "name": "overrideMinter",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_minter",
-          "type": "address"
-        }
-      ],
       "name": "setMinter",
       "outputs": [],
       "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "superMaster",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -330,4 +304,5 @@ const blackAbi = [
     }
   ];
 
+  
 module.exports = {blackAbi};
