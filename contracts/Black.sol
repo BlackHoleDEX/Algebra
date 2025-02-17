@@ -19,9 +19,9 @@ contract Black is IBlack {
     event Transfer(address indexed from, address indexed to, uint value);
     event Approval(address indexed owner, address indexed spender, uint value);
 
-    constructor() {
+    constructor(address receiver, uint _amount) {
         minter = msg.sender;
-        _mint(msg.sender, 0);
+        _mint(receiver, _amount);
     }
 
     // No checks as its meant to be once off to set minting rights to BaseV1 Minter
