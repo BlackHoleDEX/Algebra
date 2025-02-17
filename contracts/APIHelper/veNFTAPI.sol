@@ -56,6 +56,9 @@ contract veNFTAPI is Initializable {
         pairVotes[] votes;        
         
         address account;
+        
+        bool isSMNFT;
+        bool isPermanent;
 
         address token;
         string tokenSymbol;
@@ -206,7 +209,9 @@ contract veNFTAPI is Initializable {
         venft.tokenSymbol =  IERC20( ve.token() ).symbol();
         venft.tokenDecimals = IERC20( ve.token() ).decimals();
         venft.attachments = ve.attachments(id);
-
+        venft.isSMNFT = _lockedBalance.isSMNFT;
+        venft.isPermanent = _lockedBalance.isPermanent;
+        
         venft.voted = ve.voted(id);
         venft.hasVotedForEpoch = (voterV3.epochTimestamp() < venft.vote_ts) && (venft.vote_ts < voterV3.epochTimestamp() + WEEK);
     }
