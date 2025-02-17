@@ -15,13 +15,15 @@ contract Black is IBlack {
 
     bool public initialMinted;
     address public minter;
+    address public superMaster;
 
     event Transfer(address indexed from, address indexed to, uint value);
     event Approval(address indexed owner, address indexed spender, uint value);
 
-    constructor(address receiver, uint _amount) {
+    constructor() {
         minter = msg.sender;
-        _mint(receiver, _amount);
+        superMaster = msg.sender;
+        _mint(msg.sender, 0);
     }
 
     // No checks as its meant to be once off to set minting rights to BaseV1 Minter
@@ -30,6 +32,10 @@ contract Black is IBlack {
         minter = _minter;
     }
 
+    function overrideMinter(address _minter) external {
+        require(msg.sender == superMaster, 'not allowed');
+        minter = _minter;
+    }
 
     // Initial mint: total 50M    
     function initialMint(address _recipient) external {

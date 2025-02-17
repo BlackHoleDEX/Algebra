@@ -1,6 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 const { ethers } = require("hardhat");
+const { blackAbi } = require("../../../../generated/black")
+const { BigNumber } = require("ethers");
 
 const deployedTokensPath = path.resolve(__dirname, "../../token-constants/deployed-tokens.json");
 const deployedTokens = require(deployedTokensPath);
@@ -16,6 +18,20 @@ const deployBlack = async () => {
     }
 };
 
+const mintBlack = async (blackAddress, receiver, amount) => {
+    try {
+
+        const amountAdd = BigNumber.from(amount).mul(BigNumber.from("1000000000000000000"));
+
+        const blackContract = await ethers.getContractAt(blackAbi, blackAddress);
+        await blackContract.mint(receiver, amountAdd);
+        console.log("Black token transferred");
+    } catch (error) {
+        console.log("Black token transfer failed : ", error);
+    }
+};
+
+
 async function main() {
     const accounts = await ethers.getSigners();
     const owner = accounts[0];
@@ -28,10 +44,12 @@ async function main() {
         process.exit(1);
     }
 
+    await mintBlack(blackAddress, owner.address, 100000);
+
     // Update or add the Black token address
     deployedTokens[0].address = blackAddress;
 
-    console.log("deployedTokens" , deployedTokensPath, JSON.stringify(deployedTokens, null, 2));
+    // console.log("deployedTokens" , deployedTokensPath, JSON.stringify(deployedTokens, null, 2));
 
     // Write the updated JSON back to the file
     fs.writeFileSync(deployedTokensPath, JSON.stringify(deployedTokens, null, 2));
