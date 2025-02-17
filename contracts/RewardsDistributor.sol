@@ -200,7 +200,7 @@ contract RewardsDistributor is IRewardsDistributor {
                 user_epoch += 1;
                 old_user_point = user_point;
                 if (user_epoch > max_user_epoch) {
-                    user_point = IVotingEscrow.Point(0,0,0,0);
+                    user_point = IVotingEscrow.Point(0,0,0,0,0);
                 } else {
                     user_point = IVotingEscrow(ve).user_point_history(_tokenId, user_epoch);
                 }
@@ -257,7 +257,7 @@ contract RewardsDistributor is IRewardsDistributor {
                 user_epoch += 1;
                 old_user_point = user_point;
                 if (user_epoch > max_user_epoch) {
-                    user_point = IVotingEscrow.Point(0,0,0,0);
+                    user_point = IVotingEscrow.Point(0,0,0,0,0);
                 } else {
                     user_point = IVotingEscrow(ve).user_point_history(_tokenId, user_epoch);
                 }
