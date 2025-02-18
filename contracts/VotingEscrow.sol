@@ -787,6 +787,10 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         require(_value > 0); // dev: need non-zero value
         require(_locked.amount > 0, 'No existing lock found');
         require(_locked.end > block.timestamp, 'Cannot add to expired lock. Withdraw');
+
+        if (_locked.isSMNFT) smNFTBalance += _value;
+        else if (_locked.isPermanent) permanentLockBalance += _value;
+
         _deposit_for(_tokenId, _value, 0, _locked, DepositType.DEPOSIT_FOR_TYPE);
     }
 
