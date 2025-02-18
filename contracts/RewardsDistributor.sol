@@ -28,7 +28,7 @@ contract RewardsDistributor is IRewardsDistributor {
         uint max_epoch
     );
 
-    uint constant WEEK = 1200;
+    uint constant WEEK = 1800;
 
     uint public start_time;
     uint public time_cursor;
