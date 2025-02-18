@@ -1,14 +1,14 @@
 const fs = require("fs");
 const path = require("path");
 const { ethers } = require("hardhat");
-const { blackAbi } = require("../../../../generated/black")
+const { testAbi } = require("../../../../generated/test")
 const { BigNumber } = require("ethers");
 
 const deployedTokensPath = path.resolve(__dirname, "../../token-constants/deployed-tokens.json");
 const deployedTokens = require(deployedTokensPath);
 const deployBlack = async () => {
     try {
-        const blackContract = await ethers.getContractFactory("Black");
+        const blackContract = await ethers.getContractFactory("Test");
         const blackFactory = await blackContract.deploy();
         await blackFactory.deployed();
         console.log("Black token deployed at:", blackFactory.address);
@@ -23,23 +23,13 @@ const mintBlack = async (blackAddress, receiver, amount) => {
 
         const amountAdd = BigNumber.from(amount).mul(BigNumber.from("1000000000000000000"));
 
-        const blackContract = await ethers.getContractAt(blackAbi, blackAddress);
+        const blackContract = await ethers.getContractAt(testAbi, blackAddress);
         await blackContract.mint(receiver, amountAdd);
         console.log("Black token transferred");
     } catch (error) {
         console.log("Black token transfer failed : ", error);
     }
 };
-
-const setMinter = async (blackAddress, minterAddress) => {
-    try {
-        const blackContract = await ethers.getContractAt(blackAbi, blackAddress);
-        await blackContract.setMinter(minterAddress);
-        console.log("Minter is set");
-    } catch (error) {
-        console.log("Minter set failed: ", error);
-    }
-}
 
 
 async function main() {
@@ -60,7 +50,6 @@ async function main() {
 
     await mintBlack(blackAddress, receiver, mintAmount);
 
-    await setMinter(blackAddress, receiver);
     // Update or add the Black token address
     deployedTokens[0].address = blackAddress;
 

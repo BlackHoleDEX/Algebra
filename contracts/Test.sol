@@ -3,10 +3,10 @@ pragma solidity 0.8.13;
 
 import "./interfaces/IBlack.sol";
 
-contract Black is IBlack {
+contract Test is IBlack {
 
-    string public constant name = "BLACKHOLE";
-    string public constant symbol = "BLACK";
+    string public constant name = "TESTToken";
+    string public constant symbol = "$Test";
     uint8 public constant decimals = 18;
     uint public totalSupply = 0;
 
@@ -34,7 +34,7 @@ contract Black is IBlack {
     function initialMint(address _recipient) external {
         require(msg.sender == minter && !initialMinted);
         initialMinted = true;
-        _mint(_recipient, 500 * 1e6 * 1e18);
+        _mint(_recipient, 50 * 1e6 * 1e18);
     }
 
     function approve(address _spender, uint _value) external returns (bool) {
