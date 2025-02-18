@@ -361,8 +361,8 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         require(IVotingEscrow(_ve).isApprovedOrOwner(msg.sender, _tokenId), "!approved/Owner");
         _reset(_tokenId);
         IVotingEscrow(_ve).abstain(_tokenId);
-        lastVoted[_tokenId] = epochTimestamp() + 1;
-        lastVotedTimestamp[_tokenId] = block.timestamp;
+        // lastVoted[_tokenId] = epochTimestamp() + 1;
+        // lastVotedTimestamp[_tokenId] = block.timestamp;
     }
 
     function _reset(uint256 _tokenId) internal {
@@ -410,8 +410,8 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         }
 
         _vote(_tokenId, _poolVote, _weights);
-        lastVoted[_tokenId] = epochTimestamp() + 1;
-        lastVotedTimestamp[_tokenId] = block.timestamp;
+        // lastVoted[_tokenId] = epochTimestamp() + 1;
+        // lastVotedTimestamp[_tokenId] = block.timestamp;
     }
 
     
