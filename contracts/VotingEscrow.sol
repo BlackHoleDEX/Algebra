@@ -881,9 +881,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
             smNFTBalance += _amount;
             _locked.end = 0;
             unlock_time=0;
-            // below both lines are already being called in _deposit_for function. 
-            // _checkpoint(_tokenId, locked[_tokenId], _locked);
-            // locked[_tokenId] = _locked;
+            _checkpoint(_tokenId, locked[_tokenId], _locked);
+            locked[_tokenId] = _locked;
         }
 
         _deposit_for(_tokenId, 0, unlock_time, _locked, DepositType.INCREASE_UNLOCK_TIME);
