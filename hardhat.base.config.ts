@@ -98,6 +98,11 @@ export default {
       accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
       gasPrice: 50_000_000_000,
     },
+    tac: {
+      url: `https://turin.rpc.tac.build`,
+      chainId: 2390,
+      accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`]
+    },
     artheraTestnet: {
       url: `https://rpc-test.arthera.net`,
       chainId: 10243,
@@ -149,6 +154,14 @@ export default {
           browserURL: 'https://artio.beratrail.io/',
         },
       },
+      {
+        network: 'tac',
+        chainId: 2390,
+        urls: {
+          apiURL: 'https://turin.explorer.tac.build/api',
+          browserURL: 'https://turin.explorer.tac.build',
+        },
+      }
     ],
   },
 };
