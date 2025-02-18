@@ -805,6 +805,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         if(isSMNFT) {
             _locked.isPermanent = true;
             _locked.isSMNFT = true;
+            _locked.end = 0;
             unlock_time = 0;
             smNFTBalance += _value;
         }
