@@ -31,12 +31,21 @@ const mintBlack = async (blackAddress, receiver) => {
     }
 };
 
+const setMinter = async (blackAddress, minterAddress) => {
+    try {
+        const blackContract = await ethers.getContractAt(blackAbi, blackAddress);
+        await blackContract.setMinter(minterAddress);
+        console.log("Minter is set");
+    } catch (error) {
+        console.log("Minter set failed: ", error);
+    }
+}
 
 async function main() {
     const accounts = await ethers.getSigners();
     const owner = accounts[0];
     // const receiver = owner.address;
-    const receiver = "0xa7243fc6FB83b0490eBe957941a339be4Db11c29";
+    //const receiver = "0x554289fe5A8F00Bb72C2298B601C679730f36DB6"; // this is the address we transferred all minted token.
     //const mintAmount = 100000;
     //  const mintAmount = <add_mint_amount>;
 
@@ -50,6 +59,8 @@ async function main() {
 
     await mintBlack(blackAddress, receiver);
 
+
+    await setMinter(blackAddress, receiver);
     // Update or add the Black token address
     deployedTokens[0].address = blackAddress;
 

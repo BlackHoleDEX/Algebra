@@ -31,6 +31,16 @@ const mintBlack = async (blackAddress, receiver, amount) => {
     }
 };
 
+const setMinter = async (blackAddress, minterAddress) => {
+    try {
+        const blackContract = await ethers.getContractAt(blackAbi, blackAddress);
+        await blackContract.setMinter(minterAddress);
+        console.log("Minter is set");
+    } catch (error) {
+        console.log("Minter set failed: ", error);
+    }
+}
+
 
 async function main() {
     const accounts = await ethers.getSigners();
@@ -50,6 +60,7 @@ async function main() {
 
     await mintBlack(blackAddress, receiver, mintAmount);
 
+    await setMinter(blackAddress, receiver);
     // Update or add the Black token address
     deployedTokens[0].address = blackAddress;
 
