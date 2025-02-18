@@ -865,15 +865,14 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         require(unlock_time > _locked.end, 'Can only increase lock duration');
         require(unlock_time <= block.timestamp + MAXTIME, 'Voting lock can be 2 years max');
 
-        // This code will never run for smNFT
-        // if(isSMNFT) {
-        //     _locked.isPermanent = true;
-        //     _locked.isSMNFT = true;
-        //     uint _amount = uint(int256(_locked.amount));
-        //     smNFTBalance += _amount;
-        //     _locked.end = 0;
-        //     unlock_time=0;
-        // }
+        if(isSMNFT) {
+            _locked.isPermanent = true;
+            _locked.isSMNFT = true;
+            uint _amount = uint(int256(_locked.amount));
+            smNFTBalance += _amount;
+            _locked.end = 0;
+            unlock_time=0;
+        }
 
         _deposit_for(_tokenId, 0, unlock_time, _locked, DepositType.INCREASE_UNLOCK_TIME);
 
