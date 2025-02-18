@@ -10,7 +10,7 @@ async function main () {
     console.log('Deploying Contract...');
 
     const pairFactory = '0x02b14Bc0dF9f899E98080c110851AF15cd5ab571'
-    const wETH = '0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9'
+    const wETH = '0x4200000000000000000000000000000000000006'
 
     data = await ethers.getContractFactory("RouterV2");
     router = await data.deploy(pairFactory, wETH);

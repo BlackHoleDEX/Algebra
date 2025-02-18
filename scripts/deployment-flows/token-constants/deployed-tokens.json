@@ -4,7 +4,7 @@
     "ticker": "$BLACK",
     "logo": "need to be uploaded to github or ipfs",
     "decimal": 18,
-    "address": "0x3CF8a665290D737F6aDFd0C22a75412aA223eB89"
+    "address": "0x2f3EdcB663Ad325409E38C2E7d8fcDF0c74DB78C"
   },
   {
     "name": "USDC",
@@ -12,5 +12,12 @@
     "logo": "needs to be fetched from someplace",
     "decimal": 6,
     "address": "0x036CbD53842c5426634e7929541eC2318f3dCF7e"
+  },
+  {
+    "name": "WETH",
+    "ticker": "WETH",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x4200000000000000000000000000000000000006/logo.svg",
+    "decimal": 18,
+    "address": "0x4200000000000000000000000000000000000006"
   }
 ]
