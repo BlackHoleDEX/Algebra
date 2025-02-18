@@ -759,7 +759,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         _checkpoint(_tokenId, old_locked, _locked);
 
         address from = msg.sender;
-        if (_value != 0 && deposit_type != DepositType.INCREASE_UNLOCK_TIME) {
+        if (_value != 0) {
             assert(IERC20(token).transferFrom(from, address(this), _value));
         }
 
