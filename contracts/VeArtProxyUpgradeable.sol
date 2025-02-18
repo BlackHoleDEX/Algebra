@@ -38,11 +38,12 @@ contract VeArtProxyUpgradeable is IVeArtProxy, OwnableUpgradeable {
         return string(buffer);
     }
 
-    function _tokenURI(uint _tokenId, uint _balanceOf, uint _locked_end, uint _value) external pure returns (string memory output) {
+    function _tokenURI(uint _tokenId, uint _balanceOf, uint _locked_end, uint _value, bool isSMNFT) external pure returns (string memory output) {
         output = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base { fill: white; font-family: serif; font-size: 14px; }</style><rect width="100%" height="100%" fill="black" /><text x="10" y="20" class="base">';
         output = string(abi.encodePacked(output, "token ", toString(_tokenId), '</text><text x="10" y="40" class="base">'));
         output = string(abi.encodePacked(output, "balanceOf ", toString(_balanceOf), '</text><text x="10" y="60" class="base">'));
         output = string(abi.encodePacked(output, "locked_end ", toString(_locked_end), '</text><text x="10" y="80" class="base">'));
+        output = string(abi.encodePacked(output, "isSMNFT ", isSMNFT?"true":"false", '</text><text x="10" y="100" class="base">'));
         output = string(abi.encodePacked(output, "value ", toString(_value), '</text></svg>'));
 
         string memory json = Base64.encode(bytes(string(abi.encodePacked('{"name": "lock #', toString(_tokenId), '", "description": "Black locks, can be used to boost gauge yields, vote on token emission, and receive bribes", "image": "data:image/svg+xml;base64,', Base64.encode(bytes(output)), '"}'))));
