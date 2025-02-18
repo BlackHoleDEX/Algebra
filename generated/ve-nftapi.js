@@ -1,4 +1,4 @@
-const veNFTAPIAddress = "0xE4BdD7Fa3bE8F563105Eeb62468DEf27D2fB337b";
+const veNFTAPIAddress = "0xa1145b29993Da9557cE0B70572c2337E2b848693";
 
 const veNFTAPIAbi = [
   {
@@ -240,6 +240,16 @@ const veNFTAPIAbi = [
             "type": "address"
           },
           {
+            "internalType": "bool",
+            "name": "isSMNFT",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "isPermanent",
+            "type": "bool"
+          },
+          {
             "internalType": "address",
             "name": "token",
             "type": "address"
@@ -453,6 +463,16 @@ const veNFTAPIAbi = [
             "type": "address"
           },
           {
+            "internalType": "bool",
+            "name": "isSMNFT",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "isPermanent",
+            "type": "bool"
+          },
+          {
             "internalType": "address",
             "name": "token",
             "type": "address"
@@ -559,6 +579,16 @@ const veNFTAPIAbi = [
             "internalType": "address",
             "name": "account",
             "type": "address"
+          },
+          {
+            "internalType": "bool",
+            "name": "isSMNFT",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "isPermanent",
+            "type": "bool"
           },
           {
             "internalType": "address",
