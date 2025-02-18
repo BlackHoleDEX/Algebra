@@ -738,10 +738,10 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         (old_locked.amount, old_locked.end, old_locked.isPermanent, old_locked.isSMNFT) = (_locked.amount, _locked.end, _locked.isPermanent, _locked.isSMNFT);
         // Adding to existing lock, or if a lock is expired - creating a new one
         if(old_locked.isSMNFT) {
-            if(_value!=0) {
-                _locked.amount += int128(int256(((110*_value)/100)));
+            if(deposit_type == DepositType.INCREASE_UNLOCK_TIME) {
+                _locked.amount = ((110*_locked.amount)/100);
             } else {
-                _locked.amount += ((110*old_locked.amount)/100);
+                _locked.amount += int128(int256(((110*_value)/100)));
             }
         } else {
             _locked.amount += int128(int256(_value));
