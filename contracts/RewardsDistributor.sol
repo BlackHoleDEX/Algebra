@@ -200,7 +200,7 @@ contract RewardsDistributor is IRewardsDistributor {
                 user_epoch += 1;
                 old_user_point = user_point;
                 if (user_epoch > max_user_epoch) {
-                    user_point = IVotingEscrow.Point(0,0,0,0);
+                    user_point = IVotingEscrow.Point(0,0,0,0,0);
                 } else {
                     user_point = IVotingEscrow(ve).user_point_history(_tokenId, user_epoch);
                 }
@@ -257,7 +257,7 @@ contract RewardsDistributor is IRewardsDistributor {
                 user_epoch += 1;
                 old_user_point = user_point;
                 if (user_epoch > max_user_epoch) {
-                    user_point = IVotingEscrow.Point(0,0,0,0);
+                    user_point = IVotingEscrow.Point(0,0,0,0,0);
                 } else {
                     user_point = IVotingEscrow(ve).user_point_history(_tokenId, user_epoch);
                 }
@@ -288,7 +288,7 @@ contract RewardsDistributor is IRewardsDistributor {
         if (amount != 0) {
             // if locked.end then send directly
             IVotingEscrow.LockedBalance memory _locked = IVotingEscrow(voting_escrow).locked(_tokenId);
-            if(_locked.end < block.timestamp){
+            if(_locked.end < block.timestamp && !_locked.isPermanent){
                 address _nftOwner = IVotingEscrow(voting_escrow).ownerOf(_tokenId);
                 IERC20(token).transfer(_nftOwner, amount);
             } else {
@@ -313,7 +313,7 @@ contract RewardsDistributor is IRewardsDistributor {
             if (amount != 0) {
                 // if locked.end then send directly
                 IVotingEscrow.LockedBalance memory _locked = IVotingEscrow(_voting_escrow).locked(_tokenId);
-                if(_locked.end < block.timestamp){
+                if(_locked.end < block.timestamp && !_locked.isPermanent){
                     address _nftOwner = IVotingEscrow(_voting_escrow).ownerOf(_tokenId);
                     IERC20(token).transfer(_nftOwner, amount);
                 } else {
