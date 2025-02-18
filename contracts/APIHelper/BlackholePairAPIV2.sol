@@ -21,6 +21,8 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "hardhat/console.sol";
 
+import {BlackTimeLibrary} from "../libraries/BlackTimeLibrary.sol";
+
 interface IHypervisor{
     function pool() external view returns(address);
     function getTotalAmounts() external view returns(uint tot0,uint tot1);
@@ -375,7 +377,7 @@ contract BlackholePairAPIV2 is Initializable {
         address[] memory _tokens = new address[](totTokens);
         string[] memory _symbol = new string[](totTokens);
         uint[] memory _decimals = new uint[](totTokens);
-        uint ts = IBribeAPI(_bribeAddress).getNextEpochStart();
+        uint ts = BlackTimeLibrary.epochStart(block.timestamp);
         uint i = 0;
         address _token;
 
