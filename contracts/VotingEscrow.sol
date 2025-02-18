@@ -759,7 +759,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         _checkpoint(_tokenId, old_locked, _locked);
 
         address from = msg.sender;
-        if (_value != 0) {
+        if (_value != 0 && deposit_type != DepositType.INCREASE_UNLOCK_TIME) {
             assert(IERC20(token).transferFrom(from, address(this), _value));
         }
 
@@ -881,8 +881,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
             smNFTBalance += _amount;
             _locked.end = 0;
             unlock_time=0;
-            _checkpoint(_tokenId, locked[_tokenId], _locked);
-            locked[_tokenId] = _locked;
+            // below both lines are already being called in _deposit_for function. 
+            // _checkpoint(_tokenId, locked[_tokenId], _locked);
+            // locked[_tokenId] = _locked;
         }
 
         _deposit_for(_tokenId, 0, unlock_time, _locked, DepositType.INCREASE_UNLOCK_TIME);
