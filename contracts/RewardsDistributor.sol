@@ -288,7 +288,7 @@ contract RewardsDistributor is IRewardsDistributor {
         if (amount != 0) {
             // if locked.end then send directly
             IVotingEscrow.LockedBalance memory _locked = IVotingEscrow(voting_escrow).locked(_tokenId);
-            if(_locked.end < block.timestamp){
+            if(_locked.end < block.timestamp && !_locked.isPermanent){
                 address _nftOwner = IVotingEscrow(voting_escrow).ownerOf(_tokenId);
                 IERC20(token).transfer(_nftOwner, amount);
             } else {
@@ -313,7 +313,7 @@ contract RewardsDistributor is IRewardsDistributor {
             if (amount != 0) {
                 // if locked.end then send directly
                 IVotingEscrow.LockedBalance memory _locked = IVotingEscrow(_voting_escrow).locked(_tokenId);
-                if(_locked.end < block.timestamp){
+                if(_locked.end < block.timestamp && !_locked.isPermanent){
                     address _nftOwner = IVotingEscrow(_voting_escrow).ownerOf(_tokenId);
                     IERC20(token).transfer(_nftOwner, amount);
                 } else {
