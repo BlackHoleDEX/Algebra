@@ -383,7 +383,7 @@ async function main () {
     //setVoter in bribe factory
     await setVoterBribeV3(voterV3Address, bribeV3Address);
 
-    // blackholeV2Abi deployment
+    // // blackholeV2Abi deployment
     const blackholeV2AbiAddress = await deployBloackholeV2Abi(voterV3Address, routerV2Address);
 
     //deploy rewardsDistributor
@@ -400,13 +400,11 @@ async function main () {
     //set minter in black
     await setMinterInBlack(minterUpgradableAddress, blackAddress);
 
-    // console.log("BEFORE INITIALIZING MINTER: ")
     // await logActivePeriod();
 
     // call _initialize
     await initializeMinter(minterUpgradableAddress);
 
-    // console.log("AFTER INITIALIZING MINTER: ")
     // await logActivePeriod();
 
     //set minter in reward distributer in depositer
@@ -415,8 +413,8 @@ async function main () {
     // deploy epoch controller here.
     const epochControllerAddress = await deployEpochController(voterV3Address, minterUpgradableAddress);
 
-    //set chainlink address
-    await setChainLinkAddress(epochControllerAddress, "0xb2C2f24FcC2478f279B6B566419a739FA53c70D3");
+    // set chainlink address
+    // await setChainLinkAddress(epochControllerAddress, "0xb2C2f24FcC2478f279B6B566419a739FA53c70D3");
 
     //add black to user Address
     await addBlackToUserAddress(minterUpgradableAddress);

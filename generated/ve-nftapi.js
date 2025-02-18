@@ -240,6 +240,16 @@ const veNFTAPIAbi = [
             "type": "address"
           },
           {
+            "internalType": "bool",
+            "name": "isSMNFT",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "isPermanent",
+            "type": "bool"
+          },
+          {
             "internalType": "address",
             "name": "token",
             "type": "address"
@@ -453,6 +463,16 @@ const veNFTAPIAbi = [
             "type": "address"
           },
           {
+            "internalType": "bool",
+            "name": "isSMNFT",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "isPermanent",
+            "type": "bool"
+          },
+          {
             "internalType": "address",
             "name": "token",
             "type": "address"
@@ -559,6 +579,16 @@ const veNFTAPIAbi = [
             "internalType": "address",
             "name": "account",
             "type": "address"
+          },
+          {
+            "internalType": "bool",
+            "name": "isSMNFT",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "isPermanent",
+            "type": "bool"
           },
           {
             "internalType": "address",

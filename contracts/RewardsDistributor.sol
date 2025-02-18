@@ -28,7 +28,7 @@ contract RewardsDistributor is IRewardsDistributor {
         uint max_epoch
     );
 
-    uint constant WEEK = 1200;
+    uint constant WEEK = 1800;
 
     uint public start_time;
     uint public time_cursor;
@@ -55,7 +55,7 @@ contract RewardsDistributor is IRewardsDistributor {
         voting_escrow = _voting_escrow;
         depositor = msg.sender; //0x86069feb223ee303085a1a505892c9d4bdbee996
         owner = msg.sender;
-        require(IERC20(_token).approve(_voting_escrow, type(uint).max));
+        require(IERC20(_token).approve(_voting_escrow, type(uint).max), "approval failed");
     }
 
     function timestamp() external view returns (uint) {
@@ -200,7 +200,7 @@ contract RewardsDistributor is IRewardsDistributor {
                 user_epoch += 1;
                 old_user_point = user_point;
                 if (user_epoch > max_user_epoch) {
-                    user_point = IVotingEscrow.Point(0,0,0,0);
+                    user_point = IVotingEscrow.Point(0,0,0,0,0);
                 } else {
                     user_point = IVotingEscrow(ve).user_point_history(_tokenId, user_epoch);
                 }
@@ -257,7 +257,7 @@ contract RewardsDistributor is IRewardsDistributor {
                 user_epoch += 1;
                 old_user_point = user_point;
                 if (user_epoch > max_user_epoch) {
-                    user_point = IVotingEscrow.Point(0,0,0,0);
+                    user_point = IVotingEscrow.Point(0,0,0,0,0);
                 } else {
                     user_point = IVotingEscrow(ve).user_point_history(_tokenId, user_epoch);
                 }
@@ -288,7 +288,7 @@ contract RewardsDistributor is IRewardsDistributor {
         if (amount != 0) {
             // if locked.end then send directly
             IVotingEscrow.LockedBalance memory _locked = IVotingEscrow(voting_escrow).locked(_tokenId);
-            if(_locked.end < block.timestamp){
+            if(_locked.end < block.timestamp && !_locked.isPermanent){
                 address _nftOwner = IVotingEscrow(voting_escrow).ownerOf(_tokenId);
                 IERC20(token).transfer(_nftOwner, amount);
             } else {
@@ -313,7 +313,7 @@ contract RewardsDistributor is IRewardsDistributor {
             if (amount != 0) {
                 // if locked.end then send directly
                 IVotingEscrow.LockedBalance memory _locked = IVotingEscrow(_voting_escrow).locked(_tokenId);
-                if(_locked.end < block.timestamp){
+                if(_locked.end < block.timestamp && !_locked.isPermanent){
                     address _nftOwner = IVotingEscrow(_voting_escrow).ownerOf(_tokenId);
                     IERC20(token).transfer(_nftOwner, amount);
                 } else {

@@ -14,7 +14,7 @@ import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 contract Bribe is ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    uint256 public WEEK = 1200; // BlackHole:: temperory value need to changed it back to 7 days
+    uint256 public WEEK = 1800; // BlackHole:: temperory value need to changed it back to 7 days
     uint256 public firstBribeTimestamp;
 
     /* ========== STATE VARIABLES ========== */
@@ -67,6 +67,15 @@ contract Bribe is ReentrancyGuard {
         require(minter != address(0));
         owner = _owner;
         TYPE = _type;
+    }
+
+    function getEpochStart() public view returns(uint256){
+        return IMinter(minter).active_period();
+    }
+
+    /// @notice get next epoch (where bribes are saved)
+    function getNextEpochStart() public view returns(uint256){
+        return BlackTimeLibrary.epochNext(block.timestamp);
     }
 
     /* ========== VIEWS ========== */

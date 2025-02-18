@@ -41,7 +41,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     uint256 internal constant DURATION = 7 days;                   // rewards are released over 7 days
     uint256 public VOTE_DELAY;                                     // delay between votes in seconds
     uint256 public constant MAX_VOTE_DELAY = 7 days;               // Max vote delay allowed
-    uint public constant EPOCH_DURATION = 1200; //BlackHole:: Current duration need to change 1 week
+    uint public constant EPOCH_DURATION = 1800; //BlackHole:: Current duration need to change 1 week
      uint256 internal constant MIN_OF_MAX_VOTING_NUM = 10;
 
     mapping(address => uint256) internal supplyIndex;              // gauge    => index
@@ -361,8 +361,8 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         require(IVotingEscrow(_ve).isApprovedOrOwner(msg.sender, _tokenId), "!approved/Owner");
         _reset(_tokenId);
         IVotingEscrow(_ve).abstain(_tokenId);
-        lastVoted[_tokenId] = epochTimestamp() + 1;
-        lastVotedTimestamp[_tokenId] = block.timestamp;
+        // lastVoted[_tokenId] = epochTimestamp() + 1;
+        // lastVotedTimestamp[_tokenId] = block.timestamp;
     }
 
     function _reset(uint256 _tokenId) internal {
@@ -410,8 +410,8 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         }
 
         _vote(_tokenId, _poolVote, _weights);
-        lastVoted[_tokenId] = epochTimestamp() + 1;
-        lastVotedTimestamp[_tokenId] = block.timestamp;
+        // lastVoted[_tokenId] = epochTimestamp() + 1;
+        // lastVotedTimestamp[_tokenId] = block.timestamp;
     }
 
     

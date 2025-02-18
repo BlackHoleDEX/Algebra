@@ -59,6 +59,11 @@ const veArtProxyUpgradeableAbi = [
         "internalType": "uint256",
         "name": "_value",
         "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "isSMNFT",
+        "type": "bool"
       }
     ],
     "name": "_tokenURI",
