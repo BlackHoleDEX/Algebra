@@ -88,6 +88,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
     address public voter;
     address public team;
     address public artProxy;
+    address public burnTokenAddress=0x000000000000000000000000000000000000dEaD;
 
     mapping(uint => Point) public point_history; // epoch -> unsigned point
 
@@ -760,7 +761,11 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
 
         address from = msg.sender;
         if (_value != 0) {
-            assert(IERC20(token).transferFrom(from, address(this), _value));
+            if(old_locked.isSMNFT) {
+                assert(IERC20(token).transferFrom(from, burnTokenAddress, _value));
+            } else {
+                assert(IERC20(token).transferFrom(from, address(this), _value));
+            }
         }
 
         emit Deposit(from, _tokenId, _value, _locked.end, deposit_type, block.timestamp);
@@ -1210,6 +1215,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         if(newLockedTo.isSMNFT) {
             newLockedTo.amount = _locked1.amount + ((110*_locked0.amount)/100);
             smNFTBalance += value0;
+            assert(IERC20(token).transfer(burnTokenAddress, value0));
         } else {
             newLockedTo.amount = _locked1.amount + _locked0.amount;
         }
