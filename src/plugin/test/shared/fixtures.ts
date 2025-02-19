@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat';
 import { MockFactory, MockPool, MockTimeAlgebraBasePluginV1, MockTimeAlgebraBasePluginV2, MockTimeDSFactoryV2, MockTimeDSFactory, BasePluginV1Factory, BasePluginV2Factory } from '../../typechain';
-import { AlgebraFeeDiscountPlugin, FeeDiscountPluginFactory, FeeDiscountRegistry } from '../../typechain';
+import { AlgebraFeeDiscountPlugin, FeeDiscountPluginFactory, FeeDiscountRegistry, SecurityPluginFactory, SecurityRegistry, AlgebraSecurityPlugin, AlgebraBasePluginV5, BasePluginV5Factory } from '../../typechain';
 type Fixture<T> = () => Promise<T>;
 interface MockFactoryFixture {
   mockFactory: MockFactory;
@@ -115,13 +115,6 @@ export const feeDiscountPluginFixture: Fixture<FeeDiscountPluginFixture> = async
   const pluginFactoryFactory = await ethers.getContractFactory('FeeDiscountPluginFactory');
   const pluginFactory = (await pluginFactoryFactory.deploy(mockFactory)) as any as FeeDiscountPluginFactory;
 
-export const securityPluginFixture: Fixture<SecurityPluginFixture> = async function (): Promise<SecurityPluginFixture> {
-  const { mockFactory } = await mockFactoryFixture();
-  //const { token0, token1, token2 } = await tokensFixture()
-
-  const pluginFactoryFactory = await ethers.getContractFactory('SecurityPluginFactory');
-  const pluginFactory = (await pluginFactoryFactory.deploy(mockFactory)) as any as SecurityPluginFactory;
-
   const mockPoolFactory = await ethers.getContractFactory('MockPool');
   const mockPool = (await mockPoolFactory.deploy()) as any as MockPool;
 
@@ -134,6 +127,33 @@ export const securityPluginFixture: Fixture<SecurityPluginFixture> = async funct
 
   const pluginContractFactory = await ethers.getContractFactory('AlgebraFeeDiscountPlugin');
   const plugin = pluginContractFactory.attach(pluginAddress) as any as AlgebraFeeDiscountPlugin;
+
+  return {
+    plugin,
+    pluginFactory,
+    mockPool,
+    registry,
+    mockFactory
+  };
+};
+
+interface SecurityPluginFixture extends MockFactoryFixture {
+  plugin: AlgebraSecurityPlugin;
+  pluginFactory: SecurityPluginFactory;
+  mockPool: MockPool;
+  registry: SecurityRegistry;
+}
+
+export const securityPluginFixture: Fixture<SecurityPluginFixture> = async function (): Promise<SecurityPluginFixture> {
+  const { mockFactory } = await mockFactoryFixture();
+  //const { token0, token1, token2 } = await tokensFixture()
+
+  const pluginFactoryFactory = await ethers.getContractFactory('SecurityPluginFactory');
+  const pluginFactory = (await pluginFactoryFactory.deploy(mockFactory)) as any as SecurityPluginFactory;
+
+  const mockPoolFactory = await ethers.getContractFactory('MockPool');
+  const mockPool = (await mockPoolFactory.deploy()) as any as MockPool;
+
   const registryFactory = await ethers.getContractFactory('SecurityRegistry');
   const registry = (await registryFactory.deploy(mockFactory)) as any as SecurityRegistry;
 
@@ -149,6 +169,50 @@ export const securityPluginFixture: Fixture<SecurityPluginFixture> = async funct
     pluginFactory,
     mockPool,
     registry,
+    mockFactory
+  };
+};
+
+interface AlgebraBasePluginV5Fixture{
+  plugin: AlgebraBasePluginV5;
+  pluginFactory: BasePluginV5Factory;
+  mockPool: MockPool;
+  securityRegistry: SecurityRegistry;
+  feeDiscountRegistry: FeeDiscountRegistry;
+  mockFactory: MockFactory
+}
+
+export const AlgebraBasePluginV5Fixture: Fixture<AlgebraBasePluginV5Fixture> = async function (): Promise<AlgebraBasePluginV5Fixture> {
+  const { mockFactory } = await mockFactoryFixture();
+  //const { token0, token1, token2 } = await tokensFixture()
+
+  const pluginFactoryFactory = await ethers.getContractFactory('BasePluginV5Factory');
+  const pluginFactory = (await pluginFactoryFactory.deploy(mockFactory)) as any as BasePluginV5Factory;
+
+  const mockPoolFactory = await ethers.getContractFactory('MockPool');
+  const mockPool = (await mockPoolFactory.deploy()) as any as MockPool;
+
+  const discountRegistryFactory = await ethers.getContractFactory('FeeDiscountRegistry');
+  const feeDiscountRegistry = (await discountRegistryFactory.deploy(mockFactory)) as any as FeeDiscountRegistry;
+
+  await pluginFactory.setFeeDiscountRegistry(feeDiscountRegistry)
+
+  const registryFactory = await ethers.getContractFactory('SecurityRegistry');
+  const securityRegistry = (await registryFactory.deploy(mockFactory)) as any as SecurityRegistry;
+
+  await pluginFactory.setSecurityRegistry(securityRegistry)
+  await mockFactory.beforeCreatePoolHook(pluginFactory, mockPool);
+  const pluginAddress = await pluginFactory.pluginByPool(mockPool);
+
+  const pluginContractFactory = await ethers.getContractFactory('AlgebraBasePluginV5');
+  const plugin = pluginContractFactory.attach(pluginAddress) as any as AlgebraBasePluginV5;
+
+  return {
+    plugin,
+    pluginFactory,
+    mockPool,
+    securityRegistry,
+    feeDiscountRegistry, 
     mockFactory
   };
 };
