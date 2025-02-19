@@ -396,10 +396,12 @@ contract AlgebraPool is AlgebraPoolBase, TickStructure, ReentrancyGuard, Positio
     bool payInAdvance,
     bytes calldata data
   ) internal returns (uint24 overrideFee, uint24 pluginFee) {
-    if (globalState.pluginConfig.hasFlag(Plugins.BEFORE_SWAP_FLAG)) {
+    uint8 pluginConfig = globalState.pluginConfig;
+    if (pluginConfig.hasFlag(Plugins.BEFORE_SWAP_FLAG)) {
       if (_isPlugin()) return (0, 0);
       bytes4 selector;
       (selector, overrideFee, pluginFee) = IAlgebraPlugin(plugin).beforeSwap(msg.sender, recipient, zto, amount, limitPrice, payInAdvance, data);
+      if (!pluginConfig.hasFlag(Plugins.DYNAMIC_FEE) && (overrideFee > 0 || pluginFee > 0)) revert dynamicFeeDisabled();
       // we will check that fee is less than denominator inside the swap calculation
       selector.shouldReturn(IAlgebraPlugin.beforeSwap.selector);
     }
