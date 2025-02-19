@@ -37,6 +37,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         uint ts;
         uint blk; // block
         uint permanent;
+        uint smNFT;
+        uint smNFTBonus;
     }
     /* We cannot really do block numbers per se b/c slope is per time, not per block
      * and per block could be fairly bad b/c Ethereum changes blocktimes.
@@ -88,6 +90,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
     address public voter;
     address public team;
     address public artProxy;
+
+    uint public SMNFT_BONUS = 1000;
+    uint public PRECISISON = 10000;
 
     mapping(uint => Point) public point_history; // epoch -> unsigned point
 
@@ -590,7 +595,18 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         uint _epoch = epoch;
 
         if (_tokenId != 0) {
-            u_new.permanent = new_locked.isPermanent ? uint(int256(new_locked.amount)) : 0;
+            u_new.permanent = 0;
+            u_new.smNFT = 0;
+            u_new.smNFTBonus = 0;
+
+            if(new_locked.isSMNFT){
+                u_new.smNFT = _calculate_original_sm_nft_amount(uint(int256(new_locked.amount)));
+                u_new.smNFTBonus = uint(int256(new_locked.amount)) - u_new.smNFT;
+            }
+            else if(new_locked.isPermanent){
+                u_new.permanent = uint(int256(new_locked.amount));
+            }
+
             // Calculate slopes and biases
             // Kept at zero when they have to
             if (old_locked.end > block.timestamp && old_locked.amount > 0) {
@@ -615,7 +631,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
             }
         }
 
-        Point memory last_point = Point({bias: 0, slope: 0, ts: block.timestamp, blk: block.number, permanent: 0});
+        Point memory last_point = Point({bias: 0, slope: 0, ts: block.timestamp, blk: block.number, permanent: 0, smNFT : 0, smNFTBonus : 0});
         if (_epoch > 0) {
             last_point = point_history[_epoch];
         }
@@ -681,7 +697,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
             if (last_point.bias < 0) {
                 last_point.bias = 0;
             }
-            last_point.permanent = permanentLockBalance + smNFTBalance;
+            last_point.permanent = permanentLockBalance;
+            last_point.smNFT = smNFTBalance;
+            last_point.smNFTBonus = _calculate_sm_nft_bonus(smNFTBalance);
         }
 
         // Record the changed point into history
@@ -999,7 +1017,11 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
             Point memory last_point = user_point_history[_tokenId][_epoch];
             if (last_point.permanent != 0) {
                 return last_point.permanent;
-            } else {
+            } 
+            else if (last_point.smNFT != 0){
+                return last_point.smNFT + last_point.smNFTBonus;
+            }
+            else {
                 last_point.bias -= last_point.slope * int128(int256(_t) - int256(last_point.ts));
                 if (last_point.bias < 0) {
                     last_point.bias = 0;
@@ -1045,6 +1067,13 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         }
 
         Point memory upoint = user_point_history[_tokenId][_min];
+
+        if (upoint.permanent > 0){
+            return upoint.permanent;
+        }
+        else if(upoint.smNFT > 0){
+            return upoint.smNFT + upoint.smNFTBonus;
+        }
 
         uint max_epoch = epoch;
         uint _epoch = _find_block_epoch(_block, max_epoch);
@@ -1125,7 +1154,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         if (last_point.bias < 0) {
             last_point.bias = 0;
         }
-        return uint(uint128(last_point.bias)) + last_point.permanent;
+        return uint(uint128(last_point.bias)) + last_point.permanent + last_point.smNFT + last_point.smNFTBonus;
     }
 
     function totalSupply() external view returns (uint) {
@@ -1575,5 +1604,23 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
             "VotingEscrow::delegateBySig: signature expired"
         );
         return _delegate(signatory, delegatee);
+    }
+
+    function setSmNFTBonus(uint _bonus) external {
+        require(msg.sender == team, "unauthorized to set bonus");
+        require(_bonus <= 10000, "rate too high");
+        SMNFT_BONUS = _bonus;
+    }
+
+    function calculate_sm_nft_bonus(uint amount) external view returns (uint){
+        return _calculate_sm_nft_bonus(amount);
+    }
+
+    function _calculate_sm_nft_bonus(uint amount) internal view returns (uint){
+        return (SMNFT_BONUS * amount) / PRECISISON;
+    }
+
+    function _calculate_original_sm_nft_amount(uint amount) view internal returns (uint){
+        return (amount * PRECISISON) / (SMNFT_BONUS + PRECISISON);
     }
 }
