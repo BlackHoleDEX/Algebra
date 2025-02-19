@@ -217,9 +217,10 @@ contract BlackClaims is IBlackClaims {
     }
 
     ///@notice get reward tokens claimable by a player in the specified season.
-    function getClaimableReward() public view returns(uint256 _reward) 
+    function getClaimableReward(address userAddress) public view returns(uint256 _reward) 
     {
-        _reward = season_rewards[msg.sender] - claimed_rewards[msg.sender];
+
+        _reward = season_rewards[userAddress] - claimed_rewards[userAddress];
         if( !isSeasonClaimingActive() )
         {
             _reward = 0;
