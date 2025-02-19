@@ -115,6 +115,13 @@ export const feeDiscountPluginFixture: Fixture<FeeDiscountPluginFixture> = async
   const pluginFactoryFactory = await ethers.getContractFactory('FeeDiscountPluginFactory');
   const pluginFactory = (await pluginFactoryFactory.deploy(mockFactory)) as any as FeeDiscountPluginFactory;
 
+export const securityPluginFixture: Fixture<SecurityPluginFixture> = async function (): Promise<SecurityPluginFixture> {
+  const { mockFactory } = await mockFactoryFixture();
+  //const { token0, token1, token2 } = await tokensFixture()
+
+  const pluginFactoryFactory = await ethers.getContractFactory('SecurityPluginFactory');
+  const pluginFactory = (await pluginFactoryFactory.deploy(mockFactory)) as any as SecurityPluginFactory;
+
   const mockPoolFactory = await ethers.getContractFactory('MockPool');
   const mockPool = (await mockPoolFactory.deploy()) as any as MockPool;
 
@@ -127,6 +134,15 @@ export const feeDiscountPluginFixture: Fixture<FeeDiscountPluginFixture> = async
 
   const pluginContractFactory = await ethers.getContractFactory('AlgebraFeeDiscountPlugin');
   const plugin = pluginContractFactory.attach(pluginAddress) as any as AlgebraFeeDiscountPlugin;
+  const registryFactory = await ethers.getContractFactory('SecurityRegistry');
+  const registry = (await registryFactory.deploy(mockFactory)) as any as SecurityRegistry;
+
+  await pluginFactory.setSecurityRegistry(registry)
+  await mockFactory.beforeCreatePoolHook(pluginFactory, mockPool);
+  const pluginAddress = await pluginFactory.pluginByPool(mockPool);
+
+  const pluginContractFactory = await ethers.getContractFactory('AlgebraSecurityPlugin');
+  const plugin = pluginContractFactory.attach(pluginAddress) as any as AlgebraSecurityPlugin;
 
   return {
     plugin,
