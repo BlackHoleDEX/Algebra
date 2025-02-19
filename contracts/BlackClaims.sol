@@ -73,6 +73,7 @@ contract BlackClaims is IBlackClaims {
     ) external onlyOwner returns(IBlackClaims.Season memory season_)
     {
         require(start_time_ > 0, "CANNOT START AT 0");
+        require(season.start_time==0, "SEASON ALREADY STARTED");
         season_.start_time = start_time_;
         season = season_;
     }
