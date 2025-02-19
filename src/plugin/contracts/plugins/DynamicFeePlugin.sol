@@ -11,11 +11,11 @@ import '../interfaces/plugins/IDynamicFeeManager.sol';
 
 import '../libraries/AdaptiveFee.sol';
 import '../types/AlgebraFeeConfigurationU144.sol';
-import '../base/BasePlugin.sol';
+import '../base/AlgebraBasePlugin.sol';
 
 /// @title Algebra Integral 1.2 default plugin
 /// @notice This contract stores timepoints and calculates adaptive fee and statistical averages
-abstract contract DynamicFeePlugin is BasePlugin, IDynamicFeeManager {
+abstract contract DynamicFeePlugin is AlgebraBasePlugin, IDynamicFeeManager {
   using Plugins for uint8;
   using AlgebraFeeConfigurationU144Lib for AlgebraFeeConfiguration;
 
@@ -23,6 +23,12 @@ abstract contract DynamicFeePlugin is BasePlugin, IDynamicFeeManager {
 
   /// @dev AlgebraFeeConfiguration struct packed in uint144
   AlgebraFeeConfigurationU144 internal _feeConfig;
+
+  constructor(AlgebraFeeConfiguration memory _config) {
+    AdaptiveFee.validateFeeConfiguration(_config);
+
+    _feeConfig = _config.pack(); // pack struct to uint144 and write in storage
+  }
 
   /// @inheritdoc IDynamicFeeManager
   function feeConfig()
@@ -41,7 +47,7 @@ abstract contract DynamicFeePlugin is BasePlugin, IDynamicFeeManager {
 
   /// @inheritdoc IDynamicFeeManager
   function changeFeeConfiguration(AlgebraFeeConfiguration calldata _config) external override {
-    require(msg.sender == pluginFactory || IAlgebraFactory(factory).hasRoleOrOwner(ALGEBRA_BASE_PLUGIN_MANAGER, msg.sender));
+    _authorize();
     AdaptiveFee.validateFeeConfiguration(_config);
 
     _feeConfig = _config.pack(); // pack struct to uint144 and write in storage

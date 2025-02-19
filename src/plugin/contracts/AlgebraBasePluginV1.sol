@@ -18,7 +18,12 @@ contract AlgebraBasePluginV1 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
   uint8 public constant override defaultPluginConfig =
     uint8(Plugins.AFTER_INIT_FLAG | Plugins.BEFORE_SWAP_FLAG | Plugins.AFTER_SWAP_FLAG | Plugins.DYNAMIC_FEE);
 
-  constructor(address _pool, address _factory, address _pluginFactory) BasePlugin(_pool, _factory, _pluginFactory) {}
+  constructor(
+    address _pool,
+    address _factory,
+    address _pluginFactory,
+    AlgebraFeeConfiguration memory _config
+  ) AlgebraBasePlugin(_pool, _factory, _pluginFactory) DynamicFeePlugin(_config) {}
 
   // ###### HOOKS ######
 
