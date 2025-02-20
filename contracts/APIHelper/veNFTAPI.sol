@@ -301,13 +301,12 @@ contract veNFTAPI is Initializable {
     }
 
     function _getRewardsForNft(uint nftId) internal view returns (PairReward[] memory pairReward) {
-        // uint _totalPoolVotes = voter.poolVoteLength(nftId);
         address[] memory allGauges = gaugeFactoryV2.gauges();
         uint gaugesLength = gaugeFactoryV2.length();
 
         pairReward = new PairReward[](gaugesLength);
 
-        for(uint i=0; i< gaugesLength; i++){
+        for(uint i=0; i<gaugesLength; i++){
             address poolAddress = IVoter(voter).poolForGauge(allGauges[i]);
             pairReward[i].pair = poolAddress;
             pairReward[i].votingRewards = _pairReward(poolAddress, nftId, allGauges[i]);
