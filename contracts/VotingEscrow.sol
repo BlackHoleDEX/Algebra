@@ -1015,11 +1015,11 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
             return 0;
         } else {
             Point memory last_point = user_point_history[_tokenId][_epoch];
-            if (last_point.permanent != 0) {
-                return last_point.permanent;
-            } 
-            else if (last_point.smNFT != 0){
+            if (last_point.smNFT != 0){
                 return last_point.smNFT + last_point.smNFTBonus;
+            }
+            else if (last_point.permanent != 0) {
+                return last_point.permanent;
             }
             else {
                 last_point.bias -= last_point.slope * int128(int256(_t) - int256(last_point.ts));
