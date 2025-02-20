@@ -420,7 +420,7 @@ async function main () {
     await addBlackToUserAddress(minterUpgradableAddress);
 
     //deploy veNFT
-    await deployveNFT(voterV3Address, rewardsDistributorAddress, blackholeV2AbiAddress);
+    await deployveNFT(voterV3Address, rewardsDistributorAddress);
 
     //set voterV3 in voting escrow
     await setVoterV3InVotingEscrow(voterV3Address, votingEscrowAddress);

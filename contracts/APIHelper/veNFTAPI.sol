@@ -130,11 +130,8 @@ contract veNFTAPI is Initializable {
     }
     constructor() {}
 
-    function initialize(address _voter, address _rewarddistro, address _pairApi, address _gaugeFactory) initializer public {
-
+    function initialize(address _voter, address _rewarddistro, address _gaugeFactory) initializer public {
         owner = msg.sender;
-
-        pairAPI = _pairApi;
         voter = IVoter(_voter);
         voterV3 = IVoterV3(_voter);
         rewardDisitributor = IRewardsDistributor(_rewarddistro);
