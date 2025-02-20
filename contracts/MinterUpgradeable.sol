@@ -158,13 +158,6 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
         }else{
             return _weeklyMint * rebaseShare / PRECISION;
         }
-        
-        // uint lockedShare = (_veTotal) * PRECISION  / _blackTotal;
-        // if(lockedShare >= REBASEMAX){
-        //     return _weeklyMint * REBASEMAX / PRECISION;
-        // } else {
-        //     return _weeklyMint * lockedShare / PRECISION;
-        // }
     }
 
     // update period can only be called once per cycle (1 week)
