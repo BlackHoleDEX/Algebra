@@ -1,19 +1,5 @@
 [
   {
-    "name": "WETH",
-    "ticker": "WETH",
-    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x4200000000000000000000000000000000000006/logo.svg",
-    "decimal": 18,
-    "address": "0xa63Fe72AdE0A4e5eD762B2ECF9CaD3a58664001A"
-  },
-  {
-    "name": "USDC",
-    "ticker": "USDC",
-    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x833589fcd6edb6e08f4c7c32d4f71b54bda02913/logo.svg",
-    "decimal": 18,
-    "address": "0x349ddcfda1855c82123FD63aaA49F9bee949C752"
-  },
-  {
     "name": "CHAMP",
     "ticker": "CHAMP",
     "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens/8453/0xeb6d78148f001f3aa2f588997c5e102e489ad341/logo.svg",
