@@ -91,7 +91,7 @@ contract veNFTAPI is Initializable {
    
     uint256 constant public MAX_RESULTS = 1000;
     uint256 constant public MAX_PAIRS = 30;
-    uint256 public constant WEEK = 1800; 
+    uint256 public constant WEEK = 7 days; 
 
     IVoter public voter;
     IVoterV3 public voterV3;
