@@ -214,7 +214,7 @@ contract veNFTAPI is Initializable {
         venft.id = id;
         venft.account = _owner;
         venft.decimals = ve.decimals();
-        venft.amount = uint128(_lockedBalance.amount);
+        venft.amount = _lockedBalance.isSMNFT ? uint128(ve.calculate_original_sm_nft_amount(uint256(int256(_lockedBalance.amount)))) : uint128(_lockedBalance.amount); // this is 10% extra for super massive
         venft.voting_amount = ve.balanceOfNFT(id);
         venft.rebase_amount = rewardDisitributor.claimable(id);
         venft.lockEnd = _lockedBalance.end;
