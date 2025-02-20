@@ -37,7 +37,7 @@ abstract contract BasePlugin is IBasePlugin, Timestamp {
     require(msg.sender == pool, 'Only pool can call this');
   }
 
-  function _authorize() internal virtual view;
+  function _authorize() internal view virtual;
 
   function _getPoolState() internal view returns (uint160 price, int24 tick, uint16 fee, uint8 pluginConfig) {
     (price, tick, fee, pluginConfig, , ) = IAlgebraPoolState(pool).globalState();

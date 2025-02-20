@@ -57,12 +57,7 @@ contract BasePluginV2Factory is IBasePluginV2Factory {
 
   function _createPlugin(address pool) internal returns (address) {
     require(pluginByPool[pool] == address(0), 'Already created');
-    ISlidingFeePlugin plugin = new AlgebraBasePluginV2(
-      pool,
-      algebraFactory,
-      address(this),
-      defaultBaseFee
-    );
+    ISlidingFeePlugin plugin = new AlgebraBasePluginV2(pool, algebraFactory, address(this), defaultBaseFee);
     pluginByPool[pool] = address(plugin);
     return address(plugin);
   }
