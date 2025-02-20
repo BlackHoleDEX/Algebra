@@ -346,6 +346,20 @@ const pushDefaultRewardToken = async (bribeFactoryV3Address, blackAddress) => {
     await BribeFactoryV3Contract.pushDefaultRewardToken(blackAddress);
 }
 
+const deployBlackClaim = async (votingEscrowAddress, treasury) => {
+    try {
+        const BlackClaimsContract = await ethers.getContractFactory("BlackClaims");
+        const BlackClaims = await BlackClaimsContract.deploy(treasury, votingEscrowAddress);
+        const txDeployed =  await BlackClaims.deployed();
+
+        console.log("BlackClaims address: ", BlackClaims.address)
+        generateConstantFile("BlackClaims", BlackClaims.address);
+        return BlackClaims.address;
+    } catch (error) {
+        console.log("error in deploying Black Claims: ", error);
+    }
+}
+
 async function main () {
     accounts = await ethers.getSigners();
     owner = accounts[0];
@@ -431,6 +445,8 @@ async function main () {
     await addLiquidity(routerV2Address, addresses[2], addresses[3], 100, 100);
 
     await pushDefaultRewardToken(bribeV3Address, blackAddress);
+
+    const blackClaimAddress = await deployBlackClaim(votingEscrowAddress, ownerAddress);
 
     //create Gauges
     await createGauges(voterV3Address, blackholeV2AbiAddress);
