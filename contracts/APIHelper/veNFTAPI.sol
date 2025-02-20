@@ -12,6 +12,7 @@ import '../interfaces/IVoter.sol';
 import '../interfaces/IVotingEscrow.sol';
 import '../interfaces/IRewardsDistributor.sol';
 import '../interfaces/IVoterV3.sol';
+import '../interfaces/IGaugeFactoryV2.sol';
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
@@ -95,6 +96,7 @@ contract veNFTAPI is Initializable {
 
     IVoter public voter;
     IVoterV3 public voterV3;
+    IGaugeFactory public gaugeFactoryV2;
     address public underlyingToken;
     
 
@@ -113,7 +115,7 @@ contract veNFTAPI is Initializable {
     }
     constructor() {}
 
-    function initialize(address _voter, address _rewarddistro, address _pairApi) initializer public {
+    function initialize(address _voter, address _rewarddistro, address _pairApi, address _gaugeFactory) initializer public {
 
         owner = msg.sender;
 
@@ -121,6 +123,7 @@ contract veNFTAPI is Initializable {
         voter = IVoter(_voter);
         voterV3 = IVoterV3(_voter);
         rewardDisitributor = IRewardsDistributor(_rewarddistro);
+        gaugeFactoryV2 = IGaugeFactory(_gaugeFactory);
 
         require(rewardDisitributor.voting_escrow() == voter._ve(), 've!=ve');
         
@@ -230,21 +233,17 @@ contract veNFTAPI is Initializable {
                 break;
             }
             _pair = pairFactory.allPairs(i);
-            rewards[i].rewards = _pairReward(_pair, id);
+            rewards[i].rewards = _pairReward(_pair, id, _pair);
         }
     }
 
-    function singlePairReward(uint256 id, address _pair) external view returns(Reward[] memory _reward){
-        return _pairReward(_pair, id);
+    function singlePairReward(uint256 id, address _pair, address _gauge) external view returns(Reward[] memory _reward){
+        return _pairReward(_pair, id, _gauge);
     }
 
 
-    function _pairReward(address _pair, uint256 id) internal view returns (Reward[] memory _reward) {
-        if (_pair == address(0)) {
-            return _reward;
-        }
+    function _pairReward(address _pair, uint256 id,  address _gauge) internal view returns (Reward[] memory _reward) {
 
-        address _gauge = voter.gauges(_pair);
         if (_gauge == address(0)) {
             return _reward;
         }
@@ -300,16 +299,16 @@ contract veNFTAPI is Initializable {
     }
 
     function _getRewardsForNft(uint nftId) internal view returns (PairReward[] memory pairReward) {
-        uint _totalPoolVotes = voter.poolVoteLength(nftId);
-        address votedPool;
+        // uint _totalPoolVotes = voter.poolVoteLength(nftId);
+        address[] memory allGauges = gaugeFactoryV2.gauges();
+        uint gaugesLength = gaugeFactoryV2.length();
 
-        pairReward = new PairReward[](_totalPoolVotes);
+        pairReward = new PairReward[](gaugesLength);
 
-        for(uint i=0; i< _totalPoolVotes; i++){
-            votedPool = voter.poolVote(nftId, i);
-
-            pairReward[i].pair = votedPool;
-            pairReward[i].votingRewards = _pairReward(votedPool, nftId);
+        for(uint i=0; i< gaugesLength; i++){
+            address poolAddress = IVoter(voter).poolForGauge(allGauges[i]);
+            pairReward[i].pair = poolAddress;
+            pairReward[i].votingRewards = _pairReward(poolAddress, nftId, allGauges[i]);
         }
     }
 
