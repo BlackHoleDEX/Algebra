@@ -252,14 +252,16 @@ contract Bribe is ReentrancyGuard {
     }
 
     /// @notice Claim the TOKENID rewards
-    function getReward(uint256 tokenId, address[] memory tokens) external nonReentrant  {
-        require(IVotingEscrow(ve).isApprovedOrOwner(msg.sender, tokenId));
+    function getReward(uint256 tokenId, address[] memory tokens, address sender) external nonReentrant  {
+        require(IVotingEscrow(ve).isApprovedOrOwner(sender, tokenId));
          address _owner = IVotingEscrow(ve).ownerOf(tokenId);
         uint256 _length = tokens.length;
         for (uint256 i = 0; i < _length; i++) {
             uint256 _reward = earned(tokenId, tokens[i]);
             lastEarn[tokens[i]][tokenId] = block.timestamp;
-            if (_reward > 0) IERC20(tokens[i]).safeTransfer(_owner, _reward);
+            if (_reward > 0) {
+                IERC20(tokens[i]).safeTransfer(_owner, _reward);
+            }
         }
     }
 
