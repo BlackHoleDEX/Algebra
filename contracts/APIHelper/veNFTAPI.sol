@@ -228,12 +228,14 @@ contract veNFTAPI is Initializable {
         
         uint i = _offset;
         address _pair;
+        address _gaugeAddress;
         for(i; i < _offset + _amount; i++){
             if(i >= totalPairs){
                 break;
             }
             _pair = pairFactory.allPairs(i);
-            rewards[i].rewards = _pairReward(_pair, id, _pair);
+            _gaugeAddress = IVoter(voter).gauges(_pair);
+            rewards[i].rewards = _pairReward(_pair, id, _gaugeAddress);
         }
     }
 
