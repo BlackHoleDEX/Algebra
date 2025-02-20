@@ -327,10 +327,10 @@ const setVoterV3InVotingEscrow = async(voterV3Address, votingEscrowAddress) => {
     }
 }
 
-const deployveNFT = async (voterV3Address, rewardsDistributorAddress, blackholeV2AbiAddress) => {
+const deployveNFT = async (voterV3Address, rewardsDistributorAddress, gaugeV2Address) => {
     try {
         data = await ethers.getContractFactory("veNFTAPI");
-        input = [voterV3Address, rewardsDistributorAddress, blackholeV2AbiAddress] // 
+        input = [voterV3Address, rewardsDistributorAddress, gaugeV2Address] 
         const veNFTAPI = await upgrades.deployProxy(data, input, {initializer: 'initialize', gasLimit:210000000});
         txDeployed = await veNFTAPI.deployed();
 
@@ -403,7 +403,8 @@ async function main () {
     //deploy rewardsDistributor
     const rewardsDistributorAddress = await deployRewardsDistributor(votingEscrowAddress);
 
-    //set depositor
+    //deploy veNFT
+    await deployveNFT(voterV3Address, rewardsDistributorAddress, gaugeV2Address);
 
     //deploy minterUpgradable
     const minterUpgradableAddress = await deployMinterUpgradeable(votingEscrowAddress, voterV3Address, rewardsDistributorAddress);
@@ -428,13 +429,10 @@ async function main () {
     const epochControllerAddress = await deployEpochController(voterV3Address, minterUpgradableAddress);
 
     // set chainlink address
-    // await setChainLinkAddress(epochControllerAddress, "0xb2C2f24FcC2478f279B6B566419a739FA53c70D3");
+    await setChainLinkAddress(epochControllerAddress, "0x03eb20259251F324f5b1cba988754656B6BbE96F");
 
     //add black to user Address
     await addBlackToUserAddress(minterUpgradableAddress);
-
-    //deploy veNFT
-    await deployveNFT(voterV3Address, rewardsDistributorAddress);
 
     //set voterV3 in voting escrow
     await setVoterV3InVotingEscrow(voterV3Address, votingEscrowAddress);

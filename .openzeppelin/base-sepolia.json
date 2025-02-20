@@ -2884,6 +2884,51 @@
       "address": "0x7770697dBb06B6a2c6B728822990209F81a92F3a",
       "txHash": "0xadba3a4762ca5473fcb662fc42ba31c2d7abb741f2bbec146ecb5cd45cc9a6f1",
       "kind": "transparent"
+    },
+    {
+      "address": "0xEE381802bF2F431005c4FC7AB20216e5ab5aCF13",
+      "txHash": "0xb380b480cd59503429a8893358a2e42bc1c78be49985cf9d8c1ee7827736794c",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x94d96307240866eBBdA51A8e323616512A48C6c0",
+      "txHash": "0x229dad64091f4161e54b267fa845b457b82df083213f13420189a31eaa933a67",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x2a2689B58FFf2C349FAb1bEd1D68F3e7669501c6",
+      "txHash": "0x92d6a4f027bbc47bb1b463065d9b90e5f763c986dd07e5789ee93c5e83d8f30f",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x35ec020EdE0eEE12a87d4E04f2b296C9FFd3B8f0",
+      "txHash": "0xff9e70ca5e7f8f19677d38fbd90407b5b970e50f4979598250970cab8be30548",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x5d5a4fd77686614e4CC1C638aC10ABD8d3A97f54",
+      "txHash": "0x5aa9fb760c44102b6ac92b501ace6a8a9cf213a99c9e789050ababf77957bcb8",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x129FFe938E86459ad6fd182F4938552f214fb388",
+      "txHash": "0x12caf9183292ac5ac4d7a149b068b4f42f9b9bf4f5a0685d7c48f24a1ce6e656",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x41ec207F46c87fd3fd5d6Df2f3E16b3F29A24Eb3",
+      "txHash": "0x9191ef7959148827c6ef02b4ac09312df3c8a7a8fd743d074e19c55b7f6af54f",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x56E67968eE5e183Eb6CCA314C5954C04346689b2",
+      "txHash": "0x915e96139771c0dc296c445d99891bd8705c94d5e7185019a9362bc717059aaf",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x16A0C7f6bf203212EA40f0A5C2E10AFba2d3EEE1",
+      "txHash": "0x875613d04612a5a45f5ab9966a56583cf4d3312a29604d413a2d40ebaab6e091",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -25704,6 +25749,143 @@
             "numberOfBytes": "20"
           },
           "t_contract(IVotingEscrow)20673": {
+            "label": "contract IVotingEscrow",
+            "numberOfBytes": "20"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "7f0227d371e5f2399c996d28ca62952259e8d3789ce60c68a8dca09d82e2b0dd": {
+      "address": "0x58CeF825238e6E975169D1B9A61B8AbaF114f990",
+      "txHash": "0x3d96e95f95a1687dbc1cc3d33fecdc5fb63474820775ec8a12789f2abdf8099b",
+      "layout": {
+        "solcVersion": "0.8.13",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "voter",
+            "offset": 2,
+            "slot": "0",
+            "type": "t_contract(IVoter)27155",
+            "contract": "veNFTAPI",
+            "src": "contracts/APIHelper/veNFTAPI.sol:112"
+          },
+          {
+            "label": "voterV3",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_contract(IVoterV3)27223",
+            "contract": "veNFTAPI",
+            "src": "contracts/APIHelper/veNFTAPI.sol:113"
+          },
+          {
+            "label": "gaugeFactoryV2",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_contract(IGaugeFactory)26602",
+            "contract": "veNFTAPI",
+            "src": "contracts/APIHelper/veNFTAPI.sol:114"
+          },
+          {
+            "label": "underlyingToken",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_address",
+            "contract": "veNFTAPI",
+            "src": "contracts/APIHelper/veNFTAPI.sol:115"
+          },
+          {
+            "label": "ve",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_contract(IVotingEscrow)27452",
+            "contract": "veNFTAPI",
+            "src": "contracts/APIHelper/veNFTAPI.sol:118"
+          },
+          {
+            "label": "rewardDisitributor",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_contract(IRewardsDistributor)26927",
+            "contract": "veNFTAPI",
+            "src": "contracts/APIHelper/veNFTAPI.sol:119"
+          },
+          {
+            "label": "pairAPI",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_address",
+            "contract": "veNFTAPI",
+            "src": "contracts/APIHelper/veNFTAPI.sol:121"
+          },
+          {
+            "label": "pairFactory",
+            "offset": 0,
+            "slot": "7",
+            "type": "t_contract(IPairFactory)26844",
+            "contract": "veNFTAPI",
+            "src": "contracts/APIHelper/veNFTAPI.sol:122"
+          },
+          {
+            "label": "owner",
+            "offset": 0,
+            "slot": "8",
+            "type": "t_address",
+            "contract": "veNFTAPI",
+            "src": "contracts/APIHelper/veNFTAPI.sol:125"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IGaugeFactory)26602": {
+            "label": "contract IGaugeFactory",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IPairFactory)26844": {
+            "label": "contract IPairFactory",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IRewardsDistributor)26927": {
+            "label": "contract IRewardsDistributor",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IVoter)27155": {
+            "label": "contract IVoter",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IVoterV3)27223": {
+            "label": "contract IVoterV3",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IVotingEscrow)27452": {
             "label": "contract IVotingEscrow",
             "numberOfBytes": "20"
           },
