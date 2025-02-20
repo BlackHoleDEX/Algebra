@@ -62,4 +62,5 @@ interface IVotingEscrow {
 
     function smNFTBalance() external view returns (uint);
     function calculate_sm_nft_bonus(uint amount) external view returns (uint);
+    function calculate_original_sm_nft_amount(uint amount) external view returns (uint);
 }

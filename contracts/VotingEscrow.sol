@@ -1616,6 +1616,10 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         return (SMNFT_BONUS * amount) / PRECISISON;
     }
 
+    function calculate_original_sm_nft_amount(uint amount) external view returns (uint){
+        return _calculate_original_sm_nft_amount(amount);
+    }
+
     function _calculate_original_sm_nft_amount(uint amount) view internal returns (uint){
         return (amount * PRECISISON) / (SMNFT_BONUS + PRECISISON);
     }
