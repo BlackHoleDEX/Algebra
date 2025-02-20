@@ -253,7 +253,7 @@ contract veNFTAPI is Initializable {
     //         rewards[i].rewards = _pairReward(_pair, id, _gaugeAddress);
     //     }
     // }
-    
+
     function _pairReward(address _pair, uint256 id,  address _gauge) internal view returns (Reward[] memory _reward, bool) {
 
         if (_gauge == address(0)) {
@@ -362,11 +362,11 @@ contract veNFTAPI is Initializable {
         bool hasReward = false;
         if (_feeToken0 > 0) {
             _reward[0] = _createReward(internal_bribes_inputs.id, _feeToken0, internal_bribes_inputs.t0, internal_bribes_inputs.bribe_address, internal_bribes_inputs.pair);
-            if(!hasReward) hasReward = true;
+            hasReward = true;
         }
         if (_feeToken1 > 0) {
             _reward[1] = _createReward(internal_bribes_inputs.id, _feeToken1, internal_bribes_inputs.t1, internal_bribes_inputs.bribe_address, internal_bribes_inputs.pair);
-            if(!hasReward) hasReward = true;
+            hasReward = true;
         }
 
         return hasReward;
@@ -378,7 +378,9 @@ contract veNFTAPI is Initializable {
             address _token = IBribeAPI(external_bribes_input.bribe_address).rewardTokens(k);
             uint256 bribeAmount = IBribeAPI(external_bribes_input.bribe_address).earned(external_bribes_input.id, _token);
             hasReward = bribeAmount > 0;
-            _reward[2 + k] = _createReward(external_bribes_input.id, bribeAmount, _token, external_bribes_input.bribe_address, external_bribes_input.pair);
+            if(bribeAmount > 0){
+                _reward[2 + k] = _createReward(external_bribes_input.id, bribeAmount, _token, external_bribes_input.bribe_address, external_bribes_input.pair);
+            }
         }
 
         return hasReward;
