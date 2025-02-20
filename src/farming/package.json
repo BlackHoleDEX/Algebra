@@ -41,7 +41,7 @@
     "test": "hardhat test --parallel",
     "clear-cache": "rm -rf artifacts/ cache/ typechain/",
     "coverage": "npm --prefix ../periphery run compile && hardhat coverage",
-    "precommit": "pretty-quick --staged --pattern **/*.sol"
+    "precommit": "pretty-quick --staged --pattern '**/*.sol'"
   },
   "engines": {
     "npm": ">=8.0.0",
