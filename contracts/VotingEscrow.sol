@@ -756,7 +756,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         (old_locked.amount, old_locked.end, old_locked.isPermanent, old_locked.isSMNFT) = (_locked.amount, _locked.end, _locked.isPermanent, _locked.isSMNFT);
         // Adding to existing lock, or if a lock is expired - creating a new one
         if(old_locked.isSMNFT) {
-            _locked.amount += int128(int256(((110*_value)/100)));
+            _locked.amount += int128(int256(_value + _calculate_sm_nft_bonus(_value)));
         } else {
             _locked.amount += int128(int256(_value));
         }
@@ -1224,19 +1224,15 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         LockedBalance memory newLockedTo;
         newLockedTo.isPermanent = _locked1.isPermanent;
         newLockedTo.isSMNFT = _locked1.isSMNFT;
-        
-        if(newLockedTo.isSMNFT) {
-            newLockedTo.amount = _locked1.amount + ((110*_locked0.amount)/100);
+
+        if(newLockedTo.isSMNFT){
+            newLockedTo.amount = _locked1.amount + _locked0.amount + int128(int256(_calculate_sm_nft_bonus(uint256(int256(_locked0.amount)))));
             smNFTBalance += value0;
-        } else {
+        }else if (newLockedTo.isPermanent){
             newLockedTo.amount = _locked1.amount + _locked0.amount;
-        }
-        
-        if (newLockedTo.isPermanent) {
-            if(!newLockedTo.isSMNFT) {
-                permanentLockBalance += value0;
-            }
-        } else {
+            permanentLockBalance += value0;
+        }else{
+            newLockedTo.amount = _locked1.amount + _locked0.amount;
             newLockedTo.end = end;
         }
 
