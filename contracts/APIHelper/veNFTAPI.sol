@@ -41,6 +41,21 @@ contract veNFTAPI is Initializable {
         uint256 weight;
     }
 
+    struct InternalBribeInputs {
+        uint id;
+        address bribe_address;
+        address t0;
+        address t1;
+        address pair;
+    }
+
+    struct ExternalBribeInputs {
+        uint id;
+        address bribe_address;
+        uint tokens;
+        address pair;
+    }
+
     struct veNFT {
         uint8 decimals;
         
@@ -220,34 +235,29 @@ contract veNFTAPI is Initializable {
     }
 
     // used only for sAMM and vAMM    
-    function allPairRewards(uint256 _amount, uint256 _offset, uint256 id) external view returns(AllPairRewards[] memory rewards){
+    // function allPairRewards(uint256 _amount, uint256 _offset, uint256 id) external view returns(AllPairRewards[] memory rewards){
         
-        rewards = new AllPairRewards[](MAX_PAIRS);
+    //     rewards = new AllPairRewards[](MAX_PAIRS);
 
-        uint256 totalPairs = pairFactory.allPairsLength();
+    //     uint256 totalPairs = pairFactory.allPairsLength();
         
-        uint i = _offset;
-        address _pair;
-        address _gaugeAddress;
-        for(i; i < _offset + _amount; i++){
-            if(i >= totalPairs){
-                break;
-            }
-            _pair = pairFactory.allPairs(i);
-            _gaugeAddress = IVoter(voter).gauges(_pair);
-            rewards[i].rewards = _pairReward(_pair, id, _gaugeAddress);
-        }
-    }
-
-    function singlePairReward(uint256 id, address _pair, address _gauge) external view returns(Reward[] memory _reward){
-        return _pairReward(_pair, id, _gauge);
-    }
-
-
-    function _pairReward(address _pair, uint256 id,  address _gauge) internal view returns (Reward[] memory _reward) {
+    //     uint i = _offset;
+    //     address _pair;
+    //     address _gaugeAddress;
+    //     for(i; i < _offset + _amount; i++){
+    //         if(i >= totalPairs){
+    //             break;
+    //         }
+    //         _pair = pairFactory.allPairs(i);
+    //         _gaugeAddress = IVoter(voter).gauges(_pair);
+    //         rewards[i].rewards = _pairReward(_pair, id, _gaugeAddress);
+    //     }
+    // }
+    
+    function _pairReward(address _pair, uint256 id,  address _gauge) internal view returns (Reward[] memory _reward, bool) {
 
         if (_gauge == address(0)) {
-            return _reward;
+            return (_reward, false);
         }
 
         address external_bribe = voter.external_bribes(_gauge);
@@ -260,14 +270,35 @@ contract veNFTAPI is Initializable {
         IPair ipair = IPair(_pair);
         (address t0, address t1) = (ipair.token0(), ipair.token1());
 
+        bool hasReward = false;
+
+        InternalBribeInputs memory internal_bribes_input = InternalBribeInputs({
+            id: id,
+            t0: t0,
+            t1: t1,
+            bribe_address: internal_bribe,
+            pair: _pair
+        });
+
+        ExternalBribeInputs memory external_bribes_input = ExternalBribeInputs({
+            id: id,
+            bribe_address: address(0),
+            tokens: 0,
+            pair: address(0)
+        });
+
         // Fetch earned fees
-        _addInternalBribeRewards(_reward, id, t0, t1, internal_bribe, _pair);
+        hasReward = _addInternalBribeRewards(_reward, internal_bribes_input);
 
         if (external_bribe != address(0)) {
-            _addExternalBribeRewards(_reward, id, totBribeTokens, external_bribe, _pair);
+            external_bribes_input.id = id;
+            external_bribes_input.bribe_address = external_bribe;
+            external_bribes_input.tokens = totBribeTokens;
+            external_bribes_input.pair = _pair;
+            hasReward = hasReward || _addExternalBribeRewards(_reward, external_bribes_input);
         }
 
-        return _reward;
+        return (_reward, hasReward);
     }
 
     function getAllPairRewards(address _user, uint _amounts, uint _offset) external view returns(uint totNFTs, bool hasNext, LockReward[] memory _lockReward){
@@ -303,34 +334,54 @@ contract veNFTAPI is Initializable {
     function _getRewardsForNft(uint nftId) internal view returns (PairReward[] memory pairReward) {
         address[] memory allGauges = gaugeFactoryV2.gauges();
         uint gaugesLength = gaugeFactoryV2.length();
-
-        pairReward = new PairReward[](gaugesLength);
+        uint maxPairRewardCount = 0;
+        PairReward[] memory _pairRewards = new PairReward[](gaugesLength);
 
         for(uint i=0; i<gaugesLength; i++){
             address poolAddress = IVoter(voter).poolForGauge(allGauges[i]);
-            pairReward[i].pair = poolAddress;
-            pairReward[i].votingRewards = _pairReward(poolAddress, nftId, allGauges[i]);
+            (Reward[] memory _rewardData, bool hasReward) = _pairReward(poolAddress, nftId, allGauges[i]);
+            if(hasReward)
+            {
+                _pairRewards[maxPairRewardCount].pair = poolAddress;
+                _pairRewards[maxPairRewardCount].votingRewards = _rewardData;
+                maxPairRewardCount++;
+            }
+        }
+
+        pairReward = new PairReward[](maxPairRewardCount);
+
+        for(uint i=0; i<maxPairRewardCount; i++){
+            pairReward[i].pair = _pairRewards[i].pair;
+            pairReward[i].votingRewards = _pairRewards[maxPairRewardCount].votingRewards;
         }
     }
 
-    function _addInternalBribeRewards(Reward[] memory _reward, uint256 id, address t0, address t1, address internal_bribe, address _pair) internal view {
-        uint256 _feeToken0 = IBribeAPI(internal_bribe).earned(id, t0);
-        uint256 _feeToken1 = IBribeAPI(internal_bribe).earned(id, t1);
-
+    function _addInternalBribeRewards(Reward[] memory _reward, InternalBribeInputs memory internal_bribes_inputs) internal view returns (bool) {
+        uint256 _feeToken0 = IBribeAPI(internal_bribes_inputs.bribe_address).earned(internal_bribes_inputs.id, internal_bribes_inputs.t0);
+        uint256 _feeToken1 = IBribeAPI(internal_bribes_inputs.bribe_address).earned(internal_bribes_inputs.id, internal_bribes_inputs.t1);
+        bool hasReward = false;
         if (_feeToken0 > 0) {
-            _reward[0] = _createReward(id, _feeToken0, t0, internal_bribe, _pair);
+            _reward[0] = _createReward(internal_bribes_inputs.id, _feeToken0, internal_bribes_inputs.t0, internal_bribes_inputs.bribe_address, internal_bribes_inputs.pair);
+            if(!hasReward) hasReward = true;
         }
         if (_feeToken1 > 0) {
-            _reward[1] = _createReward(id, _feeToken1, t1, internal_bribe, _pair);
+            _reward[1] = _createReward(internal_bribes_inputs.id, _feeToken1, internal_bribes_inputs.t1, internal_bribes_inputs.bribe_address, internal_bribes_inputs.pair);
+            if(!hasReward) hasReward = true;
         }
+
+        return hasReward;
     }
 
-    function _addExternalBribeRewards(Reward[] memory _reward, uint256 id, uint256 totBribeTokens, address external_bribe, address _pair) internal view {
-        for (uint256 k = 0; k < totBribeTokens; k++) {
-            address _token = IBribeAPI(external_bribe).rewardTokens(k);
-            uint256 bribeAmount = IBribeAPI(external_bribe).earned(id, _token);
-            _reward[2 + k] = _createReward(id, bribeAmount, _token, external_bribe, _pair);
+    function _addExternalBribeRewards(Reward[] memory _reward, ExternalBribeInputs memory external_bribes_input) internal view returns (bool) {
+        bool hasReward = false;
+        for (uint256 k = 0; k < external_bribes_input.tokens; k++) {
+            address _token = IBribeAPI(external_bribes_input.bribe_address).rewardTokens(k);
+            uint256 bribeAmount = IBribeAPI(external_bribes_input.bribe_address).earned(external_bribes_input.id, _token);
+            hasReward = bribeAmount > 0;
+            _reward[2 + k] = _createReward(external_bribes_input.id, bribeAmount, _token, external_bribes_input.bribe_address, external_bribes_input.pair);
         }
+
+        return hasReward;
     }
 
     function _createReward(uint256 id, uint256 amount, address token, address bribe, address _pair) internal view returns (Reward memory) {
