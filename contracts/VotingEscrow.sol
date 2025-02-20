@@ -1604,7 +1604,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
 
     function setSmNFTBonus(uint _bonus) external {
         require(msg.sender == team, "unauthorized to set bonus");
-        require(_bonus <= 10000, "rate too high");
+        require(_bonus <= PRECISISON, "rate too high");
         SMNFT_BONUS = _bonus;
     }
 
