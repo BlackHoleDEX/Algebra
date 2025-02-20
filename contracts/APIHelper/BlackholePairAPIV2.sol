@@ -15,10 +15,13 @@ import '../interfaces/IVoter.sol';
 import '../interfaces/IVotingEscrow.sol';
 import '../../contracts/Pair.sol';
 import '../interfaces/IVoterV3.sol';
+import '../interfaces/IRouter01.sol';
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "hardhat/console.sol";
+
+import {BlackTimeLibrary} from "../libraries/BlackTimeLibrary.sol";
 
 interface IHypervisor{
     function pool() external view returns(address);
@@ -71,9 +74,8 @@ contract BlackholePairAPIV2 is Initializable {
         uint votes;
 
         // fees
-        address feeAddress; 
-        uint token0_fees;      // token 0 fees accumulated till now
-        uint token1_fees;      // token 1 fees accumulated till now
+        uint staked_token0_fees;      // staked token 0 fees accumulated till now
+        uint staked_token1_fees;      // staked token 1 fees accumulated till now
 
         // bribes
         Bribes internal_bribes;
@@ -107,6 +109,26 @@ contract BlackholePairAPIV2 is Initializable {
         Bribes[] bribes;
     }
 
+    struct route {
+        address pair;
+        address from;
+        address to;
+        bool stable;
+        uint amountOut;
+    }
+
+    struct TempData {
+        uint amountOut;
+        bool stable;
+        address _pair1;
+        address _pair2;
+        address token_0;
+        address token_1;
+        uint amount1;
+        uint amount2;
+        bool foundPath;
+    }
+
     uint256 public constant MAX_PAIRS = 1000;
     uint256 public constant MAX_EPOCHS = 200;
     uint256 public constant MAX_REWARDS = 16;
@@ -117,6 +139,7 @@ contract BlackholePairAPIV2 is Initializable {
     IAlgebraFactory public algebraFactory;
     IVoter public voter;
     IVoterV3 public voterV3;
+    IRouter01 public routerV2;
 
     address public underlyingToken;
 
@@ -129,12 +152,14 @@ contract BlackholePairAPIV2 is Initializable {
 
     constructor() {}
 
-    function initialize(address _voter) initializer public {
+    function initialize(address _voter, address _router) initializer public {
   
         owner = msg.sender;
 
         voter = IVoter(_voter);
         voterV3 = IVoterV3(_voter);
+
+        routerV2 = IRouter01(_router);
 
         pairFactory = IPairFactory(voter.factories()[0]);
         underlyingToken = IVotingEscrow(voter._ve()).token();
@@ -144,6 +169,10 @@ contract BlackholePairAPIV2 is Initializable {
 
     function getClaimable(address _account, address _pair) internal view returns(uint claimable0, uint claimable1){
 
+        if(address(_account) == address(0)){
+            return (0,0);
+        }
+        
         Pair pair = Pair(_pair);
 
         uint _supplied = pair.balanceOf(_account); // get LP balance of `_user`
@@ -182,11 +211,9 @@ contract BlackholePairAPIV2 is Initializable {
         address _pair;
         uint claim0;
         uint claim1;
-        address feeAddress; 
-        uint tokenCurrentFees0;     
-        uint tokenCurrentFees1; 
+        uint stakedToken0Fees;     
+        uint stakedToken1Fees; 
         Bribes[] memory bribes;
-
 
         for(i; i < _offset + _amounts; i++){
             // if totalPairs is reached, break.
@@ -201,14 +228,13 @@ contract BlackholePairAPIV2 is Initializable {
             pairs[i - _offset].claimable0 = claim0;
             pairs[i - _offset].claimable1 = claim1;
 
-            (tokenCurrentFees0, tokenCurrentFees1, feeAddress) = getCurrentFees(_pair, pairs[i - _offset].token0, pairs[i - _offset].token1);
-            pairs[i - _offset].feeAddress = feeAddress;
-            pairs[i - _offset].token0_fees = tokenCurrentFees0;
-            pairs[i - _offset].token1_fees = tokenCurrentFees1;  
+            (stakedToken0Fees, stakedToken1Fees) = getClaimable(pairs[i - _offset].gauge, _pair);
+            pairs[i - _offset].staked_token0_fees = stakedToken0Fees;
+            pairs[i - _offset].staked_token1_fees = stakedToken1Fees;  
 
             bribes = _getBribes(_pair);
-            pairs[i - _offset].internal_bribes = bribes[0];
-            pairs[i - _offset].external_bribes = bribes[1];  
+            pairs[i - _offset].external_bribes = bribes[0];
+            pairs[i - _offset].internal_bribes = bribes[1];  
         }
 
 
@@ -218,23 +244,21 @@ contract BlackholePairAPIV2 is Initializable {
         pairInfo memory pairInformation =  _pairAddressToInfo(_pair, _account);
         uint claim0;
         uint claim1;
-        address feeAddress; 
-        uint tokenCurrentFees0;     
-        uint tokenCurrentFees1; 
+        uint stakedToken0Fees;     
+        uint stakedToken1Fees; 
 
         (claim0, claim1) = getClaimable(_account, _pair);
         pairInformation.claimable0 = claim0;
         pairInformation.claimable1 = claim1;
 
-        (tokenCurrentFees0, tokenCurrentFees1, feeAddress) = getCurrentFees(_pair, pairInformation.token0, pairInformation.token1);
-        pairInformation.feeAddress = feeAddress;
-        pairInformation.token0_fees = tokenCurrentFees0;
-        pairInformation.token1_fees = tokenCurrentFees1;  
+        (stakedToken0Fees, stakedToken1Fees) = getClaimable(pairInformation.gauge, _pair);
+        pairInformation.staked_token0_fees = stakedToken0Fees;
+        pairInformation.staked_token1_fees = stakedToken1Fees;  
 
         Bribes[] memory bribes;
         bribes = _getBribes(_pair);
-        pairInformation.internal_bribes = bribes[0];
-        pairInformation.external_bribes = bribes[1];
+        pairInformation.external_bribes = bribes[0];
+        pairInformation.internal_bribes = bribes[1];
         return pairInformation;
     }
 
@@ -292,14 +316,14 @@ contract BlackholePairAPIV2 is Initializable {
         _pairInfo.token0_decimals = IERC20(token_0).decimals();
         _pairInfo.token0_symbol = IERC20(token_0).symbol();
         _pairInfo.reserve0 = r0;
-        _pairInfo.claimable0 = _type == false ? 0 : ipair.claimable0(_account);
+        _pairInfo.claimable0 = _type == false || _account == address(0) ? 0 : ipair.claimable0(_account);
 
         // Token1 Info
         _pairInfo.token1 = token_1;
         _pairInfo.token1_decimals = IERC20(token_1).decimals();
         _pairInfo.token1_symbol = IERC20(token_1).symbol();
         _pairInfo.reserve1 = r1;
-        _pairInfo.claimable1 = _type == false ? 0 : ipair.claimable1(_account);
+        _pairInfo.claimable1 = _type == false || _account == address(0) ? 0 : ipair.claimable1(_account);
 
         
         // Pair's gauge Info
@@ -310,9 +334,9 @@ contract BlackholePairAPIV2 is Initializable {
         _pairInfo.emissions_token_decimals = IERC20(underlyingToken).decimals();			    
 
         // Account Info
-        _pairInfo.account_lp_balance = IERC20(_pair).balanceOf(_account);
-        _pairInfo.account_token0_balance = IERC20(token_0).balanceOf(_account);
-        _pairInfo.account_token1_balance = IERC20(token_1).balanceOf(_account);
+        _pairInfo.account_lp_balance = _account == address(0) ? 0 : IERC20(_pair).balanceOf(_account);
+        _pairInfo.account_token0_balance = _account == address(0) ? 0 : IERC20(token_0).balanceOf(_account);
+        _pairInfo.account_token1_balance = _account == address(0) ? 0 : IERC20(token_1).balanceOf(_account);
         _pairInfo.account_gauge_balance = accountGaugeLPAmount;
         _pairInfo.account_gauge_earned = earned;
 
@@ -353,19 +377,16 @@ contract BlackholePairAPIV2 is Initializable {
         address[] memory _tokens = new address[](totTokens);
         string[] memory _symbol = new string[](totTokens);
         uint[] memory _decimals = new uint[](totTokens);
-        uint ts = IBribeAPI(_bribeAddress).getNextEpochStart();
+        uint ts = BlackTimeLibrary.epochStart(block.timestamp);
         uint i = 0;
         address _token;
-        IBribeAPI.Reward memory _reward;
 
         for(i; i < totTokens; i++){
             _token = IBribeAPI(_bribeAddress).rewardTokens(i);
             _tokens[i] = _token;
             _symbol[i] = IERC20(_token).symbol();
             _decimals[i] = IERC20(_token).decimals();
-            _reward = IBribeAPI(_bribeAddress).rewardData(_token, ts);
-            _amounts[i] = _reward.rewardsPerEpoch;
-            
+            _amounts[i] = IBribeAPI(_bribeAddress).tokenRewardsPerEpoch(_token, ts);
         }
 
         _rewards.bribeAddress = _bribeAddress;
@@ -383,75 +404,6 @@ contract BlackholePairAPIV2 is Initializable {
         uint tokenFees1 = IERC20(token_1).balanceOf(feesAddress);
 
         return (tokenFees0, tokenFees1, feesAddress);
-    }
-
-    function getPairBribe(uint _amounts, uint _offset, address _pair) external view returns(pairBribeEpoch[] memory _pairEpoch){
-
-        require(_amounts <= MAX_EPOCHS, 'too many epochs');
-
-        _pairEpoch = new pairBribeEpoch[](_amounts);
-
-        address _gauge = voter.gauges(_pair);
-        if(_gauge == address(0)) return _pairEpoch;
-
-        IBribeAPI bribe  = IBribeAPI(voter.external_bribes(_gauge));
-
-        // check bribe and checkpoints exists
-        if(address(0) == address(bribe)) return _pairEpoch;
-        
-      
-        // scan bribes
-        // get latest balance and epoch start for bribes
-        uint _epochStartTimestamp = bribe.firstBribeTimestamp();
-
-        // if 0 then no bribe created so far
-        if(_epochStartTimestamp == 0){
-            return _pairEpoch;
-        }
-
-        uint _supply;
-        uint i = _offset;
-
-        for(i; i < _offset + _amounts; i++){
-            
-            _supply            = bribe.totalSupplyAt(_epochStartTimestamp);
-            _pairEpoch[i-_offset].epochTimestamp = _epochStartTimestamp;
-            _pairEpoch[i-_offset].pair = _pair;
-            _pairEpoch[i-_offset].totalVotes = _supply;
-            _pairEpoch[i-_offset].bribes = _bribe(_epochStartTimestamp, address(bribe));
-            
-            _epochStartTimestamp += WEEK;
-
-        }
-
-    }
-
-    function _bribe(uint _ts, address _br) internal view returns(tokenBribe[] memory _tb){
-
-        IBribeAPI _wb = IBribeAPI(_br);
-        uint tokenLen = _wb.rewardsListLength();
-
-        _tb = new tokenBribe[](tokenLen);
-
-        uint k;
-        uint _rewPerEpoch;
-        IERC20 _t;
-        for(k = 0; k < tokenLen; k++){
-            _t = IERC20(_wb.rewardTokens(k));
-            IBribeAPI.Reward memory _reward = _wb.rewardData(address(_t), _ts);
-            _rewPerEpoch = _reward.rewardsPerEpoch;
-            if(_rewPerEpoch > 0){
-                _tb[k].token = address(_t);
-                _tb[k].symbol = _t.symbol();
-                _tb[k].decimals = _t.decimals();
-                _tb[k].amount = _rewPerEpoch;
-            } else {
-                _tb[k].token = address(_t);
-                _tb[k].symbol = _t.symbol();
-                _tb[k].decimals = _t.decimals();
-                _tb[k].amount = 0;
-            }
-        }
     }
 
 
@@ -476,15 +428,108 @@ contract BlackholePairAPIV2 is Initializable {
         emit Voter(_oldVoter, _voter);
     }
 
-    function left(address _pair, address _token) external view returns(uint256 _rewPerEpoch){
-        address _gauge = voter.gauges(_pair);
-        IBribeAPI bribe  = IBribeAPI(voter.internal_bribes(_gauge));
-        
-        uint256 _ts = bribe.getEpochStart();
-        IBribeAPI.Reward memory _reward = bribe.rewardData(_token, _ts);
-        _rewPerEpoch = _reward.rewardsPerEpoch;
-    
+    function getAmountOut(uint amountIn, address tokenIn, address tokenOut) external view returns (uint amountOut, route[] memory routes) {
+
+        TempData memory temp;
+        (temp.amountOut, temp.stable) = routerV2.getAmountOut(amountIn, tokenIn, tokenOut);
+
+        if (temp.amountOut > 0) {
+            temp._pair1 = pairFactory.getPair(tokenIn, tokenOut, temp.stable);
+            routes = new route[](1);
+            routes[0] = _createRoute(temp._pair1, tokenIn, tokenOut, temp.stable, temp.amountOut);
+            amountOut = temp.amountOut;
+            return (amountOut, routes);
+        }
+
+        routes = new route[](2);
+        uint totPairs = pairFactory.allPairsLength();
+
+        temp.amountOut = type(uint256).max;
+        temp.foundPath = false;
+
+        for(uint i=0; i < totPairs; i++){
+            temp._pair1 = pairFactory.allPairs(i);
+
+            IPair ipair = IPair(temp._pair1); 
+            temp.token_0 = ipair.token0();
+            temp.token_1 = ipair.token1();
+
+            if(temp.token_0 == tokenIn){
+                temp._pair2 = pairFactory.getPair(temp.token_1, tokenOut, true);
+                if(temp._pair2 != address(0)){
+                    (temp.amount1, temp.amount2) = _getAmountViaHopping(amountIn, tokenIn, temp.token_1, tokenOut);
+                    if(temp.amount2 != 0 && temp.amount2 < temp.amountOut){
+                        temp.amountOut = temp.amount2;
+                        temp.foundPath = true;
+                        routes[0] = _createRoute(temp._pair1, tokenIn, temp.token_1, ipair.isStable(), temp.amount1);
+                        routes[1] = _createRoute(temp._pair2, temp.token_1, tokenOut, true, temp.amount2);
+                    }
+                }
+                
+                temp._pair2 = pairFactory.getPair(temp.token_1, tokenOut, false);
+                if(temp._pair2 != address(0)){
+                    (temp.amount1, temp.amount2) = _getAmountViaHopping(amountIn, tokenIn, temp.token_1, tokenOut);
+                    if(temp.amount2 != 0 && temp.amount2 < temp.amountOut){
+                        temp.amountOut = temp.amount2;
+                        temp.foundPath = true;
+                        routes[0] = _createRoute(temp._pair1, tokenIn, temp.token_1, ipair.isStable(), temp.amount1);
+                        routes[1] = _createRoute(temp._pair2, temp.token_1, tokenOut, false, temp.amount2);
+                    }
+                }
+            }
+            else if(temp.token_1 == tokenIn){
+                temp._pair2 = pairFactory.getPair(temp.token_0, tokenOut, true);
+                if(temp._pair2 != address(0)){
+                    (temp.amount1, temp.amount2) = _getAmountViaHopping(amountIn, tokenIn, temp.token_0, tokenOut);
+                    if(temp.amount2 != 0 && temp.amount2 < temp.amountOut){
+                        temp.amountOut = temp.amount2;
+                        temp.foundPath = true;
+                        routes[0] = _createRoute(temp._pair1, tokenIn, temp.token_0, ipair.isStable(), temp.amount1);
+                        routes[1] = _createRoute(temp._pair2, temp.token_0, tokenOut, true, temp.amount2);
+                    }
+                }
+                
+                temp._pair2 = pairFactory.getPair(temp.token_0, tokenOut, false);
+                if(temp._pair2 != address(0)){
+                    (temp.amount1, temp.amount2) = _getAmountViaHopping(amountIn, tokenIn, temp.token_0, tokenOut);
+                    if(temp.amount2 != 0 && temp.amount2 < temp.amountOut){
+                        temp.amountOut = temp.amount2;
+                        temp.foundPath = true;
+                        routes[0] = _createRoute(temp._pair1, tokenIn, temp.token_0, ipair.isStable(), temp.amount1);
+                        routes[1] = _createRoute(temp._pair2, temp.token_0, tokenOut, true, temp.amount2);
+                    }
+                }
+            }
+        }
+
+        if(temp.foundPath == false){
+            temp.amountOut = 0;
+        }
+
+        return (temp.amountOut, routes);
+    }
+
+    function getAmountViaHopping(uint amountIn, address tokenIn, address tokenMid, address tokenOut) external view returns (uint amount1, uint amount2){
+        return _getAmountViaHopping(amountIn, tokenIn, tokenMid, tokenOut);
     }
 
 
+    function _getAmountViaHopping(uint amountIn, address tokenIn, address tokenMid, address tokenOut) internal view returns (uint amount1, uint amount2){
+        bool stable;
+        
+        (amount1, stable) = routerV2.getAmountOut(amountIn, tokenIn, tokenMid);
+        (amount2, stable) = routerV2.getAmountOut(amount1, tokenMid, tokenOut);
+
+        return (amount1, amount2);
+    }
+
+    function _createRoute(address pair, address from, address to, bool stable, uint amountOut) internal pure returns (route memory) {
+        return route({
+            pair: pair,
+            from: from,
+            to: to,
+            stable: stable,
+            amountOut: amountOut
+        });
+    }
 }

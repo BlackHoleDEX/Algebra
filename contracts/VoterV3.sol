@@ -12,21 +12,16 @@ import './interfaces/IPairInfo.sol';
 import './interfaces/IPairFactory.sol';
 import './interfaces/IVotingEscrow.sol';
 import './interfaces/IPermissionsRegistry.sol';
-import './interfaces/IAlgebraFactory.sol';
-import "hardhat/console.sol";
+// import './interfaces/IAlgebraFactory.sol';
+// import "hardhat/console.sol";
+import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 
-
-interface IHypervisor {
-    function pool() external view returns(address);
-}
-
 contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
-
     using SafeERC20Upgradeable for IERC20Upgradeable;
     
     bool internal initflag;
@@ -42,10 +37,12 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
 
     uint256 internal index;                                        // gauge index
+    uint256 public maxVotingNum;
     uint256 internal constant DURATION = 7 days;                   // rewards are released over 7 days
     uint256 public VOTE_DELAY;                                     // delay between votes in seconds
     uint256 public constant MAX_VOTE_DELAY = 7 days;               // Max vote delay allowed
     uint public constant EPOCH_DURATION = 1800; //BlackHole:: Current duration need to change 1 week
+     uint256 internal constant MIN_OF_MAX_VOTING_NUM = 10;
 
     mapping(address => uint256) internal supplyIndex;              // gauge    => index
     mapping(address => uint256) public claimable;                  // gauge    => claimable $the
@@ -56,12 +53,16 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     mapping(address => address) public external_bribes;         // gauge    => external bribe (real bribes)
     mapping(uint256 => mapping(address => uint256)) public votes;  // nft      => pool     => votes
     mapping(uint256 => address[]) public poolVote;                 // nft      => pools
-    mapping(uint256 => mapping(address => uint256)) internal weightsPerEpoch; // timestamp => pool => weights
-    mapping(uint256 => uint256) internal totalWeightsPerEpoch;         // timestamp => total weights
+
+    mapping(address => uint256) public weights;
+    uint256 public totalWeight;
+    mapping(uint256 => uint256) public usedWeights;
+
     mapping(uint256 => uint256) public lastVoted;                     // nft      => timestamp of last vote (this is shifted to thursday of that epoc)
     mapping(uint256 => uint256) public lastVotedTimestamp;            // nft      => timestamp of last vote
     mapping(address => bool) public isGauge;                    // gauge    => boolean [is a gauge?]
     mapping(address => bool) public isWhitelisted;              // token    => boolean [is an allowed token?]
+    mapping(uint256 => bool) public isWhitelistedNFT;
     mapping(address => bool) public isAlive;                    // gauge    => boolean [is the gauge alive?]
     mapping(address => bool) public isFactory;                  // factory  => boolean [the pair factory exists?]
     mapping(address => bool) public isGaugeFactory;             // g.factory=> boolean [the gauge factory exists?]
@@ -75,6 +76,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     event DistributeReward(address indexed sender, address indexed gauge, uint256 amount);
     event Whitelisted(address indexed whitelister, address indexed token);
     event Blacklisted(address indexed blacklister, address indexed token);
+    event WhitelistedNFT(address indexed whitelister, uint256 tokenId);
 
     event SetMinter(address indexed old, address indexed latest);
     event SetBribeFactory(address indexed old, address indexed latest);
@@ -104,6 +106,8 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
         minter = msg.sender;
         permissionRegistry = msg.sender;
+
+        maxVotingNum = 30;
 
         VOTE_DELAY = 0;
         initflag = false;
@@ -215,8 +219,11 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         emit SetBribeFor(false, internal_bribes[_gauge], _external, _gauge);
         external_bribes[_gauge] = _external;
     }
-    
- 
+
+    function setMaxVotingNum(uint256 _maxVotingNum) external VoterAdmin {
+        require (_maxVotingNum >= MIN_OF_MAX_VOTING_NUM, "low voting");
+        maxVotingNum = _maxVotingNum;
+    }
     
     function addFactory(address _pairFactory, address _gaugeFactory) external VoterAdmin {
         require(_pairFactory != address(0), 'addr0');
@@ -307,17 +314,26 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         emit Blacklisted(msg.sender, _token);
     }
 
+    function whitelistNFT(uint256 _tokenId, bool _bool) external Governance() {
+        isWhitelistedNFT[_tokenId] = _bool;
+        emit WhitelistedNFT(msg.sender, _tokenId);
+    }
+
      /// @notice Kill a malicious gauge 
     /// @param  _gauge gauge to kill
     function killGauge(address _gauge) external Governance {
         require(isAlive[_gauge], "killed");
         isAlive[_gauge] = false;
+
+        // Return claimable back to minter
+        uint256 _claimable = claimable[_gauge];
+        if (_claimable > 0) {
+            IERC20Upgradeable(base).safeTransfer(minter, _claimable);
+        }
         claimable[_gauge] = 0;
 
-        uint _time = epochTimestamp();
-        totalWeightsPerEpoch[_time] -= weightsPerEpoch[_time][poolForGauge[_gauge]]; 
-
-
+        // Do we need to decrease totalWeight also. For now It's being commented out. 
+        //totalWeight = totalWeight - weights[poolForGauge[_gauge]];
         emit GaugeKilled(_gauge);
     }
 
@@ -340,29 +356,27 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
     
     /// @notice Reset the votes of a given TokenID
-    function reset(uint256 _tokenId) external nonReentrant {
-        _voteDelay(_tokenId);
+    function reset(uint256 _tokenId) external onlyNewEpoch(_tokenId) nonReentrant {
+        //_voteDelay(_tokenId);
         require(IVotingEscrow(_ve).isApprovedOrOwner(msg.sender, _tokenId), "!approved/Owner");
         _reset(_tokenId);
         IVotingEscrow(_ve).abstain(_tokenId);
-        lastVoted[_tokenId] = epochTimestamp() + 1;
-        lastVotedTimestamp[_tokenId] = block.timestamp;
+        // lastVoted[_tokenId] = epochTimestamp() + 1;
+        // lastVotedTimestamp[_tokenId] = block.timestamp;
     }
 
     function _reset(uint256 _tokenId) internal {
         address[] storage _poolVote = poolVote[_tokenId];
         uint256 _poolVoteCnt = _poolVote.length;
         uint256 _totalWeight = 0;
-        uint256 _time = epochTimestamp();
+        //uint256 _time = epochTimestamp();
 
         for (uint256 i = 0; i < _poolVoteCnt; i ++) {
             address _pool = _poolVote[i];
             uint256 _votes = votes[_tokenId][_pool];
 
             if (_votes != 0) {
-
-                // if user last vote is < than epochTimestamp then votes are 0! IF not underflow occur
-                if(lastVoted[_tokenId] > _time) weightsPerEpoch[_time][_pool] -= _votes;
+                weights[_pool] -= _votes;
 
                 votes[_tokenId][_pool] -= _votes;
                 
@@ -375,18 +389,17 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
                 emit Abstained(_tokenId, _votes);
             }
         }
-
-        
-        // if user last vote is < than epochTimestamp then _totalWeight is 0! IF not underflow occur
-        if(lastVoted[_tokenId] < _time) _totalWeight = 0;
-        
-        totalWeightsPerEpoch[_time] -= _totalWeight;
+        totalWeight -= _totalWeight;
+        usedWeights[_tokenId] = 0;
         delete poolVote[_tokenId];
     }
 
     /// @notice Recast the saved votes of a given TokenID
     function poke(uint256 _tokenId) external nonReentrant {
-        _voteDelay(_tokenId);
+        // _voteDelay(_tokenId);
+        if (block.timestamp <= BlackTimeLibrary.epochVoteStart(block.timestamp)){
+            revert("Distribution Window");
+        }
         require(IVotingEscrow(_ve).isApprovedOrOwner(msg.sender, _tokenId), "!approved/Owner");
         address[] memory _poolVote = poolVote[_tokenId];
         uint256 _poolCnt = _poolVote.length;
@@ -397,8 +410,8 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         }
 
         _vote(_tokenId, _poolVote, _weights);
-        lastVoted[_tokenId] = epochTimestamp() + 1;
-        lastVotedTimestamp[_tokenId] = block.timestamp;
+        // lastVoted[_tokenId] = epochTimestamp() + 1;
+        // lastVotedTimestamp[_tokenId] = block.timestamp;
     }
 
     
@@ -406,10 +419,15 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     /// @param  _tokenId    veNFT tokenID used to vote
     /// @param  _poolVote   array of LPs addresses to vote  (eg.: [sAMM usdc-usdt   , sAMM busd-usdt, vAMM wbnb-the ,...])
     /// @param  _weights    array of weights for each LPs   (eg.: [10               , 90            , 45             ,...])  
-    function vote(uint256 _tokenId, address[] calldata _poolVote, uint256[] calldata _weights) external nonReentrant {
-        _voteDelay(_tokenId);
+    function vote(uint256 _tokenId, address[] calldata _poolVote, uint256[] calldata _weights) 
+        external onlyNewEpoch(_tokenId) nonReentrant {
+        //_voteDelay(_tokenId);
         require(IVotingEscrow(_ve).isApprovedOrOwner(msg.sender, _tokenId), "!approved/Owner");
-        require(_poolVote.length == _weights.length, "Pool/Weights length !=");
+        require(_poolVote.length == _weights.length, "weights length !=");
+        uint256 _timestamp = block.timestamp;
+        if ((_timestamp > BlackTimeLibrary.epochVoteEnd(_timestamp)) && !isWhitelistedNFT[_tokenId]){
+            revert("not whitelisted");
+        }
         _vote(_tokenId, _poolVote, _weights);
         lastVoted[_tokenId] = epochTimestamp() + 1;
         lastVotedTimestamp[_tokenId] = block.timestamp;
@@ -422,9 +440,6 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         uint256 _totalVoteWeight = 0;
         uint256 _totalWeight = 0;
         uint256 _usedWeight = 0;
-        uint256 _time = epochTimestamp();
-
-
 
         for (uint i = 0; i < _poolCnt; i++) {
 
@@ -442,7 +457,9 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
                 require(_poolWeight != 0);
 
                 poolVote[_tokenId].push(_pool);
-                weightsPerEpoch[_time][_pool] += _poolWeight;
+                
+                //weightsPerEpoch[_time][_pool] += _poolWeight;
+                weights[_pool] += _poolWeight;
 
                 votes[_tokenId][_pool] += _poolWeight;
 
@@ -455,7 +472,9 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
             }
         }
         if (_usedWeight > 0) IVotingEscrow(_ve).voting(_tokenId);
-        totalWeightsPerEpoch[_time] += _totalWeight;
+        //totalWeightsPerEpoch[_time] += _totalWeight;
+        totalWeight += _totalWeight;
+        usedWeights[_tokenId] = _usedWeight;
     }
 
     /// @notice claim LP gauge rewards
@@ -469,7 +488,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     function claimBribes(address[] memory _bribes, address[][] memory _tokens, uint256 _tokenId) external {
         require(IVotingEscrow(_ve).isApprovedOrOwner(msg.sender, _tokenId), "!approved/Owner");
         for (uint256 i = 0; i < _bribes.length; i++) {
-            IBribe(_bribes[i]).getRewardForOwner(_tokenId, _tokens[i]);
+            IBribe(_bribes[i]).getReward(_tokenId, _tokens[i]);
         }
     }
 
@@ -477,30 +496,36 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     function claimFees(address[] memory _fees, address[][] memory _tokens, uint256 _tokenId) external {
         require(IVotingEscrow(_ve).isApprovedOrOwner(msg.sender, _tokenId), "!approved/Owner");
         for (uint256 i = 0; i < _fees.length; i++) {
-            IBribe(_fees[i]).getRewardForOwner(_tokenId, _tokens[i]);
+            IBribe(_fees[i]).getReward(_tokenId, _tokens[i]);
         }
     }
 
-    /// @notice claim bribes rewards given an address
-    function claimBribes(address[] memory _bribes, address[][] memory _tokens) external {
-        for (uint256 i = 0; i < _bribes.length; i++) {
-            IBribe(_bribes[i]).getRewardForAddress(msg.sender, _tokens[i]);
-        }
-    }
+    // /// @notice claim bribes rewards given an address
+    // function claimBribes(address[] memory _bribes, address[][] memory _tokens) external {
+    //     for (uint256 i = 0; i < _bribes.length; i++) {
+    //         IBribe(_bribes[i]).getRewardForAddress(msg.sender, _tokens[i]);
+    //     }
+    // }
 
     /// @notice claim fees rewards given an address
-    function claimFees(address[] memory _bribes, address[][] memory _tokens) external {
-        for (uint256 i = 0; i < _bribes.length; i++) {
-            IBribe(_bribes[i]).getRewardForAddress(msg.sender, _tokens[i]);
-        }
-    }    
+    // function claimFees(address[] memory _bribes, address[][] memory _tokens) external {
+    //     for (uint256 i = 0; i < _bribes.length; i++) {
+    //         IBribe(_bribes[i]).getRewardForAddress(msg.sender, _tokens[i]);
+    //     }
+    // }    
 
   
     /// @notice check if user can vote
-    function _voteDelay(uint256 _tokenId) internal view {
-        require(block.timestamp > lastVoted[_tokenId] + VOTE_DELAY, "ERR: VOTE_DELAY");
-    }
+    // function _voteDelay(uint256 _tokenId) internal view {
+    //     require(block.timestamp > lastVoted[_tokenId] + VOTE_DELAY, "ERR: VOTE_DELAY");
+    // }
 
+    modifier onlyNewEpoch(uint256 _tokenId) {
+        // ensure new epoch since last vote
+        if (BlackTimeLibrary.epochStart(block.timestamp) <= lastVoted[_tokenId]) revert("voted");
+        if (block.timestamp <= BlackTimeLibrary.epochVoteStart(block.timestamp)) revert("dw");
+        _;
+    }
 
 
      /* -----------------------------------------------------------------------------
@@ -512,7 +537,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     ----------------------------------------------------------------------------- */
     /// @notice create multiple gauges
     function createGauges(address[] memory _pool, uint256[] memory _gaugeTypes) external nonReentrant returns(address[] memory, address[] memory, address[] memory)  {
-        require(_pool.length == _gaugeTypes.length, "len mismatch");
+        require(_pool.length == _gaugeTypes.length, "mismatch");
         require(_pool.length <= 10, "max 10");
         address[] memory _gauge = new address[](_pool.length);
         address[] memory _int = new address[](_pool.length);
@@ -558,9 +583,10 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
             isPair = IPairFactory(_factory).isPair(_pool);
         } 
         if(_gaugeType == 1) {
-            address _pool_factory = IAlgebraFactory(_factory).poolByPair(tokenA, tokenB);
-            address _pool_hyper = IHypervisor(_pool).pool();
-            require(_pool_hyper == _pool_factory, 'wrong tokens');    
+            // removed due to code size
+            // address _pool_factory = IAlgebraFactory(_factory).poolByPair(tokenA, tokenB);
+            // address _pool_hyper = IHypervisor(_pool).pool();
+            // require(_pool_hyper == _pool_factory, 'wrong tokens');    
             isPair = true;
         } else {
             //update
@@ -638,27 +664,14 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         return _gaugeFactories.length;
     }
 
-    function weights(address _pool) public view returns(uint256) {
-        uint256 _time = epochTimestamp();
-        return weightsPerEpoch[_time][_pool];
-    }
-
-    function weightsAt(address _pool, uint256 _time) public view returns(uint256) {
-        return weightsPerEpoch[_time][_pool];
-    }
-
-    function totalWeight() public view returns(uint256) {
-        uint256 _time = epochTimestamp();
-        return totalWeightsPerEpoch[_time];
-    }
-
-    function totalWeightAt(uint256 _time) public view returns(uint256) {
-        return totalWeightsPerEpoch[_time];
-    }
-
     function epochTimestamp() public view returns(uint256) {
         return IMinter(minter).active_period();
     }
+
+    function getNextEpochStart() public view returns(uint256){
+        return epochTimestamp() + EPOCH_DURATION;
+    }
+
     /* -----------------------------------------------------------------------------
     --------------------------------------------------------------------------------
     --------------------------------------------------------------------------------
@@ -674,31 +687,15 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         require(msg.sender == minter, "!minter");
         IERC20Upgradeable(base).safeTransferFrom(msg.sender, address(this), amount);
 
-
-        uint256 _totalWeight = totalWeightAt(epochTimestamp() - EPOCH_DURATION);   // minter call notify after updates active_period, loads votes - 1 week
-
         uint256 _ratio = 0;
 
-        if(_totalWeight > 0) _ratio = amount * 1e18 / _totalWeight;     // 1e18 adjustment is removed during claim
+        if(totalWeight > 0) _ratio = amount * 1e18 / Math.max(totalWeight, 1);     // 1e18 adjustment is removed during claim
         if (_ratio > 0) {
             index += _ratio;
         }
 
         emit NotifyReward(msg.sender, base, amount);
     }
-
-
-    // / @notice distribute the LP Fees to the internal bribes
-    // / @param  _gauges  gauge address where to claim the fees 
-    // / @dev    the gauge is the owner of the LPs so it has to claim
-    
-    // function distributeFees(address[] memory _gauges) external {
-    //     for (uint256 i = 0; i < _gauges.length; i++) {
-    //         if (isGauge[_gauges[i]] && isAlive[_gauges[i]]){
-    //             IGauge(_gauges[i]).claimFees();
-    //         }
-    //     }
-    // }
 
     function distributeFees() external {
         uint256 i = 0;
@@ -719,17 +716,6 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         uint256 x = 0;
         uint256 stop = pools.length;
         for (x; x < stop; x++) {
-            _distribute(gauges[pools[x]]);
-        }
-    }
-
-    /// @notice distribute the emission for N gauges
-    /// @param  start   start index point of the pools array
-    /// @param  finish  finish index point of the pools array
-    /// @dev    this function is used in case we have too many pools and gasLimit is reached
-    function distribute(uint256 start, uint256 finish) public nonReentrant {
-        IMinter(minter).update_period();
-        for (uint256 x = start; x < finish; x++) {
             _distribute(gauges[pools[x]]);
         }
     }
@@ -777,8 +763,8 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     /// @dev    this function track the gauge index to emit the correct $the amount after the distribution
     function _updateForAfterDistribution(address _gauge) private {
         address _pool = poolForGauge[_gauge];
-        uint256 _time = epochTimestamp() - 1800;
-        uint256 _supplied = weightsPerEpoch[_time][_pool];
+        //uint256 _supplied = weightsPerEpoch[_time][_pool];
+        uint256 _supplied = weights[_pool];
 
         if (_supplied > 0) {
             uint256 _supplyIndex = supplyIndex[_gauge];

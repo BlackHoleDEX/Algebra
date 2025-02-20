@@ -3,7 +3,8 @@ require('@openzeppelin/hardhat-upgrades');
 require("@nomiclabs/hardhat-etherscan");
 require("@nomiclabs/hardhat-web3");
 
-const { PRIVATEKEY, APIKEY } = require("./pvkey.js");
+const { PRIVATEKEY, SECONDPRIVATEKEY, APIKEY } = require("./pvkey.js");
+const { PRIVATEKEY_DEPLOYMENT} = require("./pvkey_deployment.js");
 
 module.exports = {
   // Latest Solidity version
@@ -28,9 +29,15 @@ module.exports = {
     baseSepolia: {
       url: "https://base-sepolia.g.alchemy.com/v2/zY8fO9bbJbzywRt0xRheXQWpWjWiCqop",
       // chainId: 84532, // Sepolia's Chain ID
-      accounts: [PRIVATEKEY],
+      accounts: [PRIVATEKEY, SECONDPRIVATEKEY],
       gas: 21000000,
     },
+    // baseMainnet: {
+    //   url: "https://base-mainnet.g.alchemy.com/v2/JF1JAA_ABdvIpaNB5CWrIYGabKk00qAG",
+    //   chainId: 8453,
+    //   accounts: [PRIVATEKEY_DEPLOYMENT],
+    //   gas: "auto",
+    // },
   },
 
   etherscan: {

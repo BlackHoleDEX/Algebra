@@ -26,7 +26,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     uint public constant WEEK = 1800; // allows minting once per week (reset every Thursday 00:00 UTC)
     uint public weekly; // represents a starting weekly emission of 2.6M BLACK (BLACK has 18 decimals)
     uint public active_period;
-    uint public constant LOCK = 86400 * 7 * 52 * 2;
+    uint public constant LOCK = 86400 * 7 * 52 * 4;
 
     address internal _initializer;
     address public team;
@@ -64,7 +64,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
 
 
         active_period = ((block.timestamp + (2 * WEEK)) / WEEK) * WEEK;
-        weekly = 10_000 * 1e18; // represents a starting weekly emission of 2.6M BLACK (BLACK has 18 decimals)
+        weekly = 100_000 * 1e18; // represents a starting weekly emission of 2.6M BLACK (BLACK has 18 decimals)
         isFirstMint = true;
 
     }
@@ -79,7 +79,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
             _black.mint(address(this), max);
             _black.approve(address(_ve), type(uint).max);
             for (uint i = 0; i < claimants.length; i++) {
-                _ve.create_lock_for(amounts[i], LOCK, claimants[i]);
+                _ve.create_lock_for(amounts[i], LOCK, claimants[i], false);
             }
         }
 
