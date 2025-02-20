@@ -12,5 +12,12 @@
     "logo": "needs to be fetched from someplace",
     "decimal": 6,
     "address": "0x036CbD53842c5426634e7929541eC2318f3dCF7e"
+  },
+  {
+    "name": "WETH",
+    "ticker": "WETH",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x4200000000000000000000000000000000000006/logo.svg",
+    "decimal": 18,
+    "address": "0x4200000000000000000000000000000000000006"
   }
 ]

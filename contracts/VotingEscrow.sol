@@ -756,7 +756,11 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         (old_locked.amount, old_locked.end, old_locked.isPermanent, old_locked.isSMNFT) = (_locked.amount, _locked.end, _locked.isPermanent, _locked.isSMNFT);
         // Adding to existing lock, or if a lock is expired - creating a new one
         if(old_locked.isSMNFT) {
-            _locked.amount += int128(int256(_value + _calculate_sm_nft_bonus(_value)));
+            if(deposit_type == DepositType.INCREASE_UNLOCK_TIME) {
+                _locked.amount = int128(int256(_value + _calculate_sm_nft_bonus(_value)));
+            } else {
+                _locked.amount += int128(int256(_value + _calculate_sm_nft_bonus(_value)));
+            }
         } else {
             _locked.amount += int128(int256(_value));
         }
@@ -801,6 +805,10 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         require(_value > 0); // dev: need non-zero value
         require(_locked.amount > 0, 'No existing lock found');
         require(_locked.end > block.timestamp, 'Cannot add to expired lock. Withdraw');
+
+        if (_locked.isSMNFT) smNFTBalance += _value;
+        else if (_locked.isPermanent) permanentLockBalance += _value;
+
         _deposit_for(_tokenId, _value, 0, _locked, DepositType.DEPOSIT_FOR_TYPE);
     }
 
@@ -823,6 +831,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         if(isSMNFT) {
             _locked.isPermanent = true;
             _locked.isSMNFT = true;
+            _locked.end = 0;
             unlock_time = 0;
             smNFTBalance += _value;
         }
@@ -890,6 +899,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
             smNFTBalance += _amount;
             _locked.end = 0;
             unlock_time=0;
+            _checkpoint(_tokenId, locked[_tokenId], _locked);
+            locked[_tokenId] = _locked;
         }
 
         _deposit_for(_tokenId, 0, unlock_time, _locked, DepositType.INCREASE_UNLOCK_TIME);

@@ -13,7 +13,7 @@ async function main () {
     console.log("pairFactory: ", pairFactory.address)
     const router = await ethers.getContractFactory("RouterV2");
     // const pairFactory = '0x02b14Bc0dF9f899E98080c110851AF15cd5ab571'
-    const wETH = '0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9'
+    const wETH = '0x4200000000000000000000000000000000000006'
     const tx = await router.deploy(pairFactory.address, wETH);
     await tx.deployed();
 
