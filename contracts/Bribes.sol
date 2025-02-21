@@ -340,6 +340,12 @@ contract Bribe is ReentrancyGuard {
         minter = _minter;
     }
 
+    /// @notice Set a new AVM 
+    function setAVM(address _avm) external onlyAllowed {
+        require(_avm!=address(0));
+        avm = _avm;
+    }
+
     /// @notice Set a new Owner
     event SetOwner(address indexed _owner);
     function setOwner(address _owner) external onlyAllowed {
