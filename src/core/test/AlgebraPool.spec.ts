@@ -1958,7 +1958,7 @@ describe('AlgebraPool', () => {
       expect(token1Fees).to.eq(0);
     });
 
-    it.only('fees collected by lp after two swaps with intermediate withdrawal', async () => {
+    it('fees collected by lp after two swaps with intermediate withdrawal', async () => {
       await pool.setCommunityFee(170);
 
       const { token0Fees, token1Fees } = await swapAndGetFeesOwed({
