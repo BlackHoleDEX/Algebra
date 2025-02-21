@@ -206,7 +206,8 @@ contract AutomatedVotingManager is Ownable, Initializable, ReentrancyGuard {
     }
 
     function isLastHour() public view returns (bool) {
-        return block.timestamp % 7 days >= 6 days + 23 hours;
+        // return block.timestamp % 7 days >= 6 days + 23 hours;
+        return block.timestamp % 30*60 >= 25*60;
     }
 
     function setChainlinkExecutor(address _executor) external onlyOwner {

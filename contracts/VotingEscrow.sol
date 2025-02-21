@@ -89,7 +89,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
     address public voter;
     address public team;
     address public artProxy;
-    address public automatedVotingManager;
+    address public avm;
 
     mapping(uint => Point) public point_history; // epoch -> unsigned point
 
@@ -110,12 +110,12 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
 
     /// @notice Contract constructor
     /// @param token_addr `BLACK` token address
-    constructor(address token_addr, address art_proxy, address automated_voting_manager) {
+    constructor(address token_addr, address art_proxy, address _avm) {
         token = token_addr;
         voter = msg.sender;
         team = msg.sender;
         artProxy = art_proxy;
-        automatedVotingManager = automated_voting_manager;
+        avm = _avm;
 
         point_history[0].blk = block.number;
         point_history[0].ts = block.timestamp;
@@ -321,11 +321,11 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         // Set the block of ownership transfer (for Flash NFT protection)
         ownership_change[_tokenId] = block.number;
 
-        if (_to == automatedVotingManager) { 
+        if (_to == avm) { 
             // dont need additional check on originalOwner mapping
             // Store original owner before AVM takes control
             // used a setter fucntion and exposed that through the method, any ohter better method 
-            IAutomatedVotingManager(automatedVotingManager).setOriginalOwner(_tokenId, _from);
+            IAutomatedVotingManager(avm).setOriginalOwner(_tokenId, _from);
         } 
         // Log the transfer
         emit Transfer(_from, _to, _tokenId);
@@ -1173,6 +1173,11 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
     function setVoter(address _voter) external {
         require(msg.sender == team);
         voter = _voter;
+    }
+
+    function setAVM(address _avm) external {
+        require(msg.sender == team);
+        avm = _avm;
     }
 
     function voting(uint _tokenId) external {
