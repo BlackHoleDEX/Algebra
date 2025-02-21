@@ -25,7 +25,6 @@ contract AutomatedVotingManager is Ownable, ReentrancyGuard {
     address public minter;
 
     int128 public minBalanceForAutovoting;
-
     uint256[] public tokenIds;
 
     mapping(uint256 => address) public originalOwner;
@@ -41,10 +40,10 @@ contract AutomatedVotingManager is Ownable, ReentrancyGuard {
         votingEscrow = IVotingEscrow(_votingEscrow);
         chainlinkExecutor = _chainlinkExecutor;
         minter = _minter;
-        // minBalanceForAutovoting = 10000;
         minBalanceForAutovoting = 10;
     }
 
+    /// @dev Restricts function to be callable only by Chainlink executor
     modifier onlyChainlink() {
         require(msg.sender == chainlinkExecutor, "Not authorized");
         _;
@@ -59,12 +58,12 @@ contract AutomatedVotingManager is Ownable, ReentrancyGuard {
         votingEscrow.transferFrom(msg.sender, address(this), lockId);
         originalOwner[lockId] = msg.sender;
         isAutoVotingEnabled[lockId] = true;
-
         tokenIds.push(lockId);
 
         emit AutoVotingEnabled(lockId, msg.sender);
     }
 
+    /// @notice Fetches gauges from VoterV3 for the given pools
     function getGaugesFromVoterV3(address[] memory pools) internal view returns (address[] memory) {
         address[] memory gauges = new address[](pools.length);
         for (uint256 i = 0; i < pools.length; i++) {
@@ -73,6 +72,7 @@ contract AutomatedVotingManager is Ownable, ReentrancyGuard {
         return gauges;
     }
 
+    /// @notice Fetches rewards per voting power and returns the top N pools based on rewards
     function getRewardsPerVotingPower(uint256 topN) public view returns (PoolsAndRewards[] memory) {
         address[] memory pools = voterV3.pools();
         address[] memory gauges = getGaugesFromVoterV3(pools);
@@ -108,6 +108,7 @@ contract AutomatedVotingManager is Ownable, ReentrancyGuard {
         return _getTopNPools(poolRewards, topN);
     }
 
+    /// @notice Selects the top N pools with the highest rewardsPerVotingPower
     function _getTopNPools(PoolsAndRewards[] memory pools, uint256 n) internal pure returns (PoolsAndRewards[] memory) {
         uint256 len = pools.length;
         if (n > len) {
@@ -118,24 +119,19 @@ contract AutomatedVotingManager is Ownable, ReentrancyGuard {
 
         for (uint256 i = 0; i < n; i++) {
             uint256 maxIndex = i;
-
-            // Find the maximum in the remaining unsorted section
             for (uint256 j = i + 1; j < len; j++) {
                 if (pools[j].rewardsPerVotingPower > pools[maxIndex].rewardsPerVotingPower) {
                     maxIndex = j;
                 }
             }
-
-            // Swap the maximum found with the current position
             (pools[i], pools[maxIndex]) = (pools[maxIndex], pools[i]);
-
-            // Store the top N pools
             topNPools[i] = pools[i];
         }
 
         return topNPools;
     }
 
+    /// @notice Disables automated voting and transfers back the NFT to the original owner
     function disableAutoVoting(uint256 lockId) external nonReentrant {
         require(originalOwner[lockId] == msg.sender, "Not original owner");
         require(!isLastHour(), "Cannot disable in last hour before voting");
@@ -149,30 +145,34 @@ contract AutomatedVotingManager is Ownable, ReentrancyGuard {
         emit AutoVotingDisabled(lockId, msg.sender);
     }
 
+    /// @dev Removes a lockId from the tokenIds array
     function _removeTokenId(uint256 lockId) internal {
         uint256 len = tokenIds.length;
         for (uint256 i = 0; i < len; i++) {
             if (tokenIds[i] == lockId) {
-                tokenIds[i] = tokenIds[len - 1];  // ✅ Swap with last element
-                tokenIds.pop();  // ✅ Remove last element
+                tokenIds[i] = tokenIds[len - 1];
+                tokenIds.pop();
                 break;
             }
         }
     }
 
-        /// @notice Returns equal weights for voting (Currently set to 1 for all pools)
-    function getVoteWeightage() public pure returns (uint256[] memory weights) {
-        for (uint256 i = 0; i < 20; i++) {
-            weights[i] = 1; // Default equal weighting
+    /// @notice Returns equal weights for voting (Currently set to 1 for all pools)
+    function getVoteWeightage(uint256 length) public pure returns (uint256[] memory weights) {
+        weights = new uint256[](length); // ✅ Initialize array in memory
+        for (uint256 i = 0; i < length; i++) {
+            weights[i] = 1; // ✅ Assign values correctly
         }
         return weights;
     }
+
+
+    /// @notice Executes automated voting at the end of each epoch
     function executeVotes(uint256 epoch) external onlyChainlink nonReentrant {
         require(isLastHour(), "Not in last hour of epoch");
         require(!hasVotedThisEpoch[epoch], "Already executed for this epoch");
 
         hasVotedThisEpoch[epoch] = true;
-        uint256[] memory weights = getVoteWeightage();
         PoolsAndRewards[] memory poolsAndRewards = getRewardsPerVotingPower(10);
         address[] memory poolAddresses = new address[](poolsAndRewards.length);
 
@@ -180,15 +180,16 @@ contract AutomatedVotingManager is Ownable, ReentrancyGuard {
             poolAddresses[i] = poolsAndRewards[i].pool;
         }
 
-        uint256 totalLocks = tokenIds.length;  // ✅ Use stored `tokenIds`
-        for (uint256 i = 0; i < totalLocks; i++) {
+        uint256[] memory weights = getVoteWeightage(poolAddresses.length); 
+
+        for (uint256 i = 0; i < tokenIds.length; i++) {
             uint256 lockId = tokenIds[i];
             if (isAutoVotingEnabled[lockId]) {
                 voterV3.vote(lockId, poolAddresses, weights);
             }
         }
 
-        emit VotesExecuted(epoch, totalLocks);
+        emit VotesExecuted(epoch, tokenIds.length);
     }
 
     function _calculateWeights(uint256[] memory baseWeights, uint256 votingPower) internal pure returns (uint256[] memory) {
