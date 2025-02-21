@@ -105,16 +105,16 @@ abstract contract SwapCalculation is AlgebraPoolBase {
           cache.amountCalculated = cache.amountCalculated.add((step.input + step.feeAmount).toInt256()); // increase calculated input amount
         }
 
-        if (cache.pluginFee > 0 && cache.fee > 0) {
-          uint256 delta = FullMath.mulDiv(step.feeAmount, cache.pluginFee, cache.fee);
-          step.feeAmount -= delta;
-          fees.pluginFeeAmount += delta;
-        }
-
         if (cache.communityFee > 0) {
           uint256 delta = (step.feeAmount.mul(cache.communityFee)) / Constants.COMMUNITY_FEE_DENOMINATOR;
           step.feeAmount -= delta;
           fees.communityFeeAmount += delta;
+        }
+
+        if (cache.pluginFee > 0 && cache.fee > 0) {
+          uint256 delta = FullMath.mulDiv(step.feeAmount, cache.pluginFee, cache.fee);
+          step.feeAmount -= delta;
+          fees.pluginFeeAmount += delta;
         }
 
         if (currentLiquidity > 0) cache.totalFeeGrowthInput += FullMath.mulDiv(step.feeAmount, Constants.Q128, currentLiquidity);
