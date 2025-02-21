@@ -9,7 +9,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
 
     bool public isPaused;
-
+    
     uint256 public stableFee;
     uint256 public volatileFee;
     uint256 public stakingNFTFee;
@@ -24,6 +24,7 @@ contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
     mapping(address => mapping(address => mapping(bool => address))) public getPair;
     address[] public allPairs;
     mapping(address => bool) public isPair; // simplified check if its a pair, given that `stable` flag might not be available in peripherals
+    mapping(address => uint256) public customFees; //custom fees map for each pool
 
     address internal _temp0;
     address internal _temp1;
@@ -65,10 +66,10 @@ contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
         pendingFeeManager = _feeManager;
     }
 
-    function acceptFeeManager() external {
-        require(msg.sender == pendingFeeManager);
-        feeManager = pendingFeeManager;
-    }
+    // function acceptFeeManager() external {
+    //     require(msg.sender == pendingFeeManager);
+    //     feeManager = pendingFeeManager;
+    // }
 
 
     function setStakingFees(uint256 _newFee) external onlyManager {
@@ -101,7 +102,16 @@ contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
         }
     }
 
-    function getFee(bool _stable) public view returns(uint256) {
+    function setCustomFees(address _pairAddress, uint256 _fees) external onlyManager {
+        require(isPair[_pairAddress], "ip"); 
+        require(_fees <= MAX_FEE, "ve"); 
+        customFees[_pairAddress] = _fees;
+    }
+
+    function getFee(address _pairAddress, bool _stable) public view returns(uint256) {
+        if(customFees[_pairAddress] > 0){
+            return customFees[_pairAddress];
+        }
         return _stable ? stableFee : volatileFee;
     }
 
@@ -114,10 +124,10 @@ contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
     }
 
     function createPair(address tokenA, address tokenB, bool stable) external returns (address pair) {
-        require(tokenA != tokenB, 'IA'); // Pair: IDENTICAL_ADDRESSES
+        require(tokenA != tokenB, '0'); // Pair: IDENTICAL_ADDRESSES
         (address token0, address token1) = tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
-        require(token0 != address(0), 'ZA'); // Pair: ZERO_ADDRESS
-        require(getPair[token0][token1][stable] == address(0), 'PE'); // Pair: PAIR_EXISTS - single check is sufficient
+        require(token0 != address(0), '0'); // Pair: ZERO_ADDRESS
+        require(getPair[token0][token1][stable] == address(0), '0'); // Pair: PAIR_EXISTS - single check is sufficient
         bytes32 salt = keccak256(abi.encodePacked(token0, token1, stable)); // notice salt includes stable as well, 3 parameters
         (_temp0, _temp1, _temp) = (token0, token1, stable);
         pair = address(new Pair{salt:salt}());
