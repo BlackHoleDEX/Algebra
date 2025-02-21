@@ -365,10 +365,10 @@ contract veNFTAPI is Initializable {
         for (uint256 k = 0; k < external_bribes_input.tokens; k++) {
             address _token = IBribeAPI(external_bribes_input.bribe_address).rewardTokens(k);
             uint256 bribeAmount = IBribeAPI(external_bribes_input.bribe_address).earned(external_bribes_input.id, _token);
-            hasReward = bribeAmount > 0;
             if(bribeAmount > 0){
-            _reward[2 + k] = _createReward(external_bribes_input.id, bribeAmount, _token, external_bribes_input.bribe_address, external_bribes_input.pair);
-        }
+                hasReward = true;
+                _reward[2 + k] = _createReward(external_bribes_input.id, bribeAmount, _token, external_bribes_input.bribe_address, external_bribes_input.pair);
+            }
         }
 
         return hasReward;
