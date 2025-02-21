@@ -1,4 +1,4 @@
-const veArtProxyUpgradeableAddress = "0xB42860661398d9860cB571Bb16D63eED39525a44";
+const veArtProxyUpgradeableAddress = "0xde1722ef9711ee966E3D07f9df9d14d52fDf0782";
 
 const veArtProxyUpgradeableAbi = [
   {
@@ -59,6 +59,11 @@ const veArtProxyUpgradeableAbi = [
         "internalType": "uint256",
         "name": "_value",
         "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "isSMNFT",
+        "type": "bool"
       }
     ],
     "name": "_tokenURI",

@@ -42,7 +42,7 @@ const deployPairFactory = async () => {
 
 const deployRouterV2 = async(pairFactoryAddress) => {
     try {
-        const wETH = '0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9'
+        const wETH = '0x4200000000000000000000000000000000000006'
         const routerV2Contract = await ethers.getContractFactory("RouterV2");
         const routerV2 = await routerV2Contract.deploy(pairFactoryAddress, wETH);
         txDeployed = await routerV2.deployed();
@@ -327,10 +327,10 @@ const setVoterV3InVotingEscrow = async(voterV3Address, votingEscrowAddress) => {
     }
 }
 
-const deployveNFT = async (voterV3Address, rewardsDistributorAddress, blackholeV2AbiAddress) => {
+const deployveNFT = async (voterV3Address, rewardsDistributorAddress, gaugeV2Address) => {
     try {
         data = await ethers.getContractFactory("veNFTAPI");
-        input = [voterV3Address, rewardsDistributorAddress, blackholeV2AbiAddress] // 
+        input = [voterV3Address, rewardsDistributorAddress, gaugeV2Address] 
         const veNFTAPI = await upgrades.deployProxy(data, input, {initializer: 'initialize', gasLimit:210000000});
         txDeployed = await veNFTAPI.deployed();
 
@@ -344,6 +344,20 @@ const deployveNFT = async (voterV3Address, rewardsDistributorAddress, blackholeV
 const pushDefaultRewardToken = async (bribeFactoryV3Address, blackAddress) => {
     const BribeFactoryV3Contract = await ethers.getContractAt(bribeFactoryV3Abi, bribeFactoryV3Address);
     await BribeFactoryV3Contract.pushDefaultRewardToken(blackAddress);
+}
+
+const deployBlackClaim = async (votingEscrowAddress, treasury) => {
+    try {
+        const BlackClaimsContract = await ethers.getContractFactory("BlackClaims");
+        const BlackClaims = await BlackClaimsContract.deploy(treasury, votingEscrowAddress);
+        const txDeployed =  await BlackClaims.deployed();
+
+        console.log("BlackClaims address: ", BlackClaims.address)
+        generateConstantFile("BlackClaims", BlackClaims.address);
+        return BlackClaims.address;
+    } catch (error) {
+        console.log("error in deploying Black Claims: ", error);
+    }
 }
 
 async function main () {
@@ -383,13 +397,14 @@ async function main () {
     //setVoter in bribe factory
     await setVoterBribeV3(voterV3Address, bribeV3Address);
 
-    // blackholeV2Abi deployment
+    // // blackholeV2Abi deployment
     const blackholeV2AbiAddress = await deployBloackholeV2Abi(voterV3Address, routerV2Address);
 
     //deploy rewardsDistributor
     const rewardsDistributorAddress = await deployRewardsDistributor(votingEscrowAddress);
 
-    //set depositor
+    //deploy veNFT
+    await deployveNFT(voterV3Address, rewardsDistributorAddress, gaugeV2Address);
 
     //deploy minterUpgradable
     const minterUpgradableAddress = await deployMinterUpgradeable(votingEscrowAddress, voterV3Address, rewardsDistributorAddress);
@@ -400,13 +415,11 @@ async function main () {
     //set minter in black
     await setMinterInBlack(minterUpgradableAddress, blackAddress);
 
-    // console.log("BEFORE INITIALIZING MINTER: ")
     // await logActivePeriod();
 
     // call _initialize
     await initializeMinter(minterUpgradableAddress);
 
-    // console.log("AFTER INITIALIZING MINTER: ")
     // await logActivePeriod();
 
     //set minter in reward distributer in depositer
@@ -415,14 +428,11 @@ async function main () {
     // deploy epoch controller here.
     const epochControllerAddress = await deployEpochController(voterV3Address, minterUpgradableAddress);
 
-    //set chainlink address
-    await setChainLinkAddress(epochControllerAddress, "0xb2C2f24FcC2478f279B6B566419a739FA53c70D3");
+    // set chainlink address
+    await setChainLinkAddress(epochControllerAddress, "0x03eb20259251F324f5b1cba988754656B6BbE96F");
 
     //add black to user Address
     await addBlackToUserAddress(minterUpgradableAddress);
-
-    //deploy veNFT
-    await deployveNFT(voterV3Address, rewardsDistributorAddress, blackholeV2AbiAddress);
 
     //set voterV3 in voting escrow
     await setVoterV3InVotingEscrow(voterV3Address, votingEscrowAddress);
@@ -433,6 +443,8 @@ async function main () {
     await addLiquidity(routerV2Address, addresses[2], addresses[3], 100, 100);
 
     await pushDefaultRewardToken(bribeV3Address, blackAddress);
+
+    const blackClaimAddress = await deployBlackClaim(votingEscrowAddress, ownerAddress);
 
     //create Gauges
     await createGauges(voterV3Address, blackholeV2AbiAddress);

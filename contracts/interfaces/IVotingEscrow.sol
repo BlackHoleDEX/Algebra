@@ -8,14 +8,19 @@ interface IVotingEscrow {
         int128 slope; // # -dweight / dt
         uint256 ts;
         uint256 blk; // block
+        uint256 permanent;
+        uint smNFT;
+        uint smNFTBonus;
     }
 
     struct LockedBalance {
         int128 amount;
         uint end;
+        bool isPermanent;
+        bool isSMNFT;
     }
 
-    function create_lock_for(uint _value, uint _lock_duration, address _to) external returns (uint);
+    function create_lock_for(uint _value, uint _lock_duration, address _to, bool isSMSFT) external returns (uint);
 
     function locked(uint id) external view returns(LockedBalance memory);
     function tokenOfOwnerByIndex(address _owner, uint _tokenIndex) external view returns (uint);
@@ -25,6 +30,7 @@ interface IVotingEscrow {
     function epoch() external view returns (uint);
     function point_history(uint loc) external view returns (Point memory);
     function user_point_history(uint tokenId, uint loc) external view returns (Point memory);
+    function permanentLockBalance() external view returns (uint256);
     function user_point_epoch(uint tokenId) external view returns (uint);
 
     function ownerOf(uint) external view returns (address);
@@ -48,4 +54,13 @@ interface IVotingEscrow {
 
 
     function decimals() external view returns(uint8);
+
+
+    function lockPermanent(uint _tokenId) external;
+
+    function unlockPermanent(uint _tokenId) external;
+
+    function smNFTBalance() external view returns (uint);
+    function calculate_sm_nft_bonus(uint amount) external view returns (uint);
+    function calculate_original_sm_nft_amount(uint amount) external view returns (uint);
 }
