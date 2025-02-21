@@ -7,10 +7,10 @@ import "./interfaces/IVoterV3.sol";
 import "./interfaces/IVotingEscrow.sol";
 import "./interfaces/IMinter.sol";
 import "./interfaces/IBribe.sol";
-
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 /// @title Automated Voting Manager
 /// @notice Manages automated voting by delegating votes based on rewards per voting power
-contract AutomatedVotingManager is Ownable, ReentrancyGuard {
+contract AutomatedVotingManager is Ownable, Initializable, ReentrancyGuard {
     
     struct PoolsAndRewards {
         address pool;
@@ -35,7 +35,12 @@ contract AutomatedVotingManager is Ownable, ReentrancyGuard {
     event AutoVotingDisabled(uint256 lockId, address owner);
     event VotesExecuted(uint256 epoch, uint256 totalLocks);
 
-    constructor(address _voterV3, address _votingEscrow, address _chainlinkExecutor, address _minter) {
+    function initialize(
+        address _voterV3,
+        address _votingEscrow,
+        address _chainlinkExecutor,
+        address _minter
+    ) public initializer {
         voterV3 = IVoterV3(_voterV3);
         votingEscrow = IVotingEscrow(_votingEscrow);
         chainlinkExecutor = _chainlinkExecutor;
