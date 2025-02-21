@@ -3,23 +3,21 @@ pragma solidity 0.8.13;
 
 import '../interfaces/IPairFactory.sol';
 import '../Pair.sol';
-
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
 
-    bool public isPaused;
-    
-    uint256 public stableFee;
-    uint256 public volatileFee;
-    uint256 public stakingNFTFee;
-    uint256 public MAX_REFERRAL_FEE; // 12%
-    uint256 public constant MAX_FEE = 25; // 0.25%
+    bool internal isPaused;
+    uint256 internal stableFee = 4;
+    uint256 internal volatileFee = 18;
+    uint256 internal stakingNFTFee = 300;
+    uint256 internal MAX_REFERRAL_FEE = 200; // 12%
+    uint256 internal constant MAX_FEE = 25; // 0.25%
 
-    address public feeManager;
-    address public pendingFeeManager;
-    address public dibs;                // referral fee handler
-    address public stakingFeeHandler;   // staking fee handler
+    address internal feeManager;
+    address internal pendingFeeManager;
+    address internal dibs;                // referral fee handler
+    address internal stakingFeeHandler;   // staking fee handler
 
     mapping(address => mapping(address => mapping(bool => address))) public getPair;
     address[] public allPairs;
@@ -42,10 +40,10 @@ contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
         __Ownable_init();
         isPaused = false;
         feeManager = msg.sender;
-        stableFee = 4; // 0.04%
-        volatileFee = 18; // 0.18%
-        stakingNFTFee = 300; // 3% of stable/volatileFee
-        MAX_REFERRAL_FEE = 200; // 2%
+        // stableFee = 4; // 0.04%
+        // volatileFee = 18; // 0.18%
+        // stakingNFTFee = 300; // 3% of stable/volatileFee
+        // MAX_REFERRAL_FEE = 200; // 2%
     }
 
 
@@ -66,10 +64,10 @@ contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
         pendingFeeManager = _feeManager;
     }
 
-    // function acceptFeeManager() external {
-    //     require(msg.sender == pendingFeeManager);
-    //     feeManager = pendingFeeManager;
-    // }
+    function acceptFeeManager() external {
+        require(msg.sender == pendingFeeManager);
+        feeManager = pendingFeeManager;
+    }
 
 
     function setStakingFees(uint256 _newFee) external onlyManager {
@@ -93,7 +91,7 @@ contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
 
 
     function setFee(bool _stable, uint256 _fee) external onlyManager {
-        require(_fee <= MAX_FEE, 'fee');
+        require(_fee <= MAX_FEE);
         require(_fee != 0);
         if (_stable) {
             stableFee = _fee;
@@ -103,12 +101,12 @@ contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
     }
 
     function setCustomFees(address _pairAddress, uint256 _fees) external onlyManager {
-        require(isPair[_pairAddress], "ip"); 
-        require(_fees <= MAX_FEE, "ve"); 
+        require(isPair[_pairAddress]); 
+        require(_fees <= MAX_FEE); 
         customFees[_pairAddress] = _fees;
     }
 
-    function getFee(address _pairAddress, bool _stable) public view returns(uint256) {
+    function getFee(address _pairAddress, bool _stable) external view returns(uint256) {
         if(customFees[_pairAddress] > 0){
             return customFees[_pairAddress];
         }
