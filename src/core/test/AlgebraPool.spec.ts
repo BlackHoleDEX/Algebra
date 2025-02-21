@@ -3076,6 +3076,27 @@ describe('AlgebraPool', () => {
         await mint(wallet.address, minTick, maxTick, expandTo18Decimals(1));
         await expect(pool.setFee(20000)).to.be.revertedWithCustomError(pool, 'dynamicFeeActive');
       });
+
+      it('swap fee cannot be overridden if dynamic fee disabled', async () => {
+        await pool.initialize(encodePriceSqrt(1, 1));
+        await mint(wallet.address, minTick, maxTick, expandTo18Decimals(1));
+        await pool.setPluginConfig(1);
+        await poolPlugin.setPluginFees(1000, 0);
+        await expect(swapExact0For1(expandTo18Decimals(1) / 10n, wallet.address)).to.be.revertedWithCustomError(pool, 'dynamicFeeDisabled');
+      });
+
+      it('plugin fees cannot be overridden if dynamic fee disabled', async () => {
+        await pool.initialize(encodePriceSqrt(1, 1));
+        await mint(wallet.address, minTick, maxTick, expandTo18Decimals(1));
+        await pool.setPluginConfig(1);
+        await poolPlugin.setPluginFees(0, 1000);
+        await expect(swapExact0For1(expandTo18Decimals(1) / 10n, wallet.address)).to.be.revertedWithCustomError(pool, 'dynamicFeeDisabled');
+        await poolPlugin.setPluginFees(1000, 1000);
+        await expect(swapExact0For1(expandTo18Decimals(1) / 10n, wallet.address)).to.be.revertedWithCustomError(pool, 'dynamicFeeDisabled');
+        await poolPlugin.setPluginFees(0, 0);
+        await expect(swapExact0For1(expandTo18Decimals(1) / 10n, wallet.address)).to.be.not.reverted;
+      });
+
     });
 
     describe('#sync', () => {
