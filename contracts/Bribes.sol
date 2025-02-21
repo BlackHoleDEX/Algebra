@@ -4,6 +4,7 @@ pragma solidity 0.8.13;
 import "./interfaces/IMinter.sol";
 import "./interfaces/IVoter.sol";
 import "./interfaces/IVotingEscrow.sol";
+import {IAutomatedVotingManager} from "./interfaces/IAutomatedVotingManager.sol";
 import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -37,6 +38,7 @@ contract Bribe is ReentrancyGuard {
     address public minter;
     address public immutable ve;
     address public owner;
+    address public avm; // does it need to be immutable?
 
     string public TYPE;
 
@@ -64,6 +66,7 @@ contract Bribe is ReentrancyGuard {
         firstBribeTimestamp = 0;
         ve = IVoter(_voter)._ve();
         minter = IVoter(_voter).minter();
+        avm = IVotingEscrow(ve).automatedVotingManager();
         require(minter != address(0));
         owner = _owner;
         TYPE = _type;
@@ -255,6 +258,10 @@ contract Bribe is ReentrancyGuard {
     function getReward(uint256 tokenId, address[] memory tokens) external nonReentrant  {
         require(IVotingEscrow(ve).isApprovedOrOwner(msg.sender, tokenId));
          address _owner = IVotingEscrow(ve).ownerOf(tokenId);
+         if(_owner == avm) {
+            _owner = IAutomatedVotingManager(avm).originalOwner(tokenId);
+        }
+
         uint256 _length = tokens.length;
         for (uint256 i = 0; i < _length; i++) {
             uint256 _reward = earned(tokenId, tokens[i]);
