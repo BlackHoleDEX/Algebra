@@ -13,4 +13,10 @@ interface IVoterV3 {
     function poke(uint256 _tokenId) external;
     function epochTimestamp() external view returns(uint);
     function lastVoted(uint tokenId) external view returns(uint);
+    function gauges(address pool) external view returns(address);
+    function pools() external view returns(address[] memory);
+    function internal_bribes(address _gauge) external view returns(address);
+    function external_bribes(address _gauge) external view returns(address);
+    function totalVotes(address _gauge) external view returns (uint256);
+    function vote(uint256 _tokenId, address[] calldata _poolVote, uint256[] calldata _weights) external;
 }
