@@ -2455,6 +2455,7 @@ describe('AlgebraPool', () => {
       await poolPlugin.setPluginFees(0, 990000);
       await pool.setPluginConfig(1)
       await pool.setFee(15000)
+      await pool.setPluginConfig(129)
       await expect(swapExact0For1(expandTo18Decimals(1), wallet.address)).to.be.revertedWithCustomError(pool, 'incorrectPluginFee');
     })
 
@@ -2582,8 +2583,8 @@ describe('AlgebraPool', () => {
       const communityFees = await  pool.getCommunityFeePending();
       const pluginFees = await pool.getPluginFeePending();
 
-      expect(communityFees[0]).to.be.eq(expandTo18Decimals(1) * 5n / 10000n); // 0.05%
-      expect(pluginFees[0]).to.be.eq(4n * 10n**15n);
+      expect(communityFees[0]).to.be.eq(expandTo18Decimals(1) * 5n * 5n/ 10000n); // 0.05%
+      expect(pluginFees[0]).to.be.eq(2n * 10n**15n);
     })
 
     it('emits an event with plugin fee and override fee on swap', async () => {
