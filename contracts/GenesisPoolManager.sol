@@ -53,8 +53,8 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
     address[] public proposedTokens;
     mapping(address => address[]) public depositers;
 
-    mapping(address => bool) public isIncentiveToken;
-    address[] public incentiveTokens;
+    mapping(address => bool) internal isIncentiveToken;
+    address[] internal incentiveTokens;
 
     event AddedTokenAllocation(address proposedToken, uint256 proposedNativeAmount, uint proposedFundingAmount);
     event AddedIncentives(address proposedToken, address[] incentivesToken, uint256[] incentivesAmount);
@@ -180,6 +180,14 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
         proposedTokens.push(proposedToken);
 
         emit OnBoardedGenesisPool(proposedToken);
+    }
+
+    function disapproveGenesisPool(address proposedToken) external nonReentrant {
+        require(_team == msg.sender, "invalid owenr");
+
+        poolsStatus[proposedToken] = PoolStatus.NOT_QUALIFIED;
+        TokenAllocation storage _tokenAllocation = allocationsInfo[proposedToken];
+        _tokenAllocation.refundableNativeAmount = _tokenAllocation.proposedFundingAmount;
     }
 
     function approveGenesisPool(address proposedToken) external nonReentrant {
@@ -371,6 +379,7 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
                 if(_endTime - WEEK < block.timestamp && block.timestamp < _endTime && targetFundingAmount < _tokenAllocation.allocatedFundingAmount) {
                     _pairFactory.setGenesisStatus(liquidityPoolsInfo[_proposedToken].pairAddress, false);
                     poolsStatus[_proposedToken] = PoolStatus.NOT_QUALIFIED;
+                    _tokenAllocation.refundableNativeAmount = _tokenAllocation.proposedNativeAmount;
                 }
             }
             // else if(_poolStatus == PoolStatus.PRE_LAUNCH){
