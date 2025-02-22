@@ -119,7 +119,7 @@ const deployVotingEscrow = async(blackAddress) =>{
         generateConstantFile("VeArtProxyUpgradeable", veArtProxy.address);
 
         const VotingEscrowContract = await ethers.getContractFactory("VotingEscrow");
-        const veBlack = await VotingEscrowContract.deploy(blackAddress, veArtProxy.address);
+        const veBlack = await VotingEscrowContract.deploy(blackAddress, veArtProxy.address, ZERO_ADDRESS);
         txDeployed = await veBlack.deployed();
         console.log("veBlack Address: ", veBlack.address);
         generateConstantFile("VotingEscrow", veBlack.address);
@@ -307,9 +307,13 @@ const setChainLinkAddress = async (epocControllerAddress, chainlinkAutomationReg
 
 const addBlackToUserAddress = async (minterUpgradableAddress) => {
     try {
+        const accounts = await ethers.getSigners();
+        const owner = accounts[0];
         const minterContract = await ethers.getContractAt(minterUpgradeableAbi, minterUpgradableAddress);
         const amountAdd = BigNumber.from("5000").mul(BigNumber.from("1000000000000000000"));
-        await minterContract.transfer("0xa7243fc6FB83b0490eBe957941a339be4Db11c29", amountAdd);
+        console.log("owner address", owner.address)
+        // await minterContract.transfer("0xa7243fc6FB83b0490eBe957941a339be4Db11c29", amountAdd);
+        await minterContract.transfer(owner.address, amountAdd);
         console.log("transfer token successfully");
     } catch (error) {
         console.log("error in transfering token: ", error);
@@ -414,6 +418,7 @@ async function main () {
     const epochControllerAddress = await deployEpochController(voterV3Address, minterUpgradableAddress);
 
     // set chainlink address
+    // TODO: separate out the setting of chalink address 
     // await setChainLinkAddress(epochControllerAddress, "0xb2C2f24FcC2478f279B6B566419a739FA53c70D3");
 
     //add black to user Address
@@ -429,6 +434,10 @@ async function main () {
     await addLiquidity(routerV2Address, addresses[0], addresses[1], 100, 100);
     await addLiquidity(routerV2Address, addresses[1], addresses[2], 100, 100);
     await addLiquidity(routerV2Address, addresses[2], addresses[3], 100, 100);
+    await addLiquidity(routerV2Address, addresses[3], addresses[4], 10, 100);
+    await addLiquidity(routerV2Address, addresses[4], addresses[5], 100, 10);
+
+    console.log("DONE ADDING LIQUIDITY")
 
     await pushDefaultRewardToken(bribeV3Address, blackAddress);
 
