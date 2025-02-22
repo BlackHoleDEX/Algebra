@@ -11,6 +11,7 @@ import "./interfaces/IVoterV3.sol";
 import "./interfaces/IVotingEscrow.sol";
 
 import { IBlackGovernor } from "./interfaces/IBlackGovernor.sol";
+import "@openzeppelin/contracts/governance/IGovernor.sol";
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
@@ -170,7 +171,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
 
     function nudge() external {
         address _epochGovernor = _voterV3.getEpochGovernor();
-        require (msg.sender != _epochGovernor);
+        require (msg.sender == _epochGovernor);
         IBlackGovernor.ProposalState _state = IBlackGovernor(_epochGovernor).status();
         require (weekly < TAIL_START);
         uint256 _period = active_period;

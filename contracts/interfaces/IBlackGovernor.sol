@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 interface IBlackGovernor {
+    
     enum ProposalState {
         Pending,
         Active,
