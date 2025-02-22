@@ -47,6 +47,8 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
     }
 
     string private _name;
+    
+    ProposalState public status;
 
     mapping(uint256 => ProposalCore) private _proposals;
 
@@ -298,7 +300,7 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
     ) public payable virtual override returns (uint256) {
         uint256 proposalId = hashProposal(targets, values, calldatas, descriptionHash);
 
-        ProposalState status = state(proposalId);
+        status = state(proposalId);
         require(
             status == ProposalState.Succeeded || status == ProposalState.Queued,
             "Governor: proposal not successful"
@@ -380,10 +382,10 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
         bytes32 descriptionHash
     ) internal virtual returns (uint256) {
         uint256 proposalId = hashProposal(targets, values, calldatas, descriptionHash);
-        ProposalState status = state(proposalId);
+        ProposalState currentStatus = state(proposalId);
 
         require(
-            status != ProposalState.Canceled && status != ProposalState.Expired && status != ProposalState.Executed,
+            currentStatus != ProposalState.Canceled && currentStatus != ProposalState.Expired && currentStatus != ProposalState.Executed,
             "Governor: proposal not active"
         );
         _proposals[proposalId].canceled = true;
