@@ -21,6 +21,8 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "hardhat/console.sol";
 
+import {BlackTimeLibrary} from "../libraries/BlackTimeLibrary.sol";
+
 interface IHypervisor{
     function pool() external view returns(address);
     function getTotalAmounts() external view returns(uint tot0,uint tot1);
@@ -375,19 +377,16 @@ contract BlackholePairAPIV2 is Initializable {
         address[] memory _tokens = new address[](totTokens);
         string[] memory _symbol = new string[](totTokens);
         uint[] memory _decimals = new uint[](totTokens);
-        uint ts = IBribeAPI(_bribeAddress).getNextEpochStart();
+        uint ts = BlackTimeLibrary.epochStart(block.timestamp);
         uint i = 0;
         address _token;
-        IBribeAPI.Reward memory _reward;
 
         for(i; i < totTokens; i++){
             _token = IBribeAPI(_bribeAddress).rewardTokens(i);
             _tokens[i] = _token;
             _symbol[i] = IERC20(_token).symbol();
             _decimals[i] = IERC20(_token).decimals();
-            _reward = IBribeAPI(_bribeAddress).rewardData(_token, ts);
-            _amounts[i] = _reward.rewardsPerEpoch;
-            
+            _amounts[i] = IBribeAPI(_bribeAddress).tokenRewardsPerEpoch(_token, ts);
         }
 
         _rewards.bribeAddress = _bribeAddress;
@@ -405,75 +404,6 @@ contract BlackholePairAPIV2 is Initializable {
         uint tokenFees1 = IERC20(token_1).balanceOf(feesAddress);
 
         return (tokenFees0, tokenFees1, feesAddress);
-    }
-
-    function getPairBribe(uint _amounts, uint _offset, address _pair) external view returns(pairBribeEpoch[] memory _pairEpoch){
-
-        require(_amounts <= MAX_EPOCHS, 'too many epochs');
-
-        _pairEpoch = new pairBribeEpoch[](_amounts);
-
-        address _gauge = voter.gauges(_pair);
-        if(_gauge == address(0)) return _pairEpoch;
-
-        IBribeAPI bribe  = IBribeAPI(voter.external_bribes(_gauge));
-
-        // check bribe and checkpoints exists
-        if(address(0) == address(bribe)) return _pairEpoch;
-        
-      
-        // scan bribes
-        // get latest balance and epoch start for bribes
-        uint _epochStartTimestamp = bribe.firstBribeTimestamp();
-
-        // if 0 then no bribe created so far
-        if(_epochStartTimestamp == 0){
-            return _pairEpoch;
-        }
-
-        uint _supply;
-        uint i = _offset;
-
-        for(i; i < _offset + _amounts; i++){
-            
-            _supply            = bribe.totalSupplyAt(_epochStartTimestamp);
-            _pairEpoch[i-_offset].epochTimestamp = _epochStartTimestamp;
-            _pairEpoch[i-_offset].pair = _pair;
-            _pairEpoch[i-_offset].totalVotes = _supply;
-            _pairEpoch[i-_offset].bribes = _bribe(_epochStartTimestamp, address(bribe));
-            
-            _epochStartTimestamp += WEEK;
-
-        }
-
-    }
-
-    function _bribe(uint _ts, address _br) internal view returns(tokenBribe[] memory _tb){
-
-        IBribeAPI _wb = IBribeAPI(_br);
-        uint tokenLen = _wb.rewardsListLength();
-
-        _tb = new tokenBribe[](tokenLen);
-
-        uint k;
-        uint _rewPerEpoch;
-        IERC20 _t;
-        for(k = 0; k < tokenLen; k++){
-            _t = IERC20(_wb.rewardTokens(k));
-            IBribeAPI.Reward memory _reward = _wb.rewardData(address(_t), _ts);
-            _rewPerEpoch = _reward.rewardsPerEpoch;
-            if(_rewPerEpoch > 0){
-                _tb[k].token = address(_t);
-                _tb[k].symbol = _t.symbol();
-                _tb[k].decimals = _t.decimals();
-                _tb[k].amount = _rewPerEpoch;
-            } else {
-                _tb[k].token = address(_t);
-                _tb[k].symbol = _t.symbol();
-                _tb[k].decimals = _t.decimals();
-                _tb[k].amount = 0;
-            }
-        }
     }
 
 
@@ -496,16 +426,6 @@ contract BlackholePairAPIV2 is Initializable {
         underlyingToken = IVotingEscrow(voter._ve()).token();
 
         emit Voter(_oldVoter, _voter);
-    }
-
-    function left(address _pair, address _token) external view returns(uint256 _rewPerEpoch){
-        address _gauge = voter.gauges(_pair);
-        IBribeAPI bribe  = IBribeAPI(voter.internal_bribes(_gauge));
-        
-        uint256 _ts = bribe.getEpochStart();
-        IBribeAPI.Reward memory _reward = bribe.rewardData(_token, _ts);
-        _rewPerEpoch = _reward.rewardsPerEpoch;
-    
     }
 
     function getAmountOut(uint amountIn, address tokenIn, address tokenOut) external view returns (uint amountOut, route[] memory routes) {

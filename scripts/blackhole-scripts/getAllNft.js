@@ -1,5 +1,5 @@
 const { ethers  } = require('hardhat');
-const { veNFTAPIAbi, veNFTAPIAddress } = require('../../generated/ve-nftapi');
+const { votingEscrowAbi, votingEscrowAddress } = require('../../generated/voting-escrow');
 
 
 
@@ -7,8 +7,8 @@ async function main () {
     accounts = await ethers.getSigners();
     owner = accounts[0];
 
-    const gaugeContract = await ethers.getContractAt(veNFTAPIAbi, veNFTAPIAddress);
-    const getAllGauge = await gaugeContract.getAllGauges();
+    const voterContract = await ethers.getContractAt(votingEscrowAbi, votingEscrowAddress);
+    const getAllGauge = await voterContract.locked(2);
     console.log("getAllGauge", getAllGauge)
 }
 

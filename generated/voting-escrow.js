@@ -1,4 +1,4 @@
-const votingEscrowAddress = "0xBA894fdAcEFcC50178a4e11C9824AA750320a806";
+const votingEscrowAddress = "0x4F9471DF8a0Ab277FE44FbaC0D5494Ce0647C7E0";
 
 const votingEscrowAbi = [
   {
@@ -65,6 +65,25 @@ const votingEscrowAbi = [
       }
     ],
     "name": "ApprovalForAll",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_fromTokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_toTokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "BatchMetadataUpdate",
     "type": "event"
   },
   {
@@ -164,6 +183,105 @@ const votingEscrowAbi = [
     "anonymous": false,
     "inputs": [
       {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_owner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "_tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_ts",
+        "type": "uint256"
+      }
+    ],
+    "name": "LockPermanent",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_sender",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "_from",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "_to",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_amountFrom",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_amountTo",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_amountFinal",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_locktime",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_ts",
+        "type": "uint256"
+      }
+    ],
+    "name": "Merge",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "MetadataUpdate",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": false,
         "internalType": "uint256",
         "name": "prevSupply",
@@ -202,6 +320,37 @@ const votingEscrowAbi = [
       }
     ],
     "name": "Transfer",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_owner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "_tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_ts",
+        "type": "uint256"
+      }
+    ],
+    "name": "UnlockPermanent",
     "type": "event"
   },
   {
@@ -264,6 +413,32 @@ const votingEscrowAbi = [
   {
     "inputs": [],
     "name": "MAX_DELEGATES",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "PRECISISON",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "SMNFT_BONUS",
     "outputs": [
       {
         "internalType": "uint256",
@@ -450,6 +625,44 @@ const votingEscrowAbi = [
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "calculate_original_sm_nft_amount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "calculate_sm_nft_bonus",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "checkpoint",
     "outputs": [],
@@ -491,6 +704,11 @@ const votingEscrowAbi = [
         "internalType": "uint256",
         "name": "_lock_duration",
         "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "isSMNFT",
+        "type": "bool"
       }
     ],
     "name": "create_lock",
@@ -520,6 +738,11 @@ const votingEscrowAbi = [
         "internalType": "address",
         "name": "_to",
         "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "isSMNFT",
+        "type": "bool"
       }
     ],
     "name": "create_lock_for",
@@ -813,6 +1036,11 @@ const votingEscrowAbi = [
         "internalType": "uint256",
         "name": "_lock_duration",
         "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "isSMNFT",
+        "type": "bool"
       }
     ],
     "name": "increase_unlock_time",
@@ -872,6 +1100,19 @@ const votingEscrowAbi = [
     "inputs": [
       {
         "internalType": "uint256",
+        "name": "_tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "lockPermanent",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
@@ -887,6 +1128,16 @@ const votingEscrowAbi = [
         "internalType": "uint256",
         "name": "end",
         "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "isPermanent",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "isSMNFT",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -1019,6 +1270,19 @@ const votingEscrowAbi = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "permanentLockBalance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -1046,6 +1310,21 @@ const votingEscrowAbi = [
       {
         "internalType": "uint256",
         "name": "blk",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "permanent",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "smNFT",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "smNFTBonus",
         "type": "uint256"
       }
     ],
@@ -1137,6 +1416,19 @@ const votingEscrowAbi = [
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "_bonus",
+        "type": "uint256"
+      }
+    ],
+    "name": "setSmNFTBonus",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "_team",
         "type": "address"
@@ -1174,6 +1466,19 @@ const votingEscrowAbi = [
         "internalType": "int128",
         "name": "",
         "type": "int128"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "smNFTBalance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -1389,6 +1694,19 @@ const votingEscrowAbi = [
     "inputs": [
       {
         "internalType": "uint256",
+        "name": "_tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "unlockPermanent",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
@@ -1437,6 +1755,21 @@ const votingEscrowAbi = [
       {
         "internalType": "uint256",
         "name": "blk",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "permanent",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "smNFT",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "smNFTBonus",
         "type": "uint256"
       }
     ],

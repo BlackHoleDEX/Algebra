@@ -201,12 +201,18 @@ contract BlackClaims is IBlackClaims {
         require(percent>=50&&percent<=100, "Percent out of bounds");
         uint256 _reward = _preClaim();
         uint256 staked_reward = 0;
+        Season storage _season = season;
 
         if(percent == 100) {
             staked_reward = _reward;
         } else {
-            staked_reward = (percent*10*_reward)/1100;
-            uint256 claimed_reward = _reward - staked_reward;
+            uint256 credit_amount = (_reward * 100)/110;
+            uint256 forfeit_amount = _reward - credit_amount;
+
+            _season.remaining_reward_amount += forfeit_amount;
+
+            staked_reward = (credit_amount * _reward)/100;
+            uint256 claimed_reward = credit_amount - staked_reward;
             bool transfer_success = token.transfer(msg.sender, claimed_reward);
             require(transfer_success, "FAILED TRANSFER");
         }

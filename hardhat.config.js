@@ -32,12 +32,12 @@ module.exports = {
       accounts: [PRIVATEKEY, SECONDPRIVATEKEY],
       gas: 21000000,
     },
-    baseMainnet: {
-      url: "https://base-mainnet.g.alchemy.com/v2/JF1JAA_ABdvIpaNB5CWrIYGabKk00qAG",
-      chainId: 8453,
-      accounts: [PRIVATEKEY_DEPLOYMENT],
-      gas: "auto",
-    },
+    // baseMainnet: {
+    //   url: "https://base-mainnet.g.alchemy.com/v2/JF1JAA_ABdvIpaNB5CWrIYGabKk00qAG",
+    //   chainId: 8453,
+    //   accounts: [PRIVATEKEY_DEPLOYMENT],
+    //   gas: "auto",
+    // },
   },
 
   etherscan: {

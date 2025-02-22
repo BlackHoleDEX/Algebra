@@ -23,7 +23,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     uint public teamRate;
     uint public constant MAX_TEAM_RATE = 50; // 5%
 
-    uint public constant WEEK = 3600; // allows minting once per week (reset every Thursday 00:00 UTC)
+    uint public constant WEEK = 1800; // allows minting once per week (reset every Thursday 00:00 UTC)
     uint public weekly; // represents a starting weekly emission of 2.6M BLACK (BLACK has 18 decimals)
     uint public active_period;
     uint public constant LOCK = 86400 * 7 * 52 * 4;
@@ -146,12 +146,17 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     function calculate_rebase(uint _weeklyMint) public view returns (uint) {
         uint _veTotal = _black.balanceOf(address(_ve));
         uint _blackTotal = _black.totalSupply();
+        uint _smNFTBalance = IVotingEscrow(_ve).smNFTBalance();
+        uint _superMassiveBonus = IVotingEscrow(_ve).calculate_sm_nft_bonus(_smNFTBalance);
+
+        uint numerator = _veTotal + _superMassiveBonus;
+        uint denominator = _blackTotal + _superMassiveBonus;
         
-        uint lockedShare = (_veTotal) * PRECISION  / _blackTotal;
-        if(lockedShare >= REBASEMAX){
+        uint rebaseShare =((((PRECISION * numerator) / denominator) * numerator) / denominator) / 2;
+        if(rebaseShare >= REBASEMAX){
             return _weeklyMint * REBASEMAX / PRECISION;
-        } else {
-            return _weeklyMint * lockedShare / PRECISION;
+        }else{
+            return _weeklyMint * rebaseShare / PRECISION;
         }
     }
 

@@ -67,50 +67,50 @@ contract RewardAPI is Initializable {
 
             // get external
             _bribe = voter.external_bribes(_gauge);
-            _tempReward[0] = _getEpochRewards(tokenId, _bribe);
+            // _tempReward[0] = _getEpochRewards(tokenId, _bribe);
             
             // get internal
             _bribe = voter.internal_bribes(_gauge);
-            _tempReward[1] = _getEpochRewards(tokenId, _bribe);
+            // _tempReward[1] = _getEpochRewards(tokenId, _bribe);
             _rewards[i].bribes = _tempReward;
         }      
 
         return _rewards;  
     }
    
-    function _getEpochRewards(uint tokenId, address _bribe) internal view returns(Bribes memory _rewards){
-        uint totTokens = IBribeAPI(_bribe).rewardsListLength();
-        uint[] memory _amounts = new uint[](totTokens);
-        address[] memory _tokens = new address[](totTokens);
-        string[] memory _symbol = new string[](totTokens);
-        uint[] memory _decimals = new uint[](totTokens);
-        uint ts = IBribeAPI(_bribe).getEpochStart();
-        uint i = 0;
-        uint _supply = IBribeAPI(_bribe).totalSupplyAt(ts);
-        uint _balance = IBribeAPI(_bribe).balanceOfAt(tokenId, ts);
-        address _token;
-        IBribeAPI.Reward memory _reward;
+    // function _getEpochRewards(uint tokenId, address _bribe) internal view returns(Bribes memory _rewards){
+    //     uint totTokens = IBribeAPI(_bribe).rewardsListLength();
+    //     uint[] memory _amounts = new uint[](totTokens);
+    //     address[] memory _tokens = new address[](totTokens);
+    //     string[] memory _symbol = new string[](totTokens);
+    //     uint[] memory _decimals = new uint[](totTokens);
+    //     uint ts = IBribeAPI(_bribe).getEpochStart();
+    //     uint i = 0;
+    //     //uint _supply = IBribeAPI(_bribe).totalSupplyAt(ts);
+    //     uint _balance = IBribeAPI(_bribe).balanceOfAt(tokenId, ts);
+    //     address _token;
+    //     IBribeAPI.Reward memory _reward;
 
-        for(i; i < totTokens; i++){
-            _token = IBribeAPI(_bribe).rewardTokens(i);
-            _tokens[i] = _token;
-            if(_balance == 0){
-                _amounts[i] = 0;
-                _symbol[i] = '';
-                _decimals[i] = 0;
-            } else {
-                _symbol[i] = IERC20(_token).symbol();
-                _decimals[i] = IERC20(_token).decimals();
-                _reward = IBribeAPI(_bribe).rewardData(_token, ts);
-                _amounts[i] = (_reward.rewardsPerEpoch * 1e18 / _supply) * _balance / 1e18;
-            }
-        }
+    //     for(i; i < totTokens; i++){
+    //         _token = IBribeAPI(_bribe).rewardTokens(i);
+    //         _tokens[i] = _token;
+    //         if(_balance == 0){
+    //             _amounts[i] = 0;
+    //             _symbol[i] = '';
+    //             _decimals[i] = 0;
+    //         } else {
+    //             _symbol[i] = IERC20(_token).symbol();
+    //             _decimals[i] = IERC20(_token).decimals();
+    //             _reward = IBribeAPI(_bribe).rewardData(_token, ts);
+    //             _amounts[i] = (_reward.rewardsPerEpoch * 1e18 / _supply) * _balance / 1e18;
+    //         }
+    //     }
 
-        _rewards.tokens = _tokens;
-        _rewards.amounts = _amounts;
-        _rewards.symbols = _symbol;
-        _rewards.decimals = _decimals;
-    }
+    //     _rewards.tokens = _tokens;
+    //     _rewards.amounts = _amounts;
+    //     _rewards.symbols = _symbol;
+    //     _rewards.decimals = _decimals;
+    // }
 
 
     
@@ -143,16 +143,13 @@ contract RewardAPI is Initializable {
         uint ts = IBribeAPI(_bribe).getNextEpochStart();
         uint i = 0;
         address _token;
-        IBribeAPI.Reward memory _reward;
 
         for(i; i < totTokens; i++){
             _token = IBribeAPI(_bribe).rewardTokens(i);
             _tokens[i] = _token;
             _symbol[i] = IERC20(_token).symbol();
             _decimals[i] = IERC20(_token).decimals();
-            _reward = IBribeAPI(_bribe).rewardData(_token, ts);
-            _amounts[i] = _reward.rewardsPerEpoch;
-            
+            _amounts[i] = IBribeAPI(_bribe).tokenRewardsPerEpoch(_token, ts);
         }
 
         _rewards.tokens = _tokens;
