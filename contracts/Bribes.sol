@@ -66,7 +66,7 @@ contract Bribe is ReentrancyGuard {
         firstBribeTimestamp = 0;
         ve = IVoter(_voter)._ve();
         minter = IVoter(_voter).minter();
-        avm = IVotingEscrow(ve).automatedVotingManager();
+        avm = IVotingEscrow(ve).avm();
         require(minter != address(0));
         owner = _owner;
         TYPE = _type;
@@ -279,7 +279,6 @@ contract Bribe is ReentrancyGuard {
     function notifyRewardAmount(address _rewardsToken, uint256 reward) external nonReentrant {
         require(isRewardToken[_rewardsToken], "reward token not verified");
         IERC20(_rewardsToken).safeTransferFrom(msg.sender,address(this),reward);
-
         uint256 epochStart = BlackTimeLibrary.epochStart(block.timestamp);
         tokenRewardsPerEpoch[_rewardsToken][epochStart] += reward;
         emit RewardAdded(_rewardsToken, reward, epochStart);

@@ -1,16 +1,17 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+pragma solidity 0.8.13;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
 import "./interfaces/IVoterV3.sol";
 import "./interfaces/IVotingEscrow.sol";
 import "./interfaces/IMinter.sol";
 import "./interfaces/IBribe.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 /// @title Automated Voting Manager
 /// @notice Manages automated voting by delegating votes based on rewards per voting power
-contract AutomatedVotingManager is Ownable, Initializable, ReentrancyGuard {
+contract AutomatedVotingManager is Initializable, OwnableUpgradeable, ReentrancyGuardUpgradeable {
     
     struct PoolsAndRewards {
         address pool;
@@ -35,17 +36,18 @@ contract AutomatedVotingManager is Ownable, Initializable, ReentrancyGuard {
     event AutoVotingDisabled(uint256 lockId, address owner);
     event VotesExecuted(uint256 epoch, uint256 totalLocks);
 
-    function initialize(
-        address _voterV3,
-        address _votingEscrow,
-        address _chainlinkExecutor,
-        address _minter
-    ) public initializer {
+    /// @dev Upgradeable contract initializer (replaces constructor)
+    function initialize(address _voterV3, address _votingEscrow, address _chainlinkExecutor, address _minter) public initializer {
+        __Ownable_init(); // ✅ Initialize Ownable
+        __ReentrancyGuard_init(); // ✅ Initialize ReentrancyGuard
+        
         voterV3 = IVoterV3(_voterV3);
         votingEscrow = IVotingEscrow(_votingEscrow);
         chainlinkExecutor = _chainlinkExecutor;
         minter = _minter;
-        minBalanceForAutovoting = 10;
+        minBalanceForAutovoting = 10*1e18; // decimals in black
+
+        _transferOwnership(msg.sender); // ✅ Set contract owner correctly
     }
 
     /// @dev Restricts function to be callable only by Chainlink executor
@@ -57,7 +59,7 @@ contract AutomatedVotingManager is Ownable, Initializable, ReentrancyGuard {
     /// @notice Enables automated voting for a lock
     function enableAutoVoting(uint256 lockId) external nonReentrant {
         require(votingEscrow.isApprovedOrOwner(msg.sender, lockId), "Not owner nor approved");
-        require(!isLastHour(), "Cannot enable in last hour before voting");
+        require(!BlackTimeLibrary.isLastHour(block.timestamp), "Cannot enable in last hour before voting");
         require(votingEscrow.locked(lockId).amount > minBalanceForAutovoting, "Insufficient balance");
 
         votingEscrow.transferFrom(msg.sender, address(this), lockId);
@@ -139,7 +141,7 @@ contract AutomatedVotingManager is Ownable, Initializable, ReentrancyGuard {
     /// @notice Disables automated voting and transfers back the NFT to the original owner
     function disableAutoVoting(uint256 lockId) external nonReentrant {
         require(originalOwner[lockId] == msg.sender, "Not original owner");
-        require(!isLastHour(), "Cannot disable in last hour before voting");
+        require(!BlackTimeLibrary.isLastHour(block.timestamp), "Cannot disable in last hour before voting");
 
         votingEscrow.transferFrom(address(this), msg.sender, lockId);
         delete originalOwner[lockId];
@@ -174,7 +176,7 @@ contract AutomatedVotingManager is Ownable, Initializable, ReentrancyGuard {
 
     /// @notice Executes automated voting at the end of each epoch
     function executeVotes(uint256 epoch) external onlyChainlink nonReentrant {
-        require(isLastHour(), "Not in last hour of epoch");
+        require(BlackTimeLibrary.isLastHour(block.timestamp), "Not in last hour of epoch");
         require(!hasVotedThisEpoch[epoch], "Already executed for this epoch");
 
         hasVotedThisEpoch[epoch] = true;
@@ -203,11 +205,6 @@ contract AutomatedVotingManager is Ownable, Initializable, ReentrancyGuard {
             adjustedWeights[i] = baseWeights[i] * votingPower;
         }
         return adjustedWeights;
-    }
-
-    function isLastHour() public view returns (bool) {
-        // return block.timestamp % 7 days >= 6 days + 23 hours;
-        return block.timestamp % 30*60 >= 25*60;
     }
 
     function setChainlinkExecutor(address _executor) external onlyOwner {
