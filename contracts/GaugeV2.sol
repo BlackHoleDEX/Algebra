@@ -42,17 +42,20 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     uint256 public lastUpdateTime;
     uint256 public rewardPerTokenStored;
 
+    address public genesisPool;
 
     mapping(address => uint256) public userRewardPerTokenPaid;
     mapping(address => uint256) public rewards;
 
     uint256 internal _totalSupply;
     mapping(address => uint256) internal _balances;
+    mapping(address => uint256) public maturityTime;
 
     event RewardAdded(uint256 reward);
     event Deposit(address indexed user, uint256 amount);
     event Withdraw(address indexed user, uint256 amount);
     event Harvest(address indexed user, uint256 reward);
+    event DepositsForGenesis(address[] users, uint256[] amounts);
 
     event ClaimFees(address indexed from, uint256 claimed0, uint256 claimed1);
     event EmergencyActivated(address indexed gauge, uint256 timestamp);
@@ -78,7 +81,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
         _;
     }
 
-    constructor(address _rewardToken,address _ve,address _token,address _distribution, address _internal_bribe, address _external_bribe, bool _isForPair) {
+    constructor(address _rewardToken,address _ve,address _token,address _distribution, address _internal_bribe, address _external_bribe, bool _isForPair, address _genesisPool) {
         rewardToken = IERC20(_rewardToken);     // main reward
         VE = _ve;                               // vested
         TOKEN = IERC20(_token);                 // underlying (LP)
@@ -87,6 +90,8 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
 
         internal_bribe = _internal_bribe;       // lp fees goes here
         external_bribe = _external_bribe;       // bribe fees goes here
+
+        genesisPool = _genesisPool;
 
         isForPair = _isForPair;                 // pair boolean, if false no claim_fees
 
@@ -194,6 +199,39 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     --------------------------------------------------------------------------------
     ----------------------------------------------------------------------------- */
 
+    function depositsForGenesis(address[] memory _accounts, uint256[] memory _amounts, address tokenOwner, uint256 timestamp) external { 
+        require(msg.sender == genesisPool, "");
+        require(_accounts.length == _amounts.length, "leneght mismatch");
+        require(tokenOwner != address(0), "tokenOwner 0 address");
+        _depositsForGenesis(_accounts, _amounts, tokenOwner, timestamp);
+    }
+
+    function _depositsForGenesis(address[] memory _accounts, uint256[] memory _amounts, address tokenOwner, uint256 timestamp) internal {
+        uint256 _accountsCnt = _accounts.length;
+        uint256 i;
+        uint256 _totalAmount = 0;
+        for(i = 0; i < _accountsCnt; i++){
+            require(_accounts[i] != address(0), "0 address");
+            _totalAmount += _amounts[i]; 
+        }
+
+        require(_totalAmount > 0, "total amount 0");
+        
+        _totalSupply = _totalSupply + _totalAmount;
+        for(i = 0; i < _accountsCnt; i++){
+            _balances[_accounts[i]] = _balances[_accounts[i]] + _amounts[i];
+            if (address(gaugeRewarder) != address(0)) {
+                IRewarder(gaugeRewarder).onReward(_accounts[i], _accounts[i], _balances[_accounts[i]]);
+            }
+        }
+
+        TOKEN.safeTransferFrom(msg.sender, address(this), _totalAmount);
+
+        maturityTime[tokenOwner] = timestamp;
+
+        emit DepositsForGenesis(_accounts, _amounts);
+    }
+
 
     ///@notice deposit all TOKEN of msg.sender
     function depositAll() external {
@@ -234,6 +272,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     function _withdraw(uint256 amount) internal nonReentrant isNotEmergency updateReward(msg.sender) {
         require(amount > 0, "Cannot withdraw 0");
         require(_balances[msg.sender] > 0, "no balances");
+        require(block.timestamp >= maturityTime[msg.sender], "not matured");
 
         _totalSupply = _totalSupply - amount;
         _balances[msg.sender] = _balances[msg.sender] - amount;

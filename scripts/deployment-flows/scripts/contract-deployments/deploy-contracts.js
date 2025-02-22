@@ -446,6 +446,10 @@ async function main () {
 
     const blackClaimAddress = await deployBlackClaim(votingEscrowAddress, ownerAddress);
 
+    const genesisPoolAddress = deployGenesisPool();
+
+    await setGenesisPoolManagerInGaugeFactory(gaugeV2Address, genesisPoolAddress);
+
     //create Gauges
     await createGauges(voterV3Address, blackholeV2AbiAddress);
 }
