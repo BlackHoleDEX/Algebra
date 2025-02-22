@@ -43,8 +43,8 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
     address[] public proposedTokens;
     mapping(address => address[]) public depositers;
 
-    mapping(address => bool) public isIncentiveToken;
-    address[] public incentiveTokens;
+    mapping(address => bool) internal isIncentiveToken;
+    address[] internal incentiveTokens;
 
     event AddedTokenAllocation(address proposedToken, uint256 proposedNativeAmount, uint proposedFundingAmount);
     event AddedIncentives(address proposedToken, address[] incentivesToken, uint256[] incentivesAmount);

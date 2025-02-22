@@ -1,53 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.13;
 
+import "../GanesisPoolBase.sol";
+
 interface IGenesisPoolManager {
-
-    struct TokenAllocation {
-        address tokenOwner;
-        uint256 proposedNativeAmount;
-        uint256 proposedFundingAmount;
-        uint256 allocatedNativeAmount;
-        uint256 allocatedFundingAmount;
-
-        uint256 refundableNativeAmount;
-    }
-
-    struct TokenIncentiveInfo{
-        address tokenOwner;
-        address[] incentivesToken;
-        uint256[] incentivesAmount;
-    }
-
-    struct GenesisPool{
-        address fundingToken;
-        uint256 duration;
-        uint8 threshold; // multiplied by 100 to support 2 decimals
-        uint256 supplyPercent; 
-        uint256 startPrice;
-        uint256 startTime;
-    }
-
-    struct ProtocolInfo {
-        address tokenAddress;
-        string tokenName;
-        string tokenTicker;
-        string protocolDesc;
-        string protocolBanner;
-        string tokenIcon;
-    }
-
-    enum PoolStatus{
-        DEFAULT,
-        TOKEN_ALLOCATED,
-        INCENTIVES_ADDED,
-        APPLIED,
-        PRE_LISTING,
-        PRE_LAUNCH,
-        PRE_LAUNCH_DEPOSIT_DISABLED,
-        LAUNCH,
-        PARTIALLY_LAUNCHED,
-        NOT_QUALIFIED,
-        MAXED_OUT
-    }
+    function proposedTokens() external view returns(address[] memory tokens);
+    function allocationsInfo(address token) external view returns(GanesisPoolBase.TokenAllocation memory tokenAllocation);
+    function incentivesInfo(address token) external view returns(GanesisPoolBase.TokenIncentiveInfo memory tokenIncentives);
+    function genesisPoolsInfo(address token) external view returns(GanesisPoolBase.GenesisPool memory genesisPoolInfo);
+    function protocolsInfo(address token) external view returns(GanesisPoolBase.ProtocolInfo memory protocolInfo);
+    function poolsStatus(address token) external view returns(GanesisPoolBase.PoolStatus poolStatus);
+    function liquidityPoolsInfo(address token) external view returns(GanesisPoolBase.LiquidityPool memory liquidityPool);
+    function userDeposits(address token, address user) external view returns(uint256 amount);
+    function getIncentiveTokens() external view returns(address[] memory tokens);
 }
