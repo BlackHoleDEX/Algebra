@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
 import "./interfaces/IVoterV3.sol";
 import "./interfaces/IVotingEscrow.sol";
-import "./interfaces/IMinter.sol";
 import "./interfaces/IBribe.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
@@ -70,46 +69,40 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
         emit AutoVotingEnabled(lockId, msg.sender);
     }
 
-    /// @notice Fetches gauges from VoterV3 for the given pools
-    function getGaugesFromVoterV3(address[] memory pools) internal view returns (address[] memory) {
-        address[] memory gauges = new address[](pools.length);
-        for (uint256 i = 0; i < pools.length; i++) {
-            gauges[i] = voterV3.gauges(pools[i]);
-        }
-        return gauges;
-    }
-
     /// @notice Fetches rewards per voting power and returns the top N pools based on rewards
     function getRewardsPerVotingPower(uint256 topN) public view returns (PoolsAndRewards[] memory) {
-        address[] memory pools = voterV3.pools();
-        address[] memory gauges = getGaugesFromVoterV3(pools);
-        uint256 numPools = pools.length;
-        PoolsAndRewards[] memory poolRewards = new PoolsAndRewards[](numPools);
-        uint256 epochStart = IMinter(minter).active_period();
+        // address[] memory pools = voterV3.pools(); // to use voterV3.length() and then iterate over it
+        uint256 numPools = voterV3.length();
+        PoolsAndRewards[] memory poolRewards = new PoolsAndRewards[](topN);
+        uint256 epochStart = BlackTimeLibrary.epochStart(block.timestamp);
 
         for (uint256 i = 0; i < numPools; i++) {
-            address gauge = gauges[i];
+            address gauge = voterV3.gauges(voterV3.pools(i));
             address bribeInternal = voterV3.internal_bribes(gauge);
             address bribeExternal = voterV3.external_bribes(gauge);
             uint256 totalRewardsPerVotingPower = 0;
-            address[] memory rewardTokens = IBribe(bribeInternal).rewardTokens();
 
-            for (uint256 j = 0; j < rewardTokens.length; j++) {
-                address token = rewardTokens[j];
+            for (uint256 j = 0; j < IBribe(bribeInternal).rewardsListLength(); j++) {
+                address token = IBribe(bribeInternal).rewardTokens(j);
                 uint256 internalBribes = IBribe(bribeInternal).tokenRewardsPerEpoch(token, epochStart);
+                totalRewardsPerVotingPower += (internalBribes);
+            }
+
+            for (uint256 j = 0; j < IBribe(bribeExternal).rewardsListLength(); j++) {
+                address token = IBribe(bribeExternal).rewardTokens(j);
                 uint256 externalBribes = IBribe(bribeExternal).tokenRewardsPerEpoch(token, epochStart);
-                totalRewardsPerVotingPower += (internalBribes + externalBribes);
+                totalRewardsPerVotingPower += (externalBribes);
             }
 
             uint256 totalVotes = voterV3.totalVotes(gauge);
-            uint256 rewardsPerVotingPower = totalVotes > 0 ? (totalRewardsPerVotingPower * 1e18) / totalVotes : 0;
+            // uint256 rewardsPerVotingPower = totalVotes > 0 ? (totalRewardsPerVotingPower * 1e18) / totalVotes : 0;
 
-            poolRewards[i] = PoolsAndRewards({ 
-                pool: pools[i], 
-                gauge: gauge, 
-                bribes: bribeInternal, 
-                rewardsPerVotingPower: rewardsPerVotingPower 
-            });
+            // poolRewards[i] = PoolsAndRewards({ 
+            //     pool: voterV3.pools(i), 
+            //     gauge: gauge, 
+            //     bribes: bribeInternal, 
+            //     rewardsPerVotingPower: rewardsPerVotingPower 
+            // });
         }
 
         return _getTopNPools(poolRewards, topN);

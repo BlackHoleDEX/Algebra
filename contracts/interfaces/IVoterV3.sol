@@ -14,7 +14,7 @@ interface IVoterV3 {
     function epochTimestamp() external view returns(uint);
     function lastVoted(uint tokenId) external view returns(uint);
     function gauges(address pool) external view returns(address);
-    function pools() external view returns(address[] memory);
+    function pools(uint256 i) external view returns(address);
     function internal_bribes(address _gauge) external view returns(address);
     function external_bribes(address _gauge) external view returns(address);
     function totalVotes(address _gauge) external view returns (uint256);
