@@ -14,4 +14,6 @@ interface IVoterV3 {
     function epochTimestamp() external view returns(uint);
     function lastVoted(uint tokenId) external view returns(uint);
     function createGauge(address _pool, uint256 _gaugeType) external returns (address _gauge, address _internal_bribe, address _external_bribe);
+    function whitelist(address _token) external;
+    function blacklist(address _token) external;
 }

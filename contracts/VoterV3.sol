@@ -132,6 +132,11 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         _;
     }
 
+    modifier GenesisManager() {
+        require(IPermissionsRegistry(permissionRegistry).hasRole("GENESIS_MANAGER", msg.sender), 'GENESIS_MANAGER');
+        _;
+    }
+
     
     /// @notice initialize the voter contract 
     /// @param  _tokens array of tokens to whitelist
@@ -286,11 +291,15 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     
     
     /// @notice Whitelist a token for gauge creation
-    function whitelist(address[] memory _token) external Governance {
+    function whitelist(address[] memory _tokens) external GenesisManager {
         uint256 i = 0;
-        for(i = 0; i < _token.length; i++){
-            _whitelist(_token[i]);
+        for(i = 0; i < _tokens.length; i++){
+            _whitelist(_tokens[i]);
         }
+    }
+
+    function whitelist(address _token) external GenesisManager {
+        _whitelist(_token);
     }
        
     function _whitelist(address _token) private {
@@ -301,11 +310,15 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     }
     
     /// @notice Blacklist a malicious token
-    function blacklist(address[] memory _token) external Governance {
+    function blacklist(address[] memory _token) external GenesisManager {
         uint256 i = 0;
         for(i = 0; i < _token.length; i++){
             _blacklist(_token[i]);
         }
+    }
+
+    function blacklist(address _token) external GenesisManager {
+        _blacklist(_token);
     }
        
     function _blacklist(address _token) private {

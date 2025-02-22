@@ -15,6 +15,15 @@ import "./interfaces/IGauge.sol";
 import "./interfaces/IDutchAuction.sol";
 import "./GanesisPoolBase.sol";
 
+
+interface IBaseV1Factory {
+    function isPair(address pair) external view returns (bool);
+    function getPair(address tokenA, address token, bool stable) external view returns (address);
+    function createPair(address tokenA, address tokenB, bool stable) external returns (address pair);
+    function setGenesisPool(address _genesisPool) external;
+    function setGenesisStatus(address _pair, bool status) external;
+}
+
 contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
     uint256 internal constant WEEK = 7 days; 
@@ -26,6 +35,7 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
     address public _owner;
     address public _epochController;
     address public _dutchAuction;
+    IBaseV1Factory public _pairFactory;
     IRouter01 public _router;
     IVoterV3 public _voter;
 
@@ -54,13 +64,14 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
 
     constructor() {}
 
-    function initialize(address router, address epochController, address voter) initializer  public {
+    function initialize(address router, address epochController, address voter, address pairFactory) initializer  public {
         __Ownable_init();
 
         _team = msg.sender;
         _owner = msg.sender;
         _dutchAuction = msg.sender;
         _epochController = epochController;
+        _pairFactory = IBaseV1Factory(pairFactory);
         _router = IRouter01(router);
         _voter = IVoterV3(voter);
     }
@@ -70,9 +81,10 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
         whiteListedTokensToUser[proposedToken][tokenOwner] = true;
     }
 
-    function addTokenAllocation(address proposedToken, uint256 proposedNativeAmount, uint proposedFundingAmount) external nonReentrant{
+    function addTokenAllocation(address proposedToken, address fundingToken, bool stable, uint256 proposedNativeAmount, uint proposedFundingAmount) external nonReentrant{
         address _sender = msg.sender;
         require(whiteListedTokensToUser[proposedToken][_sender] || _sender == _team, "not whitelisted");
+        require(_pairFactory.getPair(proposedToken, fundingToken, stable) == address(0), "existing pair");
         require(poolsStatus[proposedToken] == PoolStatus.DEFAULT, "already token allocated");
         require(proposedNativeAmount > 0, "proposed native token 0");
         require(proposedFundingAmount > 0, "proposed funding token 0");
@@ -88,11 +100,12 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
         emit AddedTokenAllocation(proposedToken, proposedNativeAmount, proposedFundingAmount);
     }
 
-    function addIncentives(address proposedToken, address[] calldata incentivesToken, uint256[] calldata incentivesAmount) external nonReentrant{
+    function addIncentives(address proposedToken, address fundingToken, bool stable, address[] calldata incentivesToken, uint256[] calldata incentivesAmount) external nonReentrant{
         address _sender = msg.sender;
         require(incentivesToken.length > 0, "incentive length 0");
         require(incentivesToken.length == incentivesAmount.length, "length mismatch");
         require(whiteListedTokensToUser[proposedToken][_sender] || _sender == _team, "not whitelisted");
+        require(_pairFactory.getPair(proposedToken, fundingToken, stable) == address(0), "existing pair");
         require(poolsStatus[proposedToken] == PoolStatus.TOKEN_ALLOCATED, "token not allocated");
 
         uint256 _incentivesCount = incentivesToken.length;
@@ -127,9 +140,11 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
         address _sender = msg.sender;
         require(whiteListedTokensToUser[proposedToken][_sender] || _sender == _team, "not whitelisted");
         require(poolsStatus[proposedToken] == PoolStatus.INCENTIVES_ADDED, "incentives not added");
+        
+        require(genesisPool.fundingToken != address(0), "invalid fundingToken token");
 
-        require(genesisPool.fundingToken != address(0), "invalid fundingToken token");
-        require(genesisPool.fundingToken != address(0), "invalid fundingToken token");
+        require(_pairFactory.getPair(proposedToken, genesisPool.fundingToken, protocolInfo.stable) == address(0), "existing pair");
+
         require(isIncentiveToken[genesisPool.fundingToken], "fundingToken not whitelisted");
         require(genesisPool.duration >= MIN_DURATION, "minimum duration");
         require(genesisPool.threshold >= MIN_THRESHOLD, "minimum threshold");
@@ -149,6 +164,7 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
 
         _tokenAllocation.allocatedNativeAmount = 0;
         _tokenAllocation.allocatedFundingAmount = 0;
+        _tokenAllocation.refundableNativeAmount = 0;
 
         GenesisPool memory _genesisPool = genesisPoolsInfo[proposedToken];
         _genesisPool = genesisPool;
@@ -168,6 +184,13 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
 
     function approveGenesisPool(address proposedToken) external nonReentrant {
         require(_team == msg.sender, "invalid owenr");
+        require(proposedToken != address(0), "0 address");
+
+        _voter.whitelist(proposedToken);
+
+        LiquidityPool storage _liquidityPool = liquidityPoolsInfo[proposedToken];
+        _liquidityPool.pairAddress = _pairFactory.createPair(proposedToken, genesisPoolsInfo[proposedToken].fundingToken, protocolsInfo[proposedToken].stable);
+        _pairFactory.setGenesisStatus(_liquidityPool.pairAddress, true);
 
         poolsStatus[proposedToken] = PoolStatus.PRE_LISTING;
 
@@ -235,13 +258,12 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
         uint256 targetFundingAmount = (_tokenAllocation.proposedFundingAmount * _genesisPool.threshold) / 10000; // threshold is 100 * of original to support 2 deciamls
 
         if(_endTime - WEEK < block.timestamp && block.timestamp < _endTime && _tokenAllocation.allocatedFundingAmount >= targetFundingAmount) {
-            // (uint amountA, uint amountB, uint liquidity) = _router.addLiquidity(_genesisPool.fundingToken, proposedToken, false, 0, 0, 0, 0, address(this), block.timestamp + 100);
-            _router.addLiquidity(_genesisPool.fundingToken, proposedToken, protocolsInfo[proposedToken].stable, 0, 0, 0, 0, address(this), block.timestamp + 100);
-            address _poolAddress = _router.pairFor(_genesisPool.fundingToken, proposedToken, false);
-            (address _gauge, address _internal_bribe, address _external_bribe) = _voter.createGauge(_poolAddress, 0);
 
             LiquidityPool storage _liquidityPool = liquidityPoolsInfo[proposedToken];
-            _liquidityPool.pairAddress = _poolAddress;
+            address _poolAddress = _liquidityPool.pairAddress;
+
+            (address _gauge, address _internal_bribe, address _external_bribe) = _voter.createGauge(_poolAddress, 0);
+
             _liquidityPool.gaugeAddress = _gauge;
             _liquidityPool.internal_bribe = _internal_bribe;
             _liquidityPool.external_bribe = _external_bribe;
@@ -279,6 +301,7 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
 
         _tokenAllocation.refundableNativeAmount = 0;
 
+        _pairFactory.setGenesisStatus(_liquidityPool.pairAddress, false);
         (, , uint liquidity) = _router.addLiquidity(_genesisPool.fundingToken, proposedToken, protocolsInfo[proposedToken].stable, amountADesired, amountBDesired, 0, 0, address(this), block.timestamp + 100);
 
         address[] storage _depositers = depositers[proposedToken];
@@ -304,6 +327,7 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
 
         _tokenAllocation.refundableNativeAmount = _tokenAllocation.proposedNativeAmount - _tokenAllocation.allocatedNativeAmount;
 
+        _pairFactory.setGenesisStatus(_liquidityPool.pairAddress, false);
         (, , uint liquidity) = _router.addLiquidity(_genesisPool.fundingToken, proposedToken, false, amountADesired, amountBDesired, 0, 0, address(this), block.timestamp + 100);
 
         address[] storage _depositers = depositers[proposedToken];
@@ -345,12 +369,13 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
                 targetFundingAmount = (_tokenAllocation.proposedFundingAmount * _genesisPool.threshold) / 10000; // threshold is 100 * of original to support 2 deciamls
 
                 if(_endTime - WEEK < block.timestamp && block.timestamp < _endTime && targetFundingAmount < _tokenAllocation.allocatedFundingAmount) {
+                    _pairFactory.setGenesisStatus(liquidityPoolsInfo[_proposedToken].pairAddress, false);
                     poolsStatus[_proposedToken] = PoolStatus.NOT_QUALIFIED;
                 }
             }
-            else if(_poolStatus == PoolStatus.PRE_LAUNCH){
-                poolsStatus[_proposedToken] = PoolStatus.NOT_QUALIFIED;
-            }
+            // else if(_poolStatus == PoolStatus.PRE_LAUNCH){
+            //     poolsStatus[_proposedToken] = PoolStatus.NOT_QUALIFIED;
+            // }
         }
     }
 
