@@ -13,6 +13,6 @@ interface IVoterV3 {
     function poke(uint256 _tokenId) external;
     function epochTimestamp() external view returns(uint);
     function lastVoted(uint tokenId) external view returns(uint);
-    function getEpochGovernor() external view returns (address);
-    function setEpochGovernor(address _epochGovernor) external;
+    function getBlackGovernor() external view returns (address);
+    function setBlackGovernor(address _epochGovernor) external;
 }

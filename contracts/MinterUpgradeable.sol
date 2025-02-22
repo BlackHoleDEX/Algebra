@@ -53,7 +53,6 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     IVoterV3 public _voterV3;
     IVotingEscrow public _ve;
     IRewardsDistributor public _rewards_distributor;
-    IVoter _epoch_controller;
 
     mapping(uint256 => bool) public proposals;
 
@@ -170,7 +169,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     }
 
     function nudge() external {
-        address _epochGovernor = _voterV3.getEpochGovernor();
+        address _epochGovernor = _voterV3.getBlackGovernor();
         require (msg.sender == _epochGovernor);
         IBlackGovernor.ProposalState _state = IBlackGovernor(_epochGovernor).status();
         require (weekly < TAIL_START);
