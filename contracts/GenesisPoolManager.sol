@@ -166,6 +166,14 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
         emit OnBoardedGenesisPool(proposedToken);
     }
 
+    function disapproveGenesisPool(address proposedToken) external nonReentrant {
+        require(_team == msg.sender, "invalid owenr");
+
+        poolsStatus[proposedToken] = PoolStatus.NOT_QUALIFIED;
+        TokenAllocation storage _tokenAllocation = allocationsInfo[proposedToken];
+        _tokenAllocation.refundableNativeAmount = _tokenAllocation.proposedFundingAmount;
+    }
+
     function approveGenesisPool(address proposedToken) external nonReentrant {
         require(_team == msg.sender, "invalid owenr");
 
@@ -346,6 +354,7 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
 
                 if(_endTime - WEEK < block.timestamp && block.timestamp < _endTime && targetFundingAmount < _tokenAllocation.allocatedFundingAmount) {
                     poolsStatus[_proposedToken] = PoolStatus.NOT_QUALIFIED;
+                    _tokenAllocation.refundableNativeAmount = _tokenAllocation.proposedNativeAmount;
                 }
             }
             else if(_poolStatus == PoolStatus.PRE_LAUNCH){
