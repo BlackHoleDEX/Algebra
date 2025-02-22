@@ -1,4 +1,4 @@
-const pairFactoryUpgradeableAddress = "0xC3A31F1bFd7d86846591D83c50d81ddC14104fd3";
+const pairFactoryUpgradeableAddress = "0x612253B74D7B4ADd321e6fC036f59347aCAf1317";
 
 const pairFactoryUpgradeableAbi = [
   {

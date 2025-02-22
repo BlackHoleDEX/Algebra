@@ -1,4 +1,4 @@
-const routerV2Address = "0x5B1d7683e297e33dfd83d6ABbd35CF8CdCf1f2cE";
+const routerV2Address = "0x2f4890A2Fa2211540d5deb96016F2DBfCeF61648";
 
 const routerV2Abi = [
   {

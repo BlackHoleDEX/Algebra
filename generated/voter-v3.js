@@ -1,4 +1,4 @@
-const voterV3Address = "0x45C148D3E3DfaA6203723F15d03041477cBdC87d";
+const voterV3Address = "0xF114daCB0075Edab342F67cE2e1531c7023110dB";
 
 const voterV3Abi = [
   {
