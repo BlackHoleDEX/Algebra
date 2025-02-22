@@ -30,7 +30,7 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
 
     mapping(uint256 => address) public originalOwner;
     mapping(uint256 => bool) public isAutoVotingEnabled;
-    mapping(uint256 => bool) public hasVotedThisEpoch;
+    mapping(uint256 => bool) public hasVotedThisEpoch; // key is considered unix epoch value of dex epoch start -- no reason as such, but it is to be used and written the same way everywhere, ofc...
 
     event AutoVotingEnabled(uint256 lockId, address owner);
     event AutoVotingDisabled(uint256 lockId, address owner);
@@ -175,11 +175,11 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
 
 
     /// @notice Executes automated voting at the end of each epoch
-    function executeVotes(uint256 epoch) external onlyChainlink nonReentrant {
+    function executeVotes() external onlyChainlink nonReentrant {
         require(BlackTimeLibrary.isLastHour(block.timestamp), "Not in last hour of epoch");
-        require(!hasVotedThisEpoch[epoch], "Already executed for this epoch");
+        require(!hasVotedThisEpoch[BlackTimeLibrary.epochStart(block.timestamp)], "Already executed for this epoch"); // is this needed? either this or the onlychainlink should be sufficient right?
 
-        hasVotedThisEpoch[epoch] = true;
+        hasVotedThisEpoch[BlackTimeLibrary.epochStart(block.timestamp)] = true;
         PoolsAndRewards[] memory poolsAndRewards = getRewardsPerVotingPower(10);
         address[] memory poolAddresses = new address[](poolsAndRewards.length);
 
@@ -196,7 +196,7 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
             }
         }
 
-        emit VotesExecuted(epoch, tokenIds.length);
+        emit VotesExecuted(BlackTimeLibrary.epochStart(block.timestamp), tokenIds.length);
     }
 
     function _calculateWeights(uint256[] memory baseWeights, uint256 votingPower) internal pure returns (uint256[] memory) {

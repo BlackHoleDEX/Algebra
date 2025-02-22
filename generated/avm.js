@@ -1,4 +1,4 @@
-const avmAddress = "0x480c82FCcDBd787D114Bef90861989709A8FD12d";
+const avmAddress = "0x3eBa932522A81E654809b1765494502f9CEF117B";
 const avmAbi = [
     {
       "anonymous": false,
@@ -129,13 +129,7 @@ const avmAbi = [
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "epoch",
-          "type": "uint256"
-        }
-      ],
+      "inputs": [],
       "name": "executeVotes",
       "outputs": [],
       "stateMutability": "nonpayable",
