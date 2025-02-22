@@ -31,9 +31,10 @@ contract GanesisPoolBase {
         address tokenAddress;
         string tokenName;
         string tokenTicker;
+        string tokenIcon;
+        bool stable;
         string protocolDesc;
         string protocolBanner;
-        string tokenIcon;
     }
 
     struct LiquidityPool {

@@ -236,7 +236,7 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
 
         if(_endTime - WEEK < block.timestamp && block.timestamp < _endTime && _tokenAllocation.allocatedFundingAmount >= targetFundingAmount) {
             // (uint amountA, uint amountB, uint liquidity) = _router.addLiquidity(_genesisPool.fundingToken, proposedToken, false, 0, 0, 0, 0, address(this), block.timestamp + 100);
-            _router.addLiquidity(_genesisPool.fundingToken, proposedToken, false, 0, 0, 0, 0, address(this), block.timestamp + 100);
+            _router.addLiquidity(_genesisPool.fundingToken, proposedToken, protocolsInfo[proposedToken].stable, 0, 0, 0, 0, address(this), block.timestamp + 100);
             address _poolAddress = _router.pairFor(_genesisPool.fundingToken, proposedToken, false);
             (address _gauge, address _internal_bribe, address _external_bribe) = _voter.createGauge(_poolAddress, 0);
 
@@ -279,7 +279,7 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
 
         _tokenAllocation.refundableNativeAmount = 0;
 
-        (, , uint liquidity) = _router.addLiquidity(_genesisPool.fundingToken, proposedToken, false, amountADesired, amountBDesired, 0, 0, address(this), block.timestamp + 100);
+        (, , uint liquidity) = _router.addLiquidity(_genesisPool.fundingToken, proposedToken, protocolsInfo[proposedToken].stable, amountADesired, amountBDesired, 0, 0, address(this), block.timestamp + 100);
 
         address[] storage _depositers = depositers[proposedToken];
         uint256 _depositerscnt = _depositers.length;
