@@ -1,4 +1,4 @@
-const avmAddress = "0x3eBa932522A81E654809b1765494502f9CEF117B";
+const avmAddress = "0x1e78F3B02cc53e6F280b80521F02129445f9A38D";
 const avmAbi = [
     {
       "anonymous": false,

@@ -1,4 +1,4 @@
-const epochControllerAddress = "0x1f0DeFAC9FC4031bA68507EaC83Ab46e8EB4146F";
+const epochControllerAddress = "0x60ef5910cb7A3482bc0914AA17024AA4E465Ca5a";
 
 const epochControllerAbi = [
   {
@@ -238,4 +238,4 @@ const epochControllerAbi = [
   }
 ];
 
-module.exports = {epochControllerAddress, epochControllerAbi}; 
+module.exports = {epochControllerAddress, epochControllerAbi};
