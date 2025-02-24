@@ -24,6 +24,7 @@ contract PairFactory is IPairFactory {
     mapping(address => mapping(address => mapping(bool => address))) public getPair;
     address[] public allPairs;
     mapping(address => bool) public isPair; // simplified check if its a pair, given that `stable` flag might not be available in peripherals
+    mapping(address => bool) public isGenesis;
 
     address internal _temp0;
     address internal _temp1;

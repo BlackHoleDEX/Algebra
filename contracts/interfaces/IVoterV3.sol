@@ -2,6 +2,7 @@
 pragma solidity 0.8.13;
 
 interface IVoterV3 {
+    function isWhitelisted(address token) external view returns(bool);
     function lastVotedTimestamp(uint id) external view returns(uint);
     function length() external view returns (uint);
     function poolVoteLength(uint tokenId) external view returns(uint);

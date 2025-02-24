@@ -17,7 +17,7 @@ interface IBaseV1Factory {
     function pairCodeHash() external pure returns (bytes32);
     function getPair(address tokenA, address token, bool stable) external view returns (address);
     function createPair(address tokenA, address tokenB, bool stable) external returns (address pair);
-    function isGenesis(address pair) external returns (bool);
+    function isGenesis(address pair) external view returns (bool);
 }
 
 interface IBaseV1Pair {
@@ -146,11 +146,11 @@ contract RouterV2 {
         address pair = pairFor(tokenIn, tokenOut, true);
         uint amountStable;
         uint amountVolatile;
-        if (IBaseV1Factory(factory).isPair(pair)) {
+        if (IBaseV1Factory(factory).isPair(pair) && !IBaseV1Factory(factory).isGenesis(pair)) {
             amountStable = IBaseV1Pair(pair).getAmountOut(amountIn, tokenIn);
         }
         pair = pairFor(tokenIn, tokenOut, false);
-        if (IBaseV1Factory(factory).isPair(pair)) {
+        if (IBaseV1Factory(factory).isPair(pair) && !IBaseV1Factory(factory).isGenesis(pair)) {
             amountVolatile = IBaseV1Pair(pair).getAmountOut(amountIn, tokenIn);
         }
         return amountStable > amountVolatile ? (amountStable, true) : (amountVolatile, false);
