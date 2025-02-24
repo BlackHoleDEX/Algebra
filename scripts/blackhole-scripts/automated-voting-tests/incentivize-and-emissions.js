@@ -104,7 +104,7 @@ async function main () {
     console.log("chainlink executor", await avmContract.chainlinkExecutor())
     console.log("avm from ve", await votingEscrow.avm())
     console.log("avm from voter", await voterV3.avm())
-    const executeVotesTx = await avmContract.executeVotes();
+    const executeVotesTx = await avmContract.executeVotes(0, 2);
     await executeVotesTx.wait();
 
 

@@ -30,6 +30,8 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
     int128 public minBalanceForAutovoting;
     uint256[] public tokenIds;
 
+    uint256 public topN;
+
     mapping(uint256 => address) public originalOwner;
     mapping(uint256 => bool) public isAutoVotingEnabled;
     mapping(uint256 => bool) public hasVotedThisEpoch; // key is considered unix epoch value of dex epoch start
@@ -84,46 +86,61 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
         require(originalOwner[lockId] == msg.sender, "Not original owner");
         require(!BlackTimeLibrary.isLastHour(block.timestamp), "Cannot disable in last hour before voting");
 
-        votingEscrow.transferFrom(address(this), msg.sender, lockId);
         delete originalOwner[lockId];
         delete isAutoVotingEnabled[lockId];
 
         _removeTokenId(lockId);
 
+        votingEscrow.transferFrom(address(this), msg.sender, lockId);
+
         emit AutoVotingDisabled(lockId, msg.sender);
     }
 
     /// @notice Executes automated voting at the end of each epoch
-    function executeVotes() external onlyChainlink nonReentrant {
+    function executeVotes(uint256 start, uint256 end) external onlyChainlink nonReentrant {
+        require(start < end && end <= tokenIds.length, "Invalid range");
         require(BlackTimeLibrary.isLastHour(block.timestamp), "Not in last hour of epoch");
-        require(!hasVotedThisEpoch[BlackTimeLibrary.epochStart(block.timestamp)], "Already executed for this epoch"); // is this needed? either this or the onlychainlink should be sufficient right?
-
+        require(!hasVotedThisEpoch[BlackTimeLibrary.epochStart(block.timestamp)] || end < tokenIds.length, "Already executed for this epoch");
+        require(tokenIds.length > 0, "No auto-voting locks available");
+        
         hasVotedThisEpoch[BlackTimeLibrary.epochStart(block.timestamp)] = true;
-        PoolsAndRewards[] memory poolsAndRewards = getRewardsPerVotingPower(2);
+        PoolsAndRewards[] memory poolsAndRewards = getRewardsPerVotingPower(topN);
         address[] memory poolAddresses = new address[](poolsAndRewards.length);
-
         for (uint256 i = 0; i < poolsAndRewards.length; i++) {
             poolAddresses[i] = poolsAndRewards[i].pool;
         }
 
-        uint256[] memory weights = getVoteWeightage(poolsAndRewards); 
+        uint256[] memory weights = getVoteWeightage(poolsAndRewards);
 
-        for (uint256 i = 0; i < tokenIds.length; i++) {
+        for (uint256 i = start; i < end; i++) {
             uint256 lockId = tokenIds[i];
             if (isAutoVotingEnabled[lockId]) {
                 voterV3.vote(lockId, poolAddresses, weights);
             }
         }
 
-        emit VotesExecuted(BlackTimeLibrary.epochStart(block.timestamp), tokenIds.length);
+        if (end == tokenIds.length) {
+            hasVotedThisEpoch[BlackTimeLibrary.epochStart(block.timestamp)] = true;
+        }
+
+        emit VotesExecuted(BlackTimeLibrary.epochStart(block.timestamp), end - start);
     }
 
+
     function setOriginalOwner(uint256 tokenId, address owner) external onlyVotingEscrow {
+        require(owner != address(0), "Invalid owner address");
+        require(tokenId != 0, "invalid token id");
         originalOwner[tokenId] = owner;
     }
 
     function setChainlinkExecutor(address _executor) external onlyOwner {
+        require(_executor != address(0), "Invalid executor address");
         chainlinkExecutor = _executor;
+    }
+
+    function setTopN(uint256 _topN) external onlyOwner {
+        require(_topN > 0, "top n is negative");
+        topN = _topN;
     }
 
     /* ======= PUBLIC VIEW FUNCTIONS ======= */
@@ -227,4 +244,4 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
         }
         return adjustedWeights;
     }
-}
+}w
