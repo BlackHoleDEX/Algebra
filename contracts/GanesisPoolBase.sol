@@ -46,7 +46,7 @@ contract GanesisPoolBase {
 
     enum PoolStatus{
         DEFAULT,
-        TOKEN_ALLOCATED,
+        NATIVE_TOKEN_DEPOSITED,
         INCENTIVES_ADDED,
         APPLIED,
         PRE_LISTING,
@@ -54,7 +54,6 @@ contract GanesisPoolBase {
         PRE_LAUNCH_DEPOSIT_DISABLED,
         LAUNCH,
         PARTIALLY_LAUNCHED,
-        NOT_QUALIFIED,
-        MAXED_OUT
+        NOT_QUALIFIED
     }
 }

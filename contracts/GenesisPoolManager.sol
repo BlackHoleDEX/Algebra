@@ -53,11 +53,14 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
     address[] public proposedTokens;
     mapping(address => address[]) public depositers;
 
-    event AddedTokenAllocation(address proposedToken, uint256 proposedNativeAmount, uint proposedFundingAmount);
+    event WhiteListedTokenToUser(address proposedToken, address tokenOwner);
+    event DepositedNativeToken(address proposedToken, uint256 proposedNativeAmount, uint proposedFundingAmount);
     event AddedIncentives(address proposedToken, address[] incentivesToken, uint256[] incentivesAmount);
-    event OnBoardedGenesisPool(address proposedToken);
-    event ApprovedGenesisPool(address proposedToken);
+    event SubmittedGenesisPool(address proposedToken);
+    event ApprovedGenesisPool(address proposedToken, address approver);
+    event RejectedGenesisPool(address proposedToken, address denier);
     event DespositedToken(address proposedToken, address fundingToken, uint256 amount);
+    event AprrovedGenesisPool(address proposedToken, address approver);
 
     modifier Governance() {
         require(IPermissionsRegistry(_permissionRegistory).hasRole("GOVERNANCE",msg.sender), 'GOVERNANCE');
@@ -80,11 +83,13 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
 
     function whiteListUserAndToken(address tokenOwner, address proposedToken) external Governance nonReentrant{
         whiteListedTokensToUser[proposedToken][tokenOwner] = true;
+        emit WhiteListedTokenToUser(proposedToken, tokenOwner);
     }
 
-    function addTokenAllocation(address proposedToken, address fundingToken, bool stable, uint256 proposedNativeAmount, uint proposedFundingAmount) external nonReentrant{
+    function depositNativeToken(address proposedToken, address fundingToken, bool stable, uint256 proposedNativeAmount, uint proposedFundingAmount) external nonReentrant{
         address _sender = msg.sender;
         require(whiteListedTokensToUser[proposedToken][_sender] || _sender == owner(), "not whitelisted");
+        require(_tokenManager.isConnector(fundingToken), "connector !=");
         require(_pairFactory.getPair(proposedToken, fundingToken, stable) == address(0), "existing pair");
         require(poolsStatus[proposedToken] == PoolStatus.DEFAULT, "already token allocated");
         require(proposedNativeAmount > 0, "proposed native token 0");
@@ -92,13 +97,24 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
 
         TokenAllocation storage _tokenAllocation = allocationsInfo[proposedToken];
 
+        assert(IERC20(proposedToken).transferFrom(_sender, address(this), proposedNativeAmount));
+
         _tokenAllocation.tokenOwner = _sender;
         _tokenAllocation.proposedNativeAmount = proposedNativeAmount;
         _tokenAllocation.proposedFundingAmount = proposedFundingAmount;
+        _tokenAllocation.allocatedNativeAmount = 0;
+        _tokenAllocation.allocatedFundingAmount = 0;
+        _tokenAllocation.refundableNativeAmount = 0;
 
-        poolsStatus[proposedToken] = PoolStatus.TOKEN_ALLOCATED;
+        GenesisPool storage _genesisPool = genesisPoolsInfo[proposedToken];
+        _genesisPool.fundingToken = fundingToken;
 
-        emit AddedTokenAllocation(proposedToken, proposedNativeAmount, proposedFundingAmount);
+        ProtocolInfo storage _protocolInfo = protocolsInfo[proposedToken];
+        _protocolInfo.stable = stable;
+
+        poolsStatus[proposedToken] = PoolStatus.NATIVE_TOKEN_DEPOSITED;
+
+        emit DepositedNativeToken(proposedToken, proposedNativeAmount, proposedFundingAmount);
     }
 
     function addIncentives(address proposedToken, address fundingToken, bool stable, address[] calldata incentivesToken, uint256[] calldata incentivesAmount) external nonReentrant{
@@ -106,8 +122,11 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
         require(incentivesToken.length > 0, "incentive length 0");
         require(incentivesToken.length == incentivesAmount.length, "length mismatch");
         require(whiteListedTokensToUser[proposedToken][_sender] || _sender == owner(), "not whitelisted");
+        require(incentivesToken.length > 0, "incentive length 0");
+        require(genesisPoolsInfo[proposedToken].fundingToken == fundingToken, "funding !=");
+        require(protocolsInfo[proposedToken].stable == stable, "stable !=");
         require(_pairFactory.getPair(proposedToken, fundingToken, stable) == address(0), "existing pair");
-        require(poolsStatus[proposedToken] == PoolStatus.TOKEN_ALLOCATED, "token not allocated");
+        require(poolsStatus[proposedToken] == PoolStatus.NATIVE_TOKEN_DEPOSITED, "token not allocated");
 
         uint256 _incentivesCount = incentivesToken.length;
         uint256 i = 0;
@@ -137,11 +156,12 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
     }
 
 
-    function onboardGenesisPool(address proposedToken, GenesisPool calldata genesisPool, ProtocolInfo calldata protocolInfo) external nonReentrant {
+    function submitGenesisPool(address proposedToken, GenesisPool calldata genesisPool, ProtocolInfo calldata protocolInfo) external nonReentrant {
         address _sender = msg.sender;
         require(whiteListedTokensToUser[proposedToken][_sender] || _sender == owner(), "not whitelisted");
-        require(poolsStatus[proposedToken] == PoolStatus.INCENTIVES_ADDED, "incentives not added");
-        
+        require(poolsStatus[proposedToken] == PoolStatus.INCENTIVES_ADDED || poolsStatus[proposedToken] == PoolStatus.NATIVE_TOKEN_DEPOSITED, "incentives not added");
+        require(genesisPoolsInfo[proposedToken].fundingToken == genesisPool.fundingToken, "funding !=");
+        require(protocolsInfo[proposedToken].stable == protocolInfo.stable, "stable !=");
         require(_tokenManager.isConnector(genesisPool.fundingToken), "fundingToken not whitelisted");
 
         require(_pairFactory.getPair(proposedToken, genesisPool.fundingToken, protocolInfo.stable) == address(0), "existing pair");
@@ -157,14 +177,6 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
         require(bytes(protocolInfo.protocolBanner).length > 0, "invalid protocol banner");
         require(bytes(protocolInfo.protocolDesc).length > 0, "invalid protocol desc");
 
-        TokenAllocation storage _tokenAllocation = allocationsInfo[proposedToken];
-
-        assert(IERC20(protocolInfo.tokenAddress).transferFrom(_sender, address(this), _tokenAllocation.proposedNativeAmount));
-
-        _tokenAllocation.allocatedNativeAmount = 0;
-        _tokenAllocation.allocatedFundingAmount = 0;
-        _tokenAllocation.refundableNativeAmount = 0;
-
         GenesisPool memory _genesisPool = genesisPoolsInfo[proposedToken];
         _genesisPool = genesisPool;
         _genesisPool.duration = BlackTimeLibrary.epochMultiples(_genesisPool.duration);
@@ -178,13 +190,14 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
         poolsStatus[proposedToken] = PoolStatus.APPLIED;
         proposedTokens.push(proposedToken);
 
-        emit OnBoardedGenesisPool(proposedToken);
+        emit SubmittedGenesisPool(proposedToken);
     }
 
-    function disapproveGenesisPool(address proposedToken) external Governance nonReentrant {
+    function rejectGenesisPool(address proposedToken) external Governance nonReentrant {
         poolsStatus[proposedToken] = PoolStatus.NOT_QUALIFIED;
         TokenAllocation storage _tokenAllocation = allocationsInfo[proposedToken];
         _tokenAllocation.refundableNativeAmount = _tokenAllocation.proposedFundingAmount;
+        emit RejectedGenesisPool(proposedToken, msg.sender);
     }
 
     function approveGenesisPool(address proposedToken) external Governance nonReentrant {
@@ -198,7 +211,7 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
 
         poolsStatus[proposedToken] = PoolStatus.PRE_LISTING;
 
-        emit ApprovedGenesisPool(proposedToken);
+        emit ApprovedGenesisPool(proposedToken, msg.sender);
     }
 
     function depositToken(address proposedToken, address fundingToken, uint256 amount) external nonReentrant{
@@ -213,9 +226,9 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
         TokenAllocation storage _tokenAllocation = allocationsInfo[proposedToken];
         uint256 _amount = _tokenAllocation.proposedFundingAmount - _tokenAllocation.allocatedFundingAmount;
         _amount = _amount < amount ? _amount : amount;
+        require(_amount > 0, "0 amount");
 
         address _spender = msg.sender;
-
         assert(IERC20(fundingToken).transferFrom(_spender, address(this), _amount));
 
         if(userDeposits[proposedToken][_spender] == 0){
