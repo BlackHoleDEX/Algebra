@@ -27,7 +27,7 @@ interface IBaseV1Factory {
 contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
     uint256 internal constant WEEK = 7 days; 
-    uint256 internal constant MIN_DURATION = 14 days; 
+    uint256 internal constant MIN_DURATION = 7 days; 
     uint256 internal constant MIN_THRESHOLD = 50 * 10 ** 2; 
     uint256 internal constant MATURITY_TIME = 90 days;
 
@@ -141,20 +141,18 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
         require(whiteListedTokensToUser[proposedToken][_sender] || _sender == _team, "not whitelisted");
         require(poolsStatus[proposedToken] == PoolStatus.INCENTIVES_ADDED, "incentives not added");
         
-        require(genesisPool.fundingToken != address(0), "invalid fundingToken token");
+        require(isIncentiveToken[genesisPool.fundingToken], "fundingToken not whitelisted");
 
         require(_pairFactory.getPair(proposedToken, genesisPool.fundingToken, protocolInfo.stable) == address(0), "existing pair");
 
-        require(isIncentiveToken[genesisPool.fundingToken], "fundingToken not whitelisted");
         require(genesisPool.duration >= MIN_DURATION, "minimum duration");
         require(genesisPool.threshold >= MIN_THRESHOLD, "minimum threshold");
         require(genesisPool.supplyPercent >= 0 && genesisPool.supplyPercent <= 100, "inavlid supplyPercent");
         require(genesisPool.startPrice > 0, "invalid startPrice");
         
-        require(protocolInfo.tokenAddress != address(0), "invalid protocol token");
+        require(protocolInfo.tokenAddress == proposedToken, "unequal protocol token");
         require(bytes(protocolInfo.tokenName).length > 0, "invalid protocol name");
         require(bytes(protocolInfo.tokenTicker).length > 0, "invalid protocol ticker");
-        require(bytes(protocolInfo.tokenName).length > 0, "invalid protocol deec");
         require(bytes(protocolInfo.protocolBanner).length > 0, "invalid protocol banner");
         require(bytes(protocolInfo.protocolDesc).length > 0, "invalid protocol desc");
 
