@@ -11,7 +11,7 @@ contract TokenHandler is  ITokenHandler {
     mapping(address => bool) public isConnector;
 
     address[] public whiteListed;
-    address[] public connector;
+    address[] public connectors;
 
     address public permissionRegistry;
 
@@ -61,6 +61,7 @@ contract TokenHandler is  ITokenHandler {
         require(!isWhitelisted[_token], "in");
         require(_token.code.length > 0, "!contract");
         isWhitelisted[_token] = true;
+        whiteListed.push(_token);
         emit Whitelisted(msg.sender, _token);
     }
     
@@ -80,6 +81,17 @@ contract TokenHandler is  ITokenHandler {
         require(isWhitelisted[_token], "out");
         require(_token.code.length > 0, "!contract");
         isWhitelisted[_token] = false;
+
+        uint256 length = whiteListed.length;
+        uint256 i;
+        for (i = 0; i < length; i++) {
+            if (whiteListed[i] == _token) {
+                whiteListed[i] = whiteListed[length - 1]; 
+                whiteListed.pop(); 
+                return;
+            }
+        }
+
         emit Blacklisted(msg.sender, _token);
     }
 
@@ -97,6 +109,7 @@ contract TokenHandler is  ITokenHandler {
         require(isWhitelisted[_token], "out");
         require(_token.code.length > 0, "!contract");
         isConnector[_token] = true;
+        connectors.push(_token);
         emit WhitelistedConnector(msg.sender, _token);
     }
 
@@ -104,6 +117,17 @@ contract TokenHandler is  ITokenHandler {
         require(isWhitelisted[_token], "out");
         require(_token.code.length > 0, "!contract");
         isConnector[_token] = false;
+
+        uint256 length = connectors.length;
+        uint256 i;
+        for (i = 0; i < length; i++) {
+            if (connectors[i] == _token) {
+                connectors[i] = connectors[length - 1]; 
+                connectors.pop(); 
+                return;
+            }
+        }
+
         emit BlacklistConnector(msg.sender, _token);
     }
 }
