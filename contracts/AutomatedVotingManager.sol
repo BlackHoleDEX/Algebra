@@ -135,7 +135,7 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
 
     function setTopN(uint256 _topN) external onlyOwner {
         require(_topN > 0, "top n is negative");
-        topN = _topN
+        topN = _topN;
     }
 
     /* ======= PUBLIC VIEW FUNCTIONS ======= */
@@ -239,4 +239,4 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
         }
         return adjustedWeights;
     }
-}w
+}

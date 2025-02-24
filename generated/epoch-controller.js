@@ -1,4 +1,4 @@
-const epochControllerAddress = "0x6B25990e45c74A245CbfE5Ad2FEBbAb556C60924";
+const epochControllerAddress = "0xD091829b348211925Ffc93bAcB2B4ACaE807a737";
 
 const epochControllerAbi = [
   {

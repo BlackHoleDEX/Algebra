@@ -1,4 +1,4 @@
-const permissionsRegistryAddress = "0x07B793CBC1bB011291a932E1Ba1be581fCcaeC6a";
+const permissionsRegistryAddress = "0x0a78D088d1a3C24726c26AAE88dAB812D6430BdD";
 
 const permissionsRegistryAbi = [
   {

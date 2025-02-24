@@ -1,4 +1,4 @@
-const minterUpgradeableAddress = "0xBEF30cBBcFA9BbA5bb25A8596A7cD3236382b9FF";
+const minterUpgradeableAddress = "0xd00020bc83D77359F4BC268030Ad0993165007fb";
 
 const minterUpgradeableAbi = [
   {
