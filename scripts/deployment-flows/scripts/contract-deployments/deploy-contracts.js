@@ -8,7 +8,7 @@ const { minterUpgradeableAbi } = require('../../../../generated/minter-upgradeab
 const { epochControllerAbi } = require('../../../../generated/epoch-controller')
 const { blackAbi } = require('../../../blackhole-scripts/gaugeConstants/black')
 const { votingEscrowAbi } = require('../../../../generated/voting-escrow');
-const { gaugeFactoryV2Abi } = require('../../../../generated/gauge-factory-v2');
+const { gaugeFactoryV2Abi, gaugeFactoryV2Address } = require('../../../../generated/gauge-factory-v2');
 const { rewardsDistributorAbi } = require('../../../../generated/rewards-distributor');
 const { addLiquidity } = require('../../../blackhole-scripts/addLiquidity')
 const { BigNumber } = require("ethers");
@@ -24,13 +24,28 @@ const jsonData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8'));
 // Extract addresses
 const addresses = jsonData.map(obj => obj.address);
 const deployedTokens = require('../../token-constants/deployed-tokens.json');
+const { pairFactoryAddress } = require("../../../blackhole-scripts/dexAbi");
 const blackAddress = deployedTokens[0].address;
 console.log("Extracted Addresses: ", addresses);
 
-const deployPairFactory = async () => {
+const deployPairGenerator = async () => {
+    try {
+        const pairGeneratorContract = await ethers.getContractFactory("PairGenerator");
+        const pairGenerator = await pairGeneratorContract.deploy();
+        txDeployed = await pairGenerator.deployed();
+        console.log("pairFactory: ", pairGenerator.address)
+        generateConstantFile("PairGenerator", pairGenerator.address);
+        return pairGenerator.address;
+    } catch (error) {
+        console.log("error in deploying pairGenerator: ", error)
+    }
+}
+
+const deployPairFactory = async (pairGeneratorAddress) => {
     try {
         const pairFactoryContract = await ethers.getContractFactory("PairFactoryUpgradeable");
-        const pairFactory = await upgrades.deployProxy(pairFactoryContract,[],{initializer: 'initialize'});
+        const inputs = [pairGeneratorAddress];
+        const pairFactory = await upgrades.deployProxy(pairFactoryContract,inputs,{initializer: 'initialize'});
         txDeployed = await pairFactory.deployed();
         console.log("pairFactory: ", pairFactory.address)
         generateConstantFile("PairFactoryUpgradeable", pairFactory.address);
@@ -403,6 +418,16 @@ const setGenesisPoolManagerInGaugeFactory = async(gaugeV2Address, genesisPoolAdd
     }
 }
 
+const setGenesisPoolManagerInPairFactory = async(pairFactoryAddress, genesisPoolAddress) => {
+    try {
+        const PairFactoryContract = await ethers.getContractAt(pairFactoryUpgradeableAbi, pairFactoryAddress);
+        await PairFactoryContract.setGenesisPool(genesisPoolAddress);
+        console.log("set genesis pool in pair factory");
+    } catch (error) {
+        console.log("error genesis pool in pair factory", error);
+    }
+}
+
 const deployDucthAction = async (genesisPoolAddress) => {
     try {
         const dutchAuctionContract = await ethers.getContractFactory("DutchAction");
@@ -439,7 +464,7 @@ const deployGenesisApi = async (genesisPoolAddress) => {
         generateConstantFile("GenesisPoolAPI", genesisApi.address);
         console.log('deployed genesis pool API address: ', genesisApi.address)
     } catch (error) {
-        console.log('deployed  genesis pool API error ', error)
+        console.log('error genesis pool API  ', error)
     }
 }
 
@@ -450,8 +475,10 @@ async function main () {
 
     console.log("Black token address is: ", blackAddress);
 
+    const pairGeneratorAddress = await deployPairGenerator();
+
     //deploy pairFactory
-    const pairFactoryAddress = await deployPairFactory();
+    const pairFactoryAddress = await deployPairFactory(pairGeneratorAddress);
 
     //deploy router V2
     const routerV2Address = await deployRouterV2(pairFactoryAddress);
@@ -524,11 +551,13 @@ async function main () {
 
     const blackClaimAddress = await deployBlackClaim(votingEscrowAddress, ownerAddress);
 
-    const genesisPoolAddress = deployGenesisPool("0xA1Fd6381C7a05E28123fFABa19069222E1Eb906a", "0x3f90ecCF1b79016e688DF6c390852D15d61f0f35", "0xD03dC65A7Ce3B98f0d97821688e59f93D9238632", "0xC942ffA94b2ab83844b6c418CB8B51B11D810cbD");
+    const genesisPoolAddress = deployGenesisPool(routerV2Address, epochControllerAddress, voterV3Address, pairFactoryAddress);
 
-    await setGenesisManagerRole("0xc307Ec262c1fab96cA409161384E2BaE8a762E4e", genesisPoolAddress);
+    await setGenesisManagerRole(permissionRegistryAddress, genesisPoolAddress);
 
-    await setGenesisPoolManagerInGaugeFactory("0x51970e68206ACD259d467807b85BE9c8fcaE27d5", genesisPoolAddress);
+    await setGenesisPoolManagerInGaugeFactory(gaugeFactoryV2Address, genesisPoolAddress);
+
+    await setGenesisPoolManagerInPairFactory(pairFactoryAddress, genesisPoolAddress);
 
     const dutchAuctionAddress = deployDucthAction(genesisPoolAddress);
 

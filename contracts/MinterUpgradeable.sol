@@ -6,7 +6,11 @@ import "./interfaces/IMinter.sol";
 import "./interfaces/IRewardsDistributor.sol";
 import "./interfaces/IBlack.sol";
 import "./interfaces/IVoter.sol";
+import "./interfaces/IVoterV3.sol";
+
 import "./interfaces/IVotingEscrow.sol";
+
+import { IBlackGovernor } from "./interfaces/IBlackGovernor.sol";
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
@@ -20,13 +24,24 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     uint public TAIL_EMISSION;
     uint public REBASEMAX;
     uint public constant PRECISION = 1000;
-    uint public teamRate;
+    uint public teamRate;  //EMISSION that goes to protocol
+
     uint public constant MAX_TEAM_RATE = 50; // 5%
+
+    uint256 public constant TAIL_START = 8_969_150 * 1e18; //TAIL EMISSIONS 
+    uint256 public tailEmissionRate = 67; 
+    uint256 public constant NUDGE = 1; //delta added in tail emissions rate after voting
+    uint256 public constant MAXIMUM_TAIL_RATE = 100; //maximum tail emissions rate after voting
+    uint256 public constant MINIMUM_TAIL_RATE = 1; //maximum tail emissions rate after voting
+    uint256 public constant MAX_BPS = 10_000; 
+    uint256 public constant WEEKLY_DECAY = 9_900; //for epoch 15 to 66 growth
+    uint256 public constant WEEKLY_GROWTH = 10_300; //for epoch 1 to 14 growth
 
     uint public constant WEEK = 1800; // allows minting once per week (reset every Thursday 00:00 UTC)
     uint public weekly; // represents a starting weekly emission of 2.6M BLACK (BLACK has 18 decimals)
     uint public active_period;
     uint public constant LOCK = 86400 * 7 * 52 * 4;
+    uint256 public epochCount;
 
     address internal _initializer;
     address public team;
@@ -34,8 +49,12 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     
     IBlack public _black;
     IVoter public _voter;
+    IVoterV3 public _voterV3;
     IVotingEscrow public _ve;
     IRewardsDistributor public _rewards_distributor;
+    IVoter _epoch_controller;
+
+    mapping(uint256 => bool) public proposals;
 
     event Mint(address indexed sender, uint weekly, uint circulating_supply, uint circulating_emission);
 
@@ -51,7 +70,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
         _initializer = msg.sender;
         team = msg.sender;
 
-        teamRate = 40; // 300 bps = 3%
+        teamRate = 30; // 300 bps = 3%
 
         EMISSION = 990; //BlackHole:: 
         TAIL_EMISSION = 2;
@@ -60,13 +79,12 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
         _black = IBlack(IVotingEscrow(__ve).token());
         _voter = IVoter(__voter);
         _ve = IVotingEscrow(__ve);
+        _voterV3 = IVoterV3(__voter);
         _rewards_distributor = IRewardsDistributor(__rewards_distributor);
 
-
         active_period = ((block.timestamp + (2 * WEEK)) / WEEK) * WEEK;
-        weekly = 100_000 * 1e18; // represents a starting weekly emission of 2.6M BLACK (BLACK has 18 decimals)
+        weekly = 10_000_000 * 1e18; // represents a starting weekly emission of 10M BLACK (BLACK has 18 decimals)
         isFirstMint = true;
-
     }
 
     function _initialize(
@@ -127,16 +145,6 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
         return _black.totalSupply() - _black.balanceOf(address(_ve));
     }
 
-    // emission calculation is 1% of available supply to mint adjusted by circulating / total supply
-    function calculate_emission() public view returns (uint) {
-        return (weekly * EMISSION) / PRECISION;
-    }
-
-    // weekly emission takes the max of calculated (aka target) emission versus circulating tail end emission
-    function weekly_emission() public view returns (uint) {
-        return Math.max(calculate_emission(), circulating_emission());
-    }
-
     // calculates tail end (infinity) emissions as 0.2% of total supply
     function circulating_emission() public view returns (uint) {
         return (circulating_supply() * TAIL_EMISSION) / PRECISION;
@@ -160,28 +168,61 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
         }
     }
 
+    function nudge() external {
+        address _epochGovernor = _voterV3.getEpochGovernor();
+        require (msg.sender != _epochGovernor);
+        IBlackGovernor.ProposalState _state = IBlackGovernor(_epochGovernor).status();
+        require (weekly < TAIL_START);
+        uint256 _period = active_period;
+        require (!proposals[_period]);
+        uint256 _newRate = tailEmissionRate;
+        uint256 _oldRate = _newRate;
+
+        if (_state != IBlackGovernor.ProposalState.Expired) {
+            if (_state == IBlackGovernor.ProposalState.Succeeded) {
+                _newRate = _oldRate + NUDGE > MAXIMUM_TAIL_RATE ? MAXIMUM_TAIL_RATE : _oldRate + NUDGE;
+            } else {
+                _newRate = _oldRate - NUDGE < MINIMUM_TAIL_RATE ? MINIMUM_TAIL_RATE : _oldRate - NUDGE;
+            }
+            tailEmissionRate = _newRate;
+        }
+        proposals[_period] = true;
+    }
+
+
     // update period can only be called once per cycle (1 week)
     function update_period() external returns (uint) {
         uint _period = active_period;
         if (block.timestamp >= _period + WEEK && _initializer == address(0)) { // only trigger if new week
+            epochCount++;
             _period = (block.timestamp / WEEK) * WEEK;
             active_period = _period;
+            uint256 _weekly = weekly;
+            uint256 _emission;
+            uint256 _totalSupply = _black.totalSupply();
+            bool _tail = _weekly < TAIL_START;
 
-            if(!isFirstMint){
-                weekly = weekly_emission();
+            if (_tail) {
+                _emission = (_totalSupply * tailEmissionRate) / MAX_BPS;
             } else {
-                isFirstMint = false;
+                _emission = _weekly;
+                if (epochCount < 15) {
+                    _weekly = (_weekly * WEEKLY_GROWTH) / MAX_BPS;
+                } else {
+                    _weekly = (_weekly * WEEKLY_DECAY) / MAX_BPS;
+                }
+                weekly = _weekly;
             }
 
-            uint _rebase = calculate_rebase(weekly);
-            uint _teamEmissions = weekly * teamRate / PRECISION;
-            uint _required = weekly;
+            uint _rebase = calculate_rebase(_emission);
 
-            uint _gauge = weekly - _rebase - _teamEmissions;
+            uint _teamEmissions = _emission * teamRate / PRECISION;
+
+            uint _gauge = _emission - _rebase - _teamEmissions;
 
             uint _balanceOf = _black.balanceOf(address(this));
-            if (_balanceOf < _required) {
-                _black.mint(address(this), _required - _balanceOf);
+            if (_balanceOf < _emission) {
+                _black.mint(address(this), _emission - _balanceOf);
             }
 
             require(_black.transfer(team, _teamEmissions));

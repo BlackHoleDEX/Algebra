@@ -17,4 +17,6 @@ interface IVoterV3 {
     function createGauge(address _pool, uint256 _gaugeType) external returns (address _gauge, address _internal_bribe, address _external_bribe);
     function whitelist(address _token) external;
     function blacklist(address _token) external;
+    function getEpochGovernor() external view returns (address);
+    function setEpochGovernor(address _epochGovernor) external;
 }
