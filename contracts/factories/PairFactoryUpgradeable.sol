@@ -3,32 +3,43 @@ pragma solidity 0.8.13;
 
 import '../interfaces/IPairFactory.sol';
 import '../Pair.sol';
+
+import '../IPairFactoryStorage.sol';
+
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
+    bool public isPaused;
 
-    bool internal isPaused;
-    uint256 internal stableFee = 4;
-    uint256 internal volatileFee = 18;
-    uint256 internal stakingNFTFee = 300;
-    uint256 internal MAX_REFERRAL_FEE = 200; // 12%
-    uint256 internal constant MAX_FEE = 25; // 0.25%
+    uint256 public stableFee;
+    uint256 public volatileFee;
+    uint256 public stakingNFTFee;
+    uint256 public MAX_REFERRAL_FEE; // 12%
+    uint256 public constant MAX_FEE = 25; // 0.25%
 
-    address internal feeManager;
-    address internal pendingFeeManager;
-    address internal dibs;                // referral fee handler
-    address internal stakingFeeHandler;   // staking fee handler
+    address public feeManager;
+    address public pendingFeeManager;
+    address public dibs; // referral fee handler
+    address public stakingFeeHandler; // staking fee handler
 
-    mapping(address => mapping(address => mapping(bool => address))) public getPair;
-    address[] public allPairs;
-    mapping(address => bool) public isPair; // simplified check if its a pair, given that `stable` flag might not be available in peripherals
-    mapping(address => uint256) public customFees; //custom fees map for each pool
+    // mapping(address => mapping(address => mapping(bool => address))) public getPair;
+    // address[] public allPairs;
+    // mapping(address => bool) public isPair; // simplified check if its a pair, given that `stable` flag might not be available in peripherals
+    // mapping(address => uint256) public customFees; //custom fees map for each pool
+
+    IPairFactoryStorage pairFactoryStorage;
 
     address internal _temp0;
     address internal _temp1;
     bool internal _temp;
 
-    event PairCreated(address indexed token0, address indexed token1, bool stable, address pair, uint);
+    event PairCreated(
+        address indexed token0,
+        address indexed token1,
+        bool stable,
+        address pair,
+        uint
+    );
 
     modifier onlyManager() {
         require(msg.sender == feeManager);
@@ -36,23 +47,24 @@ contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
     }
 
     constructor() {}
-    function initialize() initializer  public {
+
+    function initialize(address pairFactoryStore) public initializer {
         __Ownable_init();
         isPaused = false;
         feeManager = msg.sender;
-        // stableFee = 4; // 0.04%
-        // volatileFee = 18; // 0.18%
-        // stakingNFTFee = 300; // 3% of stable/volatileFee
-        // MAX_REFERRAL_FEE = 200; // 2%
+        stableFee = 4; // 0.04%
+        volatileFee = 18; // 0.18%
+        stakingNFTFee = 300; // 3% of stable/volatileFee
+        MAX_REFERRAL_FEE = 200; // 2%
+        pairFactoryStorage = IPairFactoryStorage(pairFactoryStore);
     }
-
 
     function allPairsLength() external view returns (uint) {
-        return allPairs.length;
+        return pairFactoryStorage.allPairsLength();
     }
 
-    function pairs() external view returns(address[] memory ){
-        return allPairs;
+    function pairs() external view returns (address[] memory) {
+        return pairFactoryStorage.getAllPairs();
     }
 
     function setPause(bool _state) external {
@@ -60,7 +72,7 @@ contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
         isPaused = _state;
     }
 
-    function setFeeManager(address _feeManager) external onlyManager{
+    function setFeeManager(address _feeManager) external onlyManager {
         pendingFeeManager = _feeManager;
     }
 
@@ -68,7 +80,6 @@ contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
         require(msg.sender == pendingFeeManager);
         feeManager = pendingFeeManager;
     }
-
 
     function setStakingFees(uint256 _newFee) external onlyManager {
         require(_newFee <= 3000);
@@ -89,9 +100,8 @@ contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
         MAX_REFERRAL_FEE = _refFee;
     }
 
-
     function setFee(bool _stable, uint256 _fee) external onlyManager {
-        require(_fee <= MAX_FEE);
+        require(_fee <= MAX_FEE, "fee");
         require(_fee != 0);
         if (_stable) {
             stableFee = _fee;
@@ -100,15 +110,18 @@ contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
         }
     }
 
-    function setCustomFees(address _pairAddress, uint256 _fees) external onlyManager {
-        require(isPair[_pairAddress]); 
-        require(_fees <= MAX_FEE); 
-        customFees[_pairAddress] = _fees;
+    function setCustomFees(address _pairAddress, uint256 _fees) external {
+        require(pairFactoryStorage.isPair(_pairAddress), "ip");
+        require(_fees <= MAX_FEE, "ve");
+        pairFactoryStorage.setCustomFee(_pairAddress, _fees);
     }
 
-    function getFee(address _pairAddress, bool _stable) external view returns(uint256) {
-        if(customFees[_pairAddress] > 0){
-            return customFees[_pairAddress];
+    function getFee(
+        address _pairAddress,
+        bool _stable
+    ) public view returns (uint256) {
+        if (pairFactoryStorage.getCustomFee(_pairAddress) > 0) {
+            return pairFactoryStorage.getCustomFee(_pairAddress);
         }
         return _stable ? stableFee : volatileFee;
     }
@@ -121,18 +134,46 @@ contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
         return (_temp0, _temp1, _temp);
     }
 
-    function createPair(address tokenA, address tokenB, bool stable) external returns (address pair) {
-        require(tokenA != tokenB, '0'); // Pair: IDENTICAL_ADDRESSES
-        (address token0, address token1) = tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
-        require(token0 != address(0), '0'); // Pair: ZERO_ADDRESS
-        require(getPair[token0][token1][stable] == address(0), '0'); // Pair: PAIR_EXISTS - single check is sufficient
+    function createPair(
+        address tokenA,
+        address tokenB,
+        bool stable
+    ) external returns (address pair) {
+        require(tokenA != tokenB, "0"); // Pair: IDENTICAL_ADDRESSES
+        (address token0, address token1) = tokenA < tokenB
+            ? (tokenA, tokenB)
+            : (tokenB, tokenA);
+        require(token0 != address(0), "0"); // Pair: ZERO_ADDRESS
+        require(
+            pairFactoryStorage.getPair(token0, token1, stable) == address(0),
+            "0"
+        );
         bytes32 salt = keccak256(abi.encodePacked(token0, token1, stable)); // notice salt includes stable as well, 3 parameters
         (_temp0, _temp1, _temp) = (token0, token1, stable);
-        pair = address(new Pair{salt:salt}());
-        getPair[token0][token1][stable] = pair;
-        getPair[token1][token0][stable] = pair; // populate mapping in the reverse direction
-        allPairs.push(pair);
-        isPair[pair] = true;
-        emit PairCreated(token0, token1, stable, pair, allPairs.length);
+        pair = address(new Pair{salt: salt}());
+        pairFactoryStorage.addPair(token0, token1, stable, pair);
+        // pairFactoryStorage.getPair[token0][token1][stable] = pair;
+        //pairFactoryStorage.getPair[token1][token0][stable] = pair; // populate mapping in the reverse direction
+        //pairFactoryStorage.allPairs.push(pair);
+        //pairFactoryStorage.isPair[pair] = true;
+        emit PairCreated(
+            token0,
+            token1,
+            stable,
+            pair,
+            pairFactoryStorage.allPairsLength()
+        );
     }
+
+    // function isPair(address pair) external view override returns (bool) {}
+
+    function allPairs(uint index) external view override returns (address) {}
+
+    function getPair(
+        address tokenA,
+        address token,
+        bool stable
+    ) external view override returns (address) {}
+ 
+    function isPair(address pair) external view override returns (bool) {}
 }
