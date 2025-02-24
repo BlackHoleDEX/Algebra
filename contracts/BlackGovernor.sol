@@ -28,16 +28,26 @@ contract BlackGovernor is
     }
 
     function votingDelay() public pure override(IGovernor) returns (uint256) {
-        return 15 minutes; // 1 block
+        return 2 minutes; // 1 block
     }
 
     function votingPeriod() public pure override(IGovernor) returns (uint256) {
-        return 1 weeks;
+        return 30 minutes;
     }
 
     function setTeam(address newTeam) external {
         require(msg.sender == team, "not team");
         team = newTeam;
+    }
+
+    //TODO:: Abhijeet remove this function as used for testing and variable in Governor.sol
+    function epochStarts() external view returns (bytes32){
+        return epochStart;
+    }
+
+    //TODO:: Abhijeet remove this function as used for testing and variable in Governor.sol
+    function getProposalId() external view returns (uint256){
+        return proposalIdMain;
     }
 
     function setProposalNumerator(uint256 numerator) external {

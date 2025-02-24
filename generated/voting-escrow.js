@@ -1,4 +1,4 @@
-const votingEscrowAddress = "0x4F9471DF8a0Ab277FE44FbaC0D5494Ce0647C7E0";
+const votingEscrowAddress = "0xF844747b902d1727b71A0b9403F96d2805E08384";
 
 const votingEscrowAbi = [
   {
@@ -619,6 +619,19 @@ const votingEscrowAbi = [
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "burnTokenAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",

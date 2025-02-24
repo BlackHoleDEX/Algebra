@@ -1,4 +1,4 @@
-const voterV3Address = "0xD03dC65A7Ce3B98f0d97821688e59f93D9238632";
+const voterV3Address = "0xe5851b8316D97CDF87574c4DCcDaD400D99EB6f2";
 
 const voterV3Abi = [
   {
@@ -510,6 +510,19 @@ const voterV3Abi = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "blackGoverner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address[]",
@@ -825,6 +838,19 @@ const voterV3Abi = [
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getBlackGovernor",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -1292,6 +1318,19 @@ const voterV3Abi = [
       }
     ],
     "name": "reviveGauge",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_blackGovernor",
+        "type": "address"
+      }
+    ],
+    "name": "setBlackGovernor",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

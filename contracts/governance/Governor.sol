@@ -52,8 +52,10 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
 
     string private _name;
     address public minter;
+    uint256 public proposalIdMain; //TODO:: Abhijeet remove this and make it local as used for testing
     
     ProposalState public status;
+    bytes32 public epochStart;  //TODO:: Abhijeet remove this and make it local as used for testing
 
     mapping(uint256 => ProposalCore) public _proposals;
 
@@ -273,12 +275,13 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
         require(calldatas.length == 1, "GovernorSimple: only one calldata allowed");
         require(bytes4(calldatas[0]) == IMinter.nudge.selector, "GovernorSimple: only nudge allowed");
 
-        bytes32 epochStart = bytes32(BlackTimeLibrary.epochStart(block.timestamp) + (1 weeks));
-        uint256 proposalId = hashProposal(targets, values, calldatas, epochStart);
+        epochStart = bytes32(BlackTimeLibrary.epochNext(block.timestamp));
+
+        proposalIdMain = hashProposal(targets, values, calldatas, epochStart);
 
         require(targets.length > 0, "Governor: empty proposal");
 
-        ProposalCore storage proposal = _proposals[proposalId];
+        ProposalCore storage proposal = _proposals[proposalIdMain];
         require(proposal.voteStart.isUnset(), "Governor: proposal already exists");
 
         uint64 start = block.timestamp.toUint64() + votingDelay().toUint64();
@@ -288,8 +291,10 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
         proposal.voteEnd.setDeadline(deadline);
         proposal.proposer = _msgSender();
 
+        _proposals[proposalIdMain] = proposal;
+
         emit ProposalCreated(
-            proposalId,
+            proposalIdMain,
             _msgSender(),
             targets,
             values,
@@ -299,7 +304,7 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
             deadline
         );
 
-        return proposalId;
+        return proposalIdMain;
     }
 
     /**
