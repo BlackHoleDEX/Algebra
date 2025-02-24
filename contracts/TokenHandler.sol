@@ -33,9 +33,8 @@ contract TokenHandler is  ITokenHandler {
         _;
     }
 
-
-    constructor() {
-        permissionRegistry = msg.sender;
+    constructor(address _permissionRegistry) {
+        permissionRegistry = _permissionRegistry;
     }
 
     function setPermissionsRegistry(address _permissionRegistry) external Governance {

@@ -475,6 +475,11 @@ async function main () {
 
     console.log("Black token address is: ", blackAddress);
 
+    //deploy permissionRegistry
+    const permissionRegistryAddress = await deployPermissionRegistry();
+
+    const tokenHandlerAddress = await deployTokenHanlder(permissionRegistryAddress);
+
     const pairGeneratorAddress = await deployPairGenerator();
 
     //deploy pairFactory
@@ -485,9 +490,6 @@ async function main () {
 
     //setDibs
     await setDibs(pairFactoryAddress);
-
-    //deploy permissionRegistry
-    const permissionRegistryAddress = await deployPermissionRegistry();
 
     //deploy voting  escrow
     const votingEscrowAddress = await deployVotingEscrow(blackAddress);
