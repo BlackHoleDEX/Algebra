@@ -100,9 +100,8 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
     function executeVotes(uint256 start, uint256 end) external onlyChainlink nonReentrant {
         require(start < end && end <= tokenIds.length, "Invalid range");
         require(BlackTimeLibrary.isLastHour(block.timestamp), "Not in last hour of epoch");
-        require(!hasVotedThisEpoch[BlackTimeLibrary.epochStart(block.timestamp)] || end < tokenIds.length, "Already executed for this epoch");
+        require(!hasVotedThisEpoch[BlackTimeLibrary.epochStart(block.timestamp)], "Already executed for this epoch");
         require(tokenIds.length > 0, "No auto-voting locks available");
-        
         hasVotedThisEpoch[BlackTimeLibrary.epochStart(block.timestamp)] = true;
         PoolsAndRewards[] memory poolsAndRewards = getRewardsPerVotingPower(topN);
         address[] memory poolAddresses = new address[](poolsAndRewards.length);
@@ -117,10 +116,6 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
             if (isAutoVotingEnabled[lockId]) {
                 voterV3.vote(lockId, poolAddresses, weights);
             }
-        }
-
-        if (end == tokenIds.length) {
-            hasVotedThisEpoch[BlackTimeLibrary.epochStart(block.timestamp)] = true;
         }
 
         emit VotesExecuted(BlackTimeLibrary.epochStart(block.timestamp), end - start);
@@ -140,7 +135,7 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
 
     function setTopN(uint256 _topN) external onlyOwner {
         require(_topN > 0, "top n is negative");
-        topN = _topN;
+        topN = _topN
     }
 
     /* ======= PUBLIC VIEW FUNCTIONS ======= */
