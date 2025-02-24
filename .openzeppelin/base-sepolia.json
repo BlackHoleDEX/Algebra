@@ -3219,6 +3219,526 @@
       "address": "0x1D94E1460f26189E035740F42107536CA7F2dC4f",
       "txHash": "0xed52fc51c7610f04672ff1bd54019b9975abbad64cb5b05799def483d9e49d7e",
       "kind": "transparent"
+    },
+    {
+      "address": "0xC9c083A6F521bE98Bf8f5Fe59a8E6F7BD21BC930",
+      "txHash": "0x7d6c2ca455fb6847a156bdd3130cb80d201fde2718167be3101ef80193c22d15",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x1d250392bC119AfFaeA901Ab032E10DCFdA876Db",
+      "txHash": "0x1d7fdbe14e3b247c50e719be759a9b615b98172c2352a835fb47e295cef284c3",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xb634ee8C3347e60d11B3C293cd80FbC0986c0A72",
+      "txHash": "0x78dc0ad0c2e30e5db91a92d41ab8ace229eb430e3e66daa6fdec6c174f978933",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x071Ec608539582b9d3946b70186Ec034a6770F3A",
+      "txHash": "0xf316661161d118b0ac6cf5fae6802749e554ea5dafd629bd957b5dfe59b702c5",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x370CF3b5f9dfF5A81A2807190e4185E988f14C74",
+      "txHash": "0xd5736b7d45f10fb2b5d9998c19abafcbda03b57de5289f0b801470c5ad7b74b2",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x595a3F3f866F382B8DB6FcDc211A52DBE91dd6e0",
+      "txHash": "0x5515e3b90e8270d29c50865dce8b8439d695e5b3cab90554c4cf1acf32466ce3",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xf8170452ACC9B4916731ff14e915D4c01a20dB50",
+      "txHash": "0x80c96e6b732768fa8cb3dea2dbca6780ac4bdcfde0714f69414f0212c4003121",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xA27294A87bc07606F6e002cacc88A755E1694236",
+      "txHash": "0x1d1db579210bf64b151813132b852a7002f40197b99c1b9c59e3a126bbede331",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x95Fe40bD621406C7339B8475Ad1Fdf8fefe8650f",
+      "txHash": "0x478cd5d58d64505a831bb6fdea01d33b91e689568eb041fd02a7bbb178c6d384",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x09B5B03aa4Dba588E38B14d2D10A7E0531232992",
+      "txHash": "0xdb0d1a96fb00c61f0fada8dfc961d9a3b46010191aa8dffb1900c9a1ed656ce7",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xeC483b277C6e83A79D3137ef09764c8d80066451",
+      "txHash": "0xf1e51543a6163d7b4579122af57180cf6d798af63c7fd96df8215813014d0f99",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xB58649F9025Ee5044F0C2CC745Ee561581b0D495",
+      "txHash": "0x127d930076f18d8bbb1b04031c575b08cd06d52ee4a4c5b8517964306cd46e8f",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xC647fF23C60110932aAdD5b8D3cb801a5bE46300",
+      "txHash": "0x42376ffcad93e263048c995815cf28a2e7211ba7ce01820eab9742be8f32cccb",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x7a4AA9F0ab2485C91AD1a59775c795FEDB462E2C",
+      "txHash": "0xb0b8172d206485e0c50aab1dd798328ec6149d54e34de6ffe7f6207826008777",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x2331DC385D9A76632eE9AC5aeb08B82F112261d5",
+      "txHash": "0xd09e96b7792184d3e243ccf1595c0307262d1cabe54036b108c5b5b2514e3e6f",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x2e45870af9f4537190567bC95240D6214d0531fA",
+      "txHash": "0xe896f58b6eb282fe884bd1e46127a288c2dfbfbfdf1aff373f18f7af2988e67b",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x54aB6127A75D54283e8E221Fc1b59A7Cf1AAc861",
+      "txHash": "0xe7c4ebece4ce15f95ed62c461da712a6e9a27756627829033ba459eda63c7616",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xA513bf8378A4F933dc50261c506A58D9d26123F8",
+      "txHash": "0x50d26e1b44986a91ee324a6b2df7df17435ea3f1dd06dd59267d406105b0496e",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xDB77c9A3DcF3F2bb736f51Ff7B68CdED403C15D3",
+      "txHash": "0x8efc8074601f5b08cf2c006882bf3cccf9470dbc076fd2fa6be27ae38b03bf64",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xB89f31304183C5E47b5C154FE1dBce13790721DA",
+      "txHash": "0xa66eff954a6ce5c8f377a65ea07c1d5d219b7b9ba3f2fe5e5354971e7bd46c5a",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x516953C0d2cd32E41C48278EE22e54e40d81D677",
+      "txHash": "0xd62016071432a473b434de373e692ce3063dd1dfddf0df7b206c5aa85612f341",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x69b5C3FDdD68ceB0379472afE567ad6421a12385",
+      "txHash": "0xff723058b5b13d0855a92526c691647c19d85adf70ec50eecf62123f95da4485",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x9564Fa9B49a9F9f374DD79B6B6260676aad4ee14",
+      "txHash": "0x401223e3712d3c316d642b8eec284599724dafa29906fc799c4185989755f5b6",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xE63e403B7faB35f2A2EB778b006696594EbB2193",
+      "txHash": "0xcfe6a9abd41fbdb074360cbbd84685d7726fa63fb0ae4ce65111555bd2d91ab5",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xb9F863beDf2cb681BE654FE74AfDc103B2b11906",
+      "txHash": "0x4d60c24ce4db76ec8db673b861027b0280d99a1a3938b27c26a6348224c3a8b1",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xCD3F85882550d541B793F5922ba1B2931eb7735b",
+      "txHash": "0x1f2512176d8b8bd3c698cf476dd60a0ae9dbd76053b8adb908f17f8b8e8f550b",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x97BfE02a7e33B6f6D5573Be3d02E921A314C12bF",
+      "txHash": "0x86c37ce438b11543018736232221417f56bf7f1af45a510d7dd75e6455f07d5e",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xe5f97005CdCd4C1f5C417bf2D9E780bFe4adb268",
+      "txHash": "0xfb1e00ec8c22e7af64c6a8b7743931c79607256cabaa8fef975de0cf343e0d72",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xC4A187a061b9Ce084E0a49a55A458E324C80F559",
+      "txHash": "0x66e6858f28f267aad3423923a3c50e81ab486c4a6b660a77dc3298a3035cf81e",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xF98ab0728A20f6c5D584aC2bA70183EFACa33EC0",
+      "txHash": "0x730dfe6ec7a6d8526d5107657fbd5e3e9d68d9c0df37133a8c7d1cff66affd4f",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x2959F611A965493d82977A92721142A92d4230E9",
+      "txHash": "0x9cecefc1164f26d7b61e84f297c032471c786d26ea2b6ea39661ea398a82d7e0",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x203557fa9B8eEAb8A541BAe50cc5AB7c74ED5cf8",
+      "txHash": "0x13fc28e6691cf3548e30a3a5c93fdd85970f2a8b4f7276ab2583c8e12bd79a6a",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x8f9F54850d01f577C5A0335d82F90B10bB573ceD",
+      "txHash": "0x21662db5cf536f49c0f14f8d5d319a558d75f3c9d0e78d8cef5a5d8ebcd96666",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x5237C76d9aA4eF0A3CaD22FA0Bd4B24Ab40aE033",
+      "txHash": "0x44b0e326e4fb9deb270abbccb94545678b535a7b3acd3efdbf93da925d683015",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x24AB37Cb86d7d4728b2BE19Fb8c240b624be64a7",
+      "txHash": "0x7d1037ff7f699953907bd3203d46700dd2f208a4527cdc1b7a94fe62222aa12a",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x5c5b199dc2f5026c0ac28Cbb902a4F13D7913733",
+      "txHash": "0x1bdba61d68b99b753ae1de446bced02dc293f717de8ad7b37dbaa2b1a6f444d5",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x9a806A37d3D3401BB695F088595878B5421D1A4D",
+      "txHash": "0xe0a6939543f39c726faa1a0f9dbba3f2c886f1910d245451466bab5d3ceadf39",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x74690fECa1a7d98f843efe4A0c2729649Ad1C432",
+      "txHash": "0xec44e45bbdab3059f3039a3a15529840f11ababe328aeb9c6de1953254a2628c",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x58C27777AA0D6EF647DE8F4A1c5c3aEBd4223f0f",
+      "txHash": "0x04de1541c5f4d8ea718919e2c9ac752489b9284d4e8da21f15eeca487d02b779",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x7E0DeE661e3C8dF5B6e26bF66c14E8088b06f082",
+      "txHash": "0x80dae55257f8d8ce39b802f34ba6ade1b42c6213283dd1f8cf17e058cf377a02",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xA024ca5Ff8ee3b1dfdDE0297A1199D651c150B9F",
+      "txHash": "0x4a2d13e4cf3c6333b8a1101319200cc4b71b2453e09cae9a94c2b2922361ff9b",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x35f36e49a9D83F562a21c16ebA98Aa2CA0162adF",
+      "txHash": "0xb6ae72ef82bc151ef4f394f1f00ca6037040c5a3a66f02ea3b22f8e8204fc748",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x1b984C59D669de4B04496DC9e7e53237945f7aA1",
+      "txHash": "0xaefa41704b0192ccf8b82aca7e7e101c593f66814e43f10801ac6d4be348b966",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x02fBD409c07357E9AE789bF9f7B9cCCB64C51B79",
+      "txHash": "0x78156dec0a334af80d568da69df090998ae404e3abbf3638ef7683eefd4c1aae",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xD409197e202b3E8BEf9B02B01B772f7029E3516D",
+      "txHash": "0x0dd8b474c5dacc4ae31e581c361754a5a699c39bc58178eecece5df4ea53198b",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x3326e065F9c6551fef380abdd11363D6c3bA9224",
+      "txHash": "0x4b56d8ea2920cd8fbc0f0bba248548d7da90cdff7525e26645419a88b6c7b8a6",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x933Ec3379B320757e307953cAe40167f644dBf7C",
+      "txHash": "0xc35afd294036da15fcc0d240a885c86a73ee14f8d0a631f766124e751dd3cca7",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xE26548E51b0C202239ED2B3693144E315F801D42",
+      "txHash": "0x1baa328945dbd2ddd64305b3da949560d9d658144ebd5b5696becb52da9a1710",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xCbcf03F496B47B8c023aD84FDDE6136027aB72eb",
+      "txHash": "0x9844b5a63a1d7bc893da0acd62fc1bd46856d874561afcd029c5927037bbbba6",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x34E02Bb598fb5CFDaa5d01463190E9aa99afe46f",
+      "txHash": "0xc2c5496efac46bdd8abdeb8815980bd2c0b077e07d718ca05ff21a4a6e6b0af5",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x268AA84887976c021c7feCC034C487eA852Fb53A",
+      "txHash": "0x4d2eff1fbd61d1884f1b27c09d579fbb9853efe5733bf59c8e5cb261a993d395",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x9C93b37AA9B1aCA4B2CC0cbFDb8d425448651e16",
+      "txHash": "0xbc0226ee6330d4a5d00e4de63951deea641e8d511755af301c3cdf2df478be72",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x4Caf51e7ea0A7981b9eCd51aB18658683b938633",
+      "txHash": "0xbe38e0664e9d68193ad3baadf1021ac36990b5efab20ee91f412c6ac91c071e5",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xF8477c03D251888E5d1Ae2ac0fF5ecf1767b91bE",
+      "txHash": "0x67175a1e780a247161eb430a218cbbf20a410326e0c37aaff341f5ff52ab08a6",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x91E623D40bd440b2D11e0639C6d977878638c8D0",
+      "txHash": "0x04b3bac5df6ce4387e8192fdb31ec294b0e07346056130aa94769c172ae99440",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x1A4d102627ca1649EEd89B00a827E6EBca075354",
+      "txHash": "0xd59aa7dbda47d652b2866a86d6d4169599c20c06690b083b384317953eb1a0b5",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x96f5c40f607bfD4bb52252914aB6880Ec26E7136",
+      "txHash": "0x4b41cefa5957818c2e2a649b9d4b9644612ea00b5fac1d4d741290c47208cf27",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x8F80bfbBc2c78809edd95D2fC7f274847F8b0904",
+      "txHash": "0xf800eae5925069b520c0dd22e77e2a7bc27a671059b6e0141cf30ec4b03b52e4",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xc6Fad54BFA830311A1c45f1Ad806F8d5c82B586d",
+      "txHash": "0xcc19a00b35eb8b92d2810ac2e42cb47309189cc9c02fde68c48708e086a79b28",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xe2a41760261639438B5946317d040A078ae3C32f",
+      "txHash": "0xbf58daeded286dcdad02a15665ae73cf21818259b15828036377538feccc7ac2",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xDBa975949A84a9d8486783Bd9b9D9D8C9605e442",
+      "txHash": "0x2340a2420702458102a9be3e41fa134bc036b8f3d2dba64de0f88bca231b4649",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x4e8758aa44423057E51F44F689ce6fDb1f212AC2",
+      "txHash": "0x1f57cfe08fd8f62bb37ef4b8b65c3a69772b08e7a18fa7e16d3d4e674da6a74a",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x9A59Cf622a1Dbe8AB432c65f5Cdf62a555f93beF",
+      "txHash": "0xe6dfdd37cf5db8051e82485da9d5c9a074e35efc4cbcd0cfe61da13034bd841f",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x7F8addbDB7954923911EeE5F5Fb65E182092A109",
+      "txHash": "0xcf09388581a5a99ea78fe6c72d61a1c27e5d3aec3a9307402f57cfb50822d571",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x77339Ffc2c6A126AF4f9d58F3E51E30346ae46b3",
+      "txHash": "0x91c4ebb253a9cf05974b76309dfd01cc440796eedfd007f99323cb2a3e784186",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xB21e0B6d782dB2E2EFc5EbD3937f176772a5F503",
+      "txHash": "0xfe78cfd05782ae4c6529fefab86b063bd0ff378da8ef6ae8a097dc45e71c4498",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xB737142b8486Df77A7341b4C0F9371335C6C9f31",
+      "txHash": "0x4111a75427a9b86d4d95f5dc01beac8f5ac38f8a57a924e3c5f86193d49021c6",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x68a13348A0B4247625D1525244170488f3Fe7336",
+      "txHash": "0x00776b8bb99e06bf14f307c0050a3113fd642890288fde0c74c8830831a1d4bf",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xe2770c6f2F540af08547ba1613Aea1138eEf5389",
+      "txHash": "0x2b6507b8dd1eaca51c00d5e6c0f0705c5b9d5065db53938abefec83d0faa9810",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x01012375fA980eFb7EdDec08162921E91a0ee0DC",
+      "txHash": "0xead1c001beb41437e90c0d357f524b90a9f3279cd398f799cd5e814c5093bb2b",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x85b28f421cB72E1638B6440963deaf0B0ead0f2C",
+      "txHash": "0x049d35fa64a9c5eef32312c0d0acd7768faf5927765fcc62fbfe94ad136df493",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x8bDc6d49aC172a27c5bb80CFECC0C9155a6dc47a",
+      "txHash": "0x32922b92db722f80c2363f555d7fc08bd2b975833d5bfaf8649e4307ea86f25b",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xc93042386bb7D25b5DCa07F3d50C991877cE7ee1",
+      "txHash": "0x6882723bfafd056e9bc1533deadc5db22d515d2049cebfe5701d007ac20f2faa",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x8506c875387C0786d957f2D4C77e5C66c9a79787",
+      "txHash": "0x3c9b0b24418549c91e9eff7e3adbb4b093d0ca5e9ca5f781ae33db2d8bef57cc",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x687fa93F8cCF4Ff2413b330aBf54f2b41d2073C7",
+      "txHash": "0xa495107f77d85d836298e2a3940351f3b96e989f595bfca2e86bbb327cbefa8a",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x0872b043fC6d2Cc24BA18FE0A9E565A98F84Da64",
+      "txHash": "0xa4fa187042a1fc39ec4d6e82f0264aa585384fac90996498c8636c332a7e97a9",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xF2BB020D3F07dBa1B80429CF94dE691a08E32756",
+      "txHash": "0x3b9f4ec0656f0552e47cd9f510e09fb5eab77634a05b7b0a299330af0a2b4ab1",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xee8457D17724A9D9cf725926d2cd3EF967db3a7a",
+      "txHash": "0x0f8d3dede7b6058756da9d3bc76ce7a57fb6e5acfc71e51276e786c24063e762",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x640C9daB97e2DB7b07eaeA20B8d07246CE9584e4",
+      "txHash": "0x36c5c0d668f2205f512c94b980541090beaf60d26157e94becb2ce280bb91beb",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x6eb5da80e0Fe28c597B04132592ed718c5B67970",
+      "txHash": "0x7d2838f6d56109af065ea9aedea73dee335bb4d4e29bfcc195babc220499feaa",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x7628278fA11BceD8D641E6eFb75Df01f023FA885",
+      "txHash": "0x57d0ab0e76b4afce4adc4c4b2c39df83e17d94ed43417e842b7275f8f1c2b2e5",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x12C30107B2C887E849b757Cc852536B337926b53",
+      "txHash": "0x6d24aac7dd6c9175065fb86769209593059e3ff9f713b410eaa34c9100f6952a",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x5Ccba66778111c1aEF69be5A9478f1af034154a1",
+      "txHash": "0xc054283048178b31f247a0f6689790534e12db8b23a3a656f1b86714c9ed58f1",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xfC13746C6A64048035504539f63002dcCb4F7547",
+      "txHash": "0xf27f740ef1af59dc5632628a402c0cdacc7aed9d390cf5562d2bef4f1eae16ac",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x625C37c9694D0414f260b0151Bd4fe2582Bc8624",
+      "txHash": "0x4e77feaf5bf282ecc0ae2481e105ead74523e24e5fb46dadd88b18ef9f85b4d3",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x831a8B0cb3296F357D0C91b24D4A5042Bd3bc958",
+      "txHash": "0xb19884fe4c66c79ccbcd000dc03297c547b41139701d373522f74a5cc9ceb2a9",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x56abCf9be52Ac60524E8b60723A097fd21692FD4",
+      "txHash": "0xc213f61e8b3a7e61ae48112c34745b3bfa4a482b66afc93a6821693486abbf65",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xfFf36a1a1840B0102BeCacBBfFba450457B65589",
+      "txHash": "0xa62a13aa93d935299baa66c0d3215f3f37b0e019a48266d4e7ede22e1e864642",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x69F779f2739b2021a1887979b7Bd84880F077e6C",
+      "txHash": "0x43eb212cf53bf6b2afb6ec571347f8df3d754542cd0953e248317dac408e3bde",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x9CD69A0F0Fc0bA283F30B89A528e8C3541f3a862",
+      "txHash": "0xcee9daddebc8bdb10245f9206b4388bad407ba686782c4c4e4e910b2f6cddd65",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x5A89384fDB7427150a896108C21eb4e6DCB85862",
+      "txHash": "0x2dbe8928b36b08e1ad3f67a27c0646870c98aac3231198e13484df3ae29399c7",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xCf83508d6Ec25c3Da5B09925940f347884df16c5",
+      "txHash": "0x231a44b66dd8779a681a4ecadd23bd47d182c40ffaff9853957d1b9c251b245e",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x66248d79c2572c545D12Cc75e84DAF3D16FC07e5",
+      "txHash": "0xc4c319a78e279e749cf3a9ec5c10d3399a26773710fd875dbaba998a8a8c34fd",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x950849603c01D00361e771A4CDf33A8F9F4994C7",
+      "txHash": "0x1bb496008a750e8a17da37ed5c40147ef933b988fdebd8ab9595fa5cea8d140b",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x4D44a66AaceA4941a11fD10479a06f46Dafe44bB",
+      "txHash": "0x3941a4cc4cc0e0f0becb627ee54c666fb76f4e2839f05259541c9d6e935074ff",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xA7BF52E287cb9f9Fe7D07c2416cc3FEd71C761D4",
+      "txHash": "0xc5eee756086307b6566773bc4f6ddfc20fd124f7362cc47894584eb52e3c3a0b",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xA2e3fB13A0A86f5648524009e762F8B0eBaC664a",
+      "txHash": "0xc6c4bc30bb784b226a359aa254f454371786516971204036d5e877e6bf5fc8d0",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x0Baaf2fdcbc07B0bd6038a31a8c6b55992EDB626",
+      "txHash": "0x0a48123d0ab8716306669cc96668abeb4d8565c0aa33827ec0c951b7a1940a5f",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x6071022a66fA04CF511d7A5f86De38d4d85E70a2",
+      "txHash": "0x6b7a46409a18d2dd1ba2bb31d6c2caea55e0b805f869e7a642473b63a542e009",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xf0f69d54fC505BfE060951315E03b56869054Eb3",
+      "txHash": "0x84a776af7fe46c055ed9c4962d7df0f6c255faa788061eddb09c6de367307c5d",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x809c4579BC5e51483A60c4058cdC0C990C98F95C",
+      "txHash": "0x706fd55a973218797a1a7ae6a4667bf5ea217cacfec675459fe8534f9f8c8b31",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x304e2d176009040AE9792b80575FE37F4c82dfbC",
+      "txHash": "0xf728b7eadd87aab72f5f61f5069a5b0110b24ad3f7f74651c51a1515e85a60d6",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xc00DF45a660A575c4711a67C4e26cB1d1eb607b9",
+      "txHash": "0x42d2ab69935083d80d5986882619ee140642de8bbd45671a30bd5cf40a5f1450",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x86E9B26EaB27d679Fc2fd29a326Bc2bd1dd1C237",
+      "txHash": "0x7e9c3a27e1eee0db0145aa74a458674b7334fa29b65ceb2e9fd92929a3b2450c",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -26161,6 +26681,2968 @@
           },
           "t_mapping(t_uint256,t_bool)": {
             "label": "mapping(uint256 => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "54d3100598f1659af549e94093dc459bb6b09d63eb4f7e22abc66ec033035bd5": {
+      "address": "0x4E415dbC7591372d5FcD682c58ae0ff340404C35",
+      "txHash": "0xe1d36fa4d8224e0ebbee538692ba3859a4c8effce8e5441c9da2ef3851d2a989",
+      "layout": {
+        "solcVersion": "0.8.13",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:40"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:88"
+          },
+          {
+            "label": "voterV3",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_contract(IVoterV3)15195",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:22"
+          },
+          {
+            "label": "votingEscrow",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_contract(IVotingEscrow)15406",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:23"
+          },
+          {
+            "label": "chainlinkExecutor",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_address",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:24"
+          },
+          {
+            "label": "minter",
+            "offset": 0,
+            "slot": "154",
+            "type": "t_address",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:25"
+          },
+          {
+            "label": "minBalanceForAutovoting",
+            "offset": 0,
+            "slot": "155",
+            "type": "t_int128",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:27"
+          },
+          {
+            "label": "tokenIds",
+            "offset": 0,
+            "slot": "156",
+            "type": "t_array(t_uint256)dyn_storage",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:28"
+          },
+          {
+            "label": "originalOwner",
+            "offset": 0,
+            "slot": "157",
+            "type": "t_mapping(t_uint256,t_address)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:30"
+          },
+          {
+            "label": "isAutoVotingEnabled",
+            "offset": 0,
+            "slot": "158",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:31"
+          },
+          {
+            "label": "hasVotedThisEpoch",
+            "offset": 0,
+            "slot": "159",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:32"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]",
+            "numberOfBytes": "32"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IVoterV3)15195": {
+            "label": "contract IVoterV3",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IVotingEscrow)15406": {
+            "label": "contract IVotingEscrow",
+            "numberOfBytes": "20"
+          },
+          "t_int128": {
+            "label": "int128",
+            "numberOfBytes": "16"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_bool)": {
+            "label": "mapping(uint256 => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "274d2da7662a56733b1cc84405db62e14daf2f7fbf63041abfad11e692332cd7": {
+      "address": "0x5E1673D15B67b96aD4031aF07b7430c1e55195F0",
+      "txHash": "0x0362e911e808f88c282f418e387d6584f182f1e774aceb4ad0d8b1320bf5127a",
+      "layout": {
+        "solcVersion": "0.8.13",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:40"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:88"
+          },
+          {
+            "label": "voterV3",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_contract(IVoterV3)1919",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:22"
+          },
+          {
+            "label": "votingEscrow",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_contract(IVotingEscrow)2130",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:23"
+          },
+          {
+            "label": "chainlinkExecutor",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_address",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:24"
+          },
+          {
+            "label": "minter",
+            "offset": 0,
+            "slot": "154",
+            "type": "t_address",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:25"
+          },
+          {
+            "label": "minBalanceForAutovoting",
+            "offset": 0,
+            "slot": "155",
+            "type": "t_int128",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:27"
+          },
+          {
+            "label": "tokenIds",
+            "offset": 0,
+            "slot": "156",
+            "type": "t_array(t_uint256)dyn_storage",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:28"
+          },
+          {
+            "label": "originalOwner",
+            "offset": 0,
+            "slot": "157",
+            "type": "t_mapping(t_uint256,t_address)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:30"
+          },
+          {
+            "label": "isAutoVotingEnabled",
+            "offset": 0,
+            "slot": "158",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:31"
+          },
+          {
+            "label": "hasVotedThisEpoch",
+            "offset": 0,
+            "slot": "159",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:32"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]",
+            "numberOfBytes": "32"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IVoterV3)1919": {
+            "label": "contract IVoterV3",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IVotingEscrow)2130": {
+            "label": "contract IVotingEscrow",
+            "numberOfBytes": "20"
+          },
+          "t_int128": {
+            "label": "int128",
+            "numberOfBytes": "16"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_bool)": {
+            "label": "mapping(uint256 => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "2b5ef0a5b5f8fc1f98d3c3985ef02a662f41288352e889cdaa64b859da8ce574": {
+      "address": "0xEB48063e4e56eD774C3012b927874489e25b9e49",
+      "txHash": "0x6aa7cdbbdc0232562001563465249674027a3b9b7ce0d9a507c0030d4bd6dbe9",
+      "layout": {
+        "solcVersion": "0.8.13",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:40"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:88"
+          },
+          {
+            "label": "voterV3",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_contract(IVoterV3)1926",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:22"
+          },
+          {
+            "label": "votingEscrow",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_contract(IVotingEscrow)2137",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:23"
+          },
+          {
+            "label": "chainlinkExecutor",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_address",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:24"
+          },
+          {
+            "label": "minter",
+            "offset": 0,
+            "slot": "154",
+            "type": "t_address",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:25"
+          },
+          {
+            "label": "minBalanceForAutovoting",
+            "offset": 0,
+            "slot": "155",
+            "type": "t_int128",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:27"
+          },
+          {
+            "label": "tokenIds",
+            "offset": 0,
+            "slot": "156",
+            "type": "t_array(t_uint256)dyn_storage",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:28"
+          },
+          {
+            "label": "originalOwner",
+            "offset": 0,
+            "slot": "157",
+            "type": "t_mapping(t_uint256,t_address)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:30"
+          },
+          {
+            "label": "isAutoVotingEnabled",
+            "offset": 0,
+            "slot": "158",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:31"
+          },
+          {
+            "label": "hasVotedThisEpoch",
+            "offset": 0,
+            "slot": "159",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:32"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]",
+            "numberOfBytes": "32"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IVoterV3)1926": {
+            "label": "contract IVoterV3",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IVotingEscrow)2137": {
+            "label": "contract IVotingEscrow",
+            "numberOfBytes": "20"
+          },
+          "t_int128": {
+            "label": "int128",
+            "numberOfBytes": "16"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_bool)": {
+            "label": "mapping(uint256 => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "1772e4af33872462a94f8752f1c77c224099f2bb35e4c0a98eb6287e30861cb7": {
+      "address": "0x25a18b134Ec9c4Ba7E0869f992FB7966cfE03Eb8",
+      "txHash": "0x398cc13f3f03ceec8feb1e32935e0fa653b3e429e89c0c9c9d1634f9d1437189",
+      "layout": {
+        "solcVersion": "0.8.13",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:40"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:88"
+          },
+          {
+            "label": "voterV3",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_contract(IVoterV3)1940",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:22"
+          },
+          {
+            "label": "votingEscrow",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_contract(IVotingEscrow)2151",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:23"
+          },
+          {
+            "label": "chainlinkExecutor",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_address",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:24"
+          },
+          {
+            "label": "minter",
+            "offset": 0,
+            "slot": "154",
+            "type": "t_address",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:25"
+          },
+          {
+            "label": "minBalanceForAutovoting",
+            "offset": 0,
+            "slot": "155",
+            "type": "t_int128",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:27"
+          },
+          {
+            "label": "tokenIds",
+            "offset": 0,
+            "slot": "156",
+            "type": "t_array(t_uint256)dyn_storage",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:28"
+          },
+          {
+            "label": "originalOwner",
+            "offset": 0,
+            "slot": "157",
+            "type": "t_mapping(t_uint256,t_address)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:30"
+          },
+          {
+            "label": "isAutoVotingEnabled",
+            "offset": 0,
+            "slot": "158",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:31"
+          },
+          {
+            "label": "hasVotedThisEpoch",
+            "offset": 0,
+            "slot": "159",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:32"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]",
+            "numberOfBytes": "32"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IVoterV3)1940": {
+            "label": "contract IVoterV3",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IVotingEscrow)2151": {
+            "label": "contract IVotingEscrow",
+            "numberOfBytes": "20"
+          },
+          "t_int128": {
+            "label": "int128",
+            "numberOfBytes": "16"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_bool)": {
+            "label": "mapping(uint256 => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "ed694f41ca48c7d2ecfb6f9700e16e00e725243c89080aefdb08f10f5224a805": {
+      "address": "0xb5e52E9C7459B668ebda80FE33a2cAc14853C7A1",
+      "txHash": "0x4e4142ded241635c0b3b6ce23df672f8f3e1f153336505519a0b52dd06fc2467",
+      "layout": {
+        "solcVersion": "0.8.13",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:40"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:88"
+          },
+          {
+            "label": "voterV3",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_contract(IVoterV3)1951",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:22"
+          },
+          {
+            "label": "votingEscrow",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_contract(IVotingEscrow)2162",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:23"
+          },
+          {
+            "label": "chainlinkExecutor",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_address",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:24"
+          },
+          {
+            "label": "minter",
+            "offset": 0,
+            "slot": "154",
+            "type": "t_address",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:25"
+          },
+          {
+            "label": "minBalanceForAutovoting",
+            "offset": 0,
+            "slot": "155",
+            "type": "t_int128",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:27"
+          },
+          {
+            "label": "tokenIds",
+            "offset": 0,
+            "slot": "156",
+            "type": "t_array(t_uint256)dyn_storage",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:28"
+          },
+          {
+            "label": "originalOwner",
+            "offset": 0,
+            "slot": "157",
+            "type": "t_mapping(t_uint256,t_address)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:30"
+          },
+          {
+            "label": "isAutoVotingEnabled",
+            "offset": 0,
+            "slot": "158",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:31"
+          },
+          {
+            "label": "hasVotedThisEpoch",
+            "offset": 0,
+            "slot": "159",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:32"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]",
+            "numberOfBytes": "32"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IVoterV3)1951": {
+            "label": "contract IVoterV3",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IVotingEscrow)2162": {
+            "label": "contract IVotingEscrow",
+            "numberOfBytes": "20"
+          },
+          "t_int128": {
+            "label": "int128",
+            "numberOfBytes": "16"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_bool)": {
+            "label": "mapping(uint256 => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "b767667dcc033675f89b8a92fa01b17a2ac65352d5183f988c4836b20fbc46ba": {
+      "address": "0xa9cB9b4CED6fe2679eEc4A4D09512b70Bd8478D1",
+      "txHash": "0xc098a0e46a0c917d0c287cf54c6e20b93c78e8958289d30aba4b5f00c71aa53e",
+      "layout": {
+        "solcVersion": "0.8.13",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:40"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:88"
+          },
+          {
+            "label": "voterV3",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_contract(IVoterV3)1937",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:22"
+          },
+          {
+            "label": "votingEscrow",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_contract(IVotingEscrow)2148",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:23"
+          },
+          {
+            "label": "chainlinkExecutor",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_address",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:24"
+          },
+          {
+            "label": "minter",
+            "offset": 0,
+            "slot": "154",
+            "type": "t_address",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:25"
+          },
+          {
+            "label": "minBalanceForAutovoting",
+            "offset": 0,
+            "slot": "155",
+            "type": "t_int128",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:27"
+          },
+          {
+            "label": "tokenIds",
+            "offset": 0,
+            "slot": "156",
+            "type": "t_array(t_uint256)dyn_storage",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:28"
+          },
+          {
+            "label": "originalOwner",
+            "offset": 0,
+            "slot": "157",
+            "type": "t_mapping(t_uint256,t_address)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:30"
+          },
+          {
+            "label": "isAutoVotingEnabled",
+            "offset": 0,
+            "slot": "158",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:31"
+          },
+          {
+            "label": "hasVotedThisEpoch",
+            "offset": 0,
+            "slot": "159",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:32"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]",
+            "numberOfBytes": "32"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IVoterV3)1937": {
+            "label": "contract IVoterV3",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IVotingEscrow)2148": {
+            "label": "contract IVotingEscrow",
+            "numberOfBytes": "20"
+          },
+          "t_int128": {
+            "label": "int128",
+            "numberOfBytes": "16"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_bool)": {
+            "label": "mapping(uint256 => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "efa5b6bd4491a1cc58a24d68f9ccfc7a6971093735213e4e9e2318909224b748": {
+      "address": "0x336bE235D20e29547A9fa14Daf2db77894eF4c88",
+      "txHash": "0xea7eb587c6e5ab72b9e84acda1073b255df436eb17daf91a5c96375ed1f4cdad",
+      "layout": {
+        "solcVersion": "0.8.13",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:40"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:88"
+          },
+          {
+            "label": "voterV3",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_contract(IVoterV3)1948",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:22"
+          },
+          {
+            "label": "votingEscrow",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_contract(IVotingEscrow)2159",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:23"
+          },
+          {
+            "label": "chainlinkExecutor",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_address",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:24"
+          },
+          {
+            "label": "minter",
+            "offset": 0,
+            "slot": "154",
+            "type": "t_address",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:25"
+          },
+          {
+            "label": "minBalanceForAutovoting",
+            "offset": 0,
+            "slot": "155",
+            "type": "t_int128",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:27"
+          },
+          {
+            "label": "tokenIds",
+            "offset": 0,
+            "slot": "156",
+            "type": "t_array(t_uint256)dyn_storage",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:28"
+          },
+          {
+            "label": "originalOwner",
+            "offset": 0,
+            "slot": "157",
+            "type": "t_mapping(t_uint256,t_address)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:30"
+          },
+          {
+            "label": "isAutoVotingEnabled",
+            "offset": 0,
+            "slot": "158",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:31"
+          },
+          {
+            "label": "hasVotedThisEpoch",
+            "offset": 0,
+            "slot": "159",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:32"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]",
+            "numberOfBytes": "32"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IVoterV3)1948": {
+            "label": "contract IVoterV3",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IVotingEscrow)2159": {
+            "label": "contract IVotingEscrow",
+            "numberOfBytes": "20"
+          },
+          "t_int128": {
+            "label": "int128",
+            "numberOfBytes": "16"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_bool)": {
+            "label": "mapping(uint256 => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "774a14057853044a2ba5e3141dd5b277fb44022d6ae99158d9f51150bb6cbc3f": {
+      "address": "0xDE82f65f86639bd9F10f1bf0D9EE4D9e47b203dF",
+      "txHash": "0xd2affe62d81c9cd49a8aa74decea19f6d4f072a51c467496cb28baecc899ba83",
+      "layout": {
+        "solcVersion": "0.8.13",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:40"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:88"
+          },
+          {
+            "label": "voterV3",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_contract(IVoterV3)1948",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:22"
+          },
+          {
+            "label": "votingEscrow",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_contract(IVotingEscrow)2159",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:23"
+          },
+          {
+            "label": "chainlinkExecutor",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_address",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:24"
+          },
+          {
+            "label": "minter",
+            "offset": 0,
+            "slot": "154",
+            "type": "t_address",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:25"
+          },
+          {
+            "label": "minBalanceForAutovoting",
+            "offset": 0,
+            "slot": "155",
+            "type": "t_int128",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:27"
+          },
+          {
+            "label": "tokenIds",
+            "offset": 0,
+            "slot": "156",
+            "type": "t_array(t_uint256)dyn_storage",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:28"
+          },
+          {
+            "label": "originalOwner",
+            "offset": 0,
+            "slot": "157",
+            "type": "t_mapping(t_uint256,t_address)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:30"
+          },
+          {
+            "label": "isAutoVotingEnabled",
+            "offset": 0,
+            "slot": "158",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:31"
+          },
+          {
+            "label": "hasVotedThisEpoch",
+            "offset": 0,
+            "slot": "159",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:32"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]",
+            "numberOfBytes": "32"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IVoterV3)1948": {
+            "label": "contract IVoterV3",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IVotingEscrow)2159": {
+            "label": "contract IVotingEscrow",
+            "numberOfBytes": "20"
+          },
+          "t_int128": {
+            "label": "int128",
+            "numberOfBytes": "16"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_bool)": {
+            "label": "mapping(uint256 => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "7884938c3e7f5bab4b724f5da58bc42f935c7704995a70b75ddc85fb26a9659f": {
+      "address": "0x678C6B297EC891214F5A0232586173824c037ed8",
+      "txHash": "0xbbf474f95e074ea9742664e6ae2c561c6c26bf1ea661b317d48cf622604f06ad",
+      "layout": {
+        "solcVersion": "0.8.13",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:40"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:88"
+          },
+          {
+            "label": "voterV3",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_contract(IVoterV3)1948",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:22"
+          },
+          {
+            "label": "votingEscrow",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_contract(IVotingEscrow)2159",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:23"
+          },
+          {
+            "label": "chainlinkExecutor",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_address",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:24"
+          },
+          {
+            "label": "minter",
+            "offset": 0,
+            "slot": "154",
+            "type": "t_address",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:25"
+          },
+          {
+            "label": "minBalanceForAutovoting",
+            "offset": 0,
+            "slot": "155",
+            "type": "t_int128",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:27"
+          },
+          {
+            "label": "tokenIds",
+            "offset": 0,
+            "slot": "156",
+            "type": "t_array(t_uint256)dyn_storage",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:28"
+          },
+          {
+            "label": "originalOwner",
+            "offset": 0,
+            "slot": "157",
+            "type": "t_mapping(t_uint256,t_address)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:30"
+          },
+          {
+            "label": "isAutoVotingEnabled",
+            "offset": 0,
+            "slot": "158",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:31"
+          },
+          {
+            "label": "hasVotedThisEpoch",
+            "offset": 0,
+            "slot": "159",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:32"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]",
+            "numberOfBytes": "32"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IVoterV3)1948": {
+            "label": "contract IVoterV3",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IVotingEscrow)2159": {
+            "label": "contract IVotingEscrow",
+            "numberOfBytes": "20"
+          },
+          "t_int128": {
+            "label": "int128",
+            "numberOfBytes": "16"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_bool)": {
+            "label": "mapping(uint256 => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "8d4bbb234fae296f029d3a484546c23fe6bec1fce87e1d999e66b546cf1f8b85": {
+      "address": "0x3Af657aa9c5fFB14A591A4f7238eFD3d8b6c013b",
+      "txHash": "0x6a13af76bbccfed87e495624d00fd7ea86d3cf2fad1bc5f9b0671a806be4921f",
+      "layout": {
+        "solcVersion": "0.8.13",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:40"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "last_gauge",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_address",
+            "contract": "GaugeFactoryV2",
+            "src": "contracts/factories/GaugeFactoryV2.sol:23"
+          },
+          {
+            "label": "permissionsRegistry",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_address",
+            "contract": "GaugeFactoryV2",
+            "src": "contracts/factories/GaugeFactoryV2.sol:24"
+          },
+          {
+            "label": "__gauges",
+            "offset": 0,
+            "slot": "103",
+            "type": "t_array(t_address)dyn_storage",
+            "contract": "GaugeFactoryV2",
+            "src": "contracts/factories/GaugeFactoryV2.sol:26"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "cdb269884d703ea6f128c7cfcd69f30ded0c64fee0ddd9a403cc644cd49d44db": {
+      "address": "0x1A1ac5b5e43a38d102f2D74BE8E6f443499d456B",
+      "txHash": "0xc4f05b736b710be1a4d7e54364a19e5e9452b8ee2ad3be2913ba615d832d7087",
+      "layout": {
+        "solcVersion": "0.8.13",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:40"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:88"
+          },
+          {
+            "label": "voterV3",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_contract(IVoterV3)1951",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:22"
+          },
+          {
+            "label": "votingEscrow",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_contract(IVotingEscrow)2162",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:23"
+          },
+          {
+            "label": "chainlinkExecutor",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_address",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:24"
+          },
+          {
+            "label": "minter",
+            "offset": 0,
+            "slot": "154",
+            "type": "t_address",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:25"
+          },
+          {
+            "label": "minBalanceForAutovoting",
+            "offset": 0,
+            "slot": "155",
+            "type": "t_int128",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:27"
+          },
+          {
+            "label": "tokenIds",
+            "offset": 0,
+            "slot": "156",
+            "type": "t_array(t_uint256)dyn_storage",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:28"
+          },
+          {
+            "label": "originalOwner",
+            "offset": 0,
+            "slot": "157",
+            "type": "t_mapping(t_uint256,t_address)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:30"
+          },
+          {
+            "label": "isAutoVotingEnabled",
+            "offset": 0,
+            "slot": "158",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:31"
+          },
+          {
+            "label": "hasVotedThisEpoch",
+            "offset": 0,
+            "slot": "159",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:32"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]",
+            "numberOfBytes": "32"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IVoterV3)1951": {
+            "label": "contract IVoterV3",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IVotingEscrow)2162": {
+            "label": "contract IVotingEscrow",
+            "numberOfBytes": "20"
+          },
+          "t_int128": {
+            "label": "int128",
+            "numberOfBytes": "16"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_bool)": {
+            "label": "mapping(uint256 => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "c3b00bf366470f0cb0393e35dd7d471d3f34cec1c6c8db15b5f868ba14908b9f": {
+      "address": "0x83FC4C2BEb876Ba02217f145eB422371408Ac108",
+      "txHash": "0xc751e5117cf1cb7f8435fac24ed79437837a13bc4b05ad7139ea63cad89d0ea7",
+      "layout": {
+        "solcVersion": "0.8.13",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:40"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:88"
+          },
+          {
+            "label": "voterV3",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_contract(IVoterV3)1972",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:22"
+          },
+          {
+            "label": "votingEscrow",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_contract(IVotingEscrow)2183",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:23"
+          },
+          {
+            "label": "chainlinkExecutor",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_address",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:24"
+          },
+          {
+            "label": "minter",
+            "offset": 0,
+            "slot": "154",
+            "type": "t_address",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:25"
+          },
+          {
+            "label": "minBalanceForAutovoting",
+            "offset": 0,
+            "slot": "155",
+            "type": "t_int128",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:27"
+          },
+          {
+            "label": "tokenIds",
+            "offset": 0,
+            "slot": "156",
+            "type": "t_array(t_uint256)dyn_storage",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:28"
+          },
+          {
+            "label": "originalOwner",
+            "offset": 0,
+            "slot": "157",
+            "type": "t_mapping(t_uint256,t_address)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:30"
+          },
+          {
+            "label": "isAutoVotingEnabled",
+            "offset": 0,
+            "slot": "158",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:31"
+          },
+          {
+            "label": "hasVotedThisEpoch",
+            "offset": 0,
+            "slot": "159",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "AutomatedVotingManager",
+            "src": "contracts/AutomatedVotingManager.sol:32"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]",
+            "numberOfBytes": "32"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IVoterV3)1972": {
+            "label": "contract IVoterV3",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IVotingEscrow)2183": {
+            "label": "contract IVotingEscrow",
+            "numberOfBytes": "20"
+          },
+          "t_int128": {
+            "label": "int128",
+            "numberOfBytes": "16"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_bool)": {
+            "label": "mapping(uint256 => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "85ffbc10f9aadeb856eecbc8ea55a0e27f0017d11f8deaa8be4fbefa4f732410": {
+      "address": "0x3D6c53ca61c210C202a9cD31aaE743a9476f7Ed6",
+      "txHash": "0x696729af0630e6262e72f543d9907a450e16e57f8d317af3f634b475e84a32d2",
+      "layout": {
+        "solcVersion": "0.8.13",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:40"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:88"
+          },
+          {
+            "label": "initflag",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_bool",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:28"
+          },
+          {
+            "label": "_ve",
+            "offset": 1,
+            "slot": "151",
+            "type": "t_address",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:30"
+          },
+          {
+            "label": "avm",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_address",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:31"
+          },
+          {
+            "label": "_factories",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_array(t_address)dyn_storage",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:32"
+          },
+          {
+            "label": "base",
+            "offset": 0,
+            "slot": "154",
+            "type": "t_address",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:33"
+          },
+          {
+            "label": "_gaugeFactories",
+            "offset": 0,
+            "slot": "155",
+            "type": "t_array(t_address)dyn_storage",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:34"
+          },
+          {
+            "label": "bribefactory",
+            "offset": 0,
+            "slot": "156",
+            "type": "t_address",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:35"
+          },
+          {
+            "label": "minter",
+            "offset": 0,
+            "slot": "157",
+            "type": "t_address",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:36"
+          },
+          {
+            "label": "permissionRegistry",
+            "offset": 0,
+            "slot": "158",
+            "type": "t_address",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:37"
+          },
+          {
+            "label": "pools",
+            "offset": 0,
+            "slot": "159",
+            "type": "t_array(t_address)dyn_storage",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:38"
+          },
+          {
+            "label": "index",
+            "offset": 0,
+            "slot": "160",
+            "type": "t_uint256",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:41"
+          },
+          {
+            "label": "maxVotingNum",
+            "offset": 0,
+            "slot": "161",
+            "type": "t_uint256",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:42"
+          },
+          {
+            "label": "VOTE_DELAY",
+            "offset": 0,
+            "slot": "162",
+            "type": "t_uint256",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:44"
+          },
+          {
+            "label": "supplyIndex",
+            "offset": 0,
+            "slot": "163",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:49"
+          },
+          {
+            "label": "claimable",
+            "offset": 0,
+            "slot": "164",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:50"
+          },
+          {
+            "label": "gauges",
+            "offset": 0,
+            "slot": "165",
+            "type": "t_mapping(t_address,t_address)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:51"
+          },
+          {
+            "label": "gaugesDistributionTimestmap",
+            "offset": 0,
+            "slot": "166",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:52"
+          },
+          {
+            "label": "poolForGauge",
+            "offset": 0,
+            "slot": "167",
+            "type": "t_mapping(t_address,t_address)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:53"
+          },
+          {
+            "label": "internal_bribes",
+            "offset": 0,
+            "slot": "168",
+            "type": "t_mapping(t_address,t_address)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:54"
+          },
+          {
+            "label": "external_bribes",
+            "offset": 0,
+            "slot": "169",
+            "type": "t_mapping(t_address,t_address)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:55"
+          },
+          {
+            "label": "votes",
+            "offset": 0,
+            "slot": "170",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_uint256))",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:56"
+          },
+          {
+            "label": "poolVote",
+            "offset": 0,
+            "slot": "171",
+            "type": "t_mapping(t_uint256,t_array(t_address)dyn_storage)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:57"
+          },
+          {
+            "label": "weights",
+            "offset": 0,
+            "slot": "172",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:59"
+          },
+          {
+            "label": "totalWeight",
+            "offset": 0,
+            "slot": "173",
+            "type": "t_uint256",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:60"
+          },
+          {
+            "label": "usedWeights",
+            "offset": 0,
+            "slot": "174",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:61"
+          },
+          {
+            "label": "lastVoted",
+            "offset": 0,
+            "slot": "175",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:63"
+          },
+          {
+            "label": "lastVotedTimestamp",
+            "offset": 0,
+            "slot": "176",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:64"
+          },
+          {
+            "label": "isGauge",
+            "offset": 0,
+            "slot": "177",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:65"
+          },
+          {
+            "label": "isWhitelisted",
+            "offset": 0,
+            "slot": "178",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:66"
+          },
+          {
+            "label": "isWhitelistedNFT",
+            "offset": 0,
+            "slot": "179",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:67"
+          },
+          {
+            "label": "isAlive",
+            "offset": 0,
+            "slot": "180",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:68"
+          },
+          {
+            "label": "isFactory",
+            "offset": 0,
+            "slot": "181",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:69"
+          },
+          {
+            "label": "isGaugeFactory",
+            "offset": 0,
+            "slot": "182",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:70"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_address)": {
+            "label": "mapping(address => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_array(t_address)dyn_storage)": {
+            "label": "mapping(uint256 => address[])",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_bool)": {
+            "label": "mapping(uint256 => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(uint256 => mapping(address => uint256))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "590341260d243af71c14d961773d330f1a70e7019e0ad6b83e6340ec8a3078fb": {
+      "address": "0x76451eb3a4F4dc49F91bceA12FdcFc2D4BA6479A",
+      "txHash": "0x6e9a6a5091db929cec1142b00faafa1d50968004a90a4290346abe1b2c3c2cde",
+      "layout": {
+        "solcVersion": "0.8.13",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:40"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:88"
+          },
+          {
+            "label": "initflag",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_bool",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:28"
+          },
+          {
+            "label": "_ve",
+            "offset": 1,
+            "slot": "151",
+            "type": "t_address",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:30"
+          },
+          {
+            "label": "avm",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_address",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:31"
+          },
+          {
+            "label": "_factories",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_array(t_address)dyn_storage",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:32"
+          },
+          {
+            "label": "base",
+            "offset": 0,
+            "slot": "154",
+            "type": "t_address",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:33"
+          },
+          {
+            "label": "_gaugeFactories",
+            "offset": 0,
+            "slot": "155",
+            "type": "t_array(t_address)dyn_storage",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:34"
+          },
+          {
+            "label": "bribefactory",
+            "offset": 0,
+            "slot": "156",
+            "type": "t_address",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:35"
+          },
+          {
+            "label": "minter",
+            "offset": 0,
+            "slot": "157",
+            "type": "t_address",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:36"
+          },
+          {
+            "label": "permissionRegistry",
+            "offset": 0,
+            "slot": "158",
+            "type": "t_address",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:37"
+          },
+          {
+            "label": "pools",
+            "offset": 0,
+            "slot": "159",
+            "type": "t_array(t_address)dyn_storage",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:38"
+          },
+          {
+            "label": "index",
+            "offset": 0,
+            "slot": "160",
+            "type": "t_uint256",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:41"
+          },
+          {
+            "label": "maxVotingNum",
+            "offset": 0,
+            "slot": "161",
+            "type": "t_uint256",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:42"
+          },
+          {
+            "label": "VOTE_DELAY",
+            "offset": 0,
+            "slot": "162",
+            "type": "t_uint256",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:44"
+          },
+          {
+            "label": "supplyIndex",
+            "offset": 0,
+            "slot": "163",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:49"
+          },
+          {
+            "label": "claimable",
+            "offset": 0,
+            "slot": "164",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:50"
+          },
+          {
+            "label": "gauges",
+            "offset": 0,
+            "slot": "165",
+            "type": "t_mapping(t_address,t_address)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:51"
+          },
+          {
+            "label": "gaugesDistributionTimestmap",
+            "offset": 0,
+            "slot": "166",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:52"
+          },
+          {
+            "label": "poolForGauge",
+            "offset": 0,
+            "slot": "167",
+            "type": "t_mapping(t_address,t_address)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:53"
+          },
+          {
+            "label": "internal_bribes",
+            "offset": 0,
+            "slot": "168",
+            "type": "t_mapping(t_address,t_address)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:54"
+          },
+          {
+            "label": "external_bribes",
+            "offset": 0,
+            "slot": "169",
+            "type": "t_mapping(t_address,t_address)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:55"
+          },
+          {
+            "label": "votes",
+            "offset": 0,
+            "slot": "170",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_uint256))",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:56"
+          },
+          {
+            "label": "poolVote",
+            "offset": 0,
+            "slot": "171",
+            "type": "t_mapping(t_uint256,t_array(t_address)dyn_storage)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:57"
+          },
+          {
+            "label": "weights",
+            "offset": 0,
+            "slot": "172",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:59"
+          },
+          {
+            "label": "totalWeight",
+            "offset": 0,
+            "slot": "173",
+            "type": "t_uint256",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:60"
+          },
+          {
+            "label": "usedWeights",
+            "offset": 0,
+            "slot": "174",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:61"
+          },
+          {
+            "label": "lastVoted",
+            "offset": 0,
+            "slot": "175",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:63"
+          },
+          {
+            "label": "lastVotedTimestamp",
+            "offset": 0,
+            "slot": "176",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:64"
+          },
+          {
+            "label": "isGauge",
+            "offset": 0,
+            "slot": "177",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:65"
+          },
+          {
+            "label": "isWhitelisted",
+            "offset": 0,
+            "slot": "178",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:66"
+          },
+          {
+            "label": "isWhitelistedNFT",
+            "offset": 0,
+            "slot": "179",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:67"
+          },
+          {
+            "label": "isAlive",
+            "offset": 0,
+            "slot": "180",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:68"
+          },
+          {
+            "label": "isFactory",
+            "offset": 0,
+            "slot": "181",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:69"
+          },
+          {
+            "label": "isGaugeFactory",
+            "offset": 0,
+            "slot": "182",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "VoterV3",
+            "src": "contracts/VoterV3.sol:70"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_address)": {
+            "label": "mapping(address => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_array(t_address)dyn_storage)": {
+            "label": "mapping(uint256 => address[])",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_bool)": {
+            "label": "mapping(uint256 => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(uint256 => mapping(address => uint256))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)",
             "numberOfBytes": "32"
           },
           "t_uint256": {

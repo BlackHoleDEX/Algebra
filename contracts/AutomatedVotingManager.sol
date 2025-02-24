@@ -73,11 +73,12 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
     function getRewardsPerVotingPower(uint256 topN) public view returns (PoolsAndRewards[] memory) {
         // address[] memory pools = voterV3.pools(); // to use voterV3.length() and then iterate over it
         uint256 numPools = voterV3.length();
-        PoolsAndRewards[] memory poolRewards = new PoolsAndRewards[](topN);
+        PoolsAndRewards[] memory poolRewards = new PoolsAndRewards[](numPools);
         uint256 epochStart = BlackTimeLibrary.epochStart(block.timestamp);
 
         for (uint256 i = 0; i < numPools; i++) {
-            address gauge = voterV3.gauges(voterV3.pools(i));
+            address pool = voterV3.pools(i);
+            address gauge = voterV3.gauges(pool);
             address bribeInternal = voterV3.internal_bribes(gauge);
             address bribeExternal = voterV3.external_bribes(gauge);
             uint256 totalRewardsPerVotingPower = 0;
@@ -94,15 +95,21 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
                 totalRewardsPerVotingPower += (externalBribes);
             }
 
-            uint256 totalVotes = voterV3.totalVotes(gauge);
-            // uint256 rewardsPerVotingPower = totalVotes > 0 ? (totalRewardsPerVotingPower * 1e18) / totalVotes : 0;
+            uint256 totalVotes = voterV3.weights(pool);
+            uint256 rewardsPerVotingPower;
+            // to account for pools that have no votes, so even the smallest amount of voting power voted on them can cause a huge apr
+            if (totalVotes == 0 && totalRewardsPerVotingPower > 0) {
+                rewardsPerVotingPower = type(uint256).max; // Assign max uint to signify infinite ratio
+            } else {
+                rewardsPerVotingPower = totalVotes > 0 ? (totalRewardsPerVotingPower * 1e18) / totalVotes : 0;
+            }
 
-            // poolRewards[i] = PoolsAndRewards({ 
-            //     pool: voterV3.pools(i), 
-            //     gauge: gauge, 
-            //     bribes: bribeInternal, 
-            //     rewardsPerVotingPower: rewardsPerVotingPower 
-            // });
+            poolRewards[i] = PoolsAndRewards({ 
+                pool: pool, 
+                gauge: gauge, 
+                bribes: bribeInternal, 
+                rewardsPerVotingPower: rewardsPerVotingPower 
+            });
         }
 
         return _getTopNPools(poolRewards, topN);

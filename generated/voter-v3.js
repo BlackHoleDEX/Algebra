@@ -1,4 +1,4 @@
-const voterV3Address = "0xF114daCB0075Edab342F67cE2e1531c7023110dB";
+const voterV3Address = "0xc00DF45a660A575c4711a67C4e26cB1d1eb607b9";
 
 const voterV3Abi = [
   {
@@ -507,6 +507,19 @@ const voterV3Abi = [
     "name": "addFactory",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "avm",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1292,6 +1305,13 @@ const voterV3Abi = [
       }
     ],
     "name": "reviveGauge",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "setAVM",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

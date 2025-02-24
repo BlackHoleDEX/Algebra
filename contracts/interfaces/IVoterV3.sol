@@ -17,6 +17,5 @@ interface IVoterV3 {
     function pools(uint256 i) external view returns(address);
     function internal_bribes(address _gauge) external view returns(address);
     function external_bribes(address _gauge) external view returns(address);
-    function totalVotes(address _gauge) external view returns (uint256);
     function vote(uint256 _tokenId, address[] calldata _poolVote, uint256[] calldata _weights) external;
 }
