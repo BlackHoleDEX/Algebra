@@ -429,6 +429,32 @@ const votingEscrowAbi = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "PRECISISON",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "SMNFT_BONUS",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -606,6 +632,44 @@ const votingEscrowAbi = [
   {
     "inputs": [],
     "name": "block_number",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "calculate_original_sm_nft_amount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "calculate_sm_nft_bonus",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1270,6 +1334,16 @@ const votingEscrowAbi = [
         "internalType": "uint256",
         "name": "permanent",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "smNFT",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "smNFTBonus",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -1366,6 +1440,19 @@ const votingEscrowAbi = [
       }
     ],
     "name": "setArtProxy",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_bonus",
+        "type": "uint256"
+      }
+    ],
+    "name": "setSmNFTBonus",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1704,6 +1791,16 @@ const votingEscrowAbi = [
       {
         "internalType": "uint256",
         "name": "permanent",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "smNFT",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "smNFTBonus",
         "type": "uint256"
       }
     ],

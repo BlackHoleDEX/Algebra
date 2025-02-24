@@ -331,10 +331,10 @@ const setVoterV3InVotingEscrow = async(voterV3Address, votingEscrowAddress) => {
     }
 }
 
-const deployveNFT = async (voterV3Address, rewardsDistributorAddress, blackholeV2AbiAddress) => {
+const deployveNFT = async (voterV3Address, rewardsDistributorAddress, gaugeV2Address) => {
     try {
         data = await ethers.getContractFactory("veNFTAPI");
-        input = [voterV3Address, rewardsDistributorAddress, blackholeV2AbiAddress] // 
+        input = [voterV3Address, rewardsDistributorAddress, gaugeV2Address] 
         const veNFTAPI = await upgrades.deployProxy(data, input, {initializer: 'initialize', gasLimit:210000000});
         txDeployed = await veNFTAPI.deployed();
 
@@ -348,6 +348,20 @@ const deployveNFT = async (voterV3Address, rewardsDistributorAddress, blackholeV
 const pushDefaultRewardToken = async (bribeFactoryV3Address, blackAddress) => {
     const BribeFactoryV3Contract = await ethers.getContractAt(bribeFactoryV3Abi, bribeFactoryV3Address);
     await BribeFactoryV3Contract.pushDefaultRewardToken(blackAddress);
+}
+
+const deployBlackClaim = async (votingEscrowAddress, treasury) => {
+    try {
+        const BlackClaimsContract = await ethers.getContractFactory("BlackClaims");
+        const BlackClaims = await BlackClaimsContract.deploy(treasury, votingEscrowAddress);
+        const txDeployed =  await BlackClaims.deployed();
+
+        console.log("BlackClaims address: ", BlackClaims.address)
+        generateConstantFile("BlackClaims", BlackClaims.address);
+        return BlackClaims.address;
+    } catch (error) {
+        console.log("error in deploying Black Claims: ", error);
+    }
 }
 
 async function main () {
@@ -393,7 +407,8 @@ async function main () {
     //deploy rewardsDistributor
     const rewardsDistributorAddress = await deployRewardsDistributor(votingEscrowAddress);
 
-    //set depositor
+    //deploy veNFT
+    await deployveNFT(voterV3Address, rewardsDistributorAddress, gaugeV2Address);
 
     //deploy minterUpgradable
     const minterUpgradableAddress = await deployMinterUpgradeable(votingEscrowAddress, voterV3Address, rewardsDistributorAddress);
@@ -424,9 +439,6 @@ async function main () {
     //add black to user Address
     await addBlackToUserAddress(minterUpgradableAddress);
 
-    //deploy veNFT
-    await deployveNFT(voterV3Address, rewardsDistributorAddress, blackholeV2AbiAddress);
-
     //set voterV3 in voting escrow
     await setVoterV3InVotingEscrow(voterV3Address, votingEscrowAddress);
 
@@ -440,6 +452,8 @@ async function main () {
     console.log("DONE ADDING LIQUIDITY")
 
     await pushDefaultRewardToken(bribeV3Address, blackAddress);
+
+    const blackClaimAddress = await deployBlackClaim(votingEscrowAddress, ownerAddress);
 
     //create Gauges
     await createGauges(voterV3Address, blackholeV2AbiAddress);

@@ -9,6 +9,8 @@ interface IVotingEscrow {
         uint256 ts;
         uint256 blk; // block
         uint256 permanent;
+        uint smNFT;
+        uint smNFTBonus;
     }
 
     struct LockedBalance {
@@ -58,4 +60,8 @@ interface IVotingEscrow {
     function lockPermanent(uint _tokenId) external;
 
     function unlockPermanent(uint _tokenId) external;
+
+    function smNFTBalance() external view returns (uint);
+    function calculate_sm_nft_bonus(uint amount) external view returns (uint);
+    function calculate_original_sm_nft_amount(uint amount) external view returns (uint);
 }

@@ -61,7 +61,7 @@ async function main() {
 
     await mintBlack(blackAddress, receiver, mintAmount);
 
-    await setMinter(blackAddress, receiver);
+    // await setMinter(blackAddress, receiver);
     // Update or add the Black token address
     deployedTokens[0].address = blackAddress;
 

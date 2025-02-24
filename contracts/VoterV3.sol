@@ -44,7 +44,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     uint256 public VOTE_DELAY;                                     // delay between votes in seconds
     uint256 public constant MAX_VOTE_DELAY = 7 days;               // Max vote delay allowed
     uint public constant EPOCH_DURATION = 1800; //BlackHole:: Current duration need to change 1 week
-     uint256 internal constant MIN_OF_MAX_VOTING_NUM = 10;
+     uint256 internal constant MIN_VOTING_NUM = 10;
 
     mapping(address => uint256) internal supplyIndex;              // gauge    => index
     mapping(address => uint256) public claimable;                  // gauge    => claimable $the
@@ -224,7 +224,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     }
 
     function setMaxVotingNum(uint256 _maxVotingNum) external VoterAdmin {
-        require (_maxVotingNum >= MIN_OF_MAX_VOTING_NUM, "low voting");
+        require (_maxVotingNum >= MIN_VOTING_NUM, "low voting");
         maxVotingNum = _maxVotingNum;
     }
 
@@ -431,6 +431,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         //_voteDelay(_tokenId);
         require(IVotingEscrow(_ve).isApprovedOrOwner(msg.sender, _tokenId), "!approved/Owner");
         require(_poolVote.length == _weights.length, "weights length !=");
+        require(_poolVote.length <= maxVotingNum, "pool length exceeds maxVotingNum");
         uint256 _timestamp = block.timestamp;
         if ((_timestamp > BlackTimeLibrary.epochVoteEnd(_timestamp)) && (!isWhitelistedNFT[_tokenId] && msg.sender != avm)){
             revert("not whitelisted or avm");
