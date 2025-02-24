@@ -8,10 +8,12 @@ import "./interfaces/IVotingEscrow.sol";
 import "./interfaces/IBribe.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+
 /// @title Automated Voting Manager
 /// @notice Manages automated voting by delegating votes based on rewards per voting power
 contract AutomatedVotingManager is Initializable, OwnableUpgradeable, ReentrancyGuardUpgradeable {
-    
+
+    /* ======= STRUCTS ======= */
     struct PoolsAndRewards {
         address pool;
         address gauge;
@@ -29,7 +31,7 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
 
     mapping(uint256 => address) public originalOwner;
     mapping(uint256 => bool) public isAutoVotingEnabled;
-    mapping(uint256 => bool) public hasVotedThisEpoch; // key is considered unix epoch value of dex epoch start -- no reason as such, but it is to be used and written the same way everywhere, ofc...
+    mapping(uint256 => bool) public hasVotedThisEpoch; // key is considered unix epoch value of dex epoch start
 
     event AutoVotingEnabled(uint256 lockId, address owner);
     event AutoVotingDisabled(uint256 lockId, address owner);
@@ -175,10 +177,10 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
     }
 
     /// @notice Returns equal weights for voting (Currently set to 1 for all pools)
-    function getVoteWeightage(uint256 length) public pure returns (uint256[] memory weights) {
-        weights = new uint256[](length); // ✅ Initialize array in memory
-        for (uint256 i = 0; i < length; i++) {
-            weights[i] = 1; // ✅ Assign values correctly
+    function getVoteWeightage(PoolsAndRewards[] memory poolsAndRewards) public pure returns (uint256[] memory weights) {
+        weights = new uint256[](poolsAndRewards.length); // ✅ Initialize array in memory
+        for (uint256 i = 0; i < poolsAndRewards.length; i++) {
+            weights[i] = 1;
         }
         return weights;
     }
@@ -190,14 +192,14 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
         require(!hasVotedThisEpoch[BlackTimeLibrary.epochStart(block.timestamp)], "Already executed for this epoch"); // is this needed? either this or the onlychainlink should be sufficient right?
 
         hasVotedThisEpoch[BlackTimeLibrary.epochStart(block.timestamp)] = true;
-        PoolsAndRewards[] memory poolsAndRewards = getRewardsPerVotingPower(10);
+        PoolsAndRewards[] memory poolsAndRewards = getRewardsPerVotingPower(2);
         address[] memory poolAddresses = new address[](poolsAndRewards.length);
 
         for (uint256 i = 0; i < poolsAndRewards.length; i++) {
             poolAddresses[i] = poolsAndRewards[i].pool;
         }
 
-        uint256[] memory weights = getVoteWeightage(poolAddresses.length); 
+        uint256[] memory weights = getVoteWeightage(poolsAndRewards); 
 
         for (uint256 i = 0; i < tokenIds.length; i++) {
             uint256 lockId = tokenIds[i];

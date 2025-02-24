@@ -21,6 +21,7 @@ function getEpochStart (timestamp) {
 }
 
 async function main () {
+  try {
     // INITIAL SETUP OF FETCHING CONTRACTS AND SUCH
     const owner = (await ethers.getSigners())[0];
     const ownerAddress = owner.address;
@@ -33,8 +34,18 @@ async function main () {
     const allPairs = await pairApiContract.getAllPair(ownerAddress, "5", "0");
     const allPairsInfo = allPairs[2];
     const voterV3 = await ethers.getContractAt(voterV3Abi, voterV3Address);
-    console.log("got contracts")
-    // Prepare transactions
+    console.log("got contracts" )
+        
+    for (const elm of allPairsInfo) {
+      console.log(
+        "voter v3 votes before incentivization and voting for pools: ",
+        elm.pair_address,
+        await voterV3.weights(elm.pair_address)
+      );
+    }    
+
+    console.log("last voted for token 1: ", await voterV3.lastVoted("1"), await voterV3.lastVoted("2"))
+    // // Prepare transactions
     for (const element of allPairsInfo) {
         const externalBribe = await ethers.getContractAt(bribeAbi, element.external_bribes[0]);
     
@@ -88,28 +99,41 @@ async function main () {
     const depositLPTxForPairTwo = await gaugeTwo.deposit(depositingAmount.toString());
     await depositLPTxForPairTwo.wait();
 
-    // // STEP 2: LAST HOUR FUNCTION CALL SIMULATED
-    // const votingEscrow = await ethers.getContractAt(votingEscrowAbi, votingEscrowAddress);
-    // console.log("chainlink executor", await avmContract.chainlinkExecutor())
-    // console.log("avm from voter", await votingEscrow.avm())
-    // const executeVotesTx = await avmContract.executeVotes();
-    // await executeVotesTx.wait();
+    // STEP 2: LAST HOUR FUNCTION CALL SIMULATED
+    const votingEscrow = await ethers.getContractAt(votingEscrowAbi, votingEscrowAddress);
+    console.log("chainlink executor", await avmContract.chainlinkExecutor())
+    console.log("avm from ve", await votingEscrow.avm())
+    console.log("avm from voter", await voterV3.avm())
+    const executeVotesTx = await avmContract.executeVotes();
+    await executeVotesTx.wait();
 
-    // // STEP 3: VERIFY AUTOVOTING HAS HAPPENED
-    // const epochStart = getEpochStart(Math.floor(Date.now()/1000));
-    // console.log("has voted this epoch start, where epoch started at: ", epochStart, await avmContract.hasVotedThisEpoch(epochStart));
-    // allPairsInfo.forEach(async (elm) => {
-    //     console.log("voter v3 votes for pools: ", elm.pair_address, await voterV3.totalVotes(elm.gauge));
-    //     // console.log("voted for individual pools", await )
-    // })
+
+    // // // STEP 3: VERIFY AUTOVOTING HAS HAPPENED
+    const epochStart = getEpochStart(Math.floor(Date.now() / 1000));
+    console.log(
+      "has voted this epoch start, where epoch started at: ",
+      epochStart,
+      await avmContract.hasVotedThisEpoch(epochStart)
+    );
+    
+    for (const elm of allPairsInfo) {
+      console.log(
+        "voter v3 votes for pools: ",
+        elm.pair_address,
+        await voterV3.weights(elm.pair_address)
+      );
+    }    
 
     // // STEP 4: VERIFY EMISSIONS CALL HAS BEEN DONE AFTER EPOCH ENDS 
 
     // // STEP 5: VERIFY REWARDS TO MY VOTERS 
-    // const blackBalance = await blackContract.balanceOf(ownerAddress);
-    // console.log("black balance: ", blackBalance);
-    // const gaugeContract = await ethers.getContractAt(gaugeV2Abi, allPairsInfo[1].gauge);
-    // console.log("emissions: ", await gaugeContract.earned());
+    const blackBalance = await blackContract.balanceOf(ownerAddress);
+    console.log("black balance: ", blackBalance);
+    const gaugeContract = await ethers.getContractAt(gaugeV2Abi, allPairsInfo[1].gauge);
+    console.log("emissions: ", await gaugeContract.earned());
+
+    const veNFTAPI = await ethers.getContractAt(veNFTAPIAbi, veNFTAPIAddress);
+    console.log("token id 1 details: ", await veNFTAPI.getNFTFromId("1"));
 
     // STAGE II OF TESTING STARTS FROM HERE
     
@@ -124,6 +148,9 @@ async function main () {
     // STEP 9: VERIFY EMISSIONS CALL HAS BEEN DONE AFTER EPOCH ENDS 
 
     // STEP 10: VERIFY REWARDS TO MY VOTERS 
+  } catch (err) {
+    console.error("Error in this: ", err)
+  }
 }
 
 main()
