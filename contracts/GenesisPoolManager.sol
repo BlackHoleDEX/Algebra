@@ -34,8 +34,8 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
     address public _epochController;
     address public _dutchAuction;
     address public _permissionRegistory;
+    address public _router;
     IBaseV1Factory public _pairFactory;
-    IRouter01 public _router;
     IVoterV3 public _voter;
     ITokenHandler public _tokenManager;
 
@@ -72,7 +72,7 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
         _dutchAuction = msg.sender;
         _epochController = epochController;
         _pairFactory = IBaseV1Factory(pairFactory);
-        _router = IRouter01(router);
+        _router = router;
         _voter = IVoterV3(voter);
         _tokenManager = ITokenHandler(tokenHandler);
         _permissionRegistory = permissionRegistory;
@@ -317,7 +317,13 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
         uint256 amountBDesired = _tokenAllocation.allocatedFundingAmount;
         _pairFactory.setGenesisStatus(_liquidityPool.pairAddress, false);
 
-        (, , uint liquidity) = _router.addLiquidity(_genesisPool.fundingToken, proposedToken, protocolsInfo[proposedToken].stable, amountADesired, amountBDesired, 0, 0, address(this), block.timestamp + 100);
+        IERC20(proposedToken).approve(_router, amountADesired);
+        IERC20(_genesisPool.fundingToken).approve(_router, amountBDesired);
+
+        (, , uint liquidity) = IRouter01(_router).addLiquidity(proposedToken, _genesisPool.fundingToken, protocolsInfo[proposedToken].stable, amountADesired, amountBDesired, 0, 0, address(this), block.timestamp + 100);
+
+        IERC20(proposedToken).approve(_router, amountADesired);
+        IERC20(_genesisPool.fundingToken).approve(_router, amountBDesired);
 
         address[] storage _depositers = depositers[proposedToken];
         uint256 _depositersCnt = _depositers.length;
@@ -329,6 +335,7 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
 
         (address[] memory _accounts, uint256[] memory _amounts) = IDutchAuction(_dutchAuction).getLPTokensShares(_depositers, _deposits, _tokenAllocation.tokenOwner, liquidity);
 
+        IERC20(_liquidityPool.pairAddress).approve(_liquidityPool.gaugeAddress, liquidity);
         IGauge(_liquidityPool.gaugeAddress).depositsForGenesis(_accounts, _amounts, _tokenAllocation.tokenOwner, block.timestamp + MATURITY_TIME, liquidity);
     }
     

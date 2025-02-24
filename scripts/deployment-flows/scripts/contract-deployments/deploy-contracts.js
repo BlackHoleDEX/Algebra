@@ -389,11 +389,11 @@ const deployBlackClaim = async (votingEscrowAddress, treasury) => {
     }
 }
 
-const deployGenesisPool = async (routerV2Address, epochControllerAddress, voterV3Address, pairFactoryAddress) => {
+const deployGenesisPool = async (routerV2Address, epochControllerAddress, voterV3Address, pairFactoryAddress, tokenHandlerAddress, permissionRegistryAddress) => {
     try {
         console.log("deploying 1")
         const genesisPoolContract = await ethers.getContractFactory("GenesisPoolManager");
-        input = [routerV2Address, epochControllerAddress, voterV3Address, pairFactoryAddress];
+        input = [routerV2Address, epochControllerAddress, voterV3Address, pairFactoryAddress, tokenHandlerAddress, permissionRegistryAddress];
         console.log("deploying 2")
         const genesisPool = await upgrades.deployProxy(genesisPoolContract, input, {initializer: 'initialize', gasLimit:210000000});
         console.log("deploying 3")
@@ -553,7 +553,7 @@ async function main () {
 
     const blackClaimAddress = await deployBlackClaim(votingEscrowAddress, ownerAddress);
 
-    const genesisPoolAddress = deployGenesisPool(routerV2Address, epochControllerAddress, voterV3Address, pairFactoryAddress);
+    const genesisPoolAddress = deployGenesisPool(routerV2Address, epochControllerAddress, voterV3Address, pairFactoryAddress, tokenHandlerAddress, permissionRegistryAddress);
 
     await setGenesisManagerRole(permissionRegistryAddress, genesisPoolAddress);
 
