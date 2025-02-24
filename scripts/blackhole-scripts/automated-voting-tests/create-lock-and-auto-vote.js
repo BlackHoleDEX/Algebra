@@ -15,16 +15,16 @@ const { veArtProxyUpgradeableAbi, veArtProxyUpgradeableAddress } = require("../.
 async function main () {
     const votingEscrow = await ethers.getContractAt(votingEscrowAbi, votingEscrowAddress);
     const black = await ethers.getContractAt(blackAbi, blackAddress);
-    const lockedAmount = "100000000000000000000"
-    const approveTx = await black.approve(votingEscrowAddress, lockedAmount);
-    await approveTx.wait();
-    const creationLockTx = await votingEscrow.create_lock(lockedAmount, 10*86400, false);
-    await creationLockTx.wait();
+    // const lockedAmount = "100000000000000000000"
+    // const approveTx = await black.approve(votingEscrowAddress, lockedAmount);
+    // await approveTx.wait();
+    // const creationLockTx = await votingEscrow.create_lock(lockedAmount, 10*86400, false);
+    // await creationLockTx.wait();
 
-    const approveTxTwo = await black.approve(votingEscrowAddress, lockedAmount);
-    await approveTxTwo.wait();
-    const creationLockTxTwo = await votingEscrow.create_lock(lockedAmount, 10*86400, false);
-    await creationLockTxTwo.wait();
+    // const approveTxTwo = await black.approve(votingEscrowAddress, lockedAmount);
+    // await approveTxTwo.wait();
+    // const creationLockTxTwo = await votingEscrow.create_lock(lockedAmount, 10*86400, false);
+    // await creationLockTxTwo.wait();
 
     // const notAutovotingBalance = "30000000000000000000"
     // const approveTxThree = await black.approve(votingEscrowAddress, notAutovotingBalance);

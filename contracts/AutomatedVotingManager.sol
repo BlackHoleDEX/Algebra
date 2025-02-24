@@ -138,6 +138,16 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
         return topNPools;
     }
 
+    function setOriginalOwner(uint256 tokenId, address owner) external onlyVotingEscrow {
+        originalOwner[tokenId] = owner;
+    }
+
+    /// @dev Modifier to restrict function calls to the votingEscrow contract only
+    modifier onlyVotingEscrow() {
+        require(msg.sender == address(votingEscrow), "Only VotingEscrow can call this");
+        _;
+    }
+
     /// @notice Disables automated voting and transfers back the NFT to the original owner
     function disableAutoVoting(uint256 lockId) external nonReentrant {
         require(originalOwner[lockId] == msg.sender, "Not original owner");

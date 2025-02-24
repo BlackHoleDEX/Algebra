@@ -35,65 +35,65 @@ async function main () {
     const voterV3 = await ethers.getContractAt(voterV3Abi, voterV3Address);
     console.log("got contracts")
     // Prepare transactions
-    // for (const element of allPairsInfo) {
-    //     const externalBribe = await ethers.getContractAt(bribeAbi, element.external_bribes[0]);
+    for (const element of allPairsInfo) {
+        const externalBribe = await ethers.getContractAt(bribeAbi, element.external_bribes[0]);
     
-    //     console.log(`Sending transaction for ${element.external_bribes[0]}...`);
+        console.log(`Sending transaction for ${element.external_bribes[0]}...`);
         
-    //     // Send transaction and wait for it to be mined before continuing
-    //     const tx = await externalBribe.addRewardToken(blackAddress);
-    //     await tx.wait();
+        // Send transaction and wait for it to be mined before continuing
+        const tx = await externalBribe.addRewardToken(blackAddress);
+        await tx.wait();
         
-    //     console.log(`Transaction confirmed for ${element.external_bribes[0]}`);
-    // }
+        console.log(`Transaction confirmed for ${element.external_bribes[0]}`);
+    }
     
-    // console.log("All transactions executed sequentially!");
+    console.log("All transactions executed sequentially!");
     
 
     // STEP 1: INCENTIVIZE USERS - INCENTIVIZATION CAN BE DONE BY ANYBODY AND WILL BE DISTRIBUTED TO THE VOTERS BASED ON THE VOTES
-    // const externalBribeOne = await ethers.getContractAt(bribeAbi, allPairsInfo[0].external_bribes[0]);
-    // const externalBribeTwo = await ethers.getContractAt(bribeAbi, allPairsInfo[1].external_bribes[0]);
-    // const amount = "1000000000000000000"
-    // const approveBlackToBribe = await blackContract.approve(allPairsInfo[0].external_bribes[0], amount);
-    // await approveBlackToBribe.wait();
-    // const incentivizeFirstPool = await externalBribeOne.notifyRewardAmount(blackAddress, amount);
-    // await incentivizeFirstPool.wait();
+    const externalBribeOne = await ethers.getContractAt(bribeAbi, allPairsInfo[0].external_bribes[0]);
+    const externalBribeTwo = await ethers.getContractAt(bribeAbi, allPairsInfo[1].external_bribes[0]);
+    const amount = "1000000000000000000"
+    const approveBlackToBribe = await blackContract.approve(allPairsInfo[0].external_bribes[0], amount);
+    await approveBlackToBribe.wait();
+    const incentivizeFirstPool = await externalBribeOne.notifyRewardAmount(blackAddress, amount);
+    await incentivizeFirstPool.wait();
 
-    // const approveBlackToSecondBribe = await blackContract.approve(allPairsInfo[1].external_bribes[0], amount);
-    // await approveBlackToSecondBribe.wait();
-    // const incentivizeSecondPool = await externalBribeTwo.notifyRewardAmount(blackAddress, amount);
-    // await incentivizeSecondPool.wait();
+    const approveBlackToSecondBribe = await blackContract.approve(allPairsInfo[1].external_bribes[0], amount);
+    await approveBlackToSecondBribe.wait();
+    const incentivizeSecondPool = await externalBribeTwo.notifyRewardAmount(blackAddress, amount);
+    await incentivizeSecondPool.wait();
 
     // STEP 1.1: TRADE IN ALL 5 POOLS IN WHICH U ADDED LIQUIDITY
     // SKIPPED FOR STAGE I
 
     // STEP 1.2: STAKE LIQUIDITY
-    // console.log("pair address: ", allPairsInfo[0].pair_address);
-    // const pairOne = await ethers.getContractAt(pairAbi, allPairsInfo[0].pair_address)
-    // const gaugeOne = await ethers.getContractAt(gaugeV2Abi, allPairsInfo[0].gauge)
-    // const pairBalance = allPairsInfo[0].account_lp_balance;
-    // const depositingAmount = BigNumber(pairBalance.toString()).multipliedBy(0.3).dividedToIntegerBy(1);
-    // console.log("pair balance is: ", pairBalance, BigNumber(pairBalance.toString()), " depositing pair tokens quantity: ", depositingAmount.toString())
-    // const pairApproval = await pairOne.approve(allPairsInfo[0].gauge, depositingAmount.toString());
-    // await pairApproval.wait();
-    // const depositLPTx = await gaugeOne.deposit(depositingAmount.toString());
-    // await depositLPTx.wait();
-    // console.log("approve and deposit done")
+    console.log("pair address: ", allPairsInfo[0].pair_address);
+    const pairOne = await ethers.getContractAt(pairAbi, allPairsInfo[0].pair_address)
+    const gaugeOne = await ethers.getContractAt(gaugeV2Abi, allPairsInfo[0].gauge)
+    const pairBalance = allPairsInfo[0].account_lp_balance;
+    const depositingAmount = BigNumber(pairBalance.toString()).multipliedBy(0.3).dividedToIntegerBy(1);
+    console.log("pair balance is: ", pairBalance, BigNumber(pairBalance.toString()), " depositing pair tokens quantity: ", depositingAmount.toString())
+    const pairApproval = await pairOne.approve(allPairsInfo[0].gauge, depositingAmount.toString());
+    await pairApproval.wait();
+    const depositLPTx = await gaugeOne.deposit(depositingAmount.toString());
+    await depositLPTx.wait();
+    console.log("approve and deposit done")
 
-    // const pairTwo = await ethers.getContractAt(pairAbi, allPairsInfo[1].pair_address)
-    // const gaugeTwo = await ethers.getContractAt(gaugeV2Abi, allPairsInfo[1].gauge)
+    const pairTwo = await ethers.getContractAt(pairAbi, allPairsInfo[1].pair_address)
+    const gaugeTwo = await ethers.getContractAt(gaugeV2Abi, allPairsInfo[1].gauge)
 
-    // const pairTwoApproval = await pairTwo.approve(allPairsInfo[1].gauge, depositingAmount.toString());
-    // await pairTwoApproval.wait();
-    // const depositLPTxForPairTwo = await gaugeTwo.deposit(depositingAmount.toString());
-    // await depositLPTxForPairTwo.wait();
+    const pairTwoApproval = await pairTwo.approve(allPairsInfo[1].gauge, depositingAmount.toString());
+    await pairTwoApproval.wait();
+    const depositLPTxForPairTwo = await gaugeTwo.deposit(depositingAmount.toString());
+    await depositLPTxForPairTwo.wait();
 
     // // STEP 2: LAST HOUR FUNCTION CALL SIMULATED
-    const votingEscrow = await ethers.getContractAt(votingEscrowAbi, votingEscrowAddress);
-    console.log("chainlink executor", await avmContract.chainlinkExecutor())
-    console.log("avm from voter", await votingEscrow.avm())
-    const executeVotesTx = await avmContract.executeVotes();
-    await executeVotesTx.wait();
+    // const votingEscrow = await ethers.getContractAt(votingEscrowAbi, votingEscrowAddress);
+    // console.log("chainlink executor", await avmContract.chainlinkExecutor())
+    // console.log("avm from voter", await votingEscrow.avm())
+    // const executeVotesTx = await avmContract.executeVotes();
+    // await executeVotesTx.wait();
 
     // // STEP 3: VERIFY AUTOVOTING HAS HAPPENED
     // const epochStart = getEpochStart(Math.floor(Date.now()/1000));
