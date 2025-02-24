@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: None
-// Super Champs Foundation 2024
+// BlackHole Foundation 2025
 
 pragma solidity 0.8.13;
 
@@ -26,7 +26,7 @@ interface IBlackClaims {
         uint256[] calldata rewards_
     ) external;
 
-    function getClaimableReward() external view returns(uint256); 
+    function getClaimableReward(address userAddress) external view returns(uint256); 
 
     function revokeUnclaimedReward() external;
 }
