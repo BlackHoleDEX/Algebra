@@ -12,5 +12,5 @@ interface IGauge {
     function isForPair() external view returns (bool);
     function totalSupply() external view returns (uint);
     function earned(address token, address account) external view returns (uint);
-    
+    function depositsForGenesis(address[] memory _accounts, uint256[] memory _amounts, address tokenOwner, uint256 timestamp) external;
 }

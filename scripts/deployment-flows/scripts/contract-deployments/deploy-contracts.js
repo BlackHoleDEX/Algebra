@@ -109,6 +109,20 @@ const setPermissionRegistryRoles = async (permissionRegistryAddress, ownerAddres
     }
 };
 
+const setGenesisManagerRole = async (permissionRegistryAddress, genesisPoolAddress) => {
+    const permissionRegistryContract = await ethers.getContractAt(permissionsRegistryAbi, permissionRegistryAddress);
+    const permissionRegistryRolesInStringFormat = await permissionRegistryContract.rolesToString();
+
+    try {
+        const setRoleTx = await permissionRegistryContract.setRoleFor(genesisPoolAddress, "GENESIS_MANAGER", {
+            gasLimit: 21000000,
+        });
+        await setRoleTx.wait(); // Wait for the transaction to be mined
+    } catch (err) {
+        console.log('Error in setRoleFor in permissionRegistry:', err);
+    }
+};
+
 
 const deployVotingEscrow = async(blackAddress) =>{
     try {
@@ -445,6 +459,12 @@ async function main () {
     await pushDefaultRewardToken(bribeV3Address, blackAddress);
 
     const blackClaimAddress = await deployBlackClaim(votingEscrowAddress, ownerAddress);
+
+    const genesisPoolAddress = deployGenesisPool();
+
+    await setGenesisManagerRole(permissionRegistryAddress, genesisPoolAddress);
+
+    await setGenesisPoolManagerInGaugeFactory(gaugeV2Address, genesisPoolAddress);
 
     //create Gauges
     await createGauges(voterV3Address, blackholeV2AbiAddress);

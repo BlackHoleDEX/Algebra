@@ -22,6 +22,7 @@ interface IGauge{
 contract GaugeFactoryV2 is IGaugeFactory, OwnableUpgradeable {
     address public last_gauge;
     address public permissionsRegistry;
+    address public genesisPool;
 
     address[] internal __gauges;
     constructor() {}
@@ -29,11 +30,17 @@ contract GaugeFactoryV2 is IGaugeFactory, OwnableUpgradeable {
     function initialize(address _permissionRegistry) initializer  public {
         __Ownable_init();   //after deploy ownership to multisig
         permissionsRegistry = _permissionRegistry;
+        genesisPool = msg.sender;
     }
 
     function setRegistry(address _registry) external {
         require(owner() == msg.sender, 'not owner');
         permissionsRegistry = _registry;
+    }
+
+    function setGenesisPool(address _genesisPool) external {
+        require(owner() == msg.sender, 'not owner');
+        genesisPool = _genesisPool;
     }
 
     function gauges() external view returns(address[] memory) {
@@ -46,7 +53,7 @@ contract GaugeFactoryV2 is IGaugeFactory, OwnableUpgradeable {
 
 
     function createGaugeV2(address _rewardToken,address _ve,address _token,address _distribution, address _internal_bribe, address _external_bribe, bool _isPair) external returns (address) {
-        last_gauge = address(new GaugeV2(_rewardToken,_ve,_token,_distribution,_internal_bribe,_external_bribe,_isPair) );
+        last_gauge = address(new GaugeV2(_rewardToken,_ve,_token,_distribution,_internal_bribe,_external_bribe,_isPair, genesisPool) );
         __gauges.push(last_gauge);
         return last_gauge;
     }
