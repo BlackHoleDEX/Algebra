@@ -15,6 +15,8 @@ import "@openzeppelin/contracts/governance/IGovernor.sol";
 import "@openzeppelin/contracts/governance/utils/IVotes.sol";
 import {IMinter} from "../interfaces/IMinter.sol";
 
+import {BlackTimeLibrary} from "../libraries/BlackTimeLibrary.sol";
+
 
 
 
@@ -144,10 +146,9 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
         address[] memory targets,
         uint256[] memory values,
         bytes[] memory calldatas,
-        bytes32 descriptionHash,
-        address proposer
+        bytes32 epochTimeHash
     ) public pure virtual override returns (uint256) {
-        return uint256(keccak256(abi.encode(targets, values, calldatas, descriptionHash, proposer)));
+        return uint256(keccak256(abi.encode(targets, values, calldatas, epochTimeHash)));
     }
 
     function proposalProposer(uint256 proposalId) public view virtual override returns (address) {
@@ -260,8 +261,7 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
     function propose(
         address[] memory targets,
         uint256[] memory values,
-        bytes[] memory calldatas,
-        string memory description
+        bytes[] memory calldatas
     ) public virtual override returns (uint256) {
         require(
             getVotes(_msgSender(), block.number - 1) >= proposalThreshold(),
@@ -273,8 +273,9 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
         require(calldatas.length == 1, "GovernorSimple: only one calldata allowed");
         require(bytes4(calldatas[0]) == IMinter.nudge.selector, "GovernorSimple: only nudge allowed");
 
-        uint256 proposalId = hashProposal(targets, values, calldatas, keccak256(bytes(description)), _msgSender());
-        
+        bytes32 epochStart = bytes32(BlackTimeLibrary.epochStart(block.timestamp) + (1 weeks));
+        uint256 proposalId = hashProposal(targets, values, calldatas, epochStart);
+
         require(targets.length > 0, "Governor: empty proposal");
 
         ProposalCore storage proposal = _proposals[proposalId];
@@ -295,8 +296,7 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
             new string[](targets.length),
             calldatas,
             start,
-            deadline,
-            description
+            deadline
         );
 
         return proposalId;
@@ -309,10 +309,9 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
         address[] memory targets,
         uint256[] memory values,
         bytes[] memory calldatas,
-        bytes32 descriptionHash,
-        address proposer
+        bytes32 epochTimeHash
     ) public payable virtual override returns (uint256) {
-        uint256 proposalId = hashProposal(targets, values, calldatas, descriptionHash, proposer);
+        uint256 proposalId = hashProposal(targets, values, calldatas, epochTimeHash);
 
         status = state(proposalId);
         require(
@@ -323,9 +322,9 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
 
         emit ProposalExecuted(proposalId);
 
-        _beforeExecute(proposalId, targets, values, calldatas, descriptionHash);
-        _execute(proposalId, targets, values, calldatas, descriptionHash);
-        _afterExecute(proposalId, targets, values, calldatas, descriptionHash);
+        _beforeExecute(proposalId, targets, values, calldatas, epochTimeHash);
+        _execute(proposalId, targets, values, calldatas, epochTimeHash);
+        _afterExecute(proposalId, targets, values, calldatas, epochTimeHash);
 
         return proposalId;
     }
@@ -393,10 +392,9 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
         address[] memory targets,
         uint256[] memory values,
         bytes[] memory calldatas,
-        bytes32 descriptionHash,
-        address proposer
+        bytes32 epochTimeHash
     ) internal virtual returns (uint256) {
-        uint256 proposalId = hashProposal(targets, values, calldatas, descriptionHash, proposer);
+        uint256 proposalId = hashProposal(targets, values, calldatas, epochTimeHash);
         ProposalState currentStatus = state(proposalId);
 
         require(

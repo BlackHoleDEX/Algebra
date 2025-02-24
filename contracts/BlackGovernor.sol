@@ -65,15 +65,14 @@ contract BlackGovernor is
         address[] memory targets,
         uint256[] memory values,
         bytes[] memory calldatas,
-        bytes32 descriptionHash
+        bytes32 epochTimeHash
     ) public virtual override returns (uint256 proposalId) {
         address proposer = _msgSender();
         uint256 _proposalId = hashProposal(
             targets,
             values,
             calldatas,
-            descriptionHash,
-            proposer
+            epochTimeHash
         );
         require(
             state(proposalId) == ProposalState.Pending,
@@ -83,6 +82,6 @@ contract BlackGovernor is
             proposer == _proposals[_proposalId].proposer,
             "Governor: only proposer can cancel"
         );
-        return _cancel(targets, values, calldatas, descriptionHash, proposer);
+        return _cancel(targets, values, calldatas, epochTimeHash);
     }
 }
