@@ -55,9 +55,6 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
     address[] public proposedTokens;
     mapping(address => address[]) public depositers;
 
-    mapping(address => bool) internal isIncentiveToken;
-    address[] internal incentiveTokens;
-
     event AddedTokenAllocation(address proposedToken, uint256 proposedNativeAmount, uint proposedFundingAmount);
     event AddedIncentives(address proposedToken, address[] incentivesToken, uint256[] incentivesAmount);
     event OnBoardedGenesisPool(address proposedToken);
@@ -119,7 +116,7 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
 
             if(incentivesToken[i] == proposedToken) continue;
 
-            require(isIncentiveToken[incentivesToken[i]], "incentive not whitelisted");
+            require(_tokenManager.isConnector(incentivesToken[i]), "incentive not whitelisted");
         }
 
         i = 0;
@@ -144,7 +141,7 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
         require(whiteListedTokensToUser[proposedToken][_sender] || _sender == _team, "not whitelisted");
         require(poolsStatus[proposedToken] == PoolStatus.INCENTIVES_ADDED, "incentives not added");
         
-        require(isIncentiveToken[genesisPool.fundingToken], "fundingToken not whitelisted");
+        require(_tokenManager.isConnector(genesisPool.fundingToken), "fundingToken not whitelisted");
 
         require(_pairFactory.getPair(proposedToken, genesisPool.fundingToken, protocolInfo.stable) == address(0), "existing pair");
 
@@ -491,46 +488,5 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
     function setDutchAuction(address dutchAuction) external {
         require(_team == msg.sender, "invalid access");
         _dutchAuction = dutchAuction;
-    }
-
-    function getIncentiveTokens() external view returns(address[] memory tokens) {
-        return incentiveTokens;
-    }
-
-    function whitelistIncentivesTokens(address[] memory _tokens) public {
-        require(_team == msg.sender, "invalid access");
-        uint256 i = 0;
-        for(i; i < _tokens.length; i++){
-           _whitelistIncentivesToken(_tokens[i]);
-        }
-    }
-
-    function whitelistIncentivesToken(address _token) public {
-        require(_team == msg.sender, "invalid access");
-        _whitelistIncentivesToken(_token);
-    }
-
-    function removeRewardToken(address _token) public {
-        require(_team == msg.sender, "invalid access");
-
-        if(isIncentiveToken[_token]){
-            isIncentiveToken[_token] = false;
-            uint256 length = incentiveTokens.length;
-            uint256 i;
-            for (i = 0; i < length; i++) {
-                if (incentiveTokens[i] == _token) {
-                    incentiveTokens[i] = incentiveTokens[length - 1]; 
-                    incentiveTokens.pop(); 
-                    return;
-                }
-            }
-        }
-    }
-
-    function _whitelistIncentivesToken(address _rewardsToken) internal {
-        if(!isIncentiveToken[_rewardsToken]){
-            isIncentiveToken[_rewardsToken] = true;
-            incentiveTokens.push(_rewardsToken);
-        }
     }
 }
