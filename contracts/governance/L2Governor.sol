@@ -136,9 +136,10 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
         address[] memory targets,
         uint256[] memory values,
         bytes[] memory calldatas,
-        bytes32 descriptionHash
+        bytes32 descriptionHash,
+        address proposer
     ) public pure virtual override returns (uint256) {
-        return uint256(keccak256(abi.encode(targets, values, calldatas, descriptionHash)));
+        return uint256(keccak256(abi.encode(targets, values, calldatas, descriptionHash, proposer)));
     }
 
     /**
@@ -255,7 +256,7 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
             "Governor: proposer votes below proposal threshold"
         );
 
-        uint256 proposalId = hashProposal(targets, values, calldatas, keccak256(bytes(description)));
+        uint256 proposalId = hashProposal(targets, values, calldatas, keccak256(bytes(description)), _msgSender());
 
         require(targets.length == values.length, "Governor: invalid proposal length");
         require(targets.length == calldatas.length, "Governor: invalid proposal length");
@@ -292,9 +293,10 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
         address[] memory targets,
         uint256[] memory values,
         bytes[] memory calldatas,
-        bytes32 descriptionHash
+        bytes32 descriptionHash,
+        address proposer
     ) public payable virtual override returns (uint256) {
-        uint256 proposalId = hashProposal(targets, values, calldatas, descriptionHash);
+        uint256 proposalId = hashProposal(targets, values, calldatas, descriptionHash, proposer);
 
         ProposalState status = state(proposalId);
         require(
@@ -375,9 +377,10 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
         address[] memory targets,
         uint256[] memory values,
         bytes[] memory calldatas,
-        bytes32 descriptionHash
+        bytes32 descriptionHash,
+        address proposer
     ) internal virtual returns (uint256) {
-        uint256 proposalId = hashProposal(targets, values, calldatas, descriptionHash);
+        uint256 proposalId = hashProposal(targets, values, calldatas, descriptionHash, proposer);
         ProposalState status = state(proposalId);
 
         require(
