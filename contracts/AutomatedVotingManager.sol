@@ -21,6 +21,7 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
         uint256 rewardsPerVotingPower;
     }
 
+    /* ======= STATE VARIABLES ======= */
     IVoterV3 public voterV3;
     IVotingEscrow public votingEscrow;
     address public chainlinkExecutor;
@@ -33,11 +34,23 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
     mapping(uint256 => bool) public isAutoVotingEnabled;
     mapping(uint256 => bool) public hasVotedThisEpoch; // key is considered unix epoch value of dex epoch start
 
+    /* ======= EVENTS ======= */
     event AutoVotingEnabled(uint256 lockId, address owner);
     event AutoVotingDisabled(uint256 lockId, address owner);
     event VotesExecuted(uint256 epoch, uint256 totalLocks);
 
-    /// @dev Upgradeable contract initializer (replaces constructor)
+    /* ======= MODIFIERS ======= */
+    modifier onlyChainlink() {
+        require(msg.sender == chainlinkExecutor, "Not authorized");
+        _;
+    }
+
+    modifier onlyVotingEscrow() {
+        require(msg.sender == address(votingEscrow), "Only VotingEscrow can call this");
+        _;
+    }
+
+    /* ======= INITIALIZER ======= */
     function initialize(address _voterV3, address _votingEscrow, address _chainlinkExecutor, address _minter) public initializer {
         __Ownable_init(); // ✅ Initialize Ownable
         __ReentrancyGuard_init(); // ✅ Initialize ReentrancyGuard
@@ -51,12 +64,7 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
         _transferOwnership(msg.sender); // ✅ Set contract owner correctly
     }
 
-    /// @dev Restricts function to be callable only by Chainlink executor
-    modifier onlyChainlink() {
-        require(msg.sender == chainlinkExecutor, "Not authorized");
-        _;
-    }
-
+    /* ======= EXTERNAL FUNCTIONS ======= */
     /// @notice Enables automated voting for a lock
     function enableAutoVoting(uint256 lockId) external nonReentrant {
         require(votingEscrow.isApprovedOrOwner(msg.sender, lockId), "Not owner nor approved");
@@ -71,6 +79,54 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
         emit AutoVotingEnabled(lockId, msg.sender);
     }
 
+    /// @notice Disables automated voting and transfers back the NFT to the original owner
+    function disableAutoVoting(uint256 lockId) external nonReentrant {
+        require(originalOwner[lockId] == msg.sender, "Not original owner");
+        require(!BlackTimeLibrary.isLastHour(block.timestamp), "Cannot disable in last hour before voting");
+
+        votingEscrow.transferFrom(address(this), msg.sender, lockId);
+        delete originalOwner[lockId];
+        delete isAutoVotingEnabled[lockId];
+
+        _removeTokenId(lockId);
+
+        emit AutoVotingDisabled(lockId, msg.sender);
+    }
+
+    /// @notice Executes automated voting at the end of each epoch
+    function executeVotes() external onlyChainlink nonReentrant {
+        require(BlackTimeLibrary.isLastHour(block.timestamp), "Not in last hour of epoch");
+        require(!hasVotedThisEpoch[BlackTimeLibrary.epochStart(block.timestamp)], "Already executed for this epoch"); // is this needed? either this or the onlychainlink should be sufficient right?
+
+        hasVotedThisEpoch[BlackTimeLibrary.epochStart(block.timestamp)] = true;
+        PoolsAndRewards[] memory poolsAndRewards = getRewardsPerVotingPower(2);
+        address[] memory poolAddresses = new address[](poolsAndRewards.length);
+
+        for (uint256 i = 0; i < poolsAndRewards.length; i++) {
+            poolAddresses[i] = poolsAndRewards[i].pool;
+        }
+
+        uint256[] memory weights = getVoteWeightage(poolsAndRewards); 
+
+        for (uint256 i = 0; i < tokenIds.length; i++) {
+            uint256 lockId = tokenIds[i];
+            if (isAutoVotingEnabled[lockId]) {
+                voterV3.vote(lockId, poolAddresses, weights);
+            }
+        }
+
+        emit VotesExecuted(BlackTimeLibrary.epochStart(block.timestamp), tokenIds.length);
+    }
+
+    function setOriginalOwner(uint256 tokenId, address owner) external onlyVotingEscrow {
+        originalOwner[tokenId] = owner;
+    }
+
+    function setChainlinkExecutor(address _executor) external onlyOwner {
+        chainlinkExecutor = _executor;
+    }
+
+    /* ======= PUBLIC VIEW FUNCTIONS ======= */
     /// @notice Fetches rewards per voting power and returns the top N pools based on rewards
     function getRewardsPerVotingPower(uint256 topN) public view returns (PoolsAndRewards[] memory) {
         // address[] memory pools = voterV3.pools(); // to use voterV3.length() and then iterate over it
@@ -117,6 +173,30 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
         return _getTopNPools(poolRewards, topN);
     }
 
+    /* ======= PUBLIC PURE FUNCTIONS ======= */
+    /// @notice Returns equal weights for voting (Currently set to 1 for all pools)
+    function getVoteWeightage(PoolsAndRewards[] memory poolsAndRewards) public pure returns (uint256[] memory weights) {
+        weights = new uint256[](poolsAndRewards.length); // ✅ Initialize array in memory
+        for (uint256 i = 0; i < poolsAndRewards.length; i++) {
+            weights[i] = 1;
+        }
+        return weights;
+    }
+
+    /* ======= INTERNAL FUNCTIONS ======= */
+    /// @dev Removes a lockId from the tokenIds array
+    function _removeTokenId(uint256 lockId) internal {
+        uint256 len = tokenIds.length;
+        for (uint256 i = 0; i < len; i++) {
+            if (tokenIds[i] == lockId) {
+                tokenIds[i] = tokenIds[len - 1];
+                tokenIds.pop();
+                break;
+            }
+        }
+    }
+
+    /* ======= INTERNAL PURE FUNCTIONS ======= */
     /// @notice Selects the top N pools with the highest rewardsPerVotingPower
     function _getTopNPools(PoolsAndRewards[] memory pools, uint256 n) internal pure returns (PoolsAndRewards[] memory) {
         uint256 len = pools.length;
@@ -140,86 +220,11 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
         return topNPools;
     }
 
-    function setOriginalOwner(uint256 tokenId, address owner) external onlyVotingEscrow {
-        originalOwner[tokenId] = owner;
-    }
-
-    /// @dev Modifier to restrict function calls to the votingEscrow contract only
-    modifier onlyVotingEscrow() {
-        require(msg.sender == address(votingEscrow), "Only VotingEscrow can call this");
-        _;
-    }
-
-    /// @notice Disables automated voting and transfers back the NFT to the original owner
-    function disableAutoVoting(uint256 lockId) external nonReentrant {
-        require(originalOwner[lockId] == msg.sender, "Not original owner");
-        require(!BlackTimeLibrary.isLastHour(block.timestamp), "Cannot disable in last hour before voting");
-
-        votingEscrow.transferFrom(address(this), msg.sender, lockId);
-        delete originalOwner[lockId];
-        delete isAutoVotingEnabled[lockId];
-
-        _removeTokenId(lockId);
-
-        emit AutoVotingDisabled(lockId, msg.sender);
-    }
-
-    /// @dev Removes a lockId from the tokenIds array
-    function _removeTokenId(uint256 lockId) internal {
-        uint256 len = tokenIds.length;
-        for (uint256 i = 0; i < len; i++) {
-            if (tokenIds[i] == lockId) {
-                tokenIds[i] = tokenIds[len - 1];
-                tokenIds.pop();
-                break;
-            }
-        }
-    }
-
-    /// @notice Returns equal weights for voting (Currently set to 1 for all pools)
-    function getVoteWeightage(PoolsAndRewards[] memory poolsAndRewards) public pure returns (uint256[] memory weights) {
-        weights = new uint256[](poolsAndRewards.length); // ✅ Initialize array in memory
-        for (uint256 i = 0; i < poolsAndRewards.length; i++) {
-            weights[i] = 1;
-        }
-        return weights;
-    }
-
-
-    /// @notice Executes automated voting at the end of each epoch
-    function executeVotes() external onlyChainlink nonReentrant {
-        require(BlackTimeLibrary.isLastHour(block.timestamp), "Not in last hour of epoch");
-        require(!hasVotedThisEpoch[BlackTimeLibrary.epochStart(block.timestamp)], "Already executed for this epoch"); // is this needed? either this or the onlychainlink should be sufficient right?
-
-        hasVotedThisEpoch[BlackTimeLibrary.epochStart(block.timestamp)] = true;
-        PoolsAndRewards[] memory poolsAndRewards = getRewardsPerVotingPower(2);
-        address[] memory poolAddresses = new address[](poolsAndRewards.length);
-
-        for (uint256 i = 0; i < poolsAndRewards.length; i++) {
-            poolAddresses[i] = poolsAndRewards[i].pool;
-        }
-
-        uint256[] memory weights = getVoteWeightage(poolsAndRewards); 
-
-        for (uint256 i = 0; i < tokenIds.length; i++) {
-            uint256 lockId = tokenIds[i];
-            if (isAutoVotingEnabled[lockId]) {
-                voterV3.vote(lockId, poolAddresses, weights);
-            }
-        }
-
-        emit VotesExecuted(BlackTimeLibrary.epochStart(block.timestamp), tokenIds.length);
-    }
-
     function _calculateWeights(uint256[] memory baseWeights, uint256 votingPower) internal pure returns (uint256[] memory) {
         uint256[] memory adjustedWeights = new uint256[](baseWeights.length);
         for (uint256 i = 0; i < baseWeights.length; i++) {
             adjustedWeights[i] = baseWeights[i] * votingPower;
         }
         return adjustedWeights;
-    }
-
-    function setChainlinkExecutor(address _executor) external onlyOwner {
-        chainlinkExecutor = _executor;
     }
 }
