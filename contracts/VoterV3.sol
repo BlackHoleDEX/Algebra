@@ -35,6 +35,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     address public permissionRegistry;                          // registry to check accesses
     address[] public pools;                                     // all pools viable for incentives
     address public epochOwner;
+    address public genesisManager;
                                   
 
 
@@ -81,6 +82,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     event WhitelistedNFT(address indexed whitelister, uint256 tokenId);
 
     event SetMinter(address indexed old, address indexed latest);
+    event SetGenesisManager(address indexed old, address indexed latest);
     event SetBribeFactory(address indexed old, address indexed latest);
     event SetPairFactory(address indexed old, address indexed latest);
     event SetPermissionRegistry(address indexed old, address indexed latest);
@@ -108,6 +110,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
         minter = msg.sender;
         permissionRegistry = msg.sender;
+        genesisManager = address(0);
 
         maxVotingNum = 30;
 
@@ -169,6 +172,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         emit SetVoteDelay(VOTE_DELAY, _delay);
         VOTE_DELAY = _delay;
     }
+    
 
     /// @notice Set a new Minter
     function setMinter(address _minter) external VoterAdmin {
@@ -176,6 +180,14 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         require(_minter.code.length > 0, "!contract");
         emit SetMinter(minter, _minter);
         minter = _minter;
+    }
+
+    /// @notice Set a new Minter
+    function setGenesisManager(address _genesisManager) external VoterAdmin {
+        require(_genesisManager != address(0), "addr0");
+        require(_genesisManager.code.length > 0, "!contract");
+        emit SetGenesisManager(genesisManager, _genesisManager);
+        genesisManager = _genesisManager;
     }
 
     /// @notice Set a new Bribe Factory
@@ -634,7 +646,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         _external_bribe = IBribeFactory(bribefactory).createBribe(_owner, tokenA, tokenB, _type);
 
         // create gauge
-        _gauge = IGaugeFactory(_gaugeFactory).createGaugeV2(base, _ve, _pool, address(this), _internal_bribe, _external_bribe, isPair);
+        _gauge = IGaugeFactory(_gaugeFactory).createGaugeV2(base, _ve, _pool, address(this), _internal_bribe, _external_bribe, isPair, genesisManager);
      
         // approve spending for $the
         IERC20(base).approve(_gauge, type(uint256).max);

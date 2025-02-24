@@ -31,7 +31,7 @@ contract DutchAction is GanesisPoolBase, OwnableUpgradeable {
         uint256 _totalDeposits = 0;
         uint256 _depositersCnt = depositers.length;
         uint256 i;
-        for(i > 0; i < _depositersCnt; i++){
+        for(i = 0; i < _depositersCnt; i++){
             require(depositers[i] != address(0), "invalid depositer");
             require(deposits[i] > 0, "invalid deposit amount");
             _totalDeposits += deposits[i];
@@ -42,15 +42,17 @@ contract DutchAction is GanesisPoolBase, OwnableUpgradeable {
         _account = new address[](_depositersCnt + 1); 
         _amounts = new uint256[](_depositersCnt + 1); 
 
-        _account[0] = protocolOwner;
-        _amounts[0] = liquidity / 2;
+        uint256 _totalAdded = 0;
+        uint256 _depositerLiquidity = liquidity / 2;
 
-        uint256 _remainingLiquidity = liquidity - _amounts[0];
-
-        for(i > 0; i < _depositersCnt; i++){
+        for(i = 0; i < _depositersCnt; i++){
             _account[i+1] = depositers[i];
-            _amounts[i+1] = (_remainingLiquidity * deposits[i]) / _totalDeposits;
+            _amounts[i+1] = (_depositerLiquidity * deposits[i]) / _totalDeposits;
+            _totalAdded += _amounts[i+1];
         }
+
+        _account[0] = protocolOwner;
+        _amounts[0] = liquidity - _totalAdded;
         
         return (_account, _amounts);
     }

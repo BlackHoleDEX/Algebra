@@ -259,7 +259,7 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
 
     function _checkAndPreLaunchPool(address proposedToken) internal {
         GenesisPool storage _genesisPool = genesisPoolsInfo[proposedToken];
-        uint _endTime = _genesisPool.startPrice + _genesisPool.duration;
+        uint _endTime = _genesisPool.startTime + _genesisPool.duration;
         TokenAllocation storage _tokenAllocation = allocationsInfo[proposedToken];
         uint256 targetFundingAmount = (_tokenAllocation.proposedFundingAmount * _genesisPool.threshold) / 10000; // threshold is 100 * of original to support 2 deciamls
 
@@ -301,54 +301,37 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
     }
 
     function _completelyLaunchPool(address proposedToken, TokenAllocation storage _tokenAllocation, GenesisPool storage _genesisPool) internal {
-        LiquidityPool storage _liquidityPool = liquidityPoolsInfo[proposedToken];
-        uint256 amountADesired = _tokenAllocation.allocatedNativeAmount;
-        uint256 amountBDesired = _tokenAllocation.allocatedFundingAmount;
-
         _tokenAllocation.refundableNativeAmount = 0;
-
-        _pairFactory.setGenesisStatus(_liquidityPool.pairAddress, false);
-        (, , uint liquidity) = _router.addLiquidity(_genesisPool.fundingToken, proposedToken, protocolsInfo[proposedToken].stable, amountADesired, amountBDesired, 0, 0, address(this), block.timestamp + 100);
-
-        address[] storage _depositers = depositers[proposedToken];
-        uint256 _depositerscnt = _depositers.length;
-        uint256[] memory _deposits = new uint256[](_depositerscnt);
-        uint256 i;
-        for(i = 0; i < _depositerscnt; i++){
-            _deposits[i] = userDeposits[proposedToken][_depositers[i]];
-        }
-
-        (address[] memory _accounts, uint256[] memory _amounts) = IDutchAuction(_dutchAuction).getLPTokensShares(_depositers, _deposits, _tokenAllocation.tokenOwner, liquidity);
-
-        IGauge(_liquidityPool.gaugeAddress).depositsForGenesis(_accounts, _amounts, _tokenAllocation.tokenOwner, block.timestamp + MATURITY_TIME);
-
+        _addLiquidityAndDistribute(proposedToken, _tokenAllocation, _genesisPool);
         poolsStatus[proposedToken] = PoolStatus.LAUNCH;
     }
 
 
     function _partiallyLaunchPool(address proposedToken, TokenAllocation storage _tokenAllocation, GenesisPool storage _genesisPool) internal {
+        _tokenAllocation.refundableNativeAmount = _tokenAllocation.proposedNativeAmount - _tokenAllocation.allocatedNativeAmount;
+        _addLiquidityAndDistribute(proposedToken, _tokenAllocation, _genesisPool);
+        poolsStatus[proposedToken] = PoolStatus.PARTIALLY_LAUNCHED;
+    }
+
+    function _addLiquidityAndDistribute(address proposedToken, TokenAllocation storage _tokenAllocation, GenesisPool storage _genesisPool) internal {
         LiquidityPool storage _liquidityPool = liquidityPoolsInfo[proposedToken];
         uint256 amountADesired = _tokenAllocation.allocatedNativeAmount;
         uint256 amountBDesired = _tokenAllocation.allocatedFundingAmount;
-
-        _tokenAllocation.refundableNativeAmount = _tokenAllocation.proposedNativeAmount - _tokenAllocation.allocatedNativeAmount;
-
         _pairFactory.setGenesisStatus(_liquidityPool.pairAddress, false);
-        (, , uint liquidity) = _router.addLiquidity(_genesisPool.fundingToken, proposedToken, false, amountADesired, amountBDesired, 0, 0, address(this), block.timestamp + 100);
+
+        (, , uint liquidity) = _router.addLiquidity(_genesisPool.fundingToken, proposedToken, protocolsInfo[proposedToken].stable, amountADesired, amountBDesired, 0, 0, address(this), block.timestamp + 100);
 
         address[] storage _depositers = depositers[proposedToken];
-        uint256 _depositerscnt = _depositers.length;
-        uint256[] memory _deposits = new uint256[](_depositerscnt);
+        uint256 _depositersCnt = _depositers.length;
+        uint256[] memory _deposits = new uint256[](_depositersCnt);
         uint256 i;
-        for(i = 0; i < _depositerscnt; i++){
+        for(i = 0; i < _depositersCnt; i++){
             _deposits[i] = userDeposits[proposedToken][_depositers[i]];
         }
 
         (address[] memory _accounts, uint256[] memory _amounts) = IDutchAuction(_dutchAuction).getLPTokensShares(_depositers, _deposits, _tokenAllocation.tokenOwner, liquidity);
 
-        IGauge(_liquidityPool.gaugeAddress).depositsForGenesis(_accounts, _amounts, _tokenAllocation.tokenOwner, block.timestamp + MATURITY_TIME);
-
-        poolsStatus[proposedToken] = PoolStatus.PARTIALLY_LAUNCHED;
+        IGauge(_liquidityPool.gaugeAddress).depositsForGenesis(_accounts, _amounts, _tokenAllocation.tokenOwner, block.timestamp + MATURITY_TIME, liquidity);
     }
     
     // before 3 hrs
@@ -370,7 +353,7 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
 
             if(_poolStatus == PoolStatus.PRE_LISTING){
                 _genesisPool = genesisPoolsInfo[_proposedToken];
-                _endTime = _genesisPool.startPrice + _genesisPool.duration;
+                _endTime = _genesisPool.startTime + _genesisPool.duration;
                 _tokenAllocation = allocationsInfo[_proposedToken];
                 targetFundingAmount = (_tokenAllocation.proposedFundingAmount * _genesisPool.threshold) / 10000; // threshold is 100 * of original to support 2 deciamls
 
@@ -380,9 +363,9 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
                     _tokenAllocation.refundableNativeAmount = _tokenAllocation.proposedNativeAmount;
                 }
             }
-            // else if(_poolStatus == PoolStatus.PRE_LAUNCH){
-            //     poolsStatus[_proposedToken] = PoolStatus.NOT_QUALIFIED;
-            // }
+            else if(_poolStatus == PoolStatus.PRE_LAUNCH){
+                poolsStatus[_proposedToken] = PoolStatus.PRE_LAUNCH_DEPOSIT_DISABLED;
+            }
         }
     }
 

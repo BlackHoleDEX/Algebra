@@ -42,7 +42,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     uint256 public lastUpdateTime;
     uint256 public rewardPerTokenStored;
 
-    address public genesisPool;
+    address public genesisManager;
 
     mapping(address => uint256) public userRewardPerTokenPaid;
     mapping(address => uint256) public rewards;
@@ -81,7 +81,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
         _;
     }
 
-    constructor(address _rewardToken,address _ve,address _token,address _distribution, address _internal_bribe, address _external_bribe, bool _isForPair, address _genesisPool) {
+    constructor(address _rewardToken,address _ve,address _token,address _distribution, address _internal_bribe, address _external_bribe, bool _isForPair, address _genesisManager) {
         rewardToken = IERC20(_rewardToken);     // main reward
         VE = _ve;                               // vested
         TOKEN = IERC20(_token);                 // underlying (LP)
@@ -91,7 +91,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
         internal_bribe = _internal_bribe;       // lp fees goes here
         external_bribe = _external_bribe;       // bribe fees goes here
 
-        genesisPool = _genesisPool;
+        genesisManager = _genesisManager;
 
         isForPair = _isForPair;                 // pair boolean, if false no claim_fees
 
@@ -199,20 +199,21 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     --------------------------------------------------------------------------------
     ----------------------------------------------------------------------------- */
 
-    function depositsForGenesis(address[] memory _accounts, uint256[] memory _amounts, address tokenOwner, uint256 timestamp) external { 
-        require(msg.sender == genesisPool, "");
-        require(_accounts.length == _amounts.length, "leneght mismatch");
-        require(tokenOwner != address(0), "tokenOwner 0 address");
-        _depositsForGenesis(_accounts, _amounts, tokenOwner, timestamp);
+    function depositsForGenesis(address[] memory _accounts, uint256[] memory _amounts, address _tokenOwner, uint256 _timestamp, uint256 _totalAmount) external { 
+        require(msg.sender == genesisManager, "IA");
+        require(_accounts.length == _amounts.length, "len !=");
+        require(_tokenOwner != address(0), "tokenOwner 0x");
+        require(_totalAmount > 0, "amount 0");
+        _depositsForGenesis(_accounts, _amounts, _tokenOwner, _timestamp, _totalAmount);
     }
 
-    function _depositsForGenesis(address[] memory _accounts, uint256[] memory _amounts, address tokenOwner, uint256 timestamp) internal {
+    // send whole liquidity as additional param
+    function _depositsForGenesis(address[] memory _accounts, uint256[] memory _amounts, address _tokenOwner, uint256 _timestamp, uint256 _totalAmount) internal {
         uint256 _accountsCnt = _accounts.length;
         uint256 i;
-        uint256 _totalAmount = 0;
         for(i = 0; i < _accountsCnt; i++){
             require(_accounts[i] != address(0), "0 address");
-            _totalAmount += _amounts[i]; 
+        
         }
 
         require(_totalAmount > 0, "total amount 0");
@@ -227,7 +228,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
 
         TOKEN.safeTransferFrom(msg.sender, address(this), _totalAmount);
 
-        maturityTime[tokenOwner] = timestamp;
+        maturityTime[_tokenOwner] = _timestamp;
 
         emit DepositsForGenesis(_accounts, _amounts);
     }
