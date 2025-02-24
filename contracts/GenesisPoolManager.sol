@@ -14,6 +14,7 @@ import "./interfaces/IBribe.sol";
 import "./interfaces/IGauge.sol";
 import "./interfaces/IDutchAuction.sol";
 import "./GanesisPoolBase.sol";
+import "./interfaces/ITokenHandler.sol";
 
 
 interface IBaseV1Factory {
@@ -38,6 +39,7 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
     IBaseV1Factory public _pairFactory;
     IRouter01 public _router;
     IVoterV3 public _voter;
+    ITokenHandler public _tokenManager;
 
     using SafeERC20 for IERC20;
 
@@ -64,7 +66,7 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
 
     constructor() {}
 
-    function initialize(address router, address epochController, address voter, address pairFactory) initializer  public {
+    function initialize(address router, address epochController, address voter, address pairFactory, address tokenHandler) initializer  public {
         __Ownable_init();
 
         _team = msg.sender;
@@ -74,6 +76,7 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
         _pairFactory = IBaseV1Factory(pairFactory);
         _router = IRouter01(router);
         _voter = IVoterV3(voter);
+        _tokenManager = ITokenHandler(tokenHandler);
     }
 
     function whiteListUserAndToken(address tokenOwner, address proposedToken) external nonReentrant{
@@ -192,7 +195,7 @@ contract GenesisPoolManager is GanesisPoolBase, OwnableUpgradeable, ReentrancyGu
         require(_team == msg.sender, "invalid owenr");
         require(proposedToken != address(0), "0 address");
 
-        _voter.whitelist(proposedToken);
+        _tokenManager.whitelist(proposedToken);
 
         LiquidityPool storage _liquidityPool = liquidityPoolsInfo[proposedToken];
         _liquidityPool.pairAddress = _pairFactory.createPair(proposedToken, genesisPoolsInfo[proposedToken].fundingToken, protocolsInfo[proposedToken].stable);

@@ -12,6 +12,7 @@ import './interfaces/IPairInfo.sol';
 import './interfaces/IPairFactory.sol';
 import './interfaces/IVotingEscrow.sol';
 import './interfaces/IPermissionsRegistry.sol';
+import './interfaces/ITokenHandler.sol';
 // import './interfaces/IAlgebraFactory.sol';
 // import "hardhat/console.sol";
 import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
@@ -36,7 +37,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     address[] public pools;                                     // all pools viable for incentives
     address public epochOwner;
     address public genesisManager;
-                                  
+    address public tokenHandler;                     
 
 
     uint256 internal index;                                        // gauge index
@@ -64,8 +65,6 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     mapping(uint256 => uint256) public lastVoted;                     // nft      => timestamp of last vote (this is shifted to thursday of that epoc)
     mapping(uint256 => uint256) public lastVotedTimestamp;            // nft      => timestamp of last vote
     mapping(address => bool) public isGauge;                    // gauge    => boolean [is a gauge?]
-    mapping(address => bool) public isWhitelisted;              // token    => boolean [is an allowed token?]
-    mapping(uint256 => bool) public isWhitelistedNFT;
     mapping(address => bool) public isAlive;                    // gauge    => boolean [is the gauge alive?]
     mapping(address => bool) public isFactory;                  // factory  => boolean [the pair factory exists?]
     mapping(address => bool) public isGaugeFactory;             // g.factory=> boolean [the gauge factory exists?]
@@ -77,9 +76,6 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     event Abstained(uint256 tokenId, uint256 weight);
     event NotifyReward(address indexed sender, address indexed reward, uint256 amount);
     event DistributeReward(address indexed sender, address indexed gauge, uint256 amount);
-    event Whitelisted(address indexed whitelister, address indexed token);
-    event Blacklisted(address indexed blacklister, address indexed token);
-    event WhitelistedNFT(address indexed whitelister, uint256 tokenId);
 
     event SetMinter(address indexed old, address indexed latest);
     event SetGenesisManager(address indexed old, address indexed latest);
@@ -93,7 +89,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
     constructor() {}
 
-    function initialize(address __ve, address _pairFactory, address  _gaugeFactory, address _bribes) initializer public {
+    function initialize(address __ve, address _pairFactory, address  _gaugeFactory, address _bribes, address _tokenHandler) initializer public {
         __Ownable_init();
         __ReentrancyGuard_init();
 
@@ -110,6 +106,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
         minter = msg.sender;
         permissionRegistry = msg.sender;
+        tokenHandler = _tokenHandler;
         genesisManager = address(0);
 
         maxVotingNum = 30;
@@ -144,14 +141,10 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
     
     /// @notice initialize the voter contract 
-    /// @param  _tokens array of tokens to whitelist
     /// @param  _minter the minter of $the
-    function _init(address[] memory _tokens, address _permissionsRegistry, address _minter) external {
+    function _init(address _permissionsRegistry, address _minter) external {
         require(msg.sender == minter || IPermissionsRegistry(permissionRegistry).hasRole("VOTER_ADMIN",msg.sender));
         require(!initflag);
-        for (uint256 i = 0; i < _tokens.length; i++) {
-            _whitelist(_tokens[i]);
-        }
         minter = _minter;
         permissionRegistry = _permissionsRegistry;
         initflag = true;
@@ -312,48 +305,6 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     --------------------------------------------------------------------------------
     ----------------------------------------------------------------------------- */
     
-    
-    /// @notice Whitelist a token for gauge creation
-    function whitelist(address[] memory _tokens) external GenesisManager {
-        uint256 i = 0;
-        for(i = 0; i < _tokens.length; i++){
-            _whitelist(_tokens[i]);
-        }
-    }
-
-    function whitelist(address _token) external GenesisManager {
-        _whitelist(_token);
-    }
-       
-    function _whitelist(address _token) private {
-        require(!isWhitelisted[_token], "in");
-        require(_token.code.length > 0, "!contract");
-        isWhitelisted[_token] = true;
-        emit Whitelisted(msg.sender, _token);
-    }
-    
-    /// @notice Blacklist a malicious token
-    function blacklist(address[] memory _token) external GenesisManager {
-        uint256 i = 0;
-        for(i = 0; i < _token.length; i++){
-            _blacklist(_token[i]);
-        }
-    }
-
-    function blacklist(address _token) external GenesisManager {
-        _blacklist(_token);
-    }
-       
-    function _blacklist(address _token) private {
-        require(isWhitelisted[_token], "out");
-        isWhitelisted[_token] = false;
-        emit Blacklisted(msg.sender, _token);
-    }
-
-    function whitelistNFT(uint256 _tokenId, bool _bool) external Governance() {
-        isWhitelistedNFT[_tokenId] = _bool;
-        emit WhitelistedNFT(msg.sender, _tokenId);
-    }
 
      /// @notice Kill a malicious gauge 
     /// @param  _gauge gauge to kill
@@ -462,7 +413,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         require(_poolVote.length == _weights.length, "weights length !=");
         require(_poolVote.length <= maxVotingNum, "pool length exceeds maxVotingNum");
         uint256 _timestamp = block.timestamp;
-        if ((_timestamp > BlackTimeLibrary.epochVoteEnd(_timestamp)) && !isWhitelistedNFT[_tokenId]){
+        if ((_timestamp > BlackTimeLibrary.epochVoteEnd(_timestamp)) && !ITokenHandler(tokenHandler).isWhitelistedNFT(_tokenId)){
             revert("not whitelisted");
         }
         _vote(_tokenId, _poolVote, _weights);
@@ -633,7 +584,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         // gov can create for any pool, even non-Black pairs
         if (!IPermissionsRegistry(permissionRegistry).hasRole("GOVERNANCE",msg.sender)) { 
             require(isPair, "!_pool");
-            require(isWhitelisted[tokenA] && isWhitelisted[tokenB], "!whitelisted");
+            require(!ITokenHandler(tokenHandler).isWhitelisted(tokenA) && !ITokenHandler(tokenHandler).isWhitelisted(tokenB), "!whitelisted");
             require(tokenA != address(0) && tokenB != address(0), "!pair.tokens");
         }
 

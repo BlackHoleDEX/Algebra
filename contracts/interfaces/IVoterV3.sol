@@ -2,7 +2,6 @@
 pragma solidity 0.8.13;
 
 interface IVoterV3 {
-    function isWhitelisted(address token) external view returns(bool);
     function lastVotedTimestamp(uint id) external view returns(uint);
     function length() external view returns (uint);
     function poolVoteLength(uint tokenId) external view returns(uint);
@@ -15,8 +14,6 @@ interface IVoterV3 {
     function epochTimestamp() external view returns(uint);
     function lastVoted(uint tokenId) external view returns(uint);
     function createGauge(address _pool, uint256 _gaugeType) external returns (address _gauge, address _internal_bribe, address _external_bribe);
-    function whitelist(address _token) external;
-    function blacklist(address _token) external;
     function getEpochGovernor() external view returns (address);
     function setEpochGovernor(address _epochGovernor) external;
 }
