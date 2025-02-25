@@ -263,7 +263,8 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
     function propose(
         address[] memory targets,
         uint256[] memory values,
-        bytes[] memory calldatas
+        bytes[] memory calldatas,
+        string memory description
     ) public virtual override returns (uint256) {
         require(
             getVotes(_msgSender(), block.number - 1) >= proposalThreshold(),
@@ -301,7 +302,8 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
             new string[](targets.length),
             calldatas,
             start,
-            deadline
+            deadline,
+            ""
         );
 
         return proposalIdMain;
