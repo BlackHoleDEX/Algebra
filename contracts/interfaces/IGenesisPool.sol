@@ -11,7 +11,14 @@ interface IGenesisPool {
     function liquidityPool() external view returns (IGanesisPoolBase.LiquidityPool memory);
     function poolStatus() external view returns (IGanesisPoolBase.PoolStatus);
 
-    function setGenesisPoolInfo(IGanesisPoolBase.GenesisInfo calldata _genesisInfo, IGanesisPoolBase.ProtocolInfo calldata _protocolInfo, uint256 _proposedNativeAmount, uint _proposedFundingAmount) external;
+    function setGenesisPoolInfo(IGanesisPoolBase.GenesisInfo calldata _genesisInfo, IGanesisPoolBase.ProtocolInfo calldata _protocolInfo, IGanesisPoolBase.TokenAllocation calldata _allocationInfo) external;
     function rejectPool() external;
     function approvePool(address _pairAddress) external;
+    function depositToken(address spender, uint256 amount) external returns (bool);
+    function transferIncentives(address gauge, address external_bribe, address internal_bribe) external;
+    function eligbleForPreLaunchPool() external view returns (bool);
+    function eligbleForCompleteLaunch() external view returns (bool);
+    function setLaunchStatus(IGanesisPoolBase.PoolStatus status) external returns (address, address, uint256, uint256, address, address, bool);
+    function approveTokens(address router) external;
+    function getLPTokensShares(uint256 liquidity) external returns (address[] memory, uint256[] memory, address);
 }

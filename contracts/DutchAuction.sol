@@ -3,10 +3,10 @@ pragma solidity 0.8.13;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import  "./interfaces/IDutchAuction.sol";
+import  "./interfaces/IAuction.sol";
 import "./interfaces/IGanesisPoolBase.sol";
 
-contract DutchAction is IGanesisPoolBase, OwnableUpgradeable {
+contract DutchAction is IGanesisPoolBase, IAuction, OwnableUpgradeable {
 
     address public _genesisPool;
 

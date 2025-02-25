@@ -12,12 +12,13 @@ import './interfaces/IRouter01.sol';
 import "./interfaces/IVoterV3.sol";
 import "./interfaces/IBribe.sol";
 import "./interfaces/IGauge.sol";
-import "./interfaces/IDutchAuction.sol";
+import "./interfaces/IAuction.sol";
 import "./interfaces/IGanesisPoolBase.sol";
 import "./interfaces/ITokenHandler.sol";
 import "./interfaces/IPermissionsRegistry.sol";
 import "./interfaces/IGenesisPoolFactory.sol";
 import './interfaces/IGenesisPool.sol';
+import './interfaces/IAuctionFactory.sol';
 
 interface IBaseV1Factory {
     function isPair(address pair) external view returns (bool);
@@ -42,6 +43,7 @@ contract GenesisPoolManager is IGanesisPoolBase, OwnableUpgradeable, ReentrancyG
     ITokenHandler public _tokenManager;
 
     IGenesisPoolFactory public genesisFactory;
+    IAuctionFactory public auctionFactory;
 
     using SafeERC20 for IERC20;
 
@@ -58,7 +60,7 @@ contract GenesisPoolManager is IGanesisPoolBase, OwnableUpgradeable, ReentrancyG
     mapping(address => address[]) public depositers;
 
     event WhiteListedTokenToUser(address proposedToken, address tokenOwner);
-    event DespositedToken(address proposedToken, address fundingToken, uint256 amount);
+    event DespositedToken(address genesisPool, address sender, uint256 amount);
     modifier Governance() {
         require(IPermissionsRegistry(_permissionRegistory).hasRole("GOVERNANCE",msg.sender), 'GOVERNANCE');
         _;
@@ -78,10 +80,11 @@ contract GenesisPoolManager is IGanesisPoolBase, OwnableUpgradeable, ReentrancyG
     //     _permissionRegistory = permissionRegistory;
     // }
 
-    function initialize(address _genesisFactory) initializer  public {
+    function initialize(address _genesisFactory, address _auctionFactory) initializer  public {
         __Ownable_init();
 
         genesisFactory = IGenesisPoolFactory(_genesisFactory);
+        auctionFactory = IAuctionFactory(_auctionFactory);
     }
 
     function whiteListUserAndToken(address tokenOwner, address proposedToken) external Governance nonReentrant{
@@ -89,11 +92,11 @@ contract GenesisPoolManager is IGanesisPoolBase, OwnableUpgradeable, ReentrancyG
         emit WhiteListedTokenToUser(proposedToken, tokenOwner);
     }
 
-    function depositNativeToken(address nativeToken, GenesisInfo calldata genesisPoolInfo, ProtocolInfo calldata protocolInfo, uint256 proposedNativeAmount, uint proposedFundingAmount) external nonReentrant returns(address genesisPool) {
+    function depositNativeToken(address nativeToken, uint auction, GenesisInfo calldata genesisPoolInfo, ProtocolInfo calldata protocolInfo, TokenAllocation calldata allocationInfo) external nonReentrant returns(address genesisPool) {
         address _sender = msg.sender;
         require(whiteListedTokensToUser[nativeToken][_sender] || _sender == owner(), "!listed");
-        require(proposedNativeAmount > 0, "0 native");
-        require(proposedFundingAmount > 0, "0 funding");
+        require(allocationInfo.proposedNativeAmount > 0, "0 native");
+        require(allocationInfo.proposedFundingAmount > 0, "0 funding");
         require(genesisFactory.getGenesisPool(nativeToken) == address(0), "exists");
 
         address _fundingToken = genesisPoolInfo.fundingToken;
@@ -107,13 +110,13 @@ contract GenesisPoolManager is IGanesisPoolBase, OwnableUpgradeable, ReentrancyG
         require(protocolInfo.tokenAddress == nativeToken, "unequal protocol token");
         require(bytes(protocolInfo.tokenName).length > 0 && bytes(protocolInfo.tokenTicker).length > 0 && bytes(protocolInfo.protocolBanner).length > 0 && bytes(protocolInfo.protocolDesc).length > 0, "protocol info");
 
-        genesisPool = genesisFactory.createGenesisPool(_sender, nativeToken, _fundingToken);
+        genesisPool = genesisFactory.createGenesisPool(_sender, nativeToken, _fundingToken, auctionFactory.auctions(auction));
         require(genesisPool != address(0), "0x");
 
-        assert(IERC20(nativeToken).transferFrom(_sender, genesisPool, proposedNativeAmount));
+        assert(IERC20(nativeToken).transferFrom(_sender, genesisPool, allocationInfo.proposedNativeAmount));
 
         proposedTokens.push(nativeToken);
-        IGenesisPool(genesisPool).setGenesisPoolInfo(genesisPoolInfo, protocolInfo, proposedNativeAmount, proposedFundingAmount);
+        IGenesisPool(genesisPool).setGenesisPoolInfo(genesisPoolInfo, protocolInfo, allocationInfo);
     }
 
     function rejectGenesisPool(address nativeToken) external Governance nonReentrant {
@@ -138,37 +141,17 @@ contract GenesisPoolManager is IGanesisPoolBase, OwnableUpgradeable, ReentrancyG
         IGenesisPool(genesisPool).approvePool(pairAddress);
     }
 
-    function depositToken(address proposedToken, address fundingToken, uint256 amount) external nonReentrant{
-        require(amount > 0, "invalid amount");
-        require(proposedToken != address(0), "invalid proposed token");
+    function depositToken(address genesisPool, uint256 amount) external nonReentrant{
+        require(amount > 0, "0 amt");
+        require(genesisPool != address(0), "0x");
 
-        PoolStatus _poolStatus = poolsStatus[proposedToken];
-        require(_poolStatus == PoolStatus.PRE_LISTING || _poolStatus == PoolStatus.PRE_LAUNCH, "invalid pool status");
+        bool preLaunchPool = IGenesisPool(genesisPool).depositToken(msg.sender, amount);
 
-        require(genesisPoolsInfo[proposedToken].fundingToken == fundingToken, "invalid funding token");
-
-        TokenAllocation storage _tokenAllocation = allocationsInfo[proposedToken];
-        uint256 _amount = _tokenAllocation.proposedFundingAmount - _tokenAllocation.allocatedFundingAmount;
-        _amount = _amount < amount ? _amount : amount;
-        require(_amount > 0, "0 amount");
-
-        address _spender = msg.sender;
-        assert(IERC20(fundingToken).transferFrom(_spender, address(this), _amount));
-
-        if(userDeposits[proposedToken][_spender] == 0){
-            depositers[proposedToken].push(_spender);
+        if(preLaunchPool){
+            _preLaunchPool(genesisPool);
         }
 
-        userDeposits[proposedToken][_spender] = userDeposits[proposedToken][_spender] + _amount;
-
-        _tokenAllocation.allocatedFundingAmount += _amount;
-        _tokenAllocation.allocatedNativeAmount += _getProtcolTokenAmount(proposedToken, amount, _tokenAllocation);
-
-        if(_poolStatus == PoolStatus.PRE_LISTING){
-            _checkAndPreLaunchPool(proposedToken);
-        }
-
-        emit DespositedToken(proposedToken, _spender, _amount);
+        emit DespositedToken(genesisPool, msg.sender, amount);
     }
 
 
@@ -178,102 +161,63 @@ contract GenesisPoolManager is IGanesisPoolBase, OwnableUpgradeable, ReentrancyG
 
         uint256 _proposedTokensCnt = proposedTokens.length;
         uint256 i;
-        address _proposedToken;
+        address _genesisPool;
         PoolStatus _poolStatus;
         for(i = 0; i < _proposedTokensCnt; i++){
-            _proposedToken = proposedTokens[i];
-            _poolStatus = poolsStatus[_proposedToken];
+            _genesisPool = genesisFactory.getGenesisPool(proposedTokens[i]);
+            _poolStatus = IGenesisPool(_genesisPool).poolStatus();
 
-            if(_poolStatus == PoolStatus.PRE_LISTING){
-                _checkAndPreLaunchPool(_proposedToken);
+            if(_poolStatus == PoolStatus.PRE_LISTING && IGenesisPool(_genesisPool).eligbleForPreLaunchPool()){
+                _preLaunchPool(_genesisPool);
             }else if(_poolStatus == PoolStatus.PRE_LAUNCH_DEPOSIT_DISABLED){
-                _launchPool(_proposedToken);
+                _launchPool(_genesisPool);
             }
         }
     }
 
-    function _checkAndPreLaunchPool(address proposedToken) internal {
-        GenesisInfo storage _genesisPool = genesisPoolsInfo[proposedToken];
-        uint _endTime = _genesisPool.startTime + _genesisPool.duration;
-        TokenAllocation storage _tokenAllocation = allocationsInfo[proposedToken];
-        uint256 targetFundingAmount = (_tokenAllocation.proposedFundingAmount * _genesisPool.threshold) / 10000; // threshold is 100 * of original to support 2 deciamls
 
-        if(BlackTimeLibrary.isLastEpoch(block.timestamp, _endTime) && _tokenAllocation.allocatedFundingAmount >= targetFundingAmount) {
+    function _preLaunchPool(address genesisPool) internal {
+        address _poolAddress = IGenesisPool(genesisPool).liquidityPool().pairAddress;
+        (address _gauge, address _internal_bribe, address _external_bribe) = _voter.createGauge(_poolAddress, 0);
 
-            LiquidityPool storage _liquidityPool = liquidityPoolsInfo[proposedToken];
-            address _poolAddress = _liquidityPool.pairAddress;
-
-            (address _gauge, address _internal_bribe, address _external_bribe) = _voter.createGauge(_poolAddress, 0);
-
-            _liquidityPool.gaugeAddress = _gauge;
-            _liquidityPool.internal_bribe = _internal_bribe;
-            _liquidityPool.external_bribe = _external_bribe;
-
-            TokenIncentiveInfo storage _incentiveInfo = incentivesInfo[proposedToken];
-            uint256 i;
-            uint256 _incentivesCnt = _incentiveInfo.incentivesToken.length;
-            for(i = 0; i < _incentivesCnt; i++){
-                if(_incentiveInfo.incentivesAmount[i] > 0)
-                {
-                    IBribe(_external_bribe).notifyRewardAmount(_incentiveInfo.incentivesToken[i], _incentiveInfo.incentivesAmount[i]);
-                }
-            }
-
-            poolsStatus[proposedToken] = PoolStatus.PRE_LAUNCH;
-        }
+        IGenesisPool(genesisPool).transferIncentives(_gauge, _external_bribe, _internal_bribe);
     }
 
-    function _launchPool(address proposedToken) internal {
-        TokenAllocation storage _tokenAllocation = allocationsInfo[proposedToken];
-        GenesisInfo storage _genesisPool = genesisPoolsInfo[proposedToken];
-        uint256 targetFundingAmount = (_tokenAllocation.proposedFundingAmount * _genesisPool.threshold) / 10000; // threshold is 100 * of original to support 2 deciamls
-
-        if(targetFundingAmount == _tokenAllocation.allocatedFundingAmount){
-            _completelyLaunchPool(proposedToken, _tokenAllocation, _genesisPool);
+    function _launchPool(address _genesisPool) internal {
+        if(IGenesisPool(_genesisPool).eligbleForCompleteLaunch()){
+            _completelyLaunchPool(_genesisPool);
         }else{
-            _partiallyLaunchPool(proposedToken, _tokenAllocation, _genesisPool);
+            _partiallyLaunchPool(_genesisPool);
         }
     }
 
-    function _completelyLaunchPool(address proposedToken, TokenAllocation storage _tokenAllocation, GenesisInfo storage _genesisPool) internal {
-        _tokenAllocation.refundableNativeAmount = 0;
-        _addLiquidityAndDistribute(proposedToken, _tokenAllocation, _genesisPool);
-        poolsStatus[proposedToken] = PoolStatus.LAUNCH;
+    function _completelyLaunchPool(address _genesisPool) internal {
+        (address nativeToken, address fundingToken, uint256 nativeDesired, uint256 fundingDesired, 
+        address poolAddress, address gaugeAddress, bool stable) = IGenesisPool(_genesisPool).setLaunchStatus(PoolStatus.PARTIALLY_LAUNCHED);
+
+        _addLiquidityAndDistribute(_genesisPool, nativeToken, fundingToken, nativeDesired, fundingDesired, poolAddress, gaugeAddress, stable);
     }
 
 
-    function _partiallyLaunchPool(address proposedToken, TokenAllocation storage _tokenAllocation, GenesisInfo storage _genesisPool) internal {
-        _tokenAllocation.refundableNativeAmount = _tokenAllocation.proposedNativeAmount - _tokenAllocation.allocatedNativeAmount;
-        _addLiquidityAndDistribute(proposedToken, _tokenAllocation, _genesisPool);
-        poolsStatus[proposedToken] = PoolStatus.PARTIALLY_LAUNCHED;
+    function _partiallyLaunchPool(address _genesisPool) internal {
+        (address nativeToken, address fundingToken, uint256 nativeDesired, uint256 fundingDesired, 
+        address poolAddress, address gaugeAddress, bool stable) = IGenesisPool(_genesisPool).setLaunchStatus(PoolStatus.PARTIALLY_LAUNCHED);
+
+        _addLiquidityAndDistribute(_genesisPool, nativeToken, fundingToken, nativeDesired, fundingDesired, poolAddress, gaugeAddress, stable);
     }
 
-    function _addLiquidityAndDistribute(address proposedToken, TokenAllocation storage _tokenAllocation, GenesisInfo storage _genesisPool) internal {
-        LiquidityPool storage _liquidityPool = liquidityPoolsInfo[proposedToken];
-        uint256 amountADesired = _tokenAllocation.allocatedNativeAmount;
-        uint256 amountBDesired = _tokenAllocation.allocatedFundingAmount;
-        _pairFactory.setGenesisStatus(_liquidityPool.pairAddress, false);
+    function _addLiquidityAndDistribute(address _genesisPool, address nativeToken, address fundingToken, uint256 nativeDesired, uint256 fundingDesired, 
+        address poolAddress, address gaugeAddress, bool stable) internal {
 
-        IERC20(proposedToken).approve(_router, amountADesired);
-        IERC20(_genesisPool.fundingToken).approve(_router, amountBDesired);
+        _pairFactory.setGenesisStatus(poolAddress, false);
+        IGenesisPool(_genesisPool).approveTokens(_router);
 
-        (, , uint liquidity) = IRouter01(_router).addLiquidity(proposedToken, _genesisPool.fundingToken, protocolsInfo[proposedToken].stable, amountADesired, amountBDesired, 0, 0, address(this), block.timestamp + 100);
+        (, , uint liquidity) = IRouter01(_router).addLiquidity(nativeToken, fundingToken, stable, nativeDesired, fundingDesired, 0, 0, address(this), block.timestamp + 100);
 
-        IERC20(proposedToken).approve(_router, amountADesired);
-        IERC20(_genesisPool.fundingToken).approve(_router, amountBDesired);
+        (address[] memory _accounts, uint256[] memory _amounts, address _tokenOwner) = IGenesisPool(_genesisPool).getLPTokensShares(liquidity);
 
-        address[] storage _depositers = depositers[proposedToken];
-        uint256 _depositersCnt = _depositers.length;
-        uint256[] memory _deposits = new uint256[](_depositersCnt);
-        uint256 i;
-        for(i = 0; i < _depositersCnt; i++){
-            _deposits[i] = userDeposits[proposedToken][_depositers[i]];
-        }
-
-        (address[] memory _accounts, uint256[] memory _amounts) = IDutchAuction(_dutchAuction).getLPTokensShares(_depositers, _deposits, _tokenAllocation.tokenOwner, liquidity);
-
-        IERC20(_liquidityPool.pairAddress).approve(_liquidityPool.gaugeAddress, liquidity);
-        IGauge(_liquidityPool.gaugeAddress).depositsForGenesis(_accounts, _amounts, _tokenAllocation.tokenOwner, block.timestamp + MATURITY_TIME, liquidity);
+        IERC20(poolAddress).approve(gaugeAddress, liquidity);
+        IGauge(gaugeAddress).depositsForGenesis(_accounts, _amounts, _tokenOwner, block.timestamp + MATURITY_TIME, liquidity);
     }
     
     // before 3 hrs
@@ -405,16 +349,6 @@ contract GenesisPoolManager is IGanesisPoolBase, OwnableUpgradeable, ReentrancyG
         }
 
         incentivesInfo[proposedToken] = _incentiveInfo;
-    }
-
-    function getProtcolTokenAmount(address proposedToken, uint256 depositAmount) external view returns (uint256){
-        require(proposedToken != address(0), "invalid address");
-        require(depositAmount > 0, "0 deposit amount");
-        return _getProtcolTokenAmount(proposedToken, depositAmount, allocationsInfo[proposedToken]);
-    }
-
-    function _getProtcolTokenAmount(address proposedToken, uint256 depositAmount, TokenAllocation memory tokenAllocation) internal view returns (uint256){
-        return IDutchAuction(_dutchAuction).getProtcolTokenAmount(genesisPoolsInfo[proposedToken].startPrice, depositAmount, tokenAllocation);
     }
 
     function setEpochController(address epochController) external Governance {
