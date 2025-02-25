@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.13;
 
-contract GanesisPoolBase {
+interface IGanesisPoolBase {
     struct TokenAllocation {
         address tokenOwner;
         uint256 proposedNativeAmount;
@@ -18,7 +18,7 @@ contract GanesisPoolBase {
         uint256[] incentivesAmount;
     }
 
-    struct GenesisPool{
+    struct GenesisInfo{
         address fundingToken;
         uint256 duration;
         uint8 threshold; // multiplied by 100 to support 2 decimals
