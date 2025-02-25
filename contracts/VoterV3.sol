@@ -400,7 +400,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         if (block.timestamp <= BlackTimeLibrary.epochVoteStart(block.timestamp)){
             revert("Distribution Window");
         }
-        require(IVotingEscrow(_ve).isApprovedOrOwner(msg.sender, _tokenId), "!approved/Owner");
+        require(IVotingEscrow(_ve).isApprovedOrOwner(msg.sender, _tokenId) || msg.sender == _ve, "!approved/Owner && !_ve");
         address[] memory _poolVote = poolVote[_tokenId];
         uint256 _poolCnt = _poolVote.length;
         uint256[] memory _weights = new uint256[](_poolCnt);
