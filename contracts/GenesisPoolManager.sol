@@ -25,14 +25,13 @@ interface IBaseV1Factory {
     function setGenesisStatus(address _pair, bool status) external;
 }
 
-contract GenesisPoolManager is IGanesisPoolBase, OwnableUpgradeable, ReentrancyGuardUpgradeable {
+contract GenesisPoolManager is IGanesisPoolBase, IGenesisPoolManager, OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
     uint256 public MIN_DURATION = 7 days; 
     uint256 public MIN_THRESHOLD = 50 * 10 ** 2; 
     uint256 public MATURITY_TIME = 90 days;
 
     address public epochController;
-    address public dutchAuction;
     address public permissionRegistory;
     address public router;
     IBaseV1Factory public pairFactory;
@@ -45,17 +44,8 @@ contract GenesisPoolManager is IGanesisPoolBase, OwnableUpgradeable, ReentrancyG
     using SafeERC20 for IERC20;
 
     mapping(address => mapping(address => bool)) public whiteListedTokensToUser; 
-    mapping(address => TokenAllocation) public allocationsInfo;
-    mapping(address => TokenIncentiveInfo) public incentivesInfo;
-    mapping(address => GenesisInfo) public genesisPoolsInfo;
-    mapping(address => ProtocolInfo) public protocolsInfo;
-    mapping(address => PoolStatus) public poolsStatus;
-    mapping(address => mapping(address => uint256)) public userDeposits;
-    mapping(address => LiquidityPool) public liquidityPoolsInfo;
-
     address[] public proposedTokens;
-    mapping(address => address[]) public depositers;
-
+    
     event WhiteListedTokenToUser(address proposedToken, address tokenOwner);
     event DespositedToken(address genesisPool, address sender, uint256 amount);
     modifier Governance() {
@@ -101,7 +91,7 @@ contract GenesisPoolManager is IGanesisPoolBase, OwnableUpgradeable, ReentrancyG
         require(bytes(protocolInfo.tokenName).length > 0 && bytes(protocolInfo.tokenTicker).length > 0 && bytes(protocolInfo.protocolBanner).length > 0 && bytes(protocolInfo.protocolDesc).length > 0, "protocol info");
 
         address auction = auctionFactory.auctions(auctionIndex);
-        auction = auction == address(0) ? dutchAuction : auction;
+        auction = auction == address(0) ? auctionFactory.auctions(0) : auction;
         genesisPool = genesisFactory.createGenesisPool(_sender, nativeToken, _fundingToken, auction);
         require(genesisPool != address(0), "0x");
 
@@ -127,7 +117,7 @@ contract GenesisPoolManager is IGanesisPoolBase, OwnableUpgradeable, ReentrancyG
 
         _tokenManager.whitelist(nativeToken);
 
-        address pairAddress = pairFactory.createPair(nativeToken, IGenesisPool(genesisPool).genesis().fundingToken, IGenesisPool(genesisPool).protocol().stable);
+        address pairAddress = pairFactory.createPair(nativeToken, IGenesisPool(genesisPool).getGenesisInfo().fundingToken, IGenesisPool(genesisPool).getProtocolInfo().stable);
         pairFactory.setGenesisStatus(pairAddress, true);
 
         IGenesisPool(genesisPool).approvePool(pairAddress);
@@ -169,7 +159,7 @@ contract GenesisPoolManager is IGanesisPoolBase, OwnableUpgradeable, ReentrancyG
 
 
     function _preLaunchPool(address genesisPool) internal {
-        address _poolAddress = IGenesisPool(genesisPool).liquidityPool().pairAddress;
+        address _poolAddress = IGenesisPool(genesisPool).getLiquidityPoolInfo().pairAddress;
         (address _gauge, address _internal_bribe, address _external_bribe) = voter.createGauge(_poolAddress, 0);
 
         IGenesisPool(genesisPool).transferIncentives(_gauge, _external_bribe, _internal_bribe);
@@ -225,7 +215,7 @@ contract GenesisPoolManager is IGanesisPoolBase, OwnableUpgradeable, ReentrancyG
             _poolStatus = IGenesisPool(_genesisPool).poolStatus();
 
             if(_poolStatus == PoolStatus.PRE_LISTING && IGenesisPool(_genesisPool).eligbleForDisqualify()){
-                pairFactory.setGenesisStatus(IGenesisPool(_genesisPool).liquidityPool().pairAddress, false);
+                pairFactory.setGenesisStatus(IGenesisPool(_genesisPool).getLiquidityPoolInfo().pairAddress, false);
                 IGenesisPool(_genesisPool).setPoolStatus(PoolStatus.NOT_QUALIFIED);
             }
             else if(_poolStatus == PoolStatus.PRE_LAUNCH){
@@ -234,12 +224,12 @@ contract GenesisPoolManager is IGanesisPoolBase, OwnableUpgradeable, ReentrancyG
         }
     }
 
-    function setEpochController(address _epochController) external Governance {
-        epochController = _epochController;
+    function getAllProposedTokens() external view returns (address[] memory) {
+        return proposedTokens;
     }
 
-    function setDutchAuction(address _dutchAuction) external Governance {
-        dutchAuction = _dutchAuction;
+    function setEpochController(address _epochController) external Governance {
+        epochController = _epochController;
     }
 
     function setMinimumDuration(uint256 _duration) external Governance {

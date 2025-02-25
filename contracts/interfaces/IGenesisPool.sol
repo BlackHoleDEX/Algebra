@@ -4,12 +4,13 @@ pragma solidity 0.8.13;
 import "./IGanesisPoolBase.sol";
 
 interface IGenesisPool {
-    function allocation() external view returns (IGanesisPoolBase.TokenAllocation memory);
-    function incentives() external view returns (IGanesisPoolBase.TokenIncentiveInfo memory);
-    function genesis() external view returns (IGanesisPoolBase.GenesisInfo memory);
-    function protocol() external view returns (IGanesisPoolBase.ProtocolInfo memory);
-    function liquidityPool() external view returns (IGanesisPoolBase.LiquidityPool memory);
+    function getAllocationInfo() external view returns (IGanesisPoolBase.TokenAllocation memory);
+    function getIncentivesInfo() external view returns (IGanesisPoolBase.TokenIncentiveInfo memory);
+    function getGenesisInfo() external view returns (IGanesisPoolBase.GenesisInfo memory);
+    function getProtocolInfo() external view returns (IGanesisPoolBase.ProtocolInfo memory);
+    function getLiquidityPoolInfo() external view returns (IGanesisPoolBase.LiquidityPool memory);
     function poolStatus() external view returns (IGanesisPoolBase.PoolStatus);
+    function userDeposits(address _user) external view returns (uint256);
 
     function setGenesisPoolInfo(IGanesisPoolBase.GenesisInfo calldata _genesisInfo, IGanesisPoolBase.ProtocolInfo calldata _protocolInfo, IGanesisPoolBase.TokenAllocation calldata _allocationInfo) external;
     function rejectPool() external;

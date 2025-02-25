@@ -23,11 +23,13 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
     IVoterV3 immutable internal voter;
 
     TokenAllocation public allocationInfo;
-    TokenIncentiveInfo public incentiveInfo;
     GenesisInfo public genesisInfo;
     ProtocolInfo public protocolInfo;
     PoolStatus public poolStatus;
     LiquidityPool public liquidityPoolInfo;
+
+    address[] public incentiveTokens;
+    mapping(address => uint256) public incentives;
 
     address[] public depositers;
     mapping(address => uint256) public userDeposits;
@@ -44,7 +46,6 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
 
     constructor(address _factory, address _genesisManager, address _tokenHandler, address _voter, address _auction, address _tokenOwner, address _nativeToken, address _fundingToken){
         allocationInfo.tokenOwner = _tokenOwner;
-        incentiveInfo.tokenOwner = _tokenOwner;
         protocolInfo.tokenAddress = _nativeToken;    
         genesisInfo.fundingToken = _fundingToken;
 
@@ -94,10 +95,11 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
 
         for(i = 0; i < _incentivesCnt; i++){
             assert(IERC20(_incentivesToken[i]).transferFrom(_sender, address(this), _incentivesAmount[i]));
+            if(incentives[_incentivesToken[i]] == 0){
+                incentiveTokens.push(_incentivesToken[i]);
+            }
+            incentives[_incentivesToken[i]] += _incentivesAmount[i];
         }
-
-        incentiveInfo.incentivesToken = _incentivesToken;
-        incentiveInfo.incentivesAmount = _incentivesAmount;
 
         emit AddedIncentives(protocolInfo.tokenAddress, _incentivesToken, _incentivesAmount);
     }
@@ -165,11 +167,13 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
         liquidityPoolInfo.internal_bribe = internal_bribe;
 
         uint256 i = 0;
-        uint256 _incentivesCnt = incentiveInfo.incentivesToken.length;
+        uint256 _amount = 0;
+        uint256 _incentivesCnt = incentiveTokens.length;
         for(i = 0; i < _incentivesCnt; i++){
-            if(incentiveInfo.incentivesAmount[i] > 0)
+            _amount = incentives[incentiveTokens[i]];
+            if(_amount > 0)
             {
-                IBribe(external_bribe).notifyRewardAmount(incentiveInfo.incentivesToken[i], incentiveInfo.incentivesAmount[i]);
+                IBribe(external_bribe).notifyRewardAmount(incentiveTokens[i], _amount);
             }
         }
 
@@ -276,8 +280,13 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
 
     function claimableIncentives() public view returns(address[] memory tokens , uint256[] memory amounts){
         if(poolStatus == PoolStatus.NOT_QUALIFIED && msg.sender == allocationInfo.tokenOwner){
-            tokens = incentiveInfo.incentivesToken;
-            amounts = incentiveInfo.incentivesAmount;
+            tokens = incentiveTokens;
+            uint256 incentivesCnt = incentiveTokens.length;
+            amounts = new uint256[](incentivesCnt);
+            uint256 i;
+            for(i = 0; i < incentivesCnt; i++){
+                amounts[i] = incentives[incentiveTokens[i]];
+            }
         }
     }
 
@@ -285,15 +294,15 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
         require(poolStatus == PoolStatus.NOT_QUALIFIED, "!= status");
         require(msg.sender == allocationInfo.tokenOwner, "!= onwer");
 
-        uint256 _incentivesCnt = incentiveInfo.incentivesAmount.length;
+        uint256 _incentivesCnt = incentiveTokens.length;
         uint256 i;
         uint _amount;
 
         for(i = 0; i < _incentivesCnt; i++){
-            _amount = incentiveInfo.incentivesAmount[i];
-            incentiveInfo.incentivesAmount[i] = 0;
+            _amount = incentives[incentiveTokens[i]];
+            incentives[incentiveTokens[i]] = 0;
 
-            assert(IERC20(incentiveInfo.incentivesToken[i]).transfer(msg.sender, _amount));
+            assert(IERC20(incentiveTokens[i]).transfer(msg.sender, _amount));
         }
     }
 
@@ -306,22 +315,28 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
         return auction.getProtcolTokenAmount(genesisInfo.startPrice, depositAmount, allocationInfo);
     }
 
-    function allocation() external view returns (TokenAllocation memory){
+    function getAllocationInfo() external view returns (TokenAllocation memory){
         return allocationInfo;
     }
 
-    function incentives() external view returns (IGanesisPoolBase.TokenIncentiveInfo memory){
-        return incentiveInfo;
+    function getIncentivesInfo() external view returns (IGanesisPoolBase.TokenIncentiveInfo memory incentiveInfo){
+        incentiveInfo.incentivesToken = incentiveTokens;
+        uint256 incentivesCnt = incentiveTokens.length;
+        incentiveInfo.incentivesAmount = new uint256[](incentivesCnt);
+        uint256 i;
+        for(i = 0; i < incentivesCnt; i++){
+            incentiveInfo.incentivesAmount[i] = incentives[incentiveTokens[i]];
+        }
     }
 
-    function genesis() external view returns (IGanesisPoolBase.GenesisInfo memory){
+    function getGenesisInfo() external view returns (IGanesisPoolBase.GenesisInfo memory){
         return genesisInfo;
     }
-    function protocol() external view returns (IGanesisPoolBase.ProtocolInfo memory){
+    function getProtocolInfo() external view returns (IGanesisPoolBase.ProtocolInfo memory){
         return protocolInfo;
     }
 
-    function liquidityPool() external view returns (IGanesisPoolBase.LiquidityPool memory){
+    function getLiquidityPoolInfo() external view returns (IGanesisPoolBase.LiquidityPool memory){
         return liquidityPoolInfo;
     }
 }

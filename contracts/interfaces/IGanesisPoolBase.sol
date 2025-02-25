@@ -13,7 +13,6 @@ interface IGanesisPoolBase {
     }
 
     struct TokenIncentiveInfo{
-        address tokenOwner;
         address[] incentivesToken;
         uint256[] incentivesAmount;
     }

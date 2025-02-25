@@ -5,6 +5,8 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "../interfaces/IGanesisPoolBase.sol"; 
 import '../interfaces/IGenesisPoolManager.sol';
+import '../interfaces/IGenesisPoolFactory.sol';
+import '../interfaces/IGenesisPool.sol';
 import {BlackTimeLibrary} from "../libraries/BlackTimeLibrary.sol";
 
 contract GenesisPoolAPI is IGanesisPoolBase, Initializable {
@@ -14,7 +16,7 @@ contract GenesisPoolAPI is IGanesisPoolBase, Initializable {
         uint256 userDeposit;
         TokenAllocation tokenAllocation;
         TokenIncentiveInfo incentiveInfo;
-        GenesisInfo genesisPool;
+        GenesisInfo genesisInfo;
         ProtocolInfo protocolInfo;
         LiquidityPool liquidityPool;
         PoolStatus poolStatus;
@@ -22,16 +24,18 @@ contract GenesisPoolAPI is IGanesisPoolBase, Initializable {
 
     address public owner;
     IGenesisPoolManager public genesisManager;
+    IGenesisPoolFactory public genesisPoolFactory;
 
     uint256 public constant MAX_POOLS = 1000;
 
     constructor() {}
 
-    function initialize(address _genesisManager) initializer public {
+    function initialize(address _genesisManager, address _genesisPoolFactory) initializer public {
   
         owner = msg.sender;
 
         genesisManager = IGenesisPoolManager(_genesisManager);
+        genesisPoolFactory = IGenesisPoolFactory(_genesisPoolFactory);
     }
 
 
@@ -45,11 +49,11 @@ contract GenesisPoolAPI is IGanesisPoolBase, Initializable {
 
         genesisPools = new GenesisData[](_amounts);
 
-        address[] memory proposedTokens = genesisManager.proposedTokens();
+        address[] memory proposedTokens = genesisManager.getAllProposedTokens();
         
         uint i = _offset;
         hasNext = true;
-        address proposedToken;
+        address genesisPool;
 
         for(i; i < _offset + _amounts; i++){
             if(i >= totPairs) {
@@ -57,15 +61,16 @@ contract GenesisPoolAPI is IGanesisPoolBase, Initializable {
                 break;
             }
 
-            proposedToken = proposedTokens[i];
+            genesisPool = genesisPoolFactory.getGenesisPool(proposedTokens[i]);
 
-            genesisPools[i - _offset].protocolToken = proposedToken;
-            genesisPools[i - _offset].userDeposit = genesisManager.userDeposits(proposedToken, _user);
-            genesisPools[i - _offset].tokenAllocation = genesisManager.allocationsInfo(proposedToken);
-            genesisPools[i - _offset].incentiveInfo = genesisManager.incentivesInfo(proposedToken);
-            genesisPools[i - _offset].genesisPool = genesisManager.genesisPoolsInfo(proposedToken);
-            genesisPools[i - _offset].liquidityPool = genesisManager.liquidityPoolsInfo(proposedToken);
-            genesisPools[i - _offset].poolStatus = genesisManager.poolsStatus(proposedToken);
+            genesisPools[i - _offset].protocolToken = proposedTokens[i];
+            genesisPools[i - _offset].userDeposit = IGenesisPool(genesisPool).userDeposits(_user);
+            genesisPools[i - _offset].tokenAllocation = IGenesisPool(genesisPool).getAllocationInfo();
+            genesisPools[i - _offset].incentiveInfo = IGenesisPool(genesisPool).getIncentivesInfo();
+            genesisPools[i - _offset].genesisInfo = IGenesisPool(genesisPool).getGenesisInfo();
+            genesisPools[i - _offset].protocolInfo = IGenesisPool(genesisPool).getProtocolInfo();
+            genesisPools[i - _offset].liquidityPool = IGenesisPool(genesisPool).getLiquidityPoolInfo();
+            genesisPools[i - _offset].poolStatus = IGenesisPool(genesisPool).poolStatus();
         }
 
     }
