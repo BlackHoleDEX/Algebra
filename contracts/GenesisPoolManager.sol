@@ -120,37 +120,6 @@ contract GenesisPoolManager is IGanesisPoolBase, OwnableUpgradeable, ReentrancyG
         IGenesisPool(genesisPool).setGenesisPoolInfo(genesisPoolInfo, protocolInfo, proposedNativeAmount, proposedFundingAmount);
     }
 
-    function depositNativeToken(address proposedToken, address fundingToken, bool stable, uint256 proposedNativeAmount, uint proposedFundingAmount) external nonReentrant{
-        address _sender = msg.sender;
-        require(whiteListedTokensToUser[proposedToken][_sender] || _sender == owner(), "not whitelisted");
-        require(_tokenManager.isConnector(fundingToken), "connector !=");
-        require(_pairFactory.getPair(proposedToken, fundingToken, stable) == address(0), "existing pair");
-        require(poolsStatus[proposedToken] == PoolStatus.DEFAULT, "already token allocated");
-        require(proposedNativeAmount > 0, "proposed native token 0");
-        require(proposedFundingAmount > 0, "proposed funding token 0");
-
-        TokenAllocation storage _tokenAllocation = allocationsInfo[proposedToken];
-
-        assert(IERC20(proposedToken).transferFrom(_sender, address(this), proposedNativeAmount));
-
-        _tokenAllocation.tokenOwner = _sender;
-        _tokenAllocation.proposedNativeAmount = proposedNativeAmount;
-        _tokenAllocation.proposedFundingAmount = proposedFundingAmount;
-        _tokenAllocation.allocatedNativeAmount = 0;
-        _tokenAllocation.allocatedFundingAmount = 0;
-        _tokenAllocation.refundableNativeAmount = 0;
-
-        GenesisInfo storage _genesisPool = genesisPoolsInfo[proposedToken];
-        _genesisPool.fundingToken = fundingToken;
-
-        ProtocolInfo storage _protocolInfo = protocolsInfo[proposedToken];
-        _protocolInfo.stable = stable;
-
-        poolsStatus[proposedToken] = PoolStatus.NATIVE_TOKEN_DEPOSITED;
-
-        emit DepositedNativeToken(proposedToken, proposedNativeAmount, proposedFundingAmount);
-    }
-
     function addIncentives(address proposedToken, address fundingToken, bool stable, address[] calldata incentivesToken, uint256[] calldata incentivesAmount) external nonReentrant{
         address _sender = msg.sender;
         require(incentivesToken.length > 0, "incentive length 0");
