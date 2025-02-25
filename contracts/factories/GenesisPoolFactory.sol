@@ -5,12 +5,14 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import '../interfaces/IGenesisPoolFactory.sol';
 import '../GenesisPool.sol';
 import '../interfaces/IGenesisPool.sol';
+import '../interfaces/ITokenHandler.sol';
 
 contract GenesisPoolFactory is IGenesisPoolFactory, OwnableUpgradeable {
 
     address public genesisManager;
+    address public tokenHandler;
 
-    mapping(address => address) public isGenesisPool;
+    mapping(address => address) public getGenesisPool;
     address[] public genesisPools;
 
     event GenesisCreated(address indexed nativeToken, address indexed fundingToken);
@@ -23,10 +25,11 @@ contract GenesisPoolFactory is IGenesisPoolFactory, OwnableUpgradeable {
 
     constructor() {}
 
-    function initialize() public initializer {
+    function initialize(address _tokenHandler) public initializer {
         __Ownable_init();
 
         genesisManager = msg.sender;
+        tokenHandler = _tokenHandler;
     }
 
     function SetGenesisManager(address _genesisManager) external onlyManager {
@@ -40,13 +43,13 @@ contract GenesisPoolFactory is IGenesisPoolFactory, OwnableUpgradeable {
 
     function createGenesisPool(address tokenOwner, address nativeToken, address fundingToken) external onlyManager returns (address genesisPool) {
         require(nativeToken != address(0), "0x"); 
-        require(isGenesisPool[nativeToken] == address(0), "exists");
+        require(getGenesisPool[nativeToken] == address(0), "exists");
 
         address factory = address(this);
         bytes32 salt = keccak256(abi.encodePacked(nativeToken, fundingToken));
-        genesisPool = address(new GenesisPool{salt: salt}(factory, genesisManager, tokenOwner, nativeToken, fundingToken));
+        genesisPool = address(new GenesisPool{salt: salt}(factory, genesisManager, tokenHandler, tokenOwner, nativeToken, fundingToken));
 
-        isGenesisPool[nativeToken] = genesisPool;
+        getGenesisPool[nativeToken] = genesisPool;
         genesisPools.push(genesisPool);
 
         emit GenesisCreated(nativeToken, fundingToken);

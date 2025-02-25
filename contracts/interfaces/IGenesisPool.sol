@@ -12,5 +12,6 @@ interface IGenesisPool {
     function poolStatus() external view returns (IGanesisPoolBase.PoolStatus);
 
     function setGenesisPoolInfo(IGanesisPoolBase.GenesisInfo calldata _genesisInfo, IGanesisPoolBase.ProtocolInfo calldata _protocolInfo, uint256 _proposedNativeAmount, uint _proposedFundingAmount) external;
-    function addIncentives(address _sender, address _nativeToken, address[] calldata _incentivesToken, uint256[] calldata _incentivesAmount) external;
+    function rejectPool() external;
+    function approvePool(address _pairAddress) external;
 }

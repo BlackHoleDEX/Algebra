@@ -3,9 +3,11 @@ pragma solidity 0.8.13;
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
 
 import "./interfaces/IGenesisPool.sol";
 import "./interfaces/IGanesisPoolBase.sol";
+import "./interfaces/ITokenHandler.sol";
 
 contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeable {
 
@@ -13,6 +15,7 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
 
     address immutable internal factory;
     address immutable internal genesisManager;
+    ITokenHandler immutable internal tokenHandler;
 
     TokenAllocation public allocationInfo;
     TokenIncentiveInfo public incentiveInfo;
@@ -24,15 +27,17 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
     address[] public depositers;
     mapping(address => uint256) public userDeposits;
 
-    event DepositedNativeToken(address proposedToken, address genesisPool, uint256 proposedNativeAmount, uint proposedFundingAmount);
-    event AddedIncentives(address proposedToken, address[] incentivesToken, uint256[] incentivesAmount);
+    event DepositedNativeToken(address native, address owner, address genesisPool, uint256 proposedNativeAmount, uint proposedFundingAmount);
+    event AddedIncentives(address native, address[] incentivesToken, uint256[] incentivesAmount);
+    event RejectedGenesisPool(address native);
+    event ApprovedGenesisPool(address proposedToken);
 
     modifier onlyManager() {
         require(msg.sender == genesisManager);
         _;
     }
 
-    constructor(address _factory, address _genesisManager, address _tokenOwner, address _nativeToken, address _fundingToken){
+    constructor(address _factory, address _genesisManager, address _tokenHandler, address _tokenOwner, address _nativeToken, address _fundingToken){
         allocationInfo.tokenOwner = _tokenOwner;
         incentiveInfo.tokenOwner = _tokenOwner;
         protocolInfo.tokenAddress = _nativeToken;    
@@ -40,12 +45,16 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
 
         factory = _factory;
         genesisManager = _genesisManager;
+        tokenHandler = ITokenHandler(_tokenHandler);
     }
 
 
     function setGenesisPoolInfo(GenesisInfo calldata _genesisInfo, ProtocolInfo calldata _protocolInfo, uint256 _proposedNativeAmount, uint _proposedFundingAmount) external onlyManager(){
         genesisInfo = _genesisInfo;
         protocolInfo = _protocolInfo;
+
+        genesisInfo.duration = BlackTimeLibrary.epochMultiples(genesisInfo.duration);
+        genesisInfo.startTime = BlackTimeLibrary.epochNext(block.timestamp);
 
         allocationInfo.proposedNativeAmount = _proposedNativeAmount;
         allocationInfo.proposedFundingAmount = _proposedFundingAmount;
@@ -55,16 +64,27 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
 
         poolStatus = PoolStatus.NATIVE_TOKEN_DEPOSITED;
 
-        emit DepositedNativeToken(allocationInfo.tokenOwner, address(this), _proposedNativeAmount, _proposedFundingAmount);
+        emit DepositedNativeToken(_protocolInfo.tokenAddress, allocationInfo.tokenOwner, address(this), _proposedNativeAmount, _proposedFundingAmount);
     }
 
-    function addIncentives(address _sender, address _nativeToken, address[] calldata _incentivesToken, uint256[] calldata _incentivesAmount) external onlyManager{
-        require(_nativeToken == protocolInfo.tokenAddress, "!= native");
+    function addIncentives(address[] calldata _incentivesToken, uint256[] calldata _incentivesAmount) external {
+        address _sender = msg.sender;
         require(_sender == allocationInfo.tokenOwner, "!= sender");
-        require(poolStatus == PoolStatus.NATIVE_TOKEN_DEPOSITED || poolStatus == PoolStatus.APPLIED || poolStatus == PoolStatus.PRE_LISTING, "!= status");
-
+        require(poolStatus == PoolStatus.NATIVE_TOKEN_DEPOSITED || poolStatus == PoolStatus.PRE_LISTING, "!= status");
+        require(_incentivesToken.length > 0, "0 len");
+        require(_incentivesToken.length == _incentivesAmount.length, "!= len");
         uint256 _incentivesCnt = _incentivesToken.length;
         uint256 i = 0;
+
+        for(i = 0; i < _incentivesCnt; i++){
+            require(_incentivesToken[i] != address(0), "0x incen");
+            require(_incentivesAmount[i] > 0, "0 incen");
+
+            if(_incentivesToken[i] == protocolInfo.tokenAddress) continue;
+
+            require(tokenHandler.isConnector(_incentivesToken[i]), "!=  connector");
+        }
+
         for(i = 0; i < _incentivesCnt; i++){
             assert(IERC20(_incentivesToken[i]).transferFrom(_sender, address(this), _incentivesAmount[i]));
         }
@@ -72,7 +92,19 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
         incentiveInfo.incentivesToken = _incentivesToken;
         incentiveInfo.incentivesAmount = _incentivesAmount;
 
-        emit AddedIncentives(_nativeToken, _incentivesToken, _incentivesAmount);
+        emit AddedIncentives(protocolInfo.tokenAddress, _incentivesToken, _incentivesAmount);
+    }
+
+    function rejectPool() external onlyManager {
+        poolStatus = PoolStatus.NOT_QUALIFIED;
+        allocationInfo.refundableNativeAmount = allocationInfo.proposedFundingAmount;
+        emit RejectedGenesisPool(protocolInfo.tokenAddress);
+    }
+
+    function approvePool(address _pairAddress) external onlyManager {
+        liquidityPoolInfo.pairAddress = _pairAddress;
+        poolStatus = PoolStatus.PRE_LISTING;
+        emit ApprovedGenesisPool(protocolInfo.tokenAddress);
     }
 
     function allocation() external view returns (TokenAllocation memory){

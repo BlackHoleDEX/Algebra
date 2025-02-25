@@ -58,14 +58,7 @@ contract GenesisPoolManager is IGanesisPoolBase, OwnableUpgradeable, ReentrancyG
     mapping(address => address[]) public depositers;
 
     event WhiteListedTokenToUser(address proposedToken, address tokenOwner);
-    event DepositedNativeToken(address proposedToken, uint256 proposedNativeAmount, uint proposedFundingAmount);
-    event AddedIncentives(address proposedToken, address[] incentivesToken, uint256[] incentivesAmount);
-    event SubmittedGenesisPool(address proposedToken);
-    event ApprovedGenesisPool(address proposedToken, address approver);
-    event RejectedGenesisPool(address proposedToken, address denier);
     event DespositedToken(address proposedToken, address fundingToken, uint256 amount);
-    event AprrovedGenesisPool(address proposedToken, address approver);
-
     modifier Governance() {
         require(IPermissionsRegistry(_permissionRegistory).hasRole("GOVERNANCE",msg.sender), 'GOVERNANCE');
         _;
@@ -101,7 +94,7 @@ contract GenesisPoolManager is IGanesisPoolBase, OwnableUpgradeable, ReentrancyG
         require(whiteListedTokensToUser[nativeToken][_sender] || _sender == owner(), "!listed");
         require(proposedNativeAmount > 0, "0 native");
         require(proposedFundingAmount > 0, "0 funding");
-        require(genesisFactory.isGenesisPool(nativeToken) == address(0), "exists");
+        require(genesisFactory.getGenesisPool(nativeToken) == address(0), "exists");
 
         address _fundingToken = genesisPoolInfo.fundingToken;
         require(_tokenManager.isConnector(_fundingToken), "connector !=");
@@ -119,89 +112,30 @@ contract GenesisPoolManager is IGanesisPoolBase, OwnableUpgradeable, ReentrancyG
 
         assert(IERC20(nativeToken).transferFrom(_sender, genesisPool, proposedNativeAmount));
 
+        proposedTokens.push(nativeToken);
         IGenesisPool(genesisPool).setGenesisPoolInfo(genesisPoolInfo, protocolInfo, proposedNativeAmount, proposedFundingAmount);
     }
 
-    function addIncentives(address nativeToken, address[] calldata incentivesToken, uint256[] calldata incentivesAmount) external nonReentrant{
+    function rejectGenesisPool(address nativeToken) external Governance nonReentrant {
         require(nativeToken != address(0), "0x native");
-        require(incentivesToken.length > 0, "0 len");
-        require(incentivesToken.length == incentivesAmount.length, "!= len");
-        address _sender = msg.sender;
-        require(whiteListedTokensToUser[nativeToken][_sender] || _sender == owner(), "not whitelisted");
-        address poolAddress = genesisFactory.isGenesisPool(nativeToken);
-        require(poolAddress != address(0), "0x pool");
+        address genesisPool = genesisFactory.getGenesisPool(nativeToken);
+        require(genesisPool != address(0), '0x pool');
 
-        uint256 _incentivesCnt = incentivesToken.length;
-        uint256 i = 0;
-        for(i = 0; i < _incentivesCnt; i++){
-            require(incentivesToken[i] != address(0), "0x incen");
-            require(incentivesAmount[i] > 0, "0 incen");
-
-            if(incentivesToken[i] == nativeToken) continue;
-
-            require(_tokenManager.isConnector(incentivesToken[i]), "!=  whitelisted");
-        }
-
-        IGenesisPool(poolAddress).addIncentives(_sender, nativeToken, incentivesToken, incentivesAmount);
-    }
-
-
-    function submitGenesisPool(address proposedToken, GenesisInfo calldata genesisPool, ProtocolInfo calldata protocolInfo) external nonReentrant {
-        address _sender = msg.sender;
-        require(whiteListedTokensToUser[proposedToken][_sender] || _sender == owner(), "not whitelisted");
-        // require(poolsStatus[proposedToken] == PoolStatus.INCENTIVES_ADDED || poolsStatus[proposedToken] == PoolStatus.NATIVE_TOKEN_DEPOSITED, "incentives not added");
-        require(genesisPoolsInfo[proposedToken].fundingToken == genesisPool.fundingToken, "funding !=");
-        require(protocolsInfo[proposedToken].stable == protocolInfo.stable, "stable !=");
-        require(_tokenManager.isConnector(genesisPool.fundingToken), "fundingToken not whitelisted");
-
-        require(_pairFactory.getPair(proposedToken, genesisPool.fundingToken, protocolInfo.stable) == address(0), "existing pair");
-
-        require(genesisPool.duration >= MIN_DURATION, "minimum duration");
-        require(genesisPool.threshold >= MIN_THRESHOLD, "minimum threshold");
-        require(genesisPool.supplyPercent >= 0 && genesisPool.supplyPercent <= 100, "inavlid supplyPercent");
-        require(genesisPool.startPrice > 0, "invalid startPrice");
+        IGenesisPool(genesisPool).rejectPool();
         
-        require(protocolInfo.tokenAddress == proposedToken, "unequal protocol token");
-        require(bytes(protocolInfo.tokenName).length > 0, "invalid protocol name");
-        require(bytes(protocolInfo.tokenTicker).length > 0, "invalid protocol ticker");
-        require(bytes(protocolInfo.protocolBanner).length > 0, "invalid protocol banner");
-        require(bytes(protocolInfo.protocolDesc).length > 0, "invalid protocol desc");
-
-        GenesisInfo memory _genesisPool = genesisPoolsInfo[proposedToken];
-        _genesisPool = genesisPool;
-        _genesisPool.duration = BlackTimeLibrary.epochMultiples(_genesisPool.duration);
-        _genesisPool.startTime = BlackTimeLibrary.epochNext(block.timestamp);
-        genesisPoolsInfo[proposedToken] = _genesisPool;
-
-        ProtocolInfo memory _protocolInfo = protocolsInfo[proposedToken];
-        _protocolInfo = protocolInfo;
-        protocolsInfo[proposedToken] = _protocolInfo;
-
-        poolsStatus[proposedToken] = PoolStatus.APPLIED;
-        proposedTokens.push(proposedToken);
-
-        emit SubmittedGenesisPool(proposedToken);
     }
 
-    function rejectGenesisPool(address proposedToken) external Governance nonReentrant {
-        poolsStatus[proposedToken] = PoolStatus.NOT_QUALIFIED;
-        TokenAllocation storage _tokenAllocation = allocationsInfo[proposedToken];
-        _tokenAllocation.refundableNativeAmount = _tokenAllocation.proposedFundingAmount;
-        emit RejectedGenesisPool(proposedToken, msg.sender);
-    }
+    function approveGenesisPool(address nativeToken) external Governance nonReentrant {
+        require(nativeToken != address(0), "0x native");
+        address genesisPool = genesisFactory.getGenesisPool(nativeToken);
+        require(genesisPool != address(0), '0x pool');
 
-    function approveGenesisPool(address proposedToken) external Governance nonReentrant {
-        require(proposedToken != address(0), "0 address");
+        _tokenManager.whitelist(nativeToken);
 
-        _tokenManager.whitelist(proposedToken);
+        address pairAddress = _pairFactory.createPair(nativeToken, IGenesisPool(genesisPool).genesis().fundingToken, IGenesisPool(genesisPool).protocol().stable);
+        _pairFactory.setGenesisStatus(pairAddress, true);
 
-        LiquidityPool storage _liquidityPool = liquidityPoolsInfo[proposedToken];
-        _liquidityPool.pairAddress = _pairFactory.createPair(proposedToken, genesisPoolsInfo[proposedToken].fundingToken, protocolsInfo[proposedToken].stable);
-        _pairFactory.setGenesisStatus(_liquidityPool.pairAddress, true);
-
-        poolsStatus[proposedToken] = PoolStatus.PRE_LISTING;
-
-        emit ApprovedGenesisPool(proposedToken, msg.sender);
+        IGenesisPool(genesisPool).approvePool(pairAddress);
     }
 
     function depositToken(address proposedToken, address fundingToken, uint256 amount) external nonReentrant{

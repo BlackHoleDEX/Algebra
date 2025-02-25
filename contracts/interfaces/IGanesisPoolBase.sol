@@ -44,16 +44,9 @@ interface IGanesisPoolBase {
         address external_bribe;
     }
 
-    struct GuageInfo {
-        address gaugeAddress;
-        address internal_bribe;
-        address external_bribe;
-    }
-
     enum PoolStatus{
         DEFAULT,
         NATIVE_TOKEN_DEPOSITED,
-        APPLIED,
         PRE_LISTING,
         PRE_LAUNCH,
         PRE_LAUNCH_DEPOSIT_DISABLED,
