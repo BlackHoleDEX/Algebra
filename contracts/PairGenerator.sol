@@ -15,7 +15,6 @@ contract PairGenerator is IPairGenerator {
     function createPair(address token0, address token1, bool stable) external returns (address pair) {
         address factory = msg.sender;
         bytes32 salt = keccak256(abi.encodePacked(token0, token1, stable)); // notice salt includes stable as well, 3 parameters
-        // (_temp0, _temp1, _temp) = (token0, token1, stable);
         pair = address(new Pair{salt: salt}(factory, token0, token1, stable));
     }
 }
