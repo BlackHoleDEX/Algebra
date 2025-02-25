@@ -53,7 +53,6 @@ interface IGanesisPoolBase {
     enum PoolStatus{
         DEFAULT,
         NATIVE_TOKEN_DEPOSITED,
-        INCENTIVES_ADDED,
         APPLIED,
         PRE_LISTING,
         PRE_LAUNCH,

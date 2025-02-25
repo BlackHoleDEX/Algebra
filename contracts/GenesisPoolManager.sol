@@ -96,11 +96,13 @@ contract GenesisPoolManager is IGanesisPoolBase, OwnableUpgradeable, ReentrancyG
         emit WhiteListedTokenToUser(proposedToken, tokenOwner);
     }
 
-    function depositNativeToken(address nativeToken, GenesisInfo calldata genesisPoolInfo, ProtocolInfo calldata protocolInfo, uint256 proposedNativeAmount, uint proposedFundingAmount) external nonReentrant{
+    function depositNativeToken(address nativeToken, GenesisInfo calldata genesisPoolInfo, ProtocolInfo calldata protocolInfo, uint256 proposedNativeAmount, uint proposedFundingAmount) external nonReentrant returns(address genesisPool) {
         address _sender = msg.sender;
         require(whiteListedTokensToUser[nativeToken][_sender] || _sender == owner(), "!listed");
         require(proposedNativeAmount > 0, "0 native");
         require(proposedFundingAmount > 0, "0 funding");
+        require(genesisFactory.isGenesisPool(nativeToken) == address(0), "exists");
+
         address _fundingToken = genesisPoolInfo.fundingToken;
         require(_tokenManager.isConnector(_fundingToken), "connector !=");
         bool _stable = protocolInfo.stable;
@@ -112,7 +114,7 @@ contract GenesisPoolManager is IGanesisPoolBase, OwnableUpgradeable, ReentrancyG
         require(protocolInfo.tokenAddress == nativeToken, "unequal protocol token");
         require(bytes(protocolInfo.tokenName).length > 0 && bytes(protocolInfo.tokenTicker).length > 0 && bytes(protocolInfo.protocolBanner).length > 0 && bytes(protocolInfo.protocolDesc).length > 0, "protocol info");
 
-        address genesisPool = genesisFactory.createGenesisPool(_sender, nativeToken, _fundingToken);
+        genesisPool = genesisFactory.createGenesisPool(_sender, nativeToken, _fundingToken);
         require(genesisPool != address(0), "0x");
 
         assert(IERC20(nativeToken).transferFrom(_sender, genesisPool, proposedNativeAmount));
@@ -120,49 +122,34 @@ contract GenesisPoolManager is IGanesisPoolBase, OwnableUpgradeable, ReentrancyG
         IGenesisPool(genesisPool).setGenesisPoolInfo(genesisPoolInfo, protocolInfo, proposedNativeAmount, proposedFundingAmount);
     }
 
-    function addIncentives(address proposedToken, address fundingToken, bool stable, address[] calldata incentivesToken, uint256[] calldata incentivesAmount) external nonReentrant{
+    function addIncentives(address nativeToken, address[] calldata incentivesToken, uint256[] calldata incentivesAmount) external nonReentrant{
+        require(nativeToken != address(0), "0x native");
+        require(incentivesToken.length > 0, "0 len");
+        require(incentivesToken.length == incentivesAmount.length, "!= len");
         address _sender = msg.sender;
-        require(incentivesToken.length > 0, "incentive length 0");
-        require(incentivesToken.length == incentivesAmount.length, "length mismatch");
-        require(whiteListedTokensToUser[proposedToken][_sender] || _sender == owner(), "not whitelisted");
-        require(incentivesToken.length > 0, "incentive length 0");
-        require(genesisPoolsInfo[proposedToken].fundingToken == fundingToken, "funding !=");
-        require(protocolsInfo[proposedToken].stable == stable, "stable !=");
-        require(_pairFactory.getPair(proposedToken, fundingToken, stable) == address(0), "existing pair");
-        require(poolsStatus[proposedToken] == PoolStatus.NATIVE_TOKEN_DEPOSITED, "token not allocated");
+        require(whiteListedTokensToUser[nativeToken][_sender] || _sender == owner(), "not whitelisted");
+        address poolAddress = genesisFactory.isGenesisPool(nativeToken);
+        require(poolAddress != address(0), "0x pool");
 
-        uint256 _incentivesCount = incentivesToken.length;
+        uint256 _incentivesCnt = incentivesToken.length;
         uint256 i = 0;
-        for(i = 0; i < _incentivesCount; i++){
-            require(incentivesToken[i] != address(0), "invalid incentive token address");
-            require(incentivesAmount[i] > 0, "invalid incentive amount");
+        for(i = 0; i < _incentivesCnt; i++){
+            require(incentivesToken[i] != address(0), "0x incen");
+            require(incentivesAmount[i] > 0, "0 incen");
 
-            if(incentivesToken[i] == proposedToken) continue;
+            if(incentivesToken[i] == nativeToken) continue;
 
-            require(_tokenManager.isConnector(incentivesToken[i]), "incentive not whitelisted");
+            require(_tokenManager.isConnector(incentivesToken[i]), "!=  whitelisted");
         }
 
-        i = 0;
-        for(i = 0; i < _incentivesCount; i++){
-            assert(IERC20(incentivesToken[i]).transferFrom(_sender, address(this), incentivesAmount[i]));
-        }
-
-        TokenIncentiveInfo storage _tokenIncentiveInfo = incentivesInfo[proposedToken];
-
-        _tokenIncentiveInfo.tokenOwner = _sender;
-        _tokenIncentiveInfo.incentivesToken = incentivesToken;
-        _tokenIncentiveInfo.incentivesAmount = incentivesAmount;
-
-        poolsStatus[proposedToken] = PoolStatus.INCENTIVES_ADDED;
-
-        emit AddedIncentives(proposedToken, incentivesToken, incentivesAmount);
+        IGenesisPool(poolAddress).addIncentives(_sender, nativeToken, incentivesToken, incentivesAmount);
     }
 
 
     function submitGenesisPool(address proposedToken, GenesisInfo calldata genesisPool, ProtocolInfo calldata protocolInfo) external nonReentrant {
         address _sender = msg.sender;
         require(whiteListedTokensToUser[proposedToken][_sender] || _sender == owner(), "not whitelisted");
-        require(poolsStatus[proposedToken] == PoolStatus.INCENTIVES_ADDED || poolsStatus[proposedToken] == PoolStatus.NATIVE_TOKEN_DEPOSITED, "incentives not added");
+        // require(poolsStatus[proposedToken] == PoolStatus.INCENTIVES_ADDED || poolsStatus[proposedToken] == PoolStatus.NATIVE_TOKEN_DEPOSITED, "incentives not added");
         require(genesisPoolsInfo[proposedToken].fundingToken == genesisPool.fundingToken, "funding !=");
         require(protocolsInfo[proposedToken].stable == protocolInfo.stable, "stable !=");
         require(_tokenManager.isConnector(genesisPool.fundingToken), "fundingToken not whitelisted");
