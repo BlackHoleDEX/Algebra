@@ -2,5 +2,9 @@
 pragma solidity 0.8.13;
 
 interface IGenesisPoolFactory {
-    function createGenesisPool(address nativeToken, address fundingToken) external returns (address);
+    function isGenesisPool(address nativeToken) external returns (address);
+    function genesisPools(uint index) external returns (address);
+
+    function genesisPoolsLength() external view returns (uint256);
+    function createGenesisPool(address tokenOwner, address nativeToken, address fundingToken) external returns (address);
 }

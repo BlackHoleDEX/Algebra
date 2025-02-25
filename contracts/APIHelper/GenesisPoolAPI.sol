@@ -3,18 +3,18 @@ pragma solidity 0.8.13;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-import "../GanesisPoolBase.sol"; 
+import "../interfaces/IGanesisPoolBase.sol"; 
 import '../interfaces/IGenesisPoolManager.sol';
 import {BlackTimeLibrary} from "../libraries/BlackTimeLibrary.sol";
 
-contract GenesisPoolAPI is GanesisPoolBase, Initializable {
+contract GenesisPoolAPI is IGanesisPoolBase, Initializable {
 
-    struct GenesisInfo {
+    struct GenesisData {
         address protocolToken;
         uint256 userDeposit;
         TokenAllocation tokenAllocation;
         TokenIncentiveInfo incentiveInfo;
-        GenesisPool genesisPool;
+        GenesisInfo genesisPool;
         ProtocolInfo protocolInfo;
         LiquidityPool liquidityPool;
         PoolStatus poolStatus;
@@ -35,7 +35,7 @@ contract GenesisPoolAPI is GanesisPoolBase, Initializable {
     }
 
 
-    function getAllGenesisPools(address _user, uint _amounts, uint _offset) external view returns(uint totPairs, bool hasNext, GenesisInfo[] memory genesisPools){
+    function getAllGenesisPools(address _user, uint _amounts, uint _offset) external view returns(uint totPairs, bool hasNext, GenesisData[] memory genesisPools){
          
         if(_user == address(0)) {
             return (0,false,genesisPools);
@@ -43,7 +43,7 @@ contract GenesisPoolAPI is GanesisPoolBase, Initializable {
 
         require(_amounts <= MAX_POOLS, 'too many pools');
 
-        genesisPools = new GenesisInfo[](_amounts);
+        genesisPools = new GenesisData[](_amounts);
 
         address[] memory proposedTokens = genesisManager.proposedTokens();
         

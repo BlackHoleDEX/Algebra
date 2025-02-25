@@ -10,10 +10,8 @@ contract GenesisPoolFactory is IGenesisPoolFactory, OwnableUpgradeable {
 
     address public genesisManager;
 
-    mapping(address => address) isGenesisPool;
+    mapping(address => address) public isGenesisPool;
     address[] public genesisPools;
-    address[] public completed;
-    address[] public failed;
 
     event GenesisCreated(address indexed nativeToken, address indexed fundingToken);
     event GenesisManagerChanged(address indexed oldManager, address indexed newManager);
@@ -36,13 +34,17 @@ contract GenesisPoolFactory is IGenesisPoolFactory, OwnableUpgradeable {
         genesisManager = _genesisManager;
     }
 
-    function createGenesisPool(address nativeToken, address fundingToken) external onlyManager returns (address genesisPool) {
+    function genesisPoolsLength() external view returns (uint256){
+        return genesisPools.length;
+    }
+
+    function createGenesisPool(address tokenOwner, address nativeToken, address fundingToken) external onlyManager returns (address genesisPool) {
         require(nativeToken != address(0), "0x"); 
         require(isGenesisPool[nativeToken] == address(0), "exists");
 
         address factory = address(this);
         bytes32 salt = keccak256(abi.encodePacked(nativeToken, fundingToken));
-        genesisPool = address(new GenesisPool{salt: salt}(factory, genesisManager, nativeToken, fundingToken));
+        genesisPool = address(new GenesisPool{salt: salt}(factory, genesisManager, tokenOwner, nativeToken, fundingToken));
 
         isGenesisPool[nativeToken] = genesisPool;
         genesisPools.push(genesisPool);

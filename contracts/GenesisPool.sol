@@ -9,6 +9,9 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase {
 
     using SafeERC20 for IERC20;
 
+    address immutable internal factory;
+    address immutable internal genesisManager;
+
     TokenAllocation public allocationInfo;
     TokenIncentiveInfo public incentiveInfo;
     GenesisInfo public genesisInfo;
@@ -19,9 +22,39 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase {
     address[] public depositers;
     mapping(address => uint256) public userDeposits;
 
-    constructor(address factory, address genesisManager, address nativeToken, address fundingToken){
-        
+    event DepositedNativeToken(address proposedToken, address genesisPool, uint256 proposedNativeAmount, uint proposedFundingAmount);
+
+    modifier onlyManager() {
+        require(msg.sender == genesisManager);
+        _;
     }
 
+    constructor(address _factory, address _genesisManager, address _tokenOwner, address _nativeToken, address _fundingToken){
+        allocationInfo.tokenOwner = _tokenOwner;
+        incentiveInfo.tokenOwner = _tokenOwner;
+        protocolInfo.tokenAddress = _nativeToken;    
+        genesisInfo.fundingToken = _fundingToken;
+
+        factory = _factory;
+        genesisManager = _genesisManager;
+    }
+
+
+    function setGenesisPoolInfo(GenesisInfo calldata _genesisInfo, ProtocolInfo calldata _protocolInfo, uint256 _proposedNativeAmount, uint _proposedFundingAmount) external onlyManager(){
+        genesisInfo = _genesisInfo;
+        protocolInfo = _protocolInfo;
+
+        allocationInfo.proposedNativeAmount = _proposedNativeAmount;
+        allocationInfo.proposedFundingAmount = _proposedFundingAmount;
+        allocationInfo.allocatedNativeAmount = 0;
+        allocationInfo.allocatedFundingAmount = 0;
+        allocationInfo.refundableNativeAmount = 0;
+
+        poolStatus = PoolStatus.NATIVE_TOKEN_DEPOSITED;
+
+        emit DepositedNativeToken(allocationInfo.tokenOwner, address(this), _proposedNativeAmount, _proposedFundingAmount);
+    }
+
+    
 
 }
