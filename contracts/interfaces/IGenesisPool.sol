@@ -18,7 +18,9 @@ interface IGenesisPool {
     function transferIncentives(address gauge, address external_bribe, address internal_bribe) external;
     function eligbleForPreLaunchPool() external view returns (bool);
     function eligbleForCompleteLaunch() external view returns (bool);
+    function eligbleForDisqualify() external view returns (bool);
     function setLaunchStatus(IGanesisPoolBase.PoolStatus status) external returns (address, address, uint256, uint256, address, address, bool);
+    function setPoolStatus(IGanesisPoolBase.PoolStatus status) external;
     function approveTokens(address router) external;
     function getLPTokensShares(uint256 liquidity) external returns (address[] memory, uint256[] memory, address);
 }

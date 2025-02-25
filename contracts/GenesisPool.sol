@@ -152,6 +152,13 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
         return targetFundingAmount == allocationInfo.allocatedFundingAmount;
     }
 
+    function eligbleForDisqualify() external view returns (bool){
+        uint256 _endTime = genesisInfo.startTime + genesisInfo.duration;    
+        uint256 targetFundingAmount = (allocationInfo.proposedFundingAmount * genesisInfo.threshold) / 10000; // threshold is 100 * of original to support 2 deciamls
+
+        return (BlackTimeLibrary.isLastEpoch(block.timestamp, _endTime) && targetFundingAmount < allocationInfo.allocatedFundingAmount);
+    }
+
     function transferIncentives(address gauge, address external_bribe, address internal_bribe) external onlyManager {
         liquidityPoolInfo.gaugeAddress = gauge;
         liquidityPoolInfo.external_bribe = external_bribe;
@@ -169,16 +176,11 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
         poolStatus = PoolStatus.PRE_LAUNCH;
     }
 
-    function setLaunchStatus(PoolStatus status) external returns (address nativeToken, address fundingToken, 
+    function setLaunchStatus(PoolStatus status) external onlyManager returns (address nativeToken, address fundingToken, 
         uint256 nativeDesired, uint256 fundingDesired, address poolAddress, address gaugeAddress, bool stable){
         
-        if(status == PoolStatus.PARTIALLY_LAUNCHED){
-            allocationInfo.refundableNativeAmount = allocationInfo.proposedNativeAmount - allocationInfo.allocatedNativeAmount;
-        }
-        else if(status == PoolStatus.LAUNCH){
-            allocationInfo.refundableNativeAmount = 0;
-        }
-
+        _setPoolStatus(status);
+        
         nativeToken = protocolInfo.tokenAddress;
         fundingToken = genesisInfo.fundingToken;
         nativeDesired = allocationInfo.allocatedNativeAmount;
@@ -186,6 +188,24 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
         poolAddress = liquidityPoolInfo.pairAddress;
         gaugeAddress = liquidityPoolInfo.gaugeAddress;
         stable = protocolInfo.stable;
+    }
+
+    function setPoolStatus(PoolStatus status) external onlyManager {
+        _setPoolStatus(status);
+    }
+
+    function _setPoolStatus(PoolStatus status) internal {
+        if(status == PoolStatus.PARTIALLY_LAUNCHED){
+            allocationInfo.refundableNativeAmount = allocationInfo.proposedNativeAmount - allocationInfo.allocatedNativeAmount;
+        }
+        else if(status == PoolStatus.LAUNCH){
+            allocationInfo.refundableNativeAmount = 0;
+        }
+        else if(status == PoolStatus.NOT_QUALIFIED){
+            allocationInfo.refundableNativeAmount = allocationInfo.proposedNativeAmount;
+        }
+
+        poolStatus = status;
     }
 
     function approveTokens(address router) onlyManager external {
@@ -206,6 +226,77 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
         (_accounts, _amounts) = auction.getLPTokensShares(depositers, _deposits, allocationInfo.tokenOwner, liquidity);
     }
 
+    function claimableUnallocatedAmount() public view returns(PoolStatus, address, uint256){
+        if(poolStatus == PoolStatus.PARTIALLY_LAUNCHED){
+            if(msg.sender == allocationInfo.tokenOwner){
+                return (poolStatus, protocolInfo.tokenAddress, allocationInfo.refundableNativeAmount);
+            } 
+        }else if(poolStatus == PoolStatus.NOT_QUALIFIED){
+            if(msg.sender == allocationInfo.tokenOwner){
+                return (poolStatus, protocolInfo.tokenAddress, allocationInfo.refundableNativeAmount);
+            }else{
+                return (poolStatus, genesisInfo.fundingToken, userDeposits[msg.sender]);
+            }
+        }
+        
+        return (PoolStatus.DEFAULT, address(0), 0);
+    }
+
+    function claimUnallocatedAmount() external nonReentrant{
+        require(poolStatus == PoolStatus.NOT_QUALIFIED || poolStatus == PoolStatus.PARTIALLY_LAUNCHED, "!= status");
+
+        uint256 _amount;
+        if(poolStatus == PoolStatus.PARTIALLY_LAUNCHED){
+            if(msg.sender == allocationInfo.tokenOwner){
+                _amount = allocationInfo.refundableNativeAmount;
+                allocationInfo.refundableNativeAmount = 0;
+
+                if(_amount > 0){
+                    assert(IERC20(protocolInfo.tokenAddress).transfer(msg.sender, _amount));
+                }
+            } 
+        }else if(poolStatus == PoolStatus.NOT_QUALIFIED){
+            if(msg.sender == allocationInfo.tokenOwner){
+                _amount = allocationInfo.refundableNativeAmount;
+                allocationInfo.refundableNativeAmount = 0;
+
+                if(_amount > 0){
+                    assert(IERC20(protocolInfo.tokenAddress).transfer(msg.sender, _amount));
+                }
+            }else{
+                _amount = userDeposits[msg.sender];
+                userDeposits[msg.sender] = 0;
+
+                if(_amount > 0){
+                    assert(IERC20(genesisInfo.fundingToken).transfer(msg.sender, _amount));
+                }
+            }
+        }
+    }
+
+    function claimableIncentives() public view returns(address[] memory tokens , uint256[] memory amounts){
+        if(poolStatus == PoolStatus.NOT_QUALIFIED && msg.sender == allocationInfo.tokenOwner){
+            tokens = incentiveInfo.incentivesToken;
+            amounts = incentiveInfo.incentivesAmount;
+        }
+    }
+
+    function claimIncentives() external nonReentrant{
+        require(poolStatus == PoolStatus.NOT_QUALIFIED, "!= status");
+        require(msg.sender == allocationInfo.tokenOwner, "!= onwer");
+
+        uint256 _incentivesCnt = incentiveInfo.incentivesAmount.length;
+        uint256 i;
+        uint _amount;
+
+        for(i = 0; i < _incentivesCnt; i++){
+            _amount = incentiveInfo.incentivesAmount[i];
+            incentiveInfo.incentivesAmount[i] = 0;
+
+            assert(IERC20(incentiveInfo.incentivesToken[i]).transfer(msg.sender, _amount));
+        }
+    }
+
     function getProtcolTokenAmount(uint256 depositAmount) external view returns (uint256){
         require(depositAmount > 0, "0 amt");
         return _getProtcolTokenAmount(depositAmount);
@@ -214,8 +305,6 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
     function _getProtcolTokenAmount(uint256 depositAmount) internal view returns (uint256){
         return auction.getProtcolTokenAmount(genesisInfo.startPrice, depositAmount, allocationInfo);
     }
-
-    
 
     function allocation() external view returns (TokenAllocation memory){
         return allocationInfo;
