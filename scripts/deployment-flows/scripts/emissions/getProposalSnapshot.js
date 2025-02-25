@@ -9,18 +9,14 @@ async function main () {
     
     const blackGovernorContract = await ethers.getContractAt(blackGovernorAbi, blackGovernorAddress);
     const votingEscrowContract = await ethers.getContractAt(votingEscrowAbi, votingEscrowAddress);
+    // const pid = await blackGovernorContract.proposalVotes("494099073442461112096891230999994993929747967796522132747510522691287043031"); //assign pid
+    // const snapshot = await blackGovernorContract.proposalSnapshot("494099073442461112096891230999994993929747967796522132747510522691287043031"); //assign pid
+    // const quorum = await blackGovernorContract.quorum("1740420202"); //assign pid
+    // console.log("statue of pid ", snapshot, quorum);
+    const totalSupply = await votingEscrowContract.totalSupplyAtT("1740420202");
+    // const xx = await votingEscrowContract.point_history(26);
 
-    const xx = await votingEscrowContract.getPastTotalSupply("1740404702"); //assign pid
-    console.log("statue of pid ", xx)
-
-
-    const snapshot = await blackGovernorContract.proposalSnapshot("16134786894693074512526881837070247251028559825807118338989515965967069897879");
-    // const statusPid = await blackGovernorContract.quorum(snapshot); //assign pid
-
-
-    // const votes = await blackGovernorContract._proposalVotes("16134786894693074512526881837070247251028559825807118338989515965967069897879"); 
-
-    console.log("statue of pid ", snapshot)
+    console.log("statue of pid ", totalSupply);
 }
 
 main()

@@ -9,7 +9,7 @@ async function main () {
     const ownerAddress = owner.address;
     
     const blackGovernorContract = await ethers.getContractAt(blackGovernorAbi, blackGovernorAddress);
-    const statusPid = await blackGovernorContract.state("16134786894693074512526881837070247251028559825807118338989515965967069897879"); //assign pid
+    const statusPid = await blackGovernorContract.state("494099073442461112096891230999994993929747967796522132747510522691287043031"); //assign pid
     console.log("statue of pid ", statusPid)
 }
 
