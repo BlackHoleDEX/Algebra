@@ -6,11 +6,11 @@ import '../interfaces/IAuctionFactory.sol';
 
 contract AuctionFactory is IAuctionFactory, OwnableUpgradeable {
 
-    address[] public factories;
-    mapping(address => bool) public isFactory;
+    address[] public auctions;
+    mapping(address => bool) public isAuction;
 
-    event AddFactory(address indexed factory);
-    event SetFactory(address indexed old, address indexed latest);
+    event AddAuction(address indexed auction);
+    event SetAuction(address indexed old, address indexed latest);
 
     modifier onlyManager() {
         require(msg.sender == owner());
@@ -19,50 +19,50 @@ contract AuctionFactory is IAuctionFactory, OwnableUpgradeable {
 
     constructor() {}
 
-    function initialize(address _factory) public initializer {
+    function initialize(address _auction) public initializer {
         __Ownable_init();
 
-        isFactory[_factory] = true;
-        factories.push(_factory);
+        isAuction[_auction] = true;
+        auctions.push(_auction);
     }
 
-     function addFactory(address _factory) external onlyManager {
-        require(_factory != address(0), 'addr0');
-        require(!isFactory[_factory], 'fact');
-        require(_factory.code.length > 0, "!contract");
+     function addAuction(address _auction) external onlyManager {
+        require(_auction != address(0), 'addr0');
+        require(!isAuction[_auction], 'fact');
+        require(_auction.code.length > 0, "!contract");
 
-        factories.push(_factory);
-        isFactory[_factory] = true;
-        emit AddFactory(_factory);
+        auctions.push(_auction);
+        isAuction[_auction] = true;
+        emit AddAuction(_auction);
     }
 
-    function replaceFactory(address _factory, uint256 _pos) external onlyManager {
-        require(_factory != address(0), 'addr0');
-        require(isFactory[_factory], '!fact');
-        address oldPF = factories[_pos];
-        isFactory[oldPF] = false;
+    function replaceFactory(address _auction, uint256 _pos) external onlyManager {
+        require(_auction != address(0), 'addr0');
+        require(isAuction[_auction], '!fact');
+        address oldPF = auctions[_pos];
+        isAuction[oldPF] = false;
 
-        factories[_pos] = _factory;
-        isFactory[_factory] = true;
+        auctions[_pos] = _auction;
+        isAuction[_auction] = true;
 
-        emit SetFactory(oldPF, _factory);
+        emit SetAuction(oldPF, _auction);
     }
 
     function removeFactory(uint256 _pos) external onlyManager {
-        address oldPF = factories[_pos];
-        require(isFactory[oldPF], '!fact');
+        address oldPF = auctions[_pos];
+        require(isAuction[oldPF], '!fact');
 
-        factories[_pos] = address(0);
-        isFactory[oldPF] = false;
+        auctions[_pos] = address(0);
+        isAuction[oldPF] = false;
 
-        emit SetFactory(oldPF, address(0));
+        emit SetAuction(oldPF, address(0));
     }
 
-    function factoriesLength() external view returns (uint256){
-        return factories.length;
+    function auctionsLength() external view returns (uint256){
+        return auctions.length;
     }
 
-    function allFactories() external view returns (address[] memory){
-        return factories;
+    function allAuctions() external view returns (address[] memory){
+        return auctions;
     }
 }
