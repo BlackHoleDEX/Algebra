@@ -212,7 +212,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     --------------------------------------------------------------------------------
     ----------------------------------------------------------------------------- */
 
-    function depositsForGenesis(address _tokenOwner, uint256 _timestamp, uint256 _totalAmount) external onlyGenesisManager { 
+    function depositsForGenesis(address _tokenOwner, uint256 _timestamp, uint256 _totalAmount) external onlyGenesisManager nonReentrant { 
         require(_tokenOwner != address(0), "0x owner");
         require(_totalAmount > 0, "0 amt");
         _depositsForGenesis(_tokenOwner, _timestamp, _totalAmount);
