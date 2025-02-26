@@ -367,6 +367,7 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
     }
 
     function setAuction(address _auction) external onlyManagerOrProtocol {
+        require(_auction != address(0), "0x auc");
         auction = IAuction(_auction);
     }
 }

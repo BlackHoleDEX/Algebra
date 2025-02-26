@@ -224,6 +224,11 @@ contract GenesisPoolManager is IGanesisPoolBase, IGenesisPoolManager, OwnableUpg
         }
     }
 
+    function setAuction(address _genesisPool, address _auction) external Governance {
+        require(_genesisPool != address(0), "0x pool");
+        IGenesisPool(_genesisPool).setAuction(_auction);
+    }
+
     function getAllProposedTokens() external view returns (address[] memory) {
         return proposedTokens;
     }

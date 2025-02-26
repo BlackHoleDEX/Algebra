@@ -24,4 +24,5 @@ interface IGenesisPool {
     function setPoolStatus(IGanesisPoolBase.PoolStatus status) external;
     function approveTokens(address router) external;
     function getLPTokensShares(uint256 liquidity) external returns (address[] memory, uint256[] memory, address);
+    function setAuction(address _auction) external;
 }
