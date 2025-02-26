@@ -1,4 +1,4 @@
-const pairFactoryUpgradeableAddress = "0x422Bb9f43334CD2634C857fF33E74E3334881F7B";
+const pairFactoryUpgradeableAddress = "0xfbf12dC391c24BE9daC9024e0f2708c48e3B1A04";
 
 const pairFactoryUpgradeableAbi = [
   {
@@ -170,6 +170,25 @@ const pairFactoryUpgradeableAbi = [
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "customFees",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "dibs",
     "outputs": [
@@ -196,7 +215,25 @@ const pairFactoryUpgradeableAbi = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "genesisPool",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
+      {
+        "internalType": "address",
+        "name": "_pairAddress",
+        "type": "address"
+      },
       {
         "internalType": "bool",
         "name": "_stable",
@@ -215,19 +252,15 @@ const pairFactoryUpgradeableAbi = [
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "getInitializable",
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_pairAddress",
+        "type": "address"
+      }
+    ],
+    "name": "getIsGenesis",
     "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
       {
         "internalType": "bool",
         "name": "",
@@ -267,10 +300,35 @@ const pairFactoryUpgradeableAbi = [
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_pairGenerator",
+        "type": "address"
+      }
+    ],
     "name": "initialize",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "isGenesis",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -328,17 +386,17 @@ const pairFactoryUpgradeableAbi = [
         "type": "bytes32"
       }
     ],
-    "stateMutability": "pure",
+    "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
-    "name": "pairs",
+    "name": "pairGenerator",
     "outputs": [
       {
-        "internalType": "address[]",
+        "internalType": "address",
         "name": "",
-        "type": "address[]"
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -360,6 +418,24 @@ const pairFactoryUpgradeableAbi = [
   {
     "inputs": [],
     "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_pairAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_fees",
+        "type": "uint256"
+      }
+    ],
+    "name": "setCustomFees",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -404,6 +480,55 @@ const pairFactoryUpgradeableAbi = [
       }
     ],
     "name": "setFeeManager",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_genesisPool",
+        "type": "address"
+      }
+    ],
+    "name": "setGenesisPool",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_pair",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "status",
+        "type": "bool"
+      }
+    ],
+    "name": "setGenesisStatus",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_pairAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "status",
+        "type": "bool"
+      }
+    ],
+    "name": "setIsGenesis",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
