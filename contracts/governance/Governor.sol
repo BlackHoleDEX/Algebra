@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Timers.sol";
 import "@openzeppelin/contracts/governance/IGovernor.sol";
-import "@openzeppelin/contracts/governance/utils/IVotes.sol";
+import {IBlackHoleVotes} from "../interfaces/IBlackHoleVotes.sol";
 import {IMinter} from "../interfaces/IMinter.sol";
 
 import {BlackTimeLibrary} from "../libraries/BlackTimeLibrary.sol";
@@ -736,9 +736,9 @@ abstract contract L2GovernorCountingSimple is L2Governor {
  * _Available since v4.3._
  */
 abstract contract L2GovernorVotes is L2Governor {
-    IVotes public immutable token;
+    IBlackHoleVotes public immutable token;
 
-    constructor(IVotes tokenAddress) {
+    constructor(IBlackHoleVotes tokenAddress) {
         token = tokenAddress;
     }
 
@@ -750,7 +750,7 @@ abstract contract L2GovernorVotes is L2Governor {
         uint256 blockTimestamp,
         bytes memory /*params*/
     ) internal view virtual override returns (uint256) {
-        return token.getPastVotes(account, blockTimestamp);
+        return token.getsmNFTPastVotes(account, blockTimestamp);
     }
 }
 
@@ -798,7 +798,7 @@ abstract contract L2GovernorVotesQuorumFraction is L2GovernorVotes {
      * @dev Returns the quorum for a block timestamp, in terms of number of votes: `supply * numerator / denominator`.
      */
     function quorum(uint256 blockTimestamp) public view virtual override returns (uint256) {
-        return (token.getPastTotalSupply(blockTimestamp) * quorumNumerator()) / quorumDenominator();
+        return (token.getsmNFTPastTotalSupply() * quorumNumerator()) / quorumDenominator();
     }
 
     /**
