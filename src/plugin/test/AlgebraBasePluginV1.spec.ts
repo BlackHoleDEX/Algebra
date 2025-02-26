@@ -329,10 +329,10 @@ describe('AlgebraBasePluginV1', () => {
       it('does not change at 0 volume', async () => {
         await plugin.advanceTime(1);
         await mockPool.mint(wallet.address, wallet.address, -6000, 6000, liquidity, '0x');
-        let fee2 = (await mockPool.globalState()).fee;
+        let fee2 = (await mockPool.overrideFee());
         await plugin.advanceTime(DAY + 600);
         await mint(wallet.address, -6000, 6000, 1);
-        let fee3 = (await mockPool.globalState()).fee;
+        let fee3 = (await mockPool.overrideFee());
         expect(fee3).to.be.equal(fee2);
       });
 
@@ -340,10 +340,10 @@ describe('AlgebraBasePluginV1', () => {
         await mockPool.mint(wallet.address, wallet.address, -6000, 6000, liquidity, '0x');
         await plugin.advanceTime(DAY + 600);
         await mockPool.swapToTick(100);
-        let feeInit = (await mockPool.globalState()).fee;
+        let feeInit = (await mockPool.overrideFee());
         await mockPool.swapToTick(100000);
         await mockPool.swapToTick(100001);
-        let feeAfter = (await mockPool.globalState()).fee;
+        let feeAfter = (await mockPool.overrideFee());
         expect(feeAfter).to.be.equal(feeInit);
       });
 
@@ -358,12 +358,12 @@ describe('AlgebraBasePluginV1', () => {
           baseFee: 100,
         });
         await mockPool.mint(wallet.address, wallet.address, -6000, 6000, liquidity, '0x');
-        let feeInit = (await mockPool.globalState()).fee;
         await plugin.advanceTime(DAY + 600);
         await mockPool.swapToTick(100000);
+        let feeInit = (await mockPool.overrideFee());
         await plugin.advanceTime(DAY + 600);
         await mockPool.swapToTick(-100000);
-        let feeFinal = (await mockPool.globalState()).fee;
+        let feeFinal = (await mockPool.overrideFee());
         expect(feeFinal).to.be.equal(feeInit);
       });
 
@@ -381,7 +381,7 @@ describe('AlgebraBasePluginV1', () => {
         const tick = 10;
         for (let i = 0; i < 25; i++) {
           await mockPool.swapToTick(tick - i);
-          let fee = (await mockPool.globalState()).fee;
+          let fee = (await mockPool.overrideFee());
           stats.push(`Fee: ${fee} `);
           await plugin.advanceTime(60 * 60);
         }
@@ -402,7 +402,7 @@ describe('AlgebraBasePluginV1', () => {
         const tick = 10;
         for (let i = 0; i < 25; i++) {
           await mockPool.swapToTick(tick - i);
-          let fee = (await mockPool.globalState()).fee;
+          let fee = (await mockPool.overrideFee());
           stats.push(`Fee: ${fee} `);
           await plugin.advanceTime(60 * 60);
         }
@@ -423,7 +423,7 @@ describe('AlgebraBasePluginV1', () => {
         const tick = 10;
         for (let i = 0; i < 25; i++) {
           await mockPool.swapToTick(tick - i);
-          let fee = (await mockPool.globalState()).fee;
+          let fee = (await mockPool.overrideFee());
           stats.push(`Fee: ${fee} `);
           await plugin.advanceTime(60 * 60);
         }
@@ -446,7 +446,7 @@ describe('AlgebraBasePluginV1', () => {
         const tick = 0;
         for (let i = 0; i < 25; i++) {
           await mockPool.swapToTick(tick - i);
-          let fee = (await mockPool.globalState()).fee;
+          let fee = (await mockPool.overrideFee());
           stats.push(`Fee: ${fee} `);
           await plugin.advanceTime(60 * 60);
         }

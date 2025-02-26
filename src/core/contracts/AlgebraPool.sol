@@ -520,15 +520,10 @@ contract AlgebraPool is AlgebraPoolBase, TickStructure, ReentrancyGuard, Positio
 
   /// @inheritdoc IAlgebraPoolPermissionedActions
   function setFee(uint16 newFee) external override {
+    _checkIfAdministrator();
     bool isDynamicFeeEnabled = globalState.pluginConfig.hasFlag(Plugins.DYNAMIC_FEE);
     if (!globalState.unlocked) revert locked(); // cheaper to check lock here
-
-    if (msg.sender == plugin) {
-      if (!isDynamicFeeEnabled) revert dynamicFeeDisabled();
-    } else {
-      if (isDynamicFeeEnabled) revert dynamicFeeActive();
-      _checkIfAdministrator();
-    }
+    if (isDynamicFeeEnabled) revert dynamicFeeActive();
     _setFee(newFee);
   }
 

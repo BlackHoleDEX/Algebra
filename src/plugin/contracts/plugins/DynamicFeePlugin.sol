@@ -54,20 +54,4 @@ abstract contract DynamicFeePlugin is BasePlugin, IDynamicFeeManager {
 
     return AdaptiveFee.getFee(volatilityAverage, feeConfig_);
   }
-
-  function _updateFee(uint88 volatilityAverage) internal {
-    uint16 newFee;
-    AlgebraFeeConfigurationU144 feeConfig_ = _feeConfig; // struct packed in uint144
-
-    (, , uint16 fee, ) = _getPoolState();
-    if (feeConfig_.alpha1() | feeConfig_.alpha2() == 0) {
-      newFee = feeConfig_.baseFee();
-    } else {
-      newFee = AdaptiveFee.getFee(volatilityAverage, feeConfig_);
-    }
-
-    if (newFee != fee) {
-      IAlgebraPool(pool).setFee(newFee);
-    }
-  }
 }

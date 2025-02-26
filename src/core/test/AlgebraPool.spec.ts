@@ -3098,13 +3098,6 @@ describe('AlgebraPool', () => {
         expect(lastFee).to.eq(fee);
       });
 
-      it('if dynamic fee is off, plugin can not set fee in pool', async () => {
-        await pool.initialize(encodePriceSqrt(1, 1));
-        await mint(wallet.address, minTick, maxTick, expandTo18Decimals(1));
-        await pool.setPluginConfig(127);
-        await expect(flash(100, 200, other.address)).to.be.revertedWithCustomError(pool, 'dynamicFeeDisabled');
-      });
-
       it('only owner can set fee', async () => {
         await pool.initialize(encodePriceSqrt(1, 1));
         await mint(wallet.address, minTick, maxTick, expandTo18Decimals(1));
@@ -3292,6 +3285,7 @@ describe('AlgebraPool', () => {
       ).deploy()) as any as TestAlgebraReentrantCallee;
 
       await pool.setPlugin(reentrant);
+      await factory.grantRole(await factory.POOLS_ADMINISTRATOR_ROLE(), reentrant);
       // the tests happen in solidity
       await expect(reentrant.swapToReenter(pool)).to.be.revertedWith('Unable to reenter');
     });
