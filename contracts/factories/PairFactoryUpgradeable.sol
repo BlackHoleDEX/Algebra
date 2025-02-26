@@ -22,7 +22,7 @@ contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
     address public dibs; // referral fee handler
     address public stakingFeeHandler; // staking fee handler
     address public pairGenerator;
-    address public genesisPool;
+    address public genesisManager;
 
     mapping(address => mapping(address => mapping(bool => address))) public getPair;
     address[] public allPairs;
@@ -137,12 +137,12 @@ contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
         emit PairCreated(token0, token1, stable, pair, allPairs.length);
     }
 
-    function setGenesisPool(address _genesisPool) external onlyManager {
-        genesisPool = _genesisPool;
+    function setGenesisManager(address _genesisManager) external onlyManager {
+        genesisManager = _genesisManager;
     }
 
     function setGenesisStatus(address _pair, bool status) external {
-        require(msg.sender == genesisPool || msg.sender == feeManager,  "invalid access");
+        require(msg.sender == genesisManager || msg.sender == feeManager,  "invalid access");
         isGenesis[_pair] = status;
     }
 }

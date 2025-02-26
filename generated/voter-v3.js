@@ -1,4 +1,4 @@
-const voterV3Address = "0xD03dC65A7Ce3B98f0d97821688e59f93D9238632";
+const voterV3Address = "0xeA2e5cc70e2F987c573D5Cf56087f7D18bC1C5a5";
 
 const voterV3Abi = [
   {
@@ -42,25 +42,6 @@ const voterV3Abi = [
       }
     ],
     "name": "AddFactories",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "blacklister",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "token",
-        "type": "address"
-      }
-    ],
-    "name": "Blacklisted",
     "type": "event"
   },
   {
@@ -293,6 +274,25 @@ const voterV3Abi = [
         "type": "address"
       }
     ],
+    "name": "SetGenesisManager",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "old",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "latest",
+        "type": "address"
+      }
+    ],
     "name": "SetMinter",
     "type": "event"
   },
@@ -379,44 +379,6 @@ const voterV3Abi = [
     "type": "event"
   },
   {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "whitelister",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "token",
-        "type": "address"
-      }
-    ],
-    "name": "Whitelisted",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "whitelister",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "WhitelistedNFT",
-    "type": "event"
-  },
-  {
     "inputs": [],
     "name": "EPOCH_DURATION",
     "outputs": [
@@ -457,11 +419,6 @@ const voterV3Abi = [
   },
   {
     "inputs": [
-      {
-        "internalType": "address[]",
-        "name": "_tokens",
-        "type": "address[]"
-      },
       {
         "internalType": "address",
         "name": "_permissionsRegistry",
@@ -505,19 +462,6 @@ const voterV3Abi = [
       }
     ],
     "name": "addFactory",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address[]",
-        "name": "_token",
-        "type": "address[]"
-      }
-    ],
-    "name": "blacklist",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -710,6 +654,19 @@ const voterV3Abi = [
   },
   {
     "inputs": [],
+    "name": "epochOwner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "epochTimestamp",
     "outputs": [
       {
@@ -832,6 +789,32 @@ const voterV3Abi = [
   },
   {
     "inputs": [],
+    "name": "genesisManager",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getAutomationRegistry",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "getNextEpochStart",
     "outputs": [
       {
@@ -863,6 +846,11 @@ const voterV3Abi = [
       {
         "internalType": "address",
         "name": "_bribes",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_tokenHandler",
         "type": "address"
       }
     ],
@@ -956,44 +944,6 @@ const voterV3Abi = [
       }
     ],
     "name": "isGaugeFactory",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "isWhitelisted",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "isWhitelistedNFT",
     "outputs": [
       {
         "internalType": "bool",
@@ -1313,6 +1263,19 @@ const voterV3Abi = [
     "inputs": [
       {
         "internalType": "address",
+        "name": "_epochOwner",
+        "type": "address"
+      }
+    ],
+    "name": "setEpochOwner",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "_gauge",
         "type": "address"
       },
@@ -1323,6 +1286,19 @@ const voterV3Abi = [
       }
     ],
     "name": "setExternalBribeFor",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_genesisManager",
+        "type": "address"
+      }
+    ],
+    "name": "setGenesisManager",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1418,6 +1394,19 @@ const voterV3Abi = [
     "name": "setVoteDelay",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "tokenHandler",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1529,37 +1518,6 @@ const voterV3Abi = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address[]",
-        "name": "_token",
-        "type": "address[]"
-      }
-    ],
-    "name": "whitelist",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bool",
-        "name": "_bool",
-        "type": "bool"
-      }
-    ],
-    "name": "whitelistNFT",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   }
 ];

@@ -27,16 +27,16 @@ interface IBaseV1Factory {
 
 contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
-    uint256 public MIN_DURATION = 7 days; 
-    uint256 public MIN_THRESHOLD = 50 * 10 ** 2; 
-    uint256 public MATURITY_TIME = 90 days;
+    uint256 public MIN_DURATION;
+    uint256 public MIN_THRESHOLD;
+    uint256 public MATURITY_TIME;
 
     address public epochController;
     address public permissionRegistory;
     address public router;
     IBaseV1Factory public pairFactory;
     IVoterV3 public voter;
-    ITokenHandler public _tokenManager;
+    ITokenHandler public tokenHandler;
 
     IGenesisPoolFactory public genesisFactory;
     IAuctionFactory public auctionFactory;
@@ -55,8 +55,9 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
 
     constructor() {}
 
-    function initialize(address _epochController, address _router, address _permissionRegistory, address _voter, address _pairFactory, address _genesisFactory, address _auctionFactory) initializer  public {
+    function initialize(address _epochController, address _router, address _permissionRegistory, address _voter, address _pairFactory, address _genesisFactory, address _auctionFactory, address _tokenHandler) initializer  public {
         __Ownable_init();
+        __ReentrancyGuard_init();
 
         epochController = _epochController;
         router = _router;
@@ -65,6 +66,11 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         pairFactory = IBaseV1Factory(_pairFactory);
         genesisFactory = IGenesisPoolFactory(_genesisFactory);
         auctionFactory = IAuctionFactory(_auctionFactory);
+        tokenHandler = ITokenHandler(_tokenHandler);
+
+        MIN_DURATION = 7 days; 
+        MIN_THRESHOLD = 50 * 10 ** 2; 
+        MATURITY_TIME = 90 days;
     }
 
     function whiteListUserAndToken(address tokenOwner, address proposedToken) external Governance nonReentrant{
@@ -80,7 +86,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         require(genesisFactory.getGenesisPool(nativeToken) == address(0), "exists");
 
         address _fundingToken = genesisPoolInfo.fundingToken;
-        require(_tokenManager.isConnector(_fundingToken), "connector !=");
+        require(tokenHandler.isConnector(_fundingToken), "connector !=");
         bool _stable = protocolInfo.stable;
         require(pairFactory.getPair(nativeToken, _fundingToken, _stable) == address(0), "existing pair");
 
@@ -117,7 +123,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         address genesisPool = genesisFactory.getGenesisPool(nativeToken);
         require(genesisPool != address(0), '0x pool');
 
-        _tokenManager.whitelist(nativeToken);
+        tokenHandler.whitelistToken(nativeToken);
 
         address pairAddress = pairFactory.createPair(nativeToken, IGenesisPool(genesisPool).getGenesisInfo().fundingToken, IGenesisPool(genesisPool).getProtocolInfo().stable);
         pairFactory.setGenesisStatus(pairAddress, true);

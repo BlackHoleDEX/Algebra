@@ -50,6 +50,8 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
     }
 
     constructor(address _factory, address _genesisManager, address _tokenHandler, address _voter, address _tokenOwner, address _nativeToken, address _fundingToken){
+        __ReentrancyGuard_init();
+        
         allocationInfo.tokenOwner = _tokenOwner;
         protocolInfo.tokenAddress = _nativeToken;    
         genesisInfo.fundingToken = _fundingToken;

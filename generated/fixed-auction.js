@@ -1,6 +1,6 @@
-const veArtProxyUpgradeableAddress = "0x89DC7C0292eC2e44091faDe73e04f5Ff7b345b44";
+const fixedAuctionAddress = "0x1C922B9a77F061e8D2a855c22c6E0Ea0638d9D01";
 
-const veArtProxyUpgradeableAbi = [
+const fixedAuctionAbi = [
   {
     "inputs": [],
     "stateMutability": "nonpayable",
@@ -39,42 +39,35 @@ const veArtProxyUpgradeableAbi = [
     "type": "event"
   },
   {
+    "inputs": [],
+    "name": "getNativePrice",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_tokenId",
+        "name": "depositAmount",
         "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_balanceOf",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_locked_end",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_value",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bool",
-        "name": "isSMNFT",
-        "type": "bool"
       }
     ],
-    "name": "_tokenURI",
+    "name": "getNativeTokenAmount",
     "outputs": [
       {
-        "internalType": "string",
-        "name": "output",
-        "type": "string"
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
-    "stateMutability": "pure",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -95,6 +88,19 @@ const veArtProxyUpgradeableAbi = [
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "purchased",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -119,4 +125,4 @@ const veArtProxyUpgradeableAbi = [
   }
 ];
 
-module.exports = {veArtProxyUpgradeableAddress, veArtProxyUpgradeableAbi};
+module.exports = {fixedAuctionAddress, fixedAuctionAbi};

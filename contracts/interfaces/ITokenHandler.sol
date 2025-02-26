@@ -6,6 +6,6 @@ interface ITokenHandler {
     function isWhitelistedNFT(uint256 token) external returns (bool);
     function isConnector(address token) external returns (bool);
 
-    function whitelist(address _token) external;
-    function blacklist(address _token) external;
+    function whitelistToken(address _token) external;
+    function blacklistToken(address _token) external;
 }

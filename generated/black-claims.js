@@ -1,4 +1,4 @@
-const blackClaimsAddress = "0x314dEdDb669E159109E9662110a80aa0e4195936";
+const blackClaimsAddress = "0x18F6095A4A2Ba7C2b454574673F01d2fdAA73EF6";
 
 const blackClaimsAbi = [
   {
@@ -140,7 +140,13 @@ const blackClaimsAbi = [
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "userAddress",
+        "type": "address"
+      }
+    ],
     "name": "getClaimableReward",
     "outputs": [
       {
