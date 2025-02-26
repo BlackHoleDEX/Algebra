@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.13;
 
-interface IGanesisPoolBase {
+interface IGenesisPoolBase {
     struct TokenAllocation {
         address tokenOwner;
         uint256 proposedNativeAmount;

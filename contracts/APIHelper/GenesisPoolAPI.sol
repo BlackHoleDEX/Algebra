@@ -3,13 +3,13 @@ pragma solidity 0.8.13;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-import "../interfaces/IGanesisPoolBase.sol"; 
+import "../interfaces/IGenesisPoolBase.sol"; 
 import '../interfaces/IGenesisPoolManager.sol';
 import '../interfaces/IGenesisPoolFactory.sol';
 import '../interfaces/IGenesisPool.sol';
 import {BlackTimeLibrary} from "../libraries/BlackTimeLibrary.sol";
 
-contract GenesisPoolAPI is IGanesisPoolBase, Initializable {
+contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
 
     struct GenesisData {
         address protocolToken;

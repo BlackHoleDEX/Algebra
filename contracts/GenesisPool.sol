@@ -6,13 +6,13 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
 
 import "./interfaces/IGenesisPool.sol";
-import "./interfaces/IGanesisPoolBase.sol";
+import "./interfaces/IGenesisPoolBase.sol";
 import "./interfaces/ITokenHandler.sol";
 import "./interfaces/IAuction.sol";
 import "./interfaces/IVoterV3.sol";
 import "./interfaces/IBribe.sol";
 
-contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeable {
+contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeable {
 
     using SafeERC20 for IERC20;
 
@@ -345,7 +345,7 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
         return allocationInfo;
     }
 
-    function getIncentivesInfo() external view returns (IGanesisPoolBase.TokenIncentiveInfo memory incentiveInfo){
+    function getIncentivesInfo() external view returns (IGenesisPoolBase.TokenIncentiveInfo memory incentiveInfo){
         incentiveInfo.incentivesToken = incentiveTokens;
         uint256 incentivesCnt = incentiveTokens.length;
         incentiveInfo.incentivesAmount = new uint256[](incentivesCnt);
@@ -355,19 +355,20 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
         }
     }
 
-    function getGenesisInfo() external view returns (IGanesisPoolBase.GenesisInfo memory){
+    function getGenesisInfo() external view returns (IGenesisPoolBase.GenesisInfo memory){
         return genesisInfo;
     }
-    function getProtocolInfo() external view returns (IGanesisPoolBase.ProtocolInfo memory){
+    function getProtocolInfo() external view returns (IGenesisPoolBase.ProtocolInfo memory){
         return protocolInfo;
     }
 
-    function getLiquidityPoolInfo() external view returns (IGanesisPoolBase.LiquidityPool memory){
+    function getLiquidityPoolInfo() external view returns (IGenesisPoolBase.LiquidityPool memory){
         return liquidityPoolInfo;
     }
 
     function setAuction(address _auction) external onlyManagerOrProtocol {
         require(_auction != address(0), "0x auc");
+        require(poolStatus == PoolStatus.NATIVE_TOKEN_DEPOSITED, "!= status");
         auction = IAuction(_auction);
     }
 }

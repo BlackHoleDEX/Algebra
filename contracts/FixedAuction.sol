@@ -4,10 +4,10 @@ pragma solidity 0.8.13;
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import  "./interfaces/IAuction.sol";
-import "./interfaces/IGanesisPoolBase.sol";
+import "./interfaces/IGenesisPoolBase.sol";
 import "./interfaces/IGenesisPool.sol";
 
-contract FixedAuction is IGanesisPoolBase, IAuction, OwnableUpgradeable {
+contract FixedAuction is IGenesisPoolBase, IAuction, OwnableUpgradeable {
 
     constructor() {}
 

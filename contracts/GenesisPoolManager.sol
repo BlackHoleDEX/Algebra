@@ -10,7 +10,7 @@ import "./interfaces/IGenesisPoolManager.sol";
 import './interfaces/IRouter01.sol';
 import "./interfaces/IVoterV3.sol";
 import "./interfaces/IGauge.sol";
-import "./interfaces/IGanesisPoolBase.sol";
+import "./interfaces/IGenesisPoolBase.sol";
 import "./interfaces/ITokenHandler.sol";
 import "./interfaces/IPermissionsRegistry.sol";
 import "./interfaces/IGenesisPoolFactory.sol";
@@ -25,7 +25,7 @@ interface IBaseV1Factory {
     function setGenesisStatus(address _pair, bool status) external;
 }
 
-contract GenesisPoolManager is IGanesisPoolBase, IGenesisPoolManager, OwnableUpgradeable, ReentrancyGuardUpgradeable {
+contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
     uint256 public MIN_DURATION = 7 days; 
     uint256 public MIN_THRESHOLD = 50 * 10 ** 2; 
