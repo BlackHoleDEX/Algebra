@@ -2,9 +2,9 @@
 pragma solidity 0.8.13;
 
 import {IERC721, IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
-import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {IERC20} from "./interfaces/IERC20.sol";
+import {IBlackHoleVotes} from "./interfaces/IBlackHoleVotes.sol";
 import {IVeArtProxy} from "./interfaces/IVeArtProxy.sol";
 import {IVotingEscrow} from "./interfaces/IVotingEscrow.sol";
 import {IVoterV3} from "./interfaces/IVoterV3.sol";
@@ -17,7 +17,7 @@ import {IAutomatedVotingManager} from "./interfaces/IAutomatedVotingManager.sol"
 /// @author Modified from Curve (https://github.com/curvefi/curve-dao-contracts/blob/master/contracts/VotingEscrow.vy)
 /// @author Modified from Nouns DAO (https://github.com/withtally/my-nft-dao-project/blob/main/contracts/ERC721Checkpointable.sol)
 /// @dev Vote weight decays linearly over time. Lock time cannot be more than `MAXTIME` (2 years).
-contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
+contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
     enum DepositType {
         DEPOSIT_FOR_TYPE,
         CREATE_LOCK_TYPE,
@@ -1444,8 +1444,30 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         return votes;
     }
 
+    function getsmNFTPastVotes(address account, uint timestamp) 
+        public
+        view
+        returns (uint)
+    {
+        uint32 _checkIndex = getPastVotesIndex(account, timestamp);
+        // Sum votes
+        uint[] storage _tokenIds = checkpoints[account][_checkIndex].tokenIds;
+        uint votes = 0;
+        for (uint i = 0; i < _tokenIds.length; i++) {
+            uint tId = _tokenIds[i];
+            if(!locked[tId].isSMNFT) continue;
+            // Use the provided input timestamp here to get the right decay
+            votes = votes + _balanceOfNFT(tId, timestamp);
+        }
+        return votes;
+    }
+
     function getPastTotalSupply(uint256 timestamp) external view returns (uint) {
         return totalSupplyAtT(timestamp);
+    }
+
+    function getsmNFTPastTotalSupply() external view returns (uint) {
+        return smNFTBalance;
     }
 
     /*///////////////////////////////////////////////////////////////
@@ -1490,7 +1512,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
                 // All the same plus _tokenId
                 require(
                     dstRepOld.length + 1 <= MAX_DELEGATES,
-                    "dstRep would have too many tokenIds"
+                    "too many tokenIds"
                 );
                 for (uint i = 0; i < dstRepOld.length; i++) {
                     uint tId = dstRepOld[i];
@@ -1560,7 +1582,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
                 uint ownerTokenCount = ownerToNFTokenCount[owner];
                 require(
                     dstRepOld.length + ownerTokenCount <= MAX_DELEGATES,
-                    "dstRep would have too many tokenIds"
+                    "too many tokenIds"
                 );
                 // All the same
                 for (uint i = 0; i < dstRepOld.length; i++) {
@@ -1626,15 +1648,15 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         address signatory = ecrecover(digest, v, r, s);
         require(
             signatory != address(0),
-            "VotingEscrow::delegateBySig: invalid signature"
+            "invalid signature"
         );
         require(
             nonce == nonces[signatory]++,
-            "VotingEscrow::delegateBySig: invalid nonce"
+            "invalid nonce"
         );
         require(
             block.timestamp <= expiry,
-            "VotingEscrow::delegateBySig: signature expired"
+            "signature expired"
         );
         return _delegate(signatory, delegatee);
     }

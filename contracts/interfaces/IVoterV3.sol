@@ -13,6 +13,8 @@ interface IVoterV3 {
     function poke(uint256 _tokenId) external;
     function epochTimestamp() external view returns(uint);
     function lastVoted(uint tokenId) external view returns(uint);
+    function getBlackGovernor() external view returns (address);
+    function setBlackGovernor(address _epochGovernor) external;
     function gauges(address pool) external view returns(address);
     function pools(uint256 i) external view returns(address);
     function internal_bribes(address _gauge) external view returns(address);

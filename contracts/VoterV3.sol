@@ -37,6 +37,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     address public minter;                                      // minter mints $the each epoch
     address public permissionRegistry;                          // registry to check accesses
     address[] public pools;                                     // all pools viable for incentives
+    address public blackGoverner;
     address public epochOwner;
     address public genesisManager;
     address public tokenHandler;                     
@@ -192,6 +193,16 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         require(_bribeFactory != address(0), "addr0");
         emit SetBribeFactory(bribefactory, _bribeFactory);
         bribefactory = _bribeFactory;
+    }
+
+
+    function getBlackGovernor() external view returns (address){
+        return blackGoverner;
+    }
+
+    function setBlackGovernor(address _blackGovernor) external onlyOwner {
+        require(_blackGovernor != address(0));
+        blackGoverner = _blackGovernor;
     }
 
     function getAutomationRegistry() external view returns (address){

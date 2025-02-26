@@ -374,6 +374,18 @@ const deployveNFT = async (voterV3Address, rewardsDistributorAddress, gaugeV2Add
     }
 }
 
+const deployBlackGovernor = async(votingEscrowAddress, minterUpgradableAddress) => {
+    try {
+        const blackGovernorContract = await ethers.getContractFactory("BlackGovernor");
+        const BlackGovernor = await blackGovernorContract.deploy(votingEscrowAddress, minterUpgradableAddress);
+        const txDeployed = await BlackGovernor.deployed();
+        generateConstantFile("BlackGovernor", BlackGovernor.address);
+        console.log('BlackGovernor address: ', BlackGovernor.address);
+    } catch (error) {
+        console.log("error in deploying BlackGovernor: ", error);
+    }
+}
+
 const pushDefaultRewardToken = async (bribeFactoryV3Address, blackAddress) => {
     const BribeFactoryV3Contract = await ethers.getContractAt(bribeFactoryV3Abi, bribeFactoryV3Address);
     await BribeFactoryV3Contract.pushDefaultRewardToken(blackAddress);
@@ -546,13 +558,15 @@ async function main () {
 
     // set chainlink address
     // TODO: separate out the setting of chalink address 
-    // await setChainLinkAddress(epochControllerAddress, "0xb2C2f24FcC2478f279B6B566419a739FA53c70D3");
+    await setChainLinkAddress(epochControllerAddress, "0xb2C2f24FcC2478f279B6B566419a739FA53c70D3");
 
     //add black to user Address
     await addBlackToUserAddress(minterUpgradableAddress);
 
     //set voterV3 in voting escrow
     await setVoterV3InVotingEscrow(voterV3Address, votingEscrowAddress);
+
+    await deployBlackGovernor("0xF844747b902d1727b71A0b9403F96d2805E08384", "0x10a4220752E84FD8d1E28bB90d690b438629d5f9");
 
     await pushDefaultRewardToken(bribeV3Address, blackAddress);
 
@@ -571,6 +585,7 @@ async function main () {
     await setDutchAuctioninGenesisPool(genesisPoolAddress, dutchAuctionAddress);
 
     await deployGenesisApi(genesisPoolAddress);
+
 
     //createPairs two by default
     await addLiquidity(routerV2Address, addresses[0], addresses[1], 100, 100);
