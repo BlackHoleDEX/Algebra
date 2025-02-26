@@ -8,6 +8,7 @@ import {IERC20} from "./interfaces/IERC20.sol";
 import {IVeArtProxy} from "./interfaces/IVeArtProxy.sol";
 import {IVotingEscrow} from "./interfaces/IVotingEscrow.sol";
 import {IVoterV3} from "./interfaces/IVoterV3.sol";
+import {IAutomatedVotingManager} from "./interfaces/IAutomatedVotingManager.sol";
 
 /// @title Voting Escrow
 /// @notice veNFT implementation that escrows ERC-20 tokens in the form of an ERC-721 NFT
@@ -90,6 +91,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
     address public voter;
     address public team;
     address public artProxy;
+    address public avm;
     address public burnTokenAddress=0x000000000000000000000000000000000000dEaD;
 
     uint public SMNFT_BONUS = 1000;
@@ -114,11 +116,12 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
 
     /// @notice Contract constructor
     /// @param token_addr `BLACK` token address
-    constructor(address token_addr, address art_proxy) {
+    constructor(address token_addr, address art_proxy, address _avm) {
         token = token_addr;
         voter = msg.sender;
         team = msg.sender;
         artProxy = art_proxy;
+        avm = _avm;
 
         point_history[0].blk = block.number;
         point_history[0].ts = block.timestamp;
@@ -312,6 +315,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         require(attachments[_tokenId] == 0 && !voted[_tokenId], "attached");
         // Check requirements
         require(_isApprovedOrOwner(_sender, _tokenId), "caller is not owner nor approved");
+
         // Clear approval. Throws if `_from` is not the current owner
         _clearApproval(_from, _tokenId);
         // Remove NFT. Throws if `_tokenId` is not a valid NFT
@@ -322,6 +326,13 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         _addTokenTo(_to, _tokenId);
         // Set the block of ownership transfer (for Flash NFT protection)
         ownership_change[_tokenId] = block.number;
+
+        if (_to == avm) { 
+            // dont need additional check on originalOwner mapping
+            // Store original owner before AVM takes control
+            // used a setter fucntion and exposed that through the method, any ohter better method 
+            IAutomatedVotingManager(avm).setOriginalOwner(_tokenId, _from);
+        } 
         // Log the transfer
         emit Transfer(_from, _to, _tokenId);
     }
@@ -1200,6 +1211,11 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
     function setVoter(address _voter) external {
         require(msg.sender == team);
         voter = _voter;
+    }
+
+    function setAVM(address _avm) external {
+        require(msg.sender == team);
+        avm = _avm;
     }
 
     function voting(uint _tokenId) external {

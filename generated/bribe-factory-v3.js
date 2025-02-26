@@ -1,4 +1,4 @@
-const bribeFactoryV3Address = "0x4B66cF94a076c6627dFA9F7456272559e233BF95";
+const bribeFactoryV3Address = "0x7A59BCa1e17dDC20237b0D2aC59B5904A9d8A937";
 
 const bribeFactoryV3Abi = [
   {
@@ -295,6 +295,24 @@ const bribeFactoryV3Abi = [
   {
     "inputs": [],
     "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "_bribe",
+        "type": "address[]"
+      },
+      {
+        "internalType": "address",
+        "name": "_avm",
+        "type": "address"
+      }
+    ],
+    "name": "setBribeAVM",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

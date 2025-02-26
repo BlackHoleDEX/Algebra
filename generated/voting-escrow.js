@@ -1,4 +1,4 @@
-const votingEscrowAddress = "0x4F9471DF8a0Ab277FE44FbaC0D5494Ce0647C7E0";
+const votingEscrowAddress = "0xcA5fd3D3dcdda839ca97dE2632Cf7Ea05520a35b";
 
 const votingEscrowAbi = [
   {
@@ -11,6 +11,11 @@ const votingEscrowAbi = [
       {
         "internalType": "address",
         "name": "art_proxy",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_avm",
         "type": "address"
       }
     ],
@@ -520,6 +525,19 @@ const votingEscrowAbi = [
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "avm",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -1378,6 +1396,19 @@ const votingEscrowAbi = [
       }
     ],
     "name": "safeTransferFrom",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_avm",
+        "type": "address"
+      }
+    ],
+    "name": "setAVM",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

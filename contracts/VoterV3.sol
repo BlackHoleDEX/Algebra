@@ -12,6 +12,7 @@ import './interfaces/IPairInfo.sol';
 import './interfaces/IPairFactory.sol';
 import './interfaces/IVotingEscrow.sol';
 import './interfaces/IPermissionsRegistry.sol';
+import "./interfaces/IAutomatedVotingManager.sol";
 import './interfaces/ITokenHandler.sol';
 // import './interfaces/IAlgebraFactory.sol';
 // import "hardhat/console.sol";
@@ -28,6 +29,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     bool internal initflag;
 
     address public _ve;                                         // the ve token that governs these contracts
+    address public avm;
     address[] internal _factories;                                 // Array with all the pair factories
     address internal base;                                      // $the token
     address[] internal _gaugeFactories;                            // array with all the gauge factories
@@ -95,6 +97,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
         _ve = __ve;
         base = IVotingEscrow(__ve).token();
+        avm = IVotingEscrow(__ve).avm();
 
         _factories.push(_pairFactory);
         isFactory[_pairFactory] = true;
@@ -244,6 +247,10 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     function setMaxVotingNum(uint256 _maxVotingNum) external VoterAdmin {
         require (_maxVotingNum >= MIN_VOTING_NUM, "low voting");
         maxVotingNum = _maxVotingNum;
+    }
+
+    function setAVM() external VoterAdmin {
+        avm = IVotingEscrow(_ve).avm();
     }
     
     function addFactory(address _pairFactory, address _gaugeFactory) external VoterAdmin {
@@ -413,8 +420,8 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         require(_poolVote.length == _weights.length, "weights length !=");
         require(_poolVote.length <= maxVotingNum, "pool length exceeds maxVotingNum");
         uint256 _timestamp = block.timestamp;
-        if ((_timestamp > BlackTimeLibrary.epochVoteEnd(_timestamp)) && !ITokenHandler(tokenHandler).isWhitelistedNFT(_tokenId)){
-            revert("not whitelisted");
+        if ((_timestamp > BlackTimeLibrary.epochVoteEnd(_timestamp)) && !ITokenHandler(tokenHandler).isWhitelistedNFT(_tokenId) && msg.sender != avm){
+            revert("not whitelisted or avm");
         }
         _vote(_tokenId, _poolVote, _weights);
         lastVoted[_tokenId] = epochTimestamp() + 1;

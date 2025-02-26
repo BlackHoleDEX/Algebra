@@ -53,9 +53,7 @@ async function main(){
         gasLimit: 21000000
     });
 
-    console.log('tx', tx)
     const awaitedTx = await tx.wait();
-    console.log("awwaitedTex", awaitedTx);
 }
 
 
