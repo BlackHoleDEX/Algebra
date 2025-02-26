@@ -46,7 +46,8 @@ async function main() {
     const accounts = await ethers.getSigners();
     const owner = accounts[0];
     // const receiver = owner.address;
-    const receiver = "0xa7243fc6FB83b0490eBe957941a339be4Db11c29";
+    // const receiver = "0xa7243fc6FB83b0490eBe957941a339be4Db11c29";
+    const receiver = owner.address;
     const mintAmount = 100000;
     //  const mintAmount = <add_mint_amount>;
 
@@ -60,7 +61,7 @@ async function main() {
 
     await mintBlack(blackAddress, receiver, mintAmount);
 
-    await setMinter(blackAddress, receiver);
+    // await setMinter(blackAddress, receiver);
     // Update or add the Black token address
     deployedTokens[0].address = blackAddress;
 

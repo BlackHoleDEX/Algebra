@@ -8,6 +8,7 @@ const { minterUpgradeableAbi } = require('../../../../generated/minter-upgradeab
 const { epochControllerAbi } = require('../../../../generated/epoch-controller')
 const { blackAbi } = require('../../../blackhole-scripts/gaugeConstants/black')
 const { votingEscrowAbi } = require('../../../../generated/voting-escrow');
+const { gaugeFactoryV2Abi, gaugeFactoryV2Address } = require('../../../../generated/gauge-factory-v2');
 const { rewardsDistributorAbi } = require('../../../../generated/rewards-distributor');
 const { addLiquidity } = require('../../../blackhole-scripts/addLiquidity')
 const { BigNumber } = require("ethers");
@@ -23,13 +24,28 @@ const jsonData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8'));
 // Extract addresses
 const addresses = jsonData.map(obj => obj.address);
 const deployedTokens = require('../../token-constants/deployed-tokens.json');
+const { pairFactoryAddress } = require("../../../blackhole-scripts/dexAbi");
 const blackAddress = deployedTokens[0].address;
 console.log("Extracted Addresses: ", addresses);
 
-const deployPairFactory = async () => {
+const deployPairGenerator = async () => {
+    try {
+        const pairGeneratorContract = await ethers.getContractFactory("PairGenerator");
+        const pairGenerator = await pairGeneratorContract.deploy();
+        txDeployed = await pairGenerator.deployed();
+        console.log("pairFactory: ", pairGenerator.address)
+        generateConstantFile("PairGenerator", pairGenerator.address);
+        return pairGenerator.address;
+    } catch (error) {
+        console.log("error in deploying pairGenerator: ", error)
+    }
+}
+
+const deployPairFactory = async (pairGeneratorAddress) => {
     try {
         const pairFactoryContract = await ethers.getContractFactory("PairFactoryUpgradeable");
-        const pairFactory = await upgrades.deployProxy(pairFactoryContract,[],{initializer: 'initialize'});
+        const inputs = [pairGeneratorAddress];
+        const pairFactory = await upgrades.deployProxy(pairFactoryContract,inputs,{initializer: 'initialize'});
         txDeployed = await pairFactory.deployed();
         console.log("pairFactory: ", pairFactory.address)
         generateConstantFile("PairFactoryUpgradeable", pairFactory.address);
@@ -109,6 +125,19 @@ const setPermissionRegistryRoles = async (permissionRegistryAddress, ownerAddres
     }
 };
 
+const setGenesisManagerRole = async (permissionRegistryAddress, genesisPoolAddress) => {
+    const permissionRegistryContract = await ethers.getContractAt(permissionsRegistryAbi, permissionRegistryAddress);
+
+    try {
+        const setRoleTx = await permissionRegistryContract.setRoleFor(genesisPoolAddress, "GENESIS_MANAGER", {
+            gasLimit: 21000000,
+        });
+        await setRoleTx.wait(); // Wait for the transaction to be mined
+    } catch (err) {
+        console.log('Error in setRoleFor in permissionRegistry:', err);
+    }
+};
+
 
 const deployVotingEscrow = async(blackAddress) =>{
     try {
@@ -119,7 +148,7 @@ const deployVotingEscrow = async(blackAddress) =>{
         generateConstantFile("VeArtProxyUpgradeable", veArtProxy.address);
 
         const VotingEscrowContract = await ethers.getContractFactory("VotingEscrow");
-        const veBlack = await VotingEscrowContract.deploy(blackAddress, veArtProxy.address);
+        const veBlack = await VotingEscrowContract.deploy(blackAddress, veArtProxy.address, ZERO_ADDRESS);
         txDeployed = await veBlack.deployed();
         console.log("veBlack Address: ", veBlack.address);
         generateConstantFile("VotingEscrow", veBlack.address);
@@ -307,9 +336,13 @@ const setChainLinkAddress = async (epocControllerAddress, chainlinkAutomationReg
 
 const addBlackToUserAddress = async (minterUpgradableAddress) => {
     try {
+        const accounts = await ethers.getSigners();
+        const owner = accounts[0];
         const minterContract = await ethers.getContractAt(minterUpgradeableAbi, minterUpgradableAddress);
         const amountAdd = BigNumber.from("5000").mul(BigNumber.from("1000000000000000000"));
-        await minterContract.transfer("0xa7243fc6FB83b0490eBe957941a339be4Db11c29", amountAdd);
+        console.log("owner address", owner.address)
+        // await minterContract.transfer("0xa7243fc6FB83b0490eBe957941a339be4Db11c29", amountAdd);
+        await minterContract.transfer(owner.address, amountAdd);
         console.log("transfer token successfully");
     } catch (error) {
         console.log("error in transfering token: ", error);
@@ -327,10 +360,10 @@ const setVoterV3InVotingEscrow = async(voterV3Address, votingEscrowAddress) => {
     }
 }
 
-const deployveNFT = async (voterV3Address, rewardsDistributorAddress, blackholeV2AbiAddress) => {
+const deployveNFT = async (voterV3Address, rewardsDistributorAddress, gaugeV2Address) => {
     try {
         data = await ethers.getContractFactory("veNFTAPI");
-        input = [voterV3Address, rewardsDistributorAddress, blackholeV2AbiAddress] // 
+        input = [voterV3Address, rewardsDistributorAddress, gaugeV2Address] 
         const veNFTAPI = await upgrades.deployProxy(data, input, {initializer: 'initialize', gasLimit:210000000});
         txDeployed = await veNFTAPI.deployed();
 
@@ -341,9 +374,114 @@ const deployveNFT = async (voterV3Address, rewardsDistributorAddress, blackholeV
     }
 }
 
+const deployBlackGovernor = async(votingEscrowAddress, minterUpgradableAddress) => {
+    try {
+        const blackGovernorContract = await ethers.getContractFactory("BlackGovernor");
+        const BlackGovernor = await blackGovernorContract.deploy(votingEscrowAddress, minterUpgradableAddress);
+        const txDeployed = await BlackGovernor.deployed();
+        generateConstantFile("BlackGovernor", BlackGovernor.address);
+        console.log('BlackGovernor address: ', BlackGovernor.address);
+    } catch (error) {
+        console.log("error in deploying BlackGovernor: ", error);
+    }
+}
+
 const pushDefaultRewardToken = async (bribeFactoryV3Address, blackAddress) => {
     const BribeFactoryV3Contract = await ethers.getContractAt(bribeFactoryV3Abi, bribeFactoryV3Address);
     await BribeFactoryV3Contract.pushDefaultRewardToken(blackAddress);
+}
+
+const deployBlackClaim = async (votingEscrowAddress, treasury) => {
+    try {
+        const BlackClaimsContract = await ethers.getContractFactory("BlackClaims");
+        const BlackClaims = await BlackClaimsContract.deploy(treasury, votingEscrowAddress);
+        const txDeployed =  await BlackClaims.deployed();
+
+        console.log("BlackClaims address: ", BlackClaims.address)
+        generateConstantFile("BlackClaims", BlackClaims.address);
+        return BlackClaims.address;
+    } catch (error) {
+        console.log("error in deploying Black Claims: ", error);
+    }
+}
+
+const deployGenesisPool = async (routerV2Address, epochControllerAddress, voterV3Address, pairFactoryAddress, tokenHandlerAddress, permissionRegistryAddress) => {
+    try {
+        console.log("deploying 1")
+        const genesisPoolContract = await ethers.getContractFactory("GenesisPoolManager");
+        input = [routerV2Address, epochControllerAddress, voterV3Address, pairFactoryAddress, tokenHandlerAddress, permissionRegistryAddress];
+        console.log("deploying 2")
+        const genesisPool = await upgrades.deployProxy(genesisPoolContract, input, {initializer: 'initialize', gasLimit:210000000});
+        console.log("deploying 3")
+        const txDeployed = await genesisPool.deployed();
+        console.log("deploying 4")
+
+        console.log("Genesis Pool address: ", genesisPool.address)
+        generateConstantFile("GenesisPoolManager", genesisPool.address);
+        return genesisPool.address;
+    } catch (error) {
+        console.log("error in deploying Genesis Pool : ", error);
+    }
+}
+
+const setGenesisPoolManagerInGaugeFactory = async(gaugeV2Address, genesisPoolAddress) => {
+    try {
+        const GaugeFactoryContract = await ethers.getContractAt(gaugeFactoryV2Abi, gaugeV2Address);
+        await GaugeFactoryContract.setGenesisPool(genesisPoolAddress);
+        console.log("set genesis pool in gauge factory");
+    } catch (error) {
+        console.log("error genesis pool in gauge factory", error);
+    }
+}
+
+const setGenesisPoolManagerInPairFactory = async(pairFactoryAddress, genesisPoolAddress) => {
+    try {
+        const PairFactoryContract = await ethers.getContractAt(pairFactoryUpgradeableAbi, pairFactoryAddress);
+        await PairFactoryContract.setGenesisPool(genesisPoolAddress);
+        console.log("set genesis pool in pair factory");
+    } catch (error) {
+        console.log("error genesis pool in pair factory", error);
+    }
+}
+
+const deployDucthAction = async (genesisPoolAddress) => {
+    try {
+        const dutchAuctionContract = await ethers.getContractFactory("DutchAction");
+        input = [genesisPoolAddress];
+
+        const dutchAuction = await upgrades.deployProxy(dutchAuctionContract, input, {initializer: 'initialize', gasLimit:210000000});
+        const txDeployed = await dutchAuction.deployed();
+
+        console.log("Genesis Pool address: ", dutchAuction.address)
+        generateConstantFile("DutchAction", dutchAuction.address);
+        return dutchAuction.address;
+    } catch (error) {
+        console.log("error in deploying dutch aution : ", error);
+    }
+}
+
+const setDutchAuctioninGenesisPool = async (genesisPoolAddress, dutchAuctionAddress) => {
+    // try {
+    //     const VotingEscrowContract = await ethers.getContractAt(votingEscrowAbi, votingEscrowAddress);
+    //     await VotingEscrowContract.setVoter(voterV3Address);
+    //     console.log("set voterV3 in voting escrow");
+    // } catch (error) {
+    //     console.log("error voterV3 in voting escrow", error);
+    // }
+}
+
+const deployGenesisApi = async (genesisPoolAddress) => {
+    try {
+        data = await ethers.getContractFactory("GenesisPoolAPI");
+        input = [genesisPoolAddress] 
+        const genesisApi = await upgrades.deployProxy(data, input, {initializer: 'initialize', gasLimit:210000000});
+        txDeployed = await genesisApi.deployed();
+
+        generateConstantFile("GenesisPoolAPI", genesisApi.address);
+        console.log('deployed genesis pool API address: ', genesisApi.address)
+    } catch (error) {
+        console.log('error genesis pool API  ', error)
+    }
 }
 
 async function main () {
@@ -353,17 +491,21 @@ async function main () {
 
     console.log("Black token address is: ", blackAddress);
 
+    //deploy permissionRegistry
+    const permissionRegistryAddress = await deployPermissionRegistry();
+
+    const tokenHandlerAddress = await deployTokenHanlder(permissionRegistryAddress);
+
+    const pairGeneratorAddress = await deployPairGenerator();
+
     //deploy pairFactory
-    const pairFactoryAddress = await deployPairFactory();
+    const pairFactoryAddress = await deployPairFactory(pairGeneratorAddress);
 
     //deploy router V2
     const routerV2Address = await deployRouterV2(pairFactoryAddress);
 
     //setDibs
     await setDibs(pairFactoryAddress);
-
-    //deploy permissionRegistry
-    const permissionRegistryAddress = await deployPermissionRegistry();
 
     //deploy voting  escrow
     const votingEscrowAddress = await deployVotingEscrow(blackAddress);
@@ -389,7 +531,8 @@ async function main () {
     //deploy rewardsDistributor
     const rewardsDistributorAddress = await deployRewardsDistributor(votingEscrowAddress);
 
-    //set depositor
+    //deploy veNFT
+    await deployveNFT(voterV3Address, rewardsDistributorAddress, gaugeV2Address);
 
     //deploy minterUpgradable
     const minterUpgradableAddress = await deployMinterUpgradeable(votingEscrowAddress, voterV3Address, rewardsDistributorAddress);
@@ -414,23 +557,44 @@ async function main () {
     const epochControllerAddress = await deployEpochController(voterV3Address, minterUpgradableAddress);
 
     // set chainlink address
-    // await setChainLinkAddress(epochControllerAddress, "0xb2C2f24FcC2478f279B6B566419a739FA53c70D3");
+    // TODO: separate out the setting of chalink address 
+    await setChainLinkAddress(epochControllerAddress, "0xb2C2f24FcC2478f279B6B566419a739FA53c70D3");
 
     //add black to user Address
     await addBlackToUserAddress(minterUpgradableAddress);
 
-    //deploy veNFT
-    await deployveNFT(voterV3Address, rewardsDistributorAddress);
-
     //set voterV3 in voting escrow
     await setVoterV3InVotingEscrow(voterV3Address, votingEscrowAddress);
+
+    await deployBlackGovernor("0xF844747b902d1727b71A0b9403F96d2805E08384", "0x10a4220752E84FD8d1E28bB90d690b438629d5f9");
+
+    await pushDefaultRewardToken(bribeV3Address, blackAddress);
+
+    const blackClaimAddress = await deployBlackClaim(votingEscrowAddress, ownerAddress);
+
+    const genesisPoolAddress = deployGenesisPool(routerV2Address, epochControllerAddress, voterV3Address, pairFactoryAddress, tokenHandlerAddress, permissionRegistryAddress);
+
+    await setGenesisManagerRole(permissionRegistryAddress, genesisPoolAddress);
+
+    await setGenesisPoolManagerInGaugeFactory(gaugeFactoryV2Address, genesisPoolAddress);
+
+    await setGenesisPoolManagerInPairFactory(pairFactoryAddress, genesisPoolAddress);
+
+    const dutchAuctionAddress = deployDucthAction(genesisPoolAddress);
+
+    await setDutchAuctioninGenesisPool(genesisPoolAddress, dutchAuctionAddress);
+
+    await deployGenesisApi(genesisPoolAddress);
+
 
     //createPairs two by default
     await addLiquidity(routerV2Address, addresses[0], addresses[1], 100, 100);
     await addLiquidity(routerV2Address, addresses[1], addresses[2], 100, 100);
     await addLiquidity(routerV2Address, addresses[2], addresses[3], 100, 100);
+    await addLiquidity(routerV2Address, addresses[3], addresses[4], 10, 100);
+    await addLiquidity(routerV2Address, addresses[4], addresses[5], 100, 10);
 
-    await pushDefaultRewardToken(bribeV3Address, blackAddress);
+    console.log("DONE ADDING LIQUIDITY")
 
     //create Gauges
     await createGauges(voterV3Address, blackholeV2AbiAddress);

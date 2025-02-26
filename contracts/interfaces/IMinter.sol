@@ -6,4 +6,5 @@ interface IMinter {
     function check() external view returns(bool);
     function period() external view returns(uint);
     function active_period() external view returns(uint);
+    function nudge() external;
 }

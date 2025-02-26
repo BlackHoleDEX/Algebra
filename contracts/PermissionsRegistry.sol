@@ -57,6 +57,11 @@ contract PermissionsRegistry {
         _roles.push(bytes("FEE_MANAGER"));
         _checkRole[(bytes("FEE_MANAGER"))] = true;
 
+        _roles.push(bytes("CL_FEES_VAULT_ADMIN"));
+        _checkRole[(bytes("CL_FEES_VAULT_ADMIN"))] = true;
+
+        _roles.push(bytes("GENESIS_MANAGER"));
+        _checkRole[(bytes("GENESIS_MANAGER"))] = true;
     }
 
     modifier onlyBlackMultisig() {

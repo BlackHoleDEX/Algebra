@@ -1,4 +1,4 @@
-const votingEscrowAddress = "0x590A6eb22B42ecf02420535e47b1B073f9600661";
+const votingEscrowAddress = "0xF844747b902d1727b71A0b9403F96d2805E08384";
 
 const votingEscrowAbi = [
   {
@@ -11,6 +11,11 @@ const votingEscrowAbi = [
       {
         "internalType": "address",
         "name": "art_proxy",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_avm",
         "type": "address"
       }
     ],
@@ -424,6 +429,32 @@ const votingEscrowAbi = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "PRECISISON",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "SMNFT_BONUS",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -494,6 +525,19 @@ const votingEscrowAbi = [
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "avm",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -588,6 +632,57 @@ const votingEscrowAbi = [
   {
     "inputs": [],
     "name": "block_number",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "burnTokenAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "calculate_original_sm_nft_amount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "calculate_sm_nft_bonus",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1252,6 +1347,16 @@ const votingEscrowAbi = [
         "internalType": "uint256",
         "name": "permanent",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "smNFT",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "smNFTBonus",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -1312,6 +1417,19 @@ const votingEscrowAbi = [
     "inputs": [
       {
         "internalType": "address",
+        "name": "_avm",
+        "type": "address"
+      }
+    ],
+    "name": "setAVM",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "_operator",
         "type": "address"
       },
@@ -1335,6 +1453,19 @@ const votingEscrowAbi = [
       }
     ],
     "name": "setArtProxy",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_bonus",
+        "type": "uint256"
+      }
+    ],
+    "name": "setSmNFTBonus",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1673,6 +1804,16 @@ const votingEscrowAbi = [
       {
         "internalType": "uint256",
         "name": "permanent",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "smNFT",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "smNFTBonus",
         "type": "uint256"
       }
     ],
