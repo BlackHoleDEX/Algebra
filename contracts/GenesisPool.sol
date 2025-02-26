@@ -49,7 +49,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
         _;
     }
 
-    constructor(address _factory, address _genesisManager, address _tokenHandler, address _voter, address _auction, address _tokenOwner, address _nativeToken, address _fundingToken){
+    constructor(address _factory, address _genesisManager, address _tokenHandler, address _voter, address _tokenOwner, address _nativeToken, address _fundingToken){
         allocationInfo.tokenOwner = _tokenOwner;
         protocolInfo.tokenAddress = _nativeToken;    
         genesisInfo.fundingToken = _fundingToken;
@@ -58,7 +58,6 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
         genesisManager = _genesisManager;
         tokenHandler = ITokenHandler(_tokenHandler);
         voter = IVoterV3(_voter);
-        auction = IAuction(_auction);
     }
 
 

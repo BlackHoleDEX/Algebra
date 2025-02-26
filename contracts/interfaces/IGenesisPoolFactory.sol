@@ -6,5 +6,5 @@ interface IGenesisPoolFactory {
     function genesisPools(uint index) external returns (address);
 
     function genesisPoolsLength() external view returns (uint256);
-    function createGenesisPool(address tokenOwner, address nativeToken, address fundingToken, address auction) external returns (address);
+    function createGenesisPool(address tokenOwner, address nativeToken, address fundingToken) external returns (address);
 }

@@ -19,6 +19,7 @@ contract AuctionFactory is IAuctionFactory, OwnableUpgradeable {
 
     constructor() {}
 
+    // _auction is a fixed auction (default auction assigned to GPs)
     function initialize(address _auction) public initializer {
         __Ownable_init();
 

@@ -90,12 +90,14 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         require(protocolInfo.tokenAddress == nativeToken, "unequal protocol token");
         require(bytes(protocolInfo.tokenName).length > 0 && bytes(protocolInfo.tokenTicker).length > 0 && bytes(protocolInfo.protocolBanner).length > 0 && bytes(protocolInfo.protocolDesc).length > 0, "protocol info");
 
-        address auction = auctionFactory.auctions(auctionIndex);
-        auction = auction == address(0) ? auctionFactory.auctions(0) : auction;
-        genesisPool = genesisFactory.createGenesisPool(_sender, nativeToken, _fundingToken, auction);
+        genesisPool = genesisFactory.createGenesisPool(_sender, nativeToken, _fundingToken);
         require(genesisPool != address(0), "0x");
 
         assert(IERC20(nativeToken).transferFrom(_sender, genesisPool, allocationInfo.proposedNativeAmount));
+
+        address auction = auctionFactory.auctions(auctionIndex);
+        auction = auction == address(0) ? auctionFactory.auctions(0) : auction;
+        IGenesisPool(genesisPool).setAuction(auction);
 
         proposedTokens.push(nativeToken);
         IGenesisPool(genesisPool).setGenesisPoolInfo(genesisPoolInfo, protocolInfo, allocationInfo);
