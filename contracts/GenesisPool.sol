@@ -19,7 +19,7 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
     address immutable internal factory;
     address immutable internal genesisManager;
     ITokenHandler immutable internal tokenHandler;
-    IAuction immutable internal auction;
+    IAuction internal auction;
     IVoterV3 immutable internal voter;
 
     TokenAllocation public allocationInfo;
@@ -41,6 +41,11 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
 
     modifier onlyManager() {
         require(msg.sender == genesisManager);
+        _;
+    }
+
+    modifier onlyManagerOrProtocol() {
+        require(msg.sender == genesisManager || msg.sender == allocationInfo.tokenOwner);
         _;
     }
 
@@ -132,8 +137,11 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
 
         userDeposits[spender] = userDeposits[spender] + _amount;
 
+        uint256 nativeAmount = _getNativeTokenAmount(amount);
         allocationInfo.allocatedFundingAmount += _amount;
-        allocationInfo.allocatedNativeAmount += _getProtcolTokenAmount(amount);
+        allocationInfo.allocatedNativeAmount += nativeAmount;
+
+        IAuction(auction).purchased(nativeAmount);
 
         return poolStatus == PoolStatus.PRE_LISTING && _eligbleForPreLaunchPool();
     }
@@ -219,15 +227,33 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
 
     function getLPTokensShares(uint256 liquidity) onlyManager external view returns (address[] memory _accounts, uint256[] memory _amounts, address _tokenOwner){
         
+        require(liquidity > 0, "invalid liquidity");
         uint256 _depositersCnt = depositers.length;
+        uint256 _totalDeposits = 0;
         uint256[] memory _deposits = new uint256[](_depositersCnt);
         uint256 i;
         for(i = 0; i < _depositersCnt; i++){
             _deposits[i] = userDeposits[depositers[i]];
+            _totalDeposits += _deposits[i];
+        }
+
+        require(_totalDeposits > 0, "0 total deposits");
+
+        _accounts = new address[](_depositersCnt + 1); 
+        _amounts = new uint256[](_depositersCnt + 1); 
+
+        uint256 _totalAdded = 0;
+        uint256 _depositerLiquidity = liquidity / 2;
+
+        for(i = 0; i < _depositersCnt; i++){
+            _accounts[i+1] = depositers[i];
+            _amounts[i+1] = (_depositerLiquidity * _deposits[i]) / _totalDeposits;
+            _totalAdded += _amounts[i+1];
         }
 
         _tokenOwner = allocationInfo.tokenOwner;
-        (_accounts, _amounts) = auction.getLPTokensShares(depositers, _deposits, allocationInfo.tokenOwner, liquidity);
+        _accounts[0] = _tokenOwner;
+        _amounts[0] = liquidity - _totalAdded;
     }
 
     function claimableUnallocatedAmount() public view returns(PoolStatus, address, uint256){
@@ -306,13 +332,13 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
         }
     }
 
-    function getProtcolTokenAmount(uint256 depositAmount) external view returns (uint256){
+    function getNativeTokenAmount(uint256 depositAmount) external view returns (uint256){
         require(depositAmount > 0, "0 amt");
-        return _getProtcolTokenAmount(depositAmount);
+        return _getNativeTokenAmount(depositAmount);
     }
 
-    function _getProtcolTokenAmount(uint256 depositAmount) internal view returns (uint256){
-        return auction.getProtcolTokenAmount(genesisInfo.startPrice, depositAmount, allocationInfo);
+    function _getNativeTokenAmount(uint256 depositAmount) internal view returns (uint256){
+        return auction.getNativeTokenAmount(depositAmount);
     }
 
     function getAllocationInfo() external view returns (TokenAllocation memory){
@@ -338,5 +364,9 @@ contract GenesisPool is IGenesisPool, IGanesisPoolBase, ReentrancyGuardUpgradeab
 
     function getLiquidityPoolInfo() external view returns (IGanesisPoolBase.LiquidityPool memory){
         return liquidityPoolInfo;
+    }
+
+    function setAuction(address _auction) external onlyManagerOrProtocol {
+        auction = IAuction(_auction);
     }
 }
