@@ -33,8 +33,10 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
 
     address[] public depositers;
     mapping(address => uint256) public userDeposits;
+
     uint256 internal totalDeposits;
     uint256 liquidity;
+    uint256 tokenOwnerStaked;
 
     event DepositedNativeToken(address native, address owner, address genesisPool, uint256 proposedNativeAmount, uint proposedFundingAmount);
     event AddedIncentives(address native, address[] incentivesToken, uint256[] incentivesAmount);
@@ -68,6 +70,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
 
         totalDeposits = 0;
         liquidity = 0;
+        tokenOwnerStaked = 0;
     }
 
 
@@ -236,37 +239,6 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
         liquidity = _liquidity;
     }
 
-    // function getLPTokensShares(uint256 liquidity) onlyManager external view returns (address[] memory _accounts, uint256[] memory _amounts, address _tokenOwner){
-        
-    //     require(liquidity > 0, "invalid liquidity");
-    //     uint256 _depositersCnt = depositers.length;
-    //     uint256 _totalDeposits = 0;
-    //     uint256[] memory _deposits = new uint256[](_depositersCnt);
-    //     uint256 i;
-    //     for(i = 0; i < _depositersCnt; i++){
-    //         _deposits[i] = userDeposits[depositers[i]];
-    //         _totalDeposits += _deposits[i];
-    //     }
-
-    //     require(_totalDeposits > 0, "0 total deposits");
-
-    //     _accounts = new address[](_depositersCnt + 1); 
-    //     _amounts = new uint256[](_depositersCnt + 1); 
-
-    //     uint256 _totalAdded = 0;
-    //     uint256 _depositerLiquidity = liquidity / 2;
-
-    //     for(i = 0; i < _depositersCnt; i++){
-    //         _accounts[i+1] = depositers[i];
-    //         _amounts[i+1] = (_depositerLiquidity * _deposits[i]) / _totalDeposits;
-    //         _totalAdded += _amounts[i+1];
-    //     }
-
-    //     _tokenOwner = allocationInfo.tokenOwner;
-    //     _accounts[0] = _tokenOwner;
-    //     _amounts[0] = liquidity - _totalAdded;
-    // }
-
     function claimableUnallocatedAmount() public view returns(PoolStatus, address, uint256){
         if(poolStatus == PoolStatus.PARTIALLY_LAUNCHED){
             if(msg.sender == allocationInfo.tokenOwner){
@@ -345,14 +317,30 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
 
     function balanceOf(address account) external view returns (uint256) {
         uint256 _depositerLiquidity = liquidity / 2;
-        return (_depositerLiquidity * userDeposits[account]) / totalDeposits;
+        uint256 balance = (_depositerLiquidity * userDeposits[account]) / totalDeposits;
+        if(account == allocationInfo.tokenOwner) balance += (liquidity - _depositerLiquidity - tokenOwnerStaked);
+        return balance;
     }
 
     function deductAmount(address account, uint256 amount) external onlyGauge {
+        if(account == allocationInfo.tokenOwner) {
+            uint256 _depositerLiquidity = liquidity / 2;
+            uint256 pendingOwnerStaking = liquidity - _depositerLiquidity - tokenOwnerStaked;
+
+            if(amount < pendingOwnerStaking){
+                tokenOwnerStaked += amount;
+                amount = 0;
+            }else{
+                tokenOwnerStaked = liquidity - _depositerLiquidity;
+                amount -= pendingOwnerStaking;
+            }
+        }
         userDeposits[account] -= amount;
     }
 
     function deductAllAmount(address account) external onlyGauge {
+        uint256 _depositerLiquidity = liquidity / 2;
+        if(account == allocationInfo.tokenOwner) tokenOwnerStaked = liquidity - _depositerLiquidity;
         userDeposits[account] = 0;
     }
 
