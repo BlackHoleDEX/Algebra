@@ -12,6 +12,11 @@ const votingEscrowAbi = [
         "internalType": "address",
         "name": "art_proxy",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_avm",
+        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",
@@ -520,6 +525,19 @@ const votingEscrowAbi = [
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "avm",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -1391,6 +1409,19 @@ const votingEscrowAbi = [
       }
     ],
     "name": "safeTransferFrom",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_avm",
+        "type": "address"
+      }
+    ],
+    "name": "setAVM",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

@@ -31,4 +31,25 @@ library BlackTimeLibrary {
             return timestamp - (timestamp % WEEK) + WEEK - 300;
         }
     }
+
+    /// @dev Returns the status if it is the last hour of the epoch
+    function isLastHour(uint256 timestamp) internal pure returns (bool) {
+        // return block.timestamp % 7 days >= 6 days + 23 hours;
+        return timestamp >= BlackTimeLibrary.epochVoteEnd(timestamp) 
+        && timestamp < BlackTimeLibrary.epochNext(timestamp);
+    }
+
+    /// @dev Returns duration in multiples of epoch
+    function epochMultiples(uint256 duration) internal pure returns (uint256) {
+        unchecked {
+            return (duration / WEEK) * WEEK;
+        }
+    }
+
+    /// @dev Returns duration in multiples of epoch
+    function isLastEpoch(uint256 timestamp, uint256 endTime) internal pure returns (bool) {
+        unchecked {
+            return  endTime - WEEK < timestamp && timestamp < endTime;
+        }
+    }
 }

@@ -14,9 +14,10 @@ pragma solidity 0.8.13;
 interface IBaseV1Factory {
     function allPairsLength() external view returns (uint);
     function isPair(address pair) external view returns (bool);
-    function pairCodeHash() external pure returns (bytes32);
+    function pairCodeHash() external view returns (bytes32);
     function getPair(address tokenA, address token, bool stable) external view returns (address);
     function createPair(address tokenA, address tokenB, bool stable) external returns (address pair);
+    function isGenesis(address pair) external view returns (bool);
 }
 
 interface IBaseV1Pair {
@@ -27,6 +28,7 @@ interface IBaseV1Pair {
     function mint(address to) external returns (uint liquidity);
     function getReserves() external view returns (uint112 _reserve0, uint112 _reserve1, uint32 _blockTimestampLast);
     function getAmountOut(uint, address) external view returns (uint);
+    function totalSupply() external view returns (uint);
 }
 
 interface erc20 {
@@ -89,7 +91,6 @@ contract RouterV2 {
     IWETH public immutable wETH;
     uint internal constant MINIMUM_LIQUIDITY = 10**3;
     bytes32 immutable pairCodeHash;
-
     
     // swap event for the referral system
     event Swap(address indexed sender,uint amount0In,address _tokenIn, address indexed to, bool stable);  
@@ -145,11 +146,11 @@ contract RouterV2 {
         address pair = pairFor(tokenIn, tokenOut, true);
         uint amountStable;
         uint amountVolatile;
-        if (IBaseV1Factory(factory).isPair(pair)) {
+        if (IBaseV1Factory(factory).isPair(pair) && !IBaseV1Factory(factory).isGenesis(pair)) {
             amountStable = IBaseV1Pair(pair).getAmountOut(amountIn, tokenIn);
         }
         pair = pairFor(tokenIn, tokenOut, false);
-        if (IBaseV1Factory(factory).isPair(pair)) {
+        if (IBaseV1Factory(factory).isPair(pair) && !IBaseV1Factory(factory).isGenesis(pair)) {
             amountVolatile = IBaseV1Pair(pair).getAmountOut(amountIn, tokenIn);
         }
         return amountStable > amountVolatile ? (amountStable, true) : (amountVolatile, false);
@@ -272,6 +273,9 @@ contract RouterV2 {
     ) external ensure(deadline) returns (uint amountA, uint amountB, uint liquidity) {
         (amountA, amountB) = _addLiquidity(tokenA, tokenB, stable, amountADesired, amountBDesired, amountAMin, amountBMin);
         address pair = pairFor(tokenA, tokenB, stable);
+
+        require(!(IBaseV1Factory(factory).isGenesis(pair) && IBaseV1Pair(pair).totalSupply() == 0), "not allowed");
+
         _safeTransferFrom(tokenA, msg.sender, pair, amountA);
         _safeTransferFrom(tokenB, msg.sender, pair, amountB);
         liquidity = IBaseV1Pair(pair).mint(to);
@@ -599,6 +603,7 @@ contract RouterV2 {
             'BaseV1Router: INSUFFICIENT_OUTPUT_AMOUNT'
         );
     }
+
     function swapExactTokensForETHSupportingFeeOnTransferTokens(
         uint amountIn,
         uint amountOutMin,

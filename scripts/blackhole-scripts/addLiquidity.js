@@ -40,7 +40,6 @@ async function addLiquidity(routerV2Address, tokenA, tokenB, tokenAAmount, token
         to,
         deadline
     }
-    console.log('add liq method', parameters, routerV2Contract.addLiquidity)
     const tx = await routerV2Contract.addLiquidity(
         tokenA,
         tokenB,
@@ -55,7 +54,6 @@ async function addLiquidity(routerV2Address, tokenA, tokenB, tokenAAmount, token
         gasLimit: 21000000
     });
     const awaitedTx = await tx.wait();
-    console.log("awwaitedTex", awaitedTx);  
 }
 
 module.exports = { addLiquidity };

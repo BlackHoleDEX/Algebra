@@ -8,10 +8,8 @@ interface IVoter {
     function poolForGauge(address _gauge) external view returns (address);
     function factories() external view returns(address[] memory);
     function minter() external view returns(address);
-    function isWhitelisted(address token) external view returns (bool);
     function notifyRewardAmount(uint amount) external;
     function distributeAll() external;
-    // function distributeFees(address[] memory _gauges) external;
     function distributeFees() external;
 
     function internal_bribes(address _gauge) external view returns (address);
