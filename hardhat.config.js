@@ -27,13 +27,13 @@ module.exports = {
 
   networks: {
     baseSepolia: {
-      url: "https://base-sepolia.g.alchemy.com/v2/zY8fO9bbJbzywRt0xRheXQWpWjWiCqop",
+      url: "",
       // chainId: 84532, // Sepolia's Chain ID
       accounts: [PRIVATEKEY, SECONDPRIVATEKEY, THIRDPRIVATEKEY],
       gas: 21000000,
     },
     // baseMainnet: {
-    //   url: "https://base-mainnet.g.alchemy.com/v2/JF1JAA_ABdvIpaNB5CWrIYGabKk00qAG",
+    //   url: "",
     //   chainId: 8453,
     //   accounts: [PRIVATEKEY_DEPLOYMENT],
     //   gas: "auto",
