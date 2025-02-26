@@ -89,9 +89,8 @@ contract Pair is IPair {
     event Transfer(address indexed from, address indexed to, uint amount);
     event Approval(address indexed owner, address indexed spender, uint amount);
 
-    constructor() {
-        factory = msg.sender;
-        (address _token0, address _token1, bool _stable) = PairFactory(msg.sender).getInitializable();
+    constructor(address _factory, address _token0, address _token1, bool _stable) {
+        factory = _factory;
         (token0, token1, stable) = (_token0, _token1, _stable);
         fees = address(new PairFees(_token0, _token1));
         if (_stable) {

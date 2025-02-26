@@ -2,12 +2,13 @@
 pragma solidity 0.8.13;
 
 import '../interfaces/IPairFactory.sol';
-import '../Pair.sol';
+import '../interfaces/IPair.sol';
+import '../interfaces/IPairGenerator.sol';
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
-
+    
     bool public isPaused;
 
     uint256 public stableFee;
@@ -18,16 +19,16 @@ contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
 
     address public feeManager;
     address public pendingFeeManager;
-    address public dibs;                // referral fee handler
-    address public stakingFeeHandler;   // staking fee handler
+    address public dibs; // referral fee handler
+    address public stakingFeeHandler; // staking fee handler
+    address public pairGenerator;
+    address public genesisPool;
 
     mapping(address => mapping(address => mapping(bool => address))) public getPair;
     address[] public allPairs;
-    mapping(address => bool) public isPair; // simplified check if its a pair, given that `stable` flag might not be available in peripherals
-
-    address internal _temp0;
-    address internal _temp1;
-    bool internal _temp;
+    mapping(address => bool) public isPair; 
+    mapping(address => uint256) public customFees; 
+    mapping(address => bool) public isGenesis; 
 
     event PairCreated(address indexed token0, address indexed token1, bool stable, address pair, uint);
 
@@ -37,7 +38,8 @@ contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
     }
 
     constructor() {}
-    function initialize() initializer  public {
+
+    function initialize(address _pairGenerator) public initializer {
         __Ownable_init();
         isPaused = false;
         feeManager = msg.sender;
@@ -45,15 +47,11 @@ contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
         volatileFee = 18; // 0.18%
         stakingNFTFee = 300; // 3% of stable/volatileFee
         MAX_REFERRAL_FEE = 200; // 2%
+        pairGenerator = _pairGenerator;
     }
-
 
     function allPairsLength() external view returns (uint) {
         return allPairs.length;
-    }
-
-    function pairs() external view returns(address[] memory ){
-        return allPairs;
     }
 
     function setPause(bool _state) external {
@@ -61,7 +59,7 @@ contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
         isPaused = _state;
     }
 
-    function setFeeManager(address _feeManager) external onlyManager{
+    function setFeeManager(address _feeManager) external onlyManager {
         pendingFeeManager = _feeManager;
     }
 
@@ -69,7 +67,6 @@ contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
         require(msg.sender == pendingFeeManager);
         feeManager = pendingFeeManager;
     }
-
 
     function setStakingFees(uint256 _newFee) external onlyManager {
         require(_newFee <= 3000);
@@ -90,9 +87,8 @@ contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
         MAX_REFERRAL_FEE = _refFee;
     }
 
-
     function setFee(bool _stable, uint256 _fee) external onlyManager {
-        require(_fee <= MAX_FEE, 'fee');
+        require(_fee <= MAX_FEE, "fee");
         require(_fee != 0);
         if (_stable) {
             stableFee = _fee;
@@ -101,30 +97,52 @@ contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
         }
     }
 
-    function getFee(bool _stable) public view returns(uint256) {
+    function setCustomFees(address _pairAddress, uint256 _fees) external onlyManager {
+        require(_fees <= MAX_FEE, "ve");
+        require(isPair[_pairAddress], "Inv pair");
+        customFees[_pairAddress] = _fees;
+    }
+
+    function getFee(address _pairAddress, bool _stable) public view returns (uint256) {
+        if (customFees[_pairAddress] > 0) { 
+            return customFees[_pairAddress];
+        }
         return _stable ? stableFee : volatileFee;
     }
 
-    function pairCodeHash() external pure returns (bytes32) {
-        return keccak256(type(Pair).creationCode);
+    function getIsGenesis(address _pairAddress) public view returns (bool) {
+        return isGenesis[_pairAddress];
     }
 
-    function getInitializable() external view returns (address, address, bool) {
-        return (_temp0, _temp1, _temp);
+    function setIsGenesis(address _pairAddress, bool status) external onlyManager {
+        require(_pairAddress != address(0) && isPair[_pairAddress], "Inv pair");
+        isGenesis[_pairAddress] = status;
+    }
+
+    function pairCodeHash() external view returns (bytes32) {
+        return IPairGenerator(pairGenerator).pairCodeHash();
     }
 
     function createPair(address tokenA, address tokenB, bool stable) external returns (address pair) {
-        require(tokenA != tokenB, 'IA'); // Pair: IDENTICAL_ADDRESSES
+        require(tokenA != tokenB, "0"); // Pair: IDENTICAL_ADDRESSES
         (address token0, address token1) = tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
-        require(token0 != address(0), 'ZA'); // Pair: ZERO_ADDRESS
-        require(getPair[token0][token1][stable] == address(0), 'PE'); // Pair: PAIR_EXISTS - single check is sufficient
-        bytes32 salt = keccak256(abi.encodePacked(token0, token1, stable)); // notice salt includes stable as well, 3 parameters
-        (_temp0, _temp1, _temp) = (token0, token1, stable);
-        pair = address(new Pair{salt:salt}());
-        getPair[token0][token1][stable] = pair;
-        getPair[token1][token0][stable] = pair; // populate mapping in the reverse direction
+        require(token0 != address(0), "0"); // Pair: ZERO_ADDRESS
+        require(getPair[token0][token1][stable] == address(0), "0");
+        pair = IPairGenerator(pairGenerator).createPair(token0, token1, stable);
+        getPair[tokenA][tokenB][stable] = pair;
+        getPair[tokenB][tokenA][stable] = pair; // Store in reverse direction
         allPairs.push(pair);
         isPair[pair] = true;
+
         emit PairCreated(token0, token1, stable, pair, allPairs.length);
+    }
+
+    function setGenesisPool(address _genesisPool) external onlyManager {
+        genesisPool = _genesisPool;
+    }
+
+    function setGenesisStatus(address _pair, bool status) external {
+        require(msg.sender == genesisPool || msg.sender == feeManager,  "invalid access");
+        isGenesis[_pair] = status;
     }
 }
