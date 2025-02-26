@@ -53,4 +53,15 @@ interface IGenesisPoolBase {
         PARTIALLY_LAUNCHED,
         NOT_QUALIFIED
     }
+
+    struct LaunchPoolInfo {
+        address nativeToken;
+        address fundingToken;
+        address poolAddress;
+        address gaugeAddress;
+        uint256 nativeDesired;
+        uint256 fundingDesired;
+        bool stable;
+        address tokenOwner;
+    }
 }
