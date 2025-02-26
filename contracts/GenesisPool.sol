@@ -239,20 +239,30 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
         liquidity = _liquidity;
     }
 
-    function claimableUnallocatedAmount() public view returns(PoolStatus, address, uint256){
+    function claimableUnallocatedAmount() public view returns(PoolStatus, address[] memory addresses, uint256[] memory amounts){
+        uint claimableCnt = 1;
+        if(poolStatus == PoolStatus.NOT_QUALIFIED && msg.sender == allocationInfo.tokenOwner){
+            claimableCnt++;
+        }
+
+        addresses = new address[](claimableCnt);
+        amounts = new uint256[](claimableCnt);
+
         if(poolStatus == PoolStatus.PARTIALLY_LAUNCHED){
             if(msg.sender == allocationInfo.tokenOwner){
-                return (poolStatus, protocolInfo.tokenAddress, allocationInfo.refundableNativeAmount);
+                addresses[0] = protocolInfo.tokenAddress;
+                amounts[0] = allocationInfo.refundableNativeAmount;
             } 
         }else if(poolStatus == PoolStatus.NOT_QUALIFIED){
+            addresses[0] = genesisInfo.fundingToken;
+            amounts[0] = userDeposits[msg.sender];
             if(msg.sender == allocationInfo.tokenOwner){
-                return (poolStatus, protocolInfo.tokenAddress, allocationInfo.refundableNativeAmount);
-            }else{
-                return (poolStatus, genesisInfo.fundingToken, userDeposits[msg.sender]);
+                addresses[1] = protocolInfo.tokenAddress;
+                amounts[1] = allocationInfo.refundableNativeAmount;
             }
         }
         
-        return (PoolStatus.DEFAULT, address(0), 0);
+        return (PoolStatus.DEFAULT, addresses, amounts);
     }
 
     function claimUnallocatedAmount() external nonReentrant{
@@ -276,13 +286,13 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
                 if(_amount > 0){
                     assert(IERC20(protocolInfo.tokenAddress).transfer(msg.sender, _amount));
                 }
-            }else{
-                _amount = userDeposits[msg.sender];
-                userDeposits[msg.sender] = 0;
+            }
 
-                if(_amount > 0){
-                    assert(IERC20(genesisInfo.fundingToken).transfer(msg.sender, _amount));
-                }
+            _amount = userDeposits[msg.sender];
+            userDeposits[msg.sender] = 0;
+
+            if(_amount > 0){
+                assert(IERC20(genesisInfo.fundingToken).transfer(msg.sender, _amount));
             }
         }
     }
