@@ -20,9 +20,12 @@ interface IGenesisPool {
     function eligbleForPreLaunchPool() external view returns (bool);
     function eligbleForCompleteLaunch() external view returns (bool);
     function eligbleForDisqualify() external view returns (bool);
-    function setLaunchStatus(IGenesisPoolBase.PoolStatus status) external returns (address, address, uint256, uint256, address, address, bool);
+    function getLaunchInfo() external view returns (IGenesisPoolBase.LaunchPoolInfo memory);
     function setPoolStatus(IGenesisPoolBase.PoolStatus status) external;
+    function setLiquidity(uint256 liquidity) external;
     function approveTokens(address router) external;
-    function getLPTokensShares(uint256 liquidity) external returns (address[] memory, uint256[] memory, address);
+    function balanceOf(address account) external view returns (uint256);
+    function deductAmount(address account, uint256 amount) external;
+    function deductAllAmount(address account) external;
     function setAuction(address _auction) external;
 }

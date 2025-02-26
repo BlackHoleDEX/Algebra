@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import './interfaces/IPair.sol';
 import './interfaces/IBribe.sol';
 import "./libraries/Math.sol";
+import './interfaces/IGenesisPool.sol';
 
 interface IRewarder {
     function onReward(
@@ -43,6 +44,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     uint256 public rewardPerTokenStored;
 
     address public genesisManager;
+    address public genesisPool;
 
     mapping(address => uint256) public userRewardPerTokenPaid;
     mapping(address => uint256) public rewards;
@@ -55,7 +57,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     event Deposit(address indexed user, uint256 amount);
     event Withdraw(address indexed user, uint256 amount);
     event Harvest(address indexed user, uint256 reward);
-    event DepositsForGenesis(address[] users, uint256[] amounts);
+    event DepositsForGenesis(address owner, uint256 amount);
 
     event ClaimFees(address indexed from, uint256 claimed0, uint256 claimed1);
     event EmergencyActivated(address indexed gauge, uint256 timestamp);
@@ -73,6 +75,11 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
 
     modifier onlyDistribution() {
         require(msg.sender == DISTRIBUTION, "Caller is not RewardsDistribution contract");
+        _;
+    }
+
+    modifier onlyGenesisManager() {
+        require(msg.sender == genesisManager, "!= genesisManager");
         _;
     }
 
@@ -158,7 +165,13 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
 
     ///@notice balance of a user
     function balanceOf(address account) external view returns (uint256) {
-        return _balances[account];
+        return _balanceOf(account);
+    }
+
+    function _balanceOf(address account) internal view returns (uint256) {
+        uint256 balance = _balances[account];
+        if(genesisPool != address(0)) balance += IGenesisPool(genesisPool).balanceOf(account);
+        return balance;
     }
 
     ///@notice last time reward
@@ -177,7 +190,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
 
     ///@notice see earned rewards for user
     function earned(address account) public view returns (uint256) {
-        return rewards[account] + _balances[account] * (rewardPerToken() - userRewardPerTokenPaid[account]) / 1e18;  
+        return rewards[account] + _balanceOf(account) * (rewardPerToken() - userRewardPerTokenPaid[account]) / 1e18;  
     }
 
     ///@notice get total reward for the duration
@@ -199,40 +212,20 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     --------------------------------------------------------------------------------
     ----------------------------------------------------------------------------- */
 
-    function depositsForGenesis(address[] memory _accounts, uint256[] memory _amounts, address _tokenOwner, uint256 _timestamp, uint256 _totalAmount) external { 
-        require(msg.sender == genesisManager, "IA");
-        require(_accounts.length == _amounts.length, "len !=");
-        require(_tokenOwner != address(0), "tokenOwner 0x");
-        require(_totalAmount > 0, "amount 0");
-        _depositsForGenesis(_accounts, _amounts, _tokenOwner, _timestamp, _totalAmount);
+    function depositsForGenesis(address _tokenOwner, uint256 _timestamp, uint256 _totalAmount) external onlyGenesisManager { 
+        require(_tokenOwner != address(0), "0x owner");
+        require(_totalAmount > 0, "0 amt");
+        _depositsForGenesis(_tokenOwner, _timestamp, _totalAmount);
     }
 
     // send whole liquidity as additional param
-    function _depositsForGenesis(address[] memory _accounts, uint256[] memory _amounts, address _tokenOwner, uint256 _timestamp, uint256 _totalAmount) internal {
-        uint256 _accountsCnt = _accounts.length;
-        uint256 i;
-        for(i = 0; i < _accountsCnt; i++){
-            require(_accounts[i] != address(0), "0 address");
-        
-        }
-
-        require(_totalAmount > 0, "total amount 0");
-        
+    function _depositsForGenesis(address _tokenOwner, uint256 _timestamp, uint256 _totalAmount) internal {       
         _totalSupply = _totalSupply + _totalAmount;
-        for(i = 0; i < _accountsCnt; i++){
-            _balances[_accounts[i]] = _balances[_accounts[i]] + _amounts[i];
-            if (address(gaugeRewarder) != address(0)) {
-                IRewarder(gaugeRewarder).onReward(_accounts[i], _accounts[i], _balances[_accounts[i]]);
-            }
-        }
-
         TOKEN.safeTransferFrom(msg.sender, address(this), _totalAmount);
-
         maturityTime[_tokenOwner] = _timestamp;
 
-        emit DepositsForGenesis(_accounts, _amounts);
+        emit DepositsForGenesis(_tokenOwner, _totalAmount);
     }
-
 
     ///@notice deposit all TOKEN of msg.sender
     function depositAll() external {
@@ -251,7 +244,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
         _balances[account] = _balances[account] + amount;
         _totalSupply = _totalSupply + amount;
         if (address(gaugeRewarder) != address(0)) {
-            IRewarder(gaugeRewarder).onReward(account, account, _balances[account]);
+            IRewarder(gaugeRewarder).onReward(account, account, _balanceOf(account));
         }
 
         TOKEN.safeTransferFrom(account, address(this), amount);
@@ -261,7 +254,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
 
     ///@notice withdraw all token
     function withdrawAll() external {
-        _withdraw(_balances[msg.sender]);
+        _withdraw(_balanceOf(msg.sender));
     }
 
     ///@notice withdraw a certain amount of TOKEN
@@ -272,14 +265,14 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     ///@notice withdraw internal
     function _withdraw(uint256 amount) internal nonReentrant isNotEmergency updateReward(msg.sender) {
         require(amount > 0, "Cannot withdraw 0");
-        require(_balances[msg.sender] > 0, "no balances");
+        require(_balanceOf(msg.sender) > 0, "no balances");
         require(block.timestamp >= maturityTime[msg.sender], "not matured");
 
         _totalSupply = _totalSupply - amount;
-        _balances[msg.sender] = _balances[msg.sender] - amount;
+        _deductBalance(amount);
 
         if (address(gaugeRewarder) != address(0)) {
-            IRewarder(gaugeRewarder).onReward(msg.sender, msg.sender,_balances[msg.sender]);
+            IRewarder(gaugeRewarder).onReward(msg.sender, msg.sender,_balanceOf(msg.sender));
         }
 
         TOKEN.safeTransfer(msg.sender, amount);
@@ -289,26 +282,42 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
 
     function emergencyWithdraw() external nonReentrant {
         require(emergency, "emergency");
-        require(_balances[msg.sender] > 0, "no balances");
-        uint256 _amount = _balances[msg.sender];
+        uint256 _amount = _balanceOf(msg.sender);
+        require(_amount > 0, "no balances");
         _totalSupply = _totalSupply - _amount;
+
         _balances[msg.sender] = 0;
+        if(genesisPool != address(0)) IGenesisPool(genesisPool).deductAllAmount(msg.sender);
+
         TOKEN.safeTransfer(msg.sender, _amount);
         emit Withdraw(msg.sender, _amount);
     }
+
     function emergencyWithdrawAmount(uint256 _amount) external nonReentrant {
 
         require(emergency, "emergency");
         _totalSupply = _totalSupply - _amount;
 
-        _balances[msg.sender] = _balances[msg.sender] - _amount;
+        _deductBalance(_amount);
+
         TOKEN.safeTransfer(msg.sender, _amount);
         emit Withdraw(msg.sender, _amount);
     }
 
+    function _deductBalance(uint256 _amount) internal {
+        uint256 gensisBalance = 0;
+        if(genesisPool != address(0)) gensisBalance = IGenesisPool(genesisPool).balanceOf(msg.sender);
+
+        uint256 genesisDeduction = gensisBalance <= _amount ? gensisBalance : _amount;
+        uint256 gaugeDeduction =  _amount - genesisDeduction;
+
+        _balances[msg.sender] = _balances[msg.sender] - gaugeDeduction;
+        IGenesisPool(genesisPool).deductAmount(msg.sender, genesisDeduction);
+    }
+
     ///@notice withdraw all TOKEN and harvest rewardToken
     function withdrawAllAndHarvest() external {
-        _withdraw(_balances[msg.sender]);
+        _withdraw(_balanceOf(msg.sender));
         getReward();
     }
 
@@ -323,7 +332,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
         }
 
         if (gaugeRewarder != address(0)) {
-            IRewarder(gaugeRewarder).onReward(_user, _user, _balances[_user]);
+            IRewarder(gaugeRewarder).onReward(_user, _user, _balanceOf(_user));
         }
     }
 
@@ -337,7 +346,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
         }
 
         if (gaugeRewarder != address(0)) {
-            IRewarder(gaugeRewarder).onReward(msg.sender, msg.sender, _balances[msg.sender]);
+            IRewarder(gaugeRewarder).onReward(msg.sender, msg.sender, _balanceOf(msg.sender));
         }
     }
 
@@ -359,6 +368,10 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     /// BLACKHOLE: need to change duration for testing purpose currently 20 minutes
     function setRewardDuration(uint256 _duration) external {
         DURATION = _duration;
+    }
+
+    function setGenesisPool(address _genesisPool) external onlyGenesisManager{
+        genesisPool = _genesisPool;
     }
 
     /// @dev Receive rewards from distribution
