@@ -182,32 +182,30 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
     }
 
     function _completelyLaunchPool(address _genesisPool) internal {
-        (address nativeToken, address fundingToken, uint256 nativeDesired, uint256 fundingDesired, 
-        address poolAddress, address gaugeAddress, bool stable) = IGenesisPool(_genesisPool).setLaunchStatus(PoolStatus.LAUNCH);
-
-        _addLiquidityAndDistribute(_genesisPool, nativeToken, fundingToken, nativeDesired, fundingDesired, poolAddress, gaugeAddress, stable);
+        IGenesisPool(_genesisPool).setPoolStatus(PoolStatus.LAUNCH);
+        LaunchPoolInfo memory launchPoolInfo = IGenesisPool(_genesisPool).getLaunchInfo();
+        _addLiquidityAndDistribute(_genesisPool, launchPoolInfo);
     }
 
 
     function _partiallyLaunchPool(address _genesisPool) internal {
-        (address nativeToken, address fundingToken, uint256 nativeDesired, uint256 fundingDesired, 
-        address poolAddress, address gaugeAddress, bool stable) = IGenesisPool(_genesisPool).setLaunchStatus(PoolStatus.PARTIALLY_LAUNCHED);
+        IGenesisPool(_genesisPool).setPoolStatus(PoolStatus.PARTIALLY_LAUNCHED);
+         LaunchPoolInfo memory launchPoolInfo = IGenesisPool(_genesisPool).getLaunchInfo();
 
-        _addLiquidityAndDistribute(_genesisPool, nativeToken, fundingToken, nativeDesired, fundingDesired, poolAddress, gaugeAddress, stable);
+        _addLiquidityAndDistribute(_genesisPool, launchPoolInfo);
     }
 
-    function _addLiquidityAndDistribute(address _genesisPool, address nativeToken, address fundingToken, uint256 nativeDesired, uint256 fundingDesired, 
-        address poolAddress, address gaugeAddress, bool stable) internal {
+    function _addLiquidityAndDistribute(address _genesisPool, LaunchPoolInfo memory launchPoolInfo) internal {
 
-        pairFactory.setGenesisStatus(poolAddress, false);
+        pairFactory.setGenesisStatus(launchPoolInfo.poolAddress, false);
         IGenesisPool(_genesisPool).approveTokens(router);
 
-        (, , uint liquidity) = IRouter01(router).addLiquidity(nativeToken, fundingToken, stable, nativeDesired, fundingDesired, 0, 0, address(this), block.timestamp + 100);
+        (, , uint liquidity) = IRouter01(router).addLiquidity(launchPoolInfo.nativeToken, launchPoolInfo.fundingToken, launchPoolInfo.stable, launchPoolInfo.nativeDesired, launchPoolInfo.fundingDesired, 0, 0, address(this), block.timestamp + 100);
 
-        (address[] memory _accounts, uint256[] memory _amounts, address _tokenOwner) = IGenesisPool(_genesisPool).getLPTokensShares(liquidity);
-
-        IERC20(poolAddress).approve(gaugeAddress, liquidity);
-        IGauge(gaugeAddress).depositsForGenesis(_accounts, _amounts, _tokenOwner, block.timestamp + MATURITY_TIME, liquidity);
+        IGenesisPool(_genesisPool).setLiquidity(liquidity);
+        IGauge(launchPoolInfo.gaugeAddress).setGenesisPool(_genesisPool);
+        IERC20(launchPoolInfo.poolAddress).approve(launchPoolInfo.gaugeAddress, liquidity);
+        IGauge(launchPoolInfo.gaugeAddress).depositsForGenesis(launchPoolInfo.tokenOwner, block.timestamp + MATURITY_TIME, liquidity);
     }
     
     // before 3 hrs

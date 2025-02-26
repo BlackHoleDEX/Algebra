@@ -815,6 +815,10 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         else if (_locked.isPermanent) permanentLockBalance += _value;
 
         _deposit_for(_tokenId, _value, 0, _locked, DepositType.DEPOSIT_FOR_TYPE);
+            
+        if(voted[_tokenId]) {
+            IVoterV3(voter).poke(_tokenId);
+        }
     }
 
     /// @notice Deposit `_value` tokens for `_to` and lock for `_lock_duration`
