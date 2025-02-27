@@ -494,7 +494,7 @@ async function main () {
     // deploy permissionRegistry
     const permissionRegistryAddress = await deployPermissionRegistry();
 
-    const tokenHandlerAddress = await deployTokenHandler(permissionRegistryAddress);
+    // const tokenHandlerAddress = await deployTokenHandler(permissionRegistryAddress);
 
     const pairGeneratorAddress = await deployPairGenerator();
 
@@ -571,7 +571,7 @@ async function main () {
     await pushDefaultRewardToken(bribeV3Address, blackAddress);
 
 
-    const genesisPoolAddress = deployGenesisPool(routerV2Address, epochControllerAddress, voterV3Address, pairFactoryAddress, tokenHandlerAddress, permissionRegistryAddress);
+    // const genesisPoolAddress = deployGenesisPool(routerV2Address, epochControllerAddress, voterV3Address, pairFactoryAddress, tokenHandlerAddress, permissionRegistryAddress);
 
     await setGenesisManagerRole(permissionRegistryAddress, genesisPoolAddress);
 
