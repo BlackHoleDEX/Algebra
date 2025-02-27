@@ -174,7 +174,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
     /// @dev Returns current token URI metadata
     /// @param _tokenId Token ID to fetch URI for.
     function tokenURI(uint _tokenId) external view returns (string memory) {
-        require(idToOwner[_tokenId] != address(0), "Query for nonexistent token");
+        require(idToOwner[_tokenId] != address(0), "Nonexistent token");
         LockedBalance memory _locked = locked[_tokenId];
         return IVeArtProxy(artProxy)._tokenURI(_tokenId,_balanceOfNFT(_tokenId, block.timestamp),_locked.end,uint(int256(_locked.amount)), _locked.isSMNFT);
     }
@@ -840,8 +840,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         uint unlock_time = (block.timestamp + _lock_duration) / WEEK * WEEK; // Locktime is rounded down to weeks
 
         require(_value > 0); // dev: need non-zero value
-        require(unlock_time > block.timestamp, 'Can only lock until time in the future');
-        require(unlock_time <= block.timestamp + MAXTIME, 'Voting lock can be 2 years max');
+        require(unlock_time > block.timestamp, 'Can only lock in future');
+        require(unlock_time <= block.timestamp + MAXTIME, '4 years max');
 
         ++tokenId;
         uint _tokenId = tokenId;
@@ -883,7 +883,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         LockedBalance memory _locked = locked[_tokenId];
 
         assert(_value > 0); // dev: need non-zero value
-        require(_locked.amount > 0, 'No existing lock found');
+        require(_locked.amount > 0, 'No lock');
         require(_locked.end > block.timestamp || _locked.isPermanent, 'Cannot add to expired lock. Withdraw');
         
         if (_locked.isSMNFT) smNFTBalance += _value;
@@ -910,7 +910,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         require(_locked.end > block.timestamp, 'Lock expired');
         require(_locked.amount > 0, 'Nothing is locked');
         require(unlock_time > _locked.end, 'Can only increase lock duration');
-        require(unlock_time <= block.timestamp + MAXTIME, 'Voting lock can be 2 years max');
+        require(unlock_time <= block.timestamp + MAXTIME, 'Voting 4 Years Max');
 
         if(isSMNFT) {
             _locked.isPermanent = true;
@@ -1288,60 +1288,6 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
             block.timestamp
         );
         emit MetadataUpdate(_to);
-    }
-
-
-    /**
-     * @notice split NFT into multiple
-     * @param amounts   % of split
-     * @param _tokenId  NFTs ID
-     */
-    function split(uint[] memory amounts, uint _tokenId) external {
-        //Not supporting split
-        /*
-        // check permission and vote
-        require(attachments[_tokenId] == 0 && !voted[_tokenId], "attached");
-        require(_isApprovedOrOwner(msg.sender, _tokenId), "caller is not owner nor approved");
-
-        // save old data and totalWeight
-        address _to = idToOwner[_tokenId];
-        LockedBalance memory _locked = locked[_tokenId];
-        uint end = _locked.end;
-        uint value = uint(int256(_locked.amount));
-        require(value > 0); // dev: need non-zero value
-        require(!_locked.isSMNFT, "can not split a SM NFT");
-        require(_locked.end > block.timestamp ||  _locked.isPermanent,"lock expired");
-        
-        // reset supply, _deposit_for increase it
-        supply = supply - value;
-
-        uint i;
-        uint totalWeight = 0;
-        for(i = 0; i < amounts.length; i++){
-            totalWeight += amounts[i];
-        }
-
-        // remove old data
-        locked[_tokenId] = LockedBalance(0, 0, false, false);
-        _checkpoint(_tokenId, _locked, LockedBalance(0, 0, false, false));
-        _burn(_tokenId);
-
-        // save end
-        uint unlock_time = end;
-        require(unlock_time > block.timestamp, 'Can only lock until time in the future');
-        require(unlock_time <= block.timestamp + MAXTIME, 'Voting lock can be 2 years max');
-        
-        // mint 
-        uint _value = 0;
-        for(i = 0; i < amounts.length; i++){   
-            ++tokenId;
-            _tokenId = tokenId;
-            _mint(_to, _tokenId);
-            _value = value * amounts[i] / totalWeight;
-            _deposit_for(_tokenId, _value, unlock_time, locked[_tokenId], DepositType.SPLIT_TYPE);
-        }
-        */     
-
     }
 
     /*///////////////////////////////////////////////////////////////
