@@ -186,11 +186,13 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
         if (deadline >= block.timestamp) {
             return ProposalState.Active;
         }
-
+        // quorum reached is basically a percentage check which is of the number specifie in constructor of the L2GovernorVotesQuorumFraction(4) // 4%
         if (_quorumReached(proposalId) && _voteSucceeded(proposalId)) {
             return ProposalState.Succeeded;
-        } else {
+        } else if (_quorumReached(proposalId) && _voteDefeated(proposalId)) {
             return ProposalState.Defeated;
+        } else {
+            return ProposalState.Expired;
         }
     }
 
@@ -224,6 +226,8 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
      * @dev Is the proposal successful or not.
      */
     function _voteSucceeded(uint256 proposalId) internal view virtual returns (bool);
+
+    function _voteDefeated(uint256 proposalId) internal view virtual returns (bool);
 
     /**
      * @dev Get the voting weight of `account` at a specific `blockTimestamp`, for a vote as described by `params`.
@@ -322,8 +326,8 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
 
         status = state(proposalId);
         require(
-            status == ProposalState.Succeeded || status == ProposalState.Queued,
-            "Governor: proposal not successful"
+            status == ProposalState.Succeeded || status == ProposalState.Defeated || status == ProposalState.Expired,
+            "Governor: proposal not successful or defeated"
         );
         _proposals[proposalId].executed = true;
 
@@ -696,7 +700,12 @@ abstract contract L2GovernorCountingSimple is L2Governor {
     function _voteSucceeded(uint256 proposalId) internal view virtual override returns (bool) {
         ProposalVote storage proposalvote = _proposalVotes[proposalId];
 
-        return proposalvote.forVotes > proposalvote.againstVotes;
+        return proposalvote.forVotes > proposalvote.againstVotes && proposalvote.forVotes > proposalvote.abstainVotes;
+    }
+
+    function _voteDefeated(uint256 proposalId) internal view virtual override returns (bool) {
+        ProposalVote storage proposalVote = _proposalVotes[proposalId];
+        return proposalVote.againstVotes > proposalVote.forVotes && proposalVote.againstVotes > proposalVote.abstainVotes;
     }
 
     /**

@@ -1,10 +1,10 @@
-const blackGovernorAddress = "0xc01d8Bdfa8fe9af9170E7b9aAc2dCADa826991b5";
+const blackGovernorAddress = "0xd5B3a67789e5c4a5495B37ae151c1A66DcbA165A";
 
 const blackGovernorAbi = [
   {
     "inputs": [
       {
-        "internalType": "contract IVotes",
+        "internalType": "contract IBlackHoleVotes",
         "name": "_ve",
         "type": "address"
       },
@@ -107,6 +107,12 @@ const blackGovernorAbi = [
         "internalType": "uint256",
         "name": "voteEnd",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "description",
+        "type": "string"
       }
     ],
     "name": "ProposalCreated",
@@ -1083,6 +1089,11 @@ const blackGovernorAbi = [
         "internalType": "bytes[]",
         "name": "calldatas",
         "type": "bytes[]"
+      },
+      {
+        "internalType": "string",
+        "name": "description",
+        "type": "string"
       }
     ],
     "name": "propose",
@@ -1259,7 +1270,7 @@ const blackGovernorAbi = [
     "name": "token",
     "outputs": [
       {
-        "internalType": "contract IVotes",
+        "internalType": "contract IBlackHoleVotes",
         "name": "",
         "type": "address"
       }

@@ -81,6 +81,11 @@ abstract contract L2GovernorCountingSimple is L2Governor {
         return proposalvote.forVotes > proposalvote.againstVotes;
     }
 
+    function _voteDefeated(uint256 proposalId) internal view virtual override returns (bool) {
+        ProposalVote storage proposalVote = _proposalVotes[proposalId];
+        return proposalVote.againstVotes > proposalVote.forVotes && proposalVote.againstVotes > proposalVote.abstainVotes;
+    }
+
     /**
      * @dev See {Governor-_countVote}. In this module, the support follows the `VoteType` enum (from Governor Bravo).
      */

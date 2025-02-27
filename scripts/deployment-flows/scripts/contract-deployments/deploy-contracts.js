@@ -4,7 +4,7 @@ const { permissionsRegistryAbi } = require('../../../../generated/permissions-re
 const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants.js");
 const { blackholePairAPIV2Abi } = require('../../../../generated/blackhole-pair-apiv2');
 const { voterV3Abi } = require('../../../../generated/voter-v3');
-const { minterUpgradeableAbi } = require('../../../../generated/minter-upgradeable');
+const { minterUpgradeableAbi, minterUpgradeableAddress } = require('../../../../generated/minter-upgradeable');
 const { epochControllerAbi } = require('../../../../generated/epoch-controller')
 const { blackAbi } = require('../../../blackhole-scripts/gaugeConstants/black')
 const { votingEscrowAbi } = require('../../../../generated/voting-escrow');
@@ -167,7 +167,8 @@ const deployVoterV3AndSetInit = async (votingEscrowAddress, permissionRegistryAd
         const txDeployed = await VoterV3.deployed();
         console.log('VoterV3 address: ', VoterV3.address)
         const listOfTokens = [...addresses, blackAddress];
-        const initializeVoter = await VoterV3._init(listOfTokens, permissionRegistryAddress, ownerAddress)
+        const initializeVoter = await VoterV3._init(permissionRegistryAddress, ownerAddress)
+        await initializeVoter.wait();
         generateConstantFile("VoterV3", VoterV3.address);
         return VoterV3.address;
     } catch (error) {
@@ -491,10 +492,10 @@ async function main () {
 
     console.log("Black token address is: ", blackAddress);
 
-    //deploy permissionRegistry
+    // deploy permissionRegistry
     const permissionRegistryAddress = await deployPermissionRegistry();
 
-    const tokenHandlerAddress = await deployTokenHanlder(permissionRegistryAddress);
+    // const tokenHandlerAddress = await deployTokenHandler(permissionRegistryAddress);
 
     const pairGeneratorAddress = await deployPairGenerator();
 
@@ -566,28 +567,27 @@ async function main () {
     //set voterV3 in voting escrow
     await setVoterV3InVotingEscrow(voterV3Address, votingEscrowAddress);
 
-    await deployBlackGovernor("0xF844747b902d1727b71A0b9403F96d2805E08384", "0x10a4220752E84FD8d1E28bB90d690b438629d5f9");
+    await deployBlackGovernor(votingEscrowAddress,minterUpgradeableAddress);
 
     await pushDefaultRewardToken(bribeV3Address, blackAddress);
 
-    const blackClaimAddress = await deployBlackClaim(votingEscrowAddress, ownerAddress);
 
-    const genesisPoolAddress = deployGenesisPool(routerV2Address, epochControllerAddress, voterV3Address, pairFactoryAddress, tokenHandlerAddress, permissionRegistryAddress);
+    // const genesisPoolAddress = deployGenesisPool(routerV2Address, epochControllerAddress, voterV3Address, pairFactoryAddress, tokenHandlerAddress, permissionRegistryAddress);
 
-    await setGenesisManagerRole(permissionRegistryAddress, genesisPoolAddress);
+    // await setGenesisManagerRole(permissionRegistryAddress, genesisPoolAddress);
 
-    await setGenesisPoolManagerInGaugeFactory(gaugeFactoryV2Address, genesisPoolAddress);
+    // await setGenesisPoolManagerInGaugeFactory(gaugeFactoryV2Address, genesisPoolAddress);
 
-    await setGenesisPoolManagerInPairFactory(pairFactoryAddress, genesisPoolAddress);
+    // await setGenesisPoolManagerInPairFactory(pairFactoryAddress, genesisPoolAddress);
 
-    const dutchAuctionAddress = deployDucthAction(genesisPoolAddress);
+    // const dutchAuctionAddress = deployDucthAction(genesisPoolAddress);
 
-    await setDutchAuctioninGenesisPool(genesisPoolAddress, dutchAuctionAddress);
+    // await setDutchAuctioninGenesisPool(genesisPoolAddress, dutchAuctionAddress);
 
-    await deployGenesisApi(genesisPoolAddress);
+    // await deployGenesisApi(genesisPoolAddress);
 
 
-    //createPairs two by default
+    // createPairs two by default
     await addLiquidity(routerV2Address, addresses[0], addresses[1], 100, 100);
     await addLiquidity(routerV2Address, addresses[1], addresses[2], 100, 100);
     await addLiquidity(routerV2Address, addresses[2], addresses[3], 100, 100);
@@ -595,6 +595,10 @@ async function main () {
     await addLiquidity(routerV2Address, addresses[4], addresses[5], 100, 10);
 
     console.log("DONE ADDING LIQUIDITY")
+
+    await pushDefaultRewardToken(bribeV3Address, blackAddress);
+
+    const blackClaimAddress = await deployBlackClaim(votingEscrowAddress, ownerAddress);
 
     //create Gauges
     await createGauges(voterV3Address, blackholeV2AbiAddress);

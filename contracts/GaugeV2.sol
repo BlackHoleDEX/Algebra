@@ -219,7 +219,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     }
 
     // send whole liquidity as additional param
-    function _depositsForGenesis(address _tokenOwner, uint256 _timestamp, uint256 _totalAmount) internal {       
+    function _depositsForGenesis(address _tokenOwner, uint256 _timestamp, uint256 _totalAmount) internal updateReward(address(0)) {       
         _totalSupply = _totalSupply + _totalAmount;
         TOKEN.safeTransferFrom(msg.sender, address(this), _totalAmount);
         maturityTime[_tokenOwner] = _timestamp;

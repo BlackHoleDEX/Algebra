@@ -37,7 +37,7 @@ contract AuctionFactory is IAuctionFactory, OwnableUpgradeable {
         emit AddAuction(_auction);
     }
 
-    function replaceFactory(address _auction, uint256 _pos) external onlyManager {
+    function replaceAuction(address _auction, uint256 _pos) external onlyManager {
         require(_auction != address(0), 'addr0');
         require(isAuction[_auction], '!fact');
         address oldPF = auctions[_pos];
@@ -49,7 +49,7 @@ contract AuctionFactory is IAuctionFactory, OwnableUpgradeable {
         emit SetAuction(oldPF, _auction);
     }
 
-    function removeFactory(uint256 _pos) external onlyManager {
+    function removeAuction(uint256 _pos) external onlyManager {
         address oldPF = auctions[_pos];
         require(isAuction[oldPF], '!fact');
 

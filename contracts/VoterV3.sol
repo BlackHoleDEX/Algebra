@@ -93,7 +93,8 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
     constructor() {}
 
-    function initialize(address __ve, address _pairFactory, address  _gaugeFactory, address _bribes, address _tokenHandler) initializer public {
+    // function initialize(address __ve, address _pairFactory, address  _gaugeFactory, address _bribes, address _tokenHandler) initializer public {
+    function initialize(address __ve, address _pairFactory, address  _gaugeFactory, address _bribes) initializer public {
         __Ownable_init();
         __ReentrancyGuard_init();
 
@@ -111,7 +112,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
         minter = msg.sender;
         permissionRegistry = msg.sender;
-        tokenHandler = _tokenHandler;
+        // tokenHandler = _tokenHandler;
         genesisManager = address(0);
 
         maxVotingNum = 30;
