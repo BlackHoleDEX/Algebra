@@ -186,11 +186,13 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
         if (deadline >= block.timestamp) {
             return ProposalState.Active;
         }
-
+        // quorum reached is basically a percentage check which is of the number specifie in constructor of the L2GovernorVotesQuorumFraction(4) // 4%
         if (_quorumReached(proposalId) && _voteSucceeded(proposalId)) {
             return ProposalState.Succeeded;
-        } else {
+        } else if (_quorumReached(proposalId) && _voteSucceeded(proposalId)) {
             return ProposalState.Defeated;
+        } else {
+            return ProposalState.Expired;
         }
     }
 
@@ -322,8 +324,8 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
 
         status = state(proposalId);
         require(
-            status == ProposalState.Succeeded || status == ProposalState.Queued,
-            "Governor: proposal not successful"
+            status == ProposalState.Succeeded || status == ProposalState.Defeated || status == ProposalState.Expired,
+            "Governor: proposal not successful or defeated"
         );
         _proposals[proposalId].executed = true;
 

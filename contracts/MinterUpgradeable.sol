@@ -75,7 +75,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
         EMISSION = 990; //BlackHole:: 
         TAIL_EMISSION = 2;
         REBASEMAX = 300;
-        tailEmissionRate = 67;
+        tailEmissionRate = 10000;
 
         _black = IBlack(IVotingEscrow(__ve).token());
         _voter = IVoter(__voter);
@@ -158,17 +158,14 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
         uint _smNFTBalance = IVotingEscrow(_ve).smNFTBalance();
         uint _superMassiveBonus = IVotingEscrow(_ve).calculate_sm_nft_bonus(_smNFTBalance);
 
-        uint numerator = _veTotal + _superMassiveBonus;
-        uint denominator = _blackTotal + _superMassiveBonus;
+        uint veBlackSupply = _veTotal + _smNFTBalance +_superMassiveBonus;
+        uint blackSupply = _blackTotal + _superMassiveBonus;
+        uint circulatingBlack = blackSupply - veBlackSupply;
         
-        uint rebaseShare =((((PRECISION * numerator) / denominator) * numerator) / denominator) / 2;
-        if(rebaseShare >= REBASEMAX){
-            return _weeklyMint * REBASEMAX / PRECISION;
-        }else{
-            return _weeklyMint * rebaseShare / PRECISION;
-        }
+        uint rebase = ((_weeklyMint * circulatingBlack) /blackSupply)*((circulatingBlack/(2*blackSupply)));
+        return rebase;
     }
-
+    
     function nudge() external {
         address _epochGovernor = _voterV3.getBlackGovernor();
         require (msg.sender == _epochGovernor);
@@ -177,13 +174,12 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
         uint256 _period = active_period;
         require (!proposals[_period]);
         uint256 _newRate = tailEmissionRate;
-        uint256 _oldRate = _newRate;
 
         if (_state != IBlackGovernor.ProposalState.Expired) {
             if (_state == IBlackGovernor.ProposalState.Succeeded) {
-                _newRate = _oldRate + NUDGE > MAXIMUM_TAIL_RATE ? MAXIMUM_TAIL_RATE : _oldRate + NUDGE;
+                _newRate = 10100;
             } else {
-                _newRate = _oldRate - NUDGE < MINIMUM_TAIL_RATE ? MINIMUM_TAIL_RATE : _oldRate - NUDGE;
+                _newRate = 9900;
             }
             tailEmissionRate = _newRate;
         }
@@ -200,11 +196,10 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
             active_period = _period;
             uint256 _weekly = weekly;
             uint256 _emission;
-            uint256 _totalSupply = _black.totalSupply();
             bool _tail = _weekly < TAIL_START;
 
             if (_tail) {
-                _emission = (_totalSupply * tailEmissionRate) / MAX_BPS;
+                _emission = (_weekly * tailEmissionRate) / MAX_BPS;
             } else {
                 _emission = _weekly;
                 if (epochCount < 15) {
@@ -214,6 +209,8 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
                 }
                 weekly = _weekly;
             }
+
+            tailEmissionRate = 10000;
 
             uint _rebase = calculate_rebase(_emission);
 
