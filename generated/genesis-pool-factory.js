@@ -1,4 +1,4 @@
-const genesisPoolFactoryAddress = "0xd58c6931071cBF945c710D174A6a397c61d356dA";
+const genesisPoolFactoryAddress = "0x6D33c42Cab1ACC0f73e889A814f4549aF8902f84";
 
 const genesisPoolFactoryAbi = [
   {
@@ -75,19 +75,6 @@ const genesisPoolFactoryAbi = [
     ],
     "name": "OwnershipTransferred",
     "type": "event"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_genesisManager",
-        "type": "address"
-      }
-    ],
-    "name": "SetGenesisManager",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
   },
   {
     "inputs": [
@@ -216,6 +203,19 @@ const genesisPoolFactoryAbi = [
   {
     "inputs": [],
     "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_genesisManager",
+        "type": "address"
+      }
+    ],
+    "name": "setGenesisManager",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

@@ -1,4 +1,4 @@
-const minterUpgradeableAddress = "0x13cf0141270a9fDdcfE57Ab00a77B7731B4897A4";
+const minterUpgradeableAddress = "0xC250641930fDF5174c4Dca414cDBf1Df64D4523C";
 
 const minterUpgradeableAbi = [
   {
@@ -97,7 +97,59 @@ const minterUpgradeableAbi = [
   },
   {
     "inputs": [],
+    "name": "MAXIMUM_TAIL_RATE",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_BPS",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "MAX_TEAM_RATE",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MINIMUM_TAIL_RATE",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "NUDGE",
     "outputs": [
       {
         "internalType": "uint256",
@@ -149,7 +201,46 @@ const minterUpgradeableAbi = [
   },
   {
     "inputs": [],
+    "name": "TAIL_START",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "WEEK",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "WEEKLY_DECAY",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "WEEKLY_GROWTH",
     "outputs": [
       {
         "internalType": "uint256",
@@ -237,6 +328,19 @@ const minterUpgradeableAbi = [
   },
   {
     "inputs": [],
+    "name": "_voterV3",
+    "outputs": [
+      {
+        "internalType": "contract IVoterV3",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "acceptTeam",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -245,19 +349,6 @@ const minterUpgradeableAbi = [
   {
     "inputs": [],
     "name": "active_period",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "calculate_emission",
     "outputs": [
       {
         "internalType": "uint256",
@@ -327,6 +418,19 @@ const minterUpgradeableAbi = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "epochCount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -364,6 +468,13 @@ const minterUpgradeableAbi = [
   },
   {
     "inputs": [],
+    "name": "nudge",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "owner",
     "outputs": [
       {
@@ -396,6 +507,25 @@ const minterUpgradeableAbi = [
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "proposals",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -488,6 +618,19 @@ const minterUpgradeableAbi = [
   },
   {
     "inputs": [],
+    "name": "tailEmissionRate",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "team",
     "outputs": [
       {
@@ -559,19 +702,6 @@ const minterUpgradeableAbi = [
   {
     "inputs": [],
     "name": "weekly",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "weekly_emission",
     "outputs": [
       {
         "internalType": "uint256",

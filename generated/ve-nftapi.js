@@ -1,4 +1,4 @@
-const veNFTAPIAddress = "0x810Fc6423F3e6cD428d55E035684A273a3460F0C";
+const veNFTAPIAddress = "0x766a03be4008cE01bb348F183Aebe1f3D964dce7";
 
 const veNFTAPIAbi = [
   {

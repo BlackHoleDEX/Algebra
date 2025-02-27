@@ -1,10 +1,41 @@
-const pairGeneratorAddress = "0xf10D68652307e6a67ede8ea723e9fd8d04dA9459";
+const pairGeneratorAddress = "0xbE7712e2bcA74405595BBfF21cC942906F8536c5";
 
 const pairGeneratorAbi = [
   {
     "inputs": [],
     "stateMutability": "nonpayable",
     "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "token0",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "token1",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "stable",
+        "type": "bool"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "pair",
+        "type": "address"
+      }
+    ],
+    "name": "PairCreated",
+    "type": "event"
   },
   {
     "inputs": [

@@ -1,4 +1,4 @@
-const genesisPoolManagerAddress = "0xfB8436DD10BD0df8e2031735704Cd5a8D4A0118D";
+const genesisPoolManagerAddress = "0xf9CaB0cE716e13BF37315E4a425B668E474B6d5f";
 
 const genesisPoolManagerAbi = [
   {

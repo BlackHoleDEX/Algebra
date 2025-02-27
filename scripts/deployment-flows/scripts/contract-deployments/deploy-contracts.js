@@ -39,6 +39,7 @@ const deployPermissionRegistry = async() =>{
         return permissionsRegistry.address;
     } catch (error) {
         console.log("error in deploying permissionRegistry: ", error)
+        process.exit(1);
     }
 }
 
@@ -55,6 +56,7 @@ const setPermissionRegistryRoles = async (permissionRegistryAddress, ownerAddres
             console.log(`Role ${ownerAddress} = ${element}`);
         } catch (err) {
             console.log('Error in setRoleFor in permissionRegistry:', err);
+            process.exit(1);
         }
     }
 };
@@ -67,18 +69,20 @@ const deployTokenHanlder = async (permissionRegistryAddress) => {
         const tokenHandlerContract = await ethers.getContractFactory("TokenHandler");
         const tokenHandler = await tokenHandlerContract.deploy(permissionRegistryAddress);
         const txDeployed = await tokenHandler.deployed();
-        console.log("token handler address : ", tokenHandler.address)
+
+        console.log("\ntoken handler address : ", tokenHandler.address)
         generateConstantFile("TokenHandler", tokenHandler.address);
 
         await tokenHandler.whitelistTokens(tokens);
         console.log("set tokens in token handler");
         await tokenHandler.whitelistConnectors(connectorTokens);
-        console.log("set connector tokens in token handler");
+        console.log("set connector tokens in token handler\n");
 
 
         return tokenHandler.address;
     } catch (error) {
         console.log("error in deploying token handler: ", error)
+        process.exit(1);
     }
 }
 
@@ -91,7 +95,8 @@ const deployPairGenerator = async () => {
         generateConstantFile("PairGenerator", pairGenerator.address);
         return pairGenerator.address;
     } catch (error) {
-        console.log("error in deploying pairGenerator: ", error)
+        console.log("error in deploying pairGenerator: ", error);
+        process.exit(1);
     }
 }
 
@@ -106,6 +111,7 @@ const deployPairFactory = async (pairGeneratorAddress) => {
         return pairFactory.address;
     } catch (error) {
         console.log("error in deploying pairFactory: ", error)
+        process.exit(1);
     }
     
 }
@@ -121,6 +127,7 @@ const deployRouterV2 = async(pairFactoryAddress) => {
         return routerV2.address;
     } catch (error) {
         console.log("error in deploying routerV2: ", error)
+        process.exit(1);
     }
     
 }
@@ -131,8 +138,10 @@ const setDibs = async (pairFactoryAddress) =>{
         const PairFactoryContract = await ethers.getContractAt(pairFactoryUpgradeableAbi, pairFactoryAddress);
         const tx = await PairFactoryContract.setDibs(owner[0].address);
         await tx.wait();
+        console.log("setDibs\n");
    } catch (error) {
         console.log("error in setting dibs: ", error)
+        process.exit(1);
    }
 }
 
@@ -146,7 +155,8 @@ const deployBloackholeV2Abi = async(voterV3Address, routerV2Address)=>{
         generateConstantFile("BlackholePairAPIV2", blackHolePairAPIV2Factory.address);
         return blackHolePairAPIV2Factory.address;
     } catch (error) {
-        console.log("error in deploying deployBloackholeV2Abi: ", error)
+        console.log("error in deploying deployBloackholeV2Abi: ", error);
+        process.exit(1);
     }
 }
 
@@ -166,7 +176,8 @@ const deployVotingEscrow = async(blackAddress) =>{
         generateConstantFile("VotingEscrow", veBlack.address);
         return veBlack.address;
     } catch (error) {
-        console.log("error in deploying veArtProxy: ", error)
+        console.log("error in deploying veArtProxy: ", error);
+        process.exit(1);
     }
     
 }
@@ -177,14 +188,16 @@ const deployVoterV3AndSetInit = async (votingEscrowAddress, pairFactoryAddress, 
         const inputs = [votingEscrowAddress, pairFactoryAddress , gaugeV2Address, bribeFactoryV3Address, tokenHandlerAddress]
         const VoterV3 = await upgrades.deployProxy(voterV3ContractFactory, inputs, {initializer: 'initialize'});
         const txDeployed = await VoterV3.deployed();
-        console.log('VoterV3 address: ', VoterV3.address)
 
+        console.log('VoterV3 address: ', VoterV3.address)
         generateConstantFile("VoterV3", VoterV3.address);
 
         const initializeVoter = await VoterV3._init(permissionRegistryAddress, ownerAddress)
+        console.log('VoterV3 init\n', )
         return VoterV3.address;
     } catch (error) {
         console.log("error in deploying voterV3: ", error);
+        process.exit(1);
     }
     
 }
@@ -193,9 +206,10 @@ const setVoterBribeV3 = async(voterV3Address, bribeFactoryV3Address) => {
     try {
         const bribeV3Contract = await ethers.getContractAt(bribeFactoryV3Abi, bribeFactoryV3Address);
         const createVoter = await bribeV3Contract.setVoter(voterV3Address);
-        console.log('set VoterV3 in bribe');
+        console.log('set VoterV3 in bribe\n');
     } catch (error) {
         console.log("error in setting voter in bribeV3: ", error);
+        process.exit(1);
     }
     
 }
@@ -210,6 +224,7 @@ const deployRewardsDistributor = async(votingEscrowAddress) => {
         return rewardsDistributor.address;
     } catch (error) {
         console.log("error in deploying rewardsDiastributer: ", error);
+        process.exit(1);
     }
     
 }
@@ -225,6 +240,7 @@ const deployMinterUpgradeable = async(votingEscrowAddress, voterV3Address, rewar
         return minterUpgradeable.address;
     } catch (error) {
         console.log("error in deploying minterUpgradeable: ", error);
+        process.exit(1);
     }
 }
 
@@ -232,9 +248,7 @@ const createGauges = async(voterV3Address, blackholeV2AbiAddress) => {
 
     // creating gauge for pair bwn - token one and token two - basic volatile pool
     const blackHoleAllPairContract =  await ethers.getContractAt(blackholePairAPIV2Abi, blackholeV2AbiAddress);
-    console.log("blackHoleAllPairContract fetched");
     const allPairs = await blackHoleAllPairContract.getAllPair(owner.address, BigInt(100), BigInt(0));
-    console.log("All pairs fetched");
     const pairs = allPairs[2];
 
     const voterV3Contract = await ethers.getContractAt(voterV3Abi, voterV3Address);
@@ -254,7 +268,7 @@ const createGauges = async(voterV3Address, blackholeV2AbiAddress) => {
 
         }
     }
-    console.log('done creation of gauge tx')
+    console.log('done creation of gauge tx\n')
 }
 
 const deployBribeV3Factory = async (permissionRegistryAddress) => {
@@ -268,6 +282,7 @@ const deployBribeV3Factory = async (permissionRegistryAddress) => {
         return BribeFactoryV3.address;
     } catch (error) {
         console.log("error in deploying bribeV3: ", error);
+        process.exit(1);
     }
 }
 
@@ -281,26 +296,27 @@ const deployGaugeV2Factory = async (permissionRegistryAddress) => {
         generateConstantFile("GaugeFactoryV2", GaugeFactoryV2.address);
         return GaugeFactoryV2.address
     } catch (error) {
-        console.log("error in deploying gaugeV2: ", error)
+        console.log("error in deploying gaugeV2: ", error);
+        process.exit(1);
     }
 }
 
 const setMinterUpgradableInVoterV3 = async(voterV3Address, minterUpgradableAddress)=>{
     const voterV3Contract = await ethers.getContractAt(voterV3Abi, voterV3Address);
     await voterV3Contract.setMinter(minterUpgradableAddress);
-    console.log('set minter in voterV3Contract');
+    console.log('set minter in voterV3Contract\n');
 }
 
 const setMinterInBlack = async(minterUpgradableAddress, blackAddress) => {
     const blackContract = await ethers.getContractAt(blackAbi, blackAddress);
     await blackContract.setMinter(minterUpgradableAddress);
-    console.log('set minter in Black');
+    console.log('set minter in Black\n');
 }
 
 const setMinterInRewardDistributer = async(minterUpgradableAddress, rewardsDistributorAddress) => {
     const rewardDistributerContract = await ethers.getContractAt(rewardsDistributorAbi, rewardsDistributorAddress);
     await rewardDistributerContract.setDepositor(minterUpgradableAddress);
-    console.log('set depositor in rewardDistributer');
+    console.log('set depositor in rewardDistributer\n');
 }
 
 const initializeMinter = async (minterUpgradableAddress) => {
@@ -314,9 +330,10 @@ const initializeMinter = async (minterUpgradableAddress) => {
             mintAmount
         );
         await initializingTx.wait();
-        console.log("Done initializing minter post deployment")
+        console.log("Done initializing minter post deployment\n");
     } catch (error) {
-        console.log("error in initializing black value ", error)
+        console.log("error in initializing black value ", error);
+        process.exit(1);
     }
 }
 
@@ -325,16 +342,18 @@ const deployEpochController = async(voterV3Address, minterUpgradableAddress) =>{
         data = await ethers.getContractFactory("EpochController");
         const EpochController = await upgrades.deployProxy(data, [], {initializer: 'initialize'});
         txDeployed = await EpochController.deployed();
-        generateConstantFile("EpochController", EpochController.address);
+
         console.log('deployed EpochController: ', EpochController.address);
+        generateConstantFile("EpochController", EpochController.address);
 
         await EpochController.setVoter(voterV3Address);
         console.log('Voter set in EpochController');
         await EpochController.setMinter(minterUpgradableAddress);
-        console.log('minter set in EpochController');
+        console.log('minter set in EpochController\n');
         return EpochController.address;
     } catch (error) {
-        console.log("error in deploying EpochController: ", error)
+        console.log("error in deploying EpochController: ", error);
+        process.exit(1);
     }
 }
 
@@ -342,9 +361,10 @@ const setChainLinkAddress = async (epocControllerAddress, chainlinkAutomationReg
     try{
         const epochController = await ethers.getContractAt(epochControllerAbi, epocControllerAddress);
         await epochController.setAutomationRegistry(chainlinkAutomationRegistryAddress);
-        console.log("setChainLinkAddress succes");
+        console.log("setChainLinkAddress succes\n");
     } catch(error){
         console.log("setChainLinkAddress failed: ", error);
+        process.exit(1);
     }
 }
 
@@ -353,9 +373,10 @@ const addBlackToUserAddress = async (minterUpgradableAddress) => {
         const minterContract = await ethers.getContractAt(minterUpgradeableAbi, minterUpgradableAddress);
         const amountAdd = BigNumber.from("5000").mul(BigNumber.from("1000000000000000000"));
         await minterContract.transfer("0xa7243fc6FB83b0490eBe957941a339be4Db11c29", amountAdd);
-        console.log("transfer token successfully");
+        console.log("transfer token successfully\n");
     } catch (error) {
         console.log("error in transfering token: ", error);
+        process.exit(1);
     }
     
 }
@@ -364,9 +385,10 @@ const setVoterV3InVotingEscrow = async(voterV3Address, votingEscrowAddress) => {
     try {
         const VotingEscrowContract = await ethers.getContractAt(votingEscrowAbi, votingEscrowAddress);
         await VotingEscrowContract.setVoter(voterV3Address);
-        console.log("set voterV3 in voting escrow");
+        console.log("set voterV3 in voting escrow\n");
     } catch (error) {
         console.log("error voterV3 in voting escrow", error);
+        process.exit(1);
     }
 }
 
@@ -377,16 +399,18 @@ const deployveNFT = async (voterV3Address, rewardsDistributorAddress, gaugeV2Add
         const veNFTAPI = await upgrades.deployProxy(data, input, {initializer: 'initialize', gasLimit:210000000});
         txDeployed = await veNFTAPI.deployed();
 
+        console.log('deployed venftapi address: ', veNFTAPI.address);
         generateConstantFile("veNFTAPI", veNFTAPI.address);
-        console.log('deployed venftapi address: ', veNFTAPI.address)
     } catch (error) {
         console.log('deployed venftapi error ', error)
+        process.exit(1);
     }
 }
 
 const pushDefaultRewardToken = async (bribeFactoryV3Address, blackAddress) => {
     const BribeFactoryV3Contract = await ethers.getContractAt(bribeFactoryV3Abi, bribeFactoryV3Address);
     await BribeFactoryV3Contract.pushDefaultRewardToken(blackAddress);
+    console.log("pushDefaultRewardToken\n");
 }
 
 const deployBlackClaim = async (votingEscrowAddress, treasury) => {
@@ -400,6 +424,7 @@ const deployBlackClaim = async (votingEscrowAddress, treasury) => {
         return BlackClaims.address;
     } catch (error) {
         console.log("error in deploying Black Claims: ", error);
+        process.exit(1);
     }
 }
 
@@ -414,6 +439,7 @@ const deployFixedAuction = async () => {
         return fixedAuction.address;
     } catch (error) {
         console.log("error in deploying fixed aution : ", error);
+        process.exit(1);
     }
 }
 
@@ -424,11 +450,12 @@ const deployAuctionFacotry = async (fixedAuctionAddress) => {
         const auctionFactory = await upgrades.deployProxy(data, input, {initializer: 'initialize', gasLimit:210000000});
         const txDeployed = await auctionFactory.deployed();
 
-        generateConstantFile("AuctionFactory", auctionFactory.address);
         console.log('deployed auction factory address : ', auctionFactory.address);
+        generateConstantFile("AuctionFactory", auctionFactory.address);
         return auctionFactory.address;
     } catch (error) {
-        console.log('deployed auction factory address : ', error)
+        console.log('deployed auction factory address : ', error);
+        process.exit(1);
     }
 }
 
@@ -439,11 +466,12 @@ const deployGenesisFactory = async (tokenHandlerAddress, voterV3Address) => {
         const genesisFactory = await upgrades.deployProxy(data, input, {initializer: 'initialize', gasLimit:210000000});
         const txDeployed = await genesisFactory.deployed();
 
+        console.log('deployed genesis factory address : ', genesisFactory.address);
         generateConstantFile("GenesisPoolFactory", genesisFactory.address);
-        console.log('deployed genesis factory address : ', genesisFactory.address)
         return genesisFactory.address;
     } catch (error) {
-        console.log('deployed genesis factory address : ', error)
+        console.log('deployed genesis factory address : ', error);
+        process.exit(1);
     }
 }
 
@@ -459,6 +487,7 @@ const deployGenesisManager = async (epochControllerAddress, routerV2Address, per
         return genesisManager.address;
     } catch (error) {
         console.log("error in deploying Genesis manager : ", error);
+        process.exit(1);
     }
 }
 
@@ -466,9 +495,10 @@ const setGenesisManagerInGenesisFactory = async (genesisFactoryAddress, genesisM
     try {
         const genesisFactoryContract = await ethers.getContractAt(genesisPoolFactoryAbi, genesisFactoryAddress);
         await genesisFactoryContract.setGenesisManager(genesisManagerAddress);
-        console.log("set genesis pool in genesis factory");
+        console.log("set genesis pool in genesis factory\n");
     } catch (error) {
         console.log("error genesis pool in genesis factory", error);
+        process.exit(1);
     }
 }
 
@@ -480,8 +510,10 @@ const setGenesisManagerRole = async (permissionRegistryAddress, genesisManagerAd
             gasLimit: 21000000,
         });
         await setRoleTx.wait(); // Wait for the transaction to be mined
+        console.log('setRoleFor in permissionRegistry\n');
     } catch (err) {
         console.log('Error in setRoleFor in permissionRegistry:', err);
+        process.exit(1);
     }
 };
 
@@ -489,9 +521,10 @@ const setGenesisPoolManagerInVoter = async(voterV3Address, genesisManagerAddress
     try {
         const VoterContract = await ethers.getContractAt(voterV3Abi, voterV3Address);
         await VoterContract.setGenesisManager(genesisManagerAddress);
-        console.log("set genesis manager in voter");
+        console.log("set genesis manager in voter\n");
     } catch (error) {
         console.log("error genesis manager in gvoter", error);
+        process.exit(1);
     }
 };
 
@@ -499,9 +532,10 @@ const setGenesisPoolManagerInPairFactory = async(pairFactoryAddress, genesisMana
     try {
         const PairFactoryContract = await ethers.getContractAt(pairFactoryUpgradeableAbi, pairFactoryAddress);
         await PairFactoryContract.setGenesisManager(genesisManagerAddress);
-        console.log("set genesis pool in pair factory");
+        console.log("set genesis pool in pair factory\n");
     } catch (error) {
         console.log("error genesis pool in pair factory", error);
+        process.exit(1);
     }
 };
 
@@ -512,10 +546,11 @@ const deployGenesisApi = async (genesisManagerAddress, genesisFactoryAddress) =>
         const genesisApi = await upgrades.deployProxy(data, input, {initializer: 'initialize', gasLimit:210000000});
         txDeployed = await genesisApi.deployed();
 
+        console.log('deployed genesis pool API address: ', genesisApi.address);
         generateConstantFile("GenesisPoolAPI", genesisApi.address);
-        console.log('deployed genesis pool API address: ', genesisApi.address)
     } catch (error) {
-        console.log('error genesis pool API  ', error)
+        console.log('error genesis pool API  ', error);
+        process.exit(1);
     }
 }
 
