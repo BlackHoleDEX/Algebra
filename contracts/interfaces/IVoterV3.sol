@@ -21,4 +21,5 @@ interface IVoterV3 {
     function createGauge(address _pool, uint256 _gaugeType) external returns (address _gauge, address _internal_bribe, address _external_bribe);
     function getEpochGovernor() external view returns (address);
     function setEpochGovernor(address _epochGovernor) external;
+    function reset(uint256 _tokenId) external;
 }

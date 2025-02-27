@@ -78,13 +78,15 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
         isAutoVotingEnabled[lockId] = true;
         tokenIds.push(lockId);
 
-        emit AutoVotingEnabled(lockId, msg.sender);
+        emit AutoVotingEnabled(lockId, msg.sender);(
     }
 
     /// @notice Disables automated voting and transfers back the NFT to the original owner
     function disableAutoVoting(uint256 lockId) external nonReentrant {
         require(originalOwner[lockId] == msg.sender, "Not original owner");
         require(!BlackTimeLibrary.isLastHour(block.timestamp), "Cannot disable in last hour before voting");
+
+        voterV3.reset(lockId);
 
         delete originalOwner[lockId];
         delete isAutoVotingEnabled[lockId];
@@ -230,13 +232,5 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
         }
 
         return topNPools;
-    }
-
-    function _calculateWeights(uint256[] memory baseWeights, uint256 votingPower) internal pure returns (uint256[] memory) {
-        uint256[] memory adjustedWeights = new uint256[](baseWeights.length);
-        for (uint256 i = 0; i < baseWeights.length; i++) {
-            adjustedWeights[i] = baseWeights[i] * votingPower;
-        }
-        return adjustedWeights;
     }
 }
