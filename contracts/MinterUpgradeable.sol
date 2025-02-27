@@ -29,7 +29,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
 
     uint public constant MAX_TEAM_RATE = 50; // 5%
     uint256 public constant TAIL_START = 8_969_150 * 1e18; //TAIL EMISSIONS 
-    uint256 public tailEmissionRate = 67;
+    uint256 public tailEmissionRate;
     uint256 public constant NUDGE = 1; //delta added in tail emissions rate after voting
     uint256 public constant MAXIMUM_TAIL_RATE = 100; //maximum tail emissions rate after voting
     uint256 public constant MINIMUM_TAIL_RATE = 1; //maximum tail emissions rate after voting
@@ -71,13 +71,13 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
 
         _initializer = msg.sender;
         team = msg.sender;
+        tailEmissionRate = 10000;
 
         teamRate = 30; // 300 bps = 3%
 
         EMISSION = 990; //BlackHole:: 
         TAIL_EMISSION = 2;
         REBASEMAX = 300;
-        tailEmissionRate = 10000;
 
         _black = IBlack(IVotingEscrow(__ve).token());
         _voter = IVoter(__voter);

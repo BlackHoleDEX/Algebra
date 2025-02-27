@@ -1290,60 +1290,6 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         emit MetadataUpdate(_to);
     }
 
-
-    /**
-     * @notice split NFT into multiple
-     * @param amounts   % of split
-     * @param _tokenId  NFTs ID
-     */
-    function split(uint[] memory amounts, uint _tokenId) external {
-        //Not supporting split
-        /*
-        // check permission and vote
-        require(attachments[_tokenId] == 0 && !voted[_tokenId], "attached");
-        require(_isApprovedOrOwner(msg.sender, _tokenId), "caller is not owner nor approved");
-
-        // save old data and totalWeight
-        address _to = idToOwner[_tokenId];
-        LockedBalance memory _locked = locked[_tokenId];
-        uint end = _locked.end;
-        uint value = uint(int256(_locked.amount));
-        require(value > 0); // dev: need non-zero value
-        require(!_locked.isSMNFT, "can not split a SM NFT");
-        require(_locked.end > block.timestamp ||  _locked.isPermanent,"lock expired");
-        
-        // reset supply, _deposit_for increase it
-        supply = supply - value;
-
-        uint i;
-        uint totalWeight = 0;
-        for(i = 0; i < amounts.length; i++){
-            totalWeight += amounts[i];
-        }
-
-        // remove old data
-        locked[_tokenId] = LockedBalance(0, 0, false, false);
-        _checkpoint(_tokenId, _locked, LockedBalance(0, 0, false, false));
-        _burn(_tokenId);
-
-        // save end
-        uint unlock_time = end;
-        require(unlock_time > block.timestamp, 'Can only lock until time in the future');
-        require(unlock_time <= block.timestamp + MAXTIME, 'Voting lock can be 2 years max');
-        
-        // mint 
-        uint _value = 0;
-        for(i = 0; i < amounts.length; i++){   
-            ++tokenId;
-            _tokenId = tokenId;
-            _mint(_to, _tokenId);
-            _value = value * amounts[i] / totalWeight;
-            _deposit_for(_tokenId, _value, unlock_time, locked[_tokenId], DepositType.SPLIT_TYPE);
-        }
-        */     
-
-    }
-
     /*///////////////////////////////////////////////////////////////
                             DAO VOTING STORAGE
     //////////////////////////////////////////////////////////////*/

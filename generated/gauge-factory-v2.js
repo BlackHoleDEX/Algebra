@@ -1,4 +1,4 @@
-const gaugeFactoryV2Address = "0x0cE4616cF307957ABC06f2BcDe6f690f50da1D91";
+const gaugeFactoryV2Address = "0x584a233A576bD5c207115acAd51779C65E17184A";
 
 const gaugeFactoryV2Abi = [
   {
@@ -87,6 +87,11 @@ const gaugeFactoryV2Abi = [
         "internalType": "bool",
         "name": "_isPair",
         "type": "bool"
+      },
+      {
+        "internalType": "address",
+        "name": "genesisManager",
+        "type": "address"
       }
     ],
     "name": "createGaugeV2",

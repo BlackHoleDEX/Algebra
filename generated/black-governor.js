@@ -1,10 +1,10 @@
-const blackGovernorAddress = "0x10Fdb6697031a430373682A825a2645424640c45";
+const blackGovernorAddress = "0xd5B3a67789e5c4a5495B37ae151c1A66DcbA165A";
 
 const blackGovernorAbi = [
   {
     "inputs": [
       {
-        "internalType": "contract IVotes",
+        "internalType": "contract IBlackHoleVotes",
         "name": "_ve",
         "type": "address"
       },
@@ -1270,7 +1270,7 @@ const blackGovernorAbi = [
     "name": "token",
     "outputs": [
       {
-        "internalType": "contract IVotes",
+        "internalType": "contract IBlackHoleVotes",
         "name": "",
         "type": "address"
       }

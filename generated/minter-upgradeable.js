@@ -1,4 +1,4 @@
-const minterUpgradeableAddress = "0x69CC191c88E2CD5BC168ac0660F5f0312B36Fe1A";
+const minterUpgradeableAddress = "0x6E9b3B8fd7a5fF42F3c6965466C02EDf12F09F99";
 
 const minterUpgradeableAbi = [
   {
@@ -163,6 +163,32 @@ const minterUpgradeableAbi = [
   {
     "inputs": [],
     "name": "PRECISION",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "PROPOSAL_DECREASE",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "PROPOSAL_INCREASE",
     "outputs": [
       {
         "internalType": "uint256",

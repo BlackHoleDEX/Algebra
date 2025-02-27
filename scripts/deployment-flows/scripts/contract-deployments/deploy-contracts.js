@@ -167,7 +167,8 @@ const deployVoterV3AndSetInit = async (votingEscrowAddress, permissionRegistryAd
         const txDeployed = await VoterV3.deployed();
         console.log('VoterV3 address: ', VoterV3.address)
         const listOfTokens = [...addresses, blackAddress];
-        const initializeVoter = await VoterV3._init(listOfTokens, permissionRegistryAddress, ownerAddress)
+        const initializeVoter = await VoterV3._init(permissionRegistryAddress, ownerAddress)
+        await initializeVoter.wait();
         generateConstantFile("VoterV3", VoterV3.address);
         return VoterV3.address;
     } catch (error) {
@@ -573,17 +574,17 @@ async function main () {
 
     // const genesisPoolAddress = deployGenesisPool(routerV2Address, epochControllerAddress, voterV3Address, pairFactoryAddress, tokenHandlerAddress, permissionRegistryAddress);
 
-    await setGenesisManagerRole(permissionRegistryAddress, genesisPoolAddress);
+    // await setGenesisManagerRole(permissionRegistryAddress, genesisPoolAddress);
 
-    await setGenesisPoolManagerInGaugeFactory(gaugeFactoryV2Address, genesisPoolAddress);
+    // await setGenesisPoolManagerInGaugeFactory(gaugeFactoryV2Address, genesisPoolAddress);
 
-    await setGenesisPoolManagerInPairFactory(pairFactoryAddress, genesisPoolAddress);
+    // await setGenesisPoolManagerInPairFactory(pairFactoryAddress, genesisPoolAddress);
 
-    const dutchAuctionAddress = deployDucthAction(genesisPoolAddress);
+    // const dutchAuctionAddress = deployDucthAction(genesisPoolAddress);
 
-    await setDutchAuctioninGenesisPool(genesisPoolAddress, dutchAuctionAddress);
+    // await setDutchAuctioninGenesisPool(genesisPoolAddress, dutchAuctionAddress);
 
-    await deployGenesisApi(genesisPoolAddress);
+    // await deployGenesisApi(genesisPoolAddress);
 
 
     // createPairs two by default

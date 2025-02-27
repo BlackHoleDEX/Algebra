@@ -1,4 +1,4 @@
-const votingEscrowAddress = "0x494ad7cb65412c240b98Dae51183A8FD4DCEaAe9";
+const votingEscrowAddress = "0x25d5Ffb2E810A4b51b849502521bFea648D54dfc";
 
 const votingEscrowAbi = [
   {
@@ -1039,6 +1039,43 @@ const votingEscrowAbi = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "getsmNFTPastTotalSupply",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "getsmNFTPastVotes",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -1526,24 +1563,6 @@ const votingEscrowAbi = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256[]",
-        "name": "amounts",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "split",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
