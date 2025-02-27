@@ -15,6 +15,7 @@ import { IBlackGovernor } from "./interfaces/IBlackGovernor.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 // codifies the minting rules as per ve(3,3), abstracted from the token to support any token that allows minting
+// 14 increment epochs followed by 52 decrement epochs after which we wil have vote based epochs
 
 contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     
