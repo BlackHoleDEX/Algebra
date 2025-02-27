@@ -59,8 +59,7 @@ contract BasePluginV1Factory is IBasePluginV1Factory {
 
   function _createPlugin(address pool) internal returns (address) {
     require(pluginByPool[pool] == address(0), 'Already created');
-    IDynamicFeeManager volatilityOracle = new AlgebraBasePluginV1(pool, algebraFactory, address(this));
-    volatilityOracle.changeFeeConfiguration(defaultFeeConfiguration);
+    IDynamicFeeManager volatilityOracle = new AlgebraBasePluginV1(pool, algebraFactory, address(this), defaultFeeConfiguration);
     pluginByPool[pool] = address(volatilityOracle);
     return address(volatilityOracle);
   }

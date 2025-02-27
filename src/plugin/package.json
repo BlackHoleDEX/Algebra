@@ -5,9 +5,15 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "1.2.0",
+  "version": "1.2.1",
   "keywords": [
     "algebra"
+  ],
+  "files": [
+    "contracts/base/BasePlugin.sol",
+    "contracts/base/BasePluginFactory.sol",
+    "contracts/interfaces/IBasePlugin.sol",
+    "contracts/interfaces/IBasePluginFactory.sol"
   ],
   "repository": {
     "type": "git",
@@ -18,7 +24,7 @@
     "@cryptoalgebra/integral-periphery": "1.2.0"
   },
   "scripts": {
-    "precommit": "pretty-quick --staged --pattern **/*.sol && hardhat compile",
+    "precommit": "pretty-quick --staged --pattern '**/*.sol' && hardhat compile",
     "compile": "npm --prefix ../core run compile && npm --prefix ../periphery run compile && hardhat compile",
     "solhint": "solhint ./contracts/**/*.sol",
     "test": "hardhat test --parallel",

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BUSL-1.1
+// SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity =0.8.20;
 
 import '@cryptoalgebra/integral-core/contracts/base/common/Timestamp.sol';
@@ -11,8 +11,8 @@ import '@cryptoalgebra/integral-core/contracts/interfaces/IAlgebraPool.sol';
 
 import '../interfaces/IBasePlugin.sol';
 
-/// @title Algebra Integral 1.2 default plugin
-/// @notice This contract stores timepoints and calculates adaptive fee and statistical averages
+/// @title Algebra Integral 1.2 plugin base
+/// @notice This contract simplifies development process of plugins by providing base functionality
 abstract contract BasePlugin is IBasePlugin, Timestamp {
   using Plugins for uint8;
 
@@ -22,7 +22,6 @@ abstract contract BasePlugin is IBasePlugin, Timestamp {
   uint8 private constant defaultPluginConfig = 0;
 
   address public immutable pool;
-  address internal immutable factory;
   address internal immutable pluginFactory;
 
   modifier onlyPool() {
@@ -30,13 +29,15 @@ abstract contract BasePlugin is IBasePlugin, Timestamp {
     _;
   }
 
-  constructor(address _pool, address _factory, address _pluginFactory) {
-    (factory, pool, pluginFactory) = (_factory, _pool, _pluginFactory);
+  constructor(address _pool, address _pluginFactory) {
+    (pool, pluginFactory) = (_pool, _pluginFactory);
   }
 
   function _checkIfFromPool() internal view {
     require(msg.sender == pool, 'Only pool can call this');
   }
+
+  function _authorize() internal view virtual;
 
   function _getPoolState() internal view returns (uint160 price, int24 tick, uint16 fee, uint8 pluginConfig) {
     (price, tick, fee, pluginConfig, , ) = IAlgebraPoolState(pool).globalState();
@@ -48,7 +49,7 @@ abstract contract BasePlugin is IBasePlugin, Timestamp {
 
   /// @inheritdoc IBasePlugin
   function collectPluginFee(address token, uint256 amount, address recipient) external override {
-    require(msg.sender == pluginFactory || IAlgebraFactory(factory).hasRoleOrOwner(ALGEBRA_BASE_PLUGIN_MANAGER, msg.sender));
+    _authorize();
     SafeTransfer.safeTransfer(token, recipient, amount);
   }
 

@@ -8,11 +8,11 @@ import '../interfaces/IBasePluginV1Factory.sol';
 import '../interfaces/plugins/IVolatilityOracle.sol';
 
 import '../libraries/VolatilityOracle.sol';
-import '../base/BasePlugin.sol';
+import '../base/AlgebraBasePlugin.sol';
 
 /// @title Algebra Integral 1.2 VolatilityOraclePlugin plugin
 /// @notice This contract stores timepoints and calculates adaptive fee and statistical averages
-abstract contract VolatilityOraclePlugin is BasePlugin, IVolatilityOracle {
+abstract contract VolatilityOraclePlugin is AlgebraBasePlugin, IVolatilityOracle {
   using Plugins for uint8;
 
   uint256 internal constant UINT16_MODULO = 65536;

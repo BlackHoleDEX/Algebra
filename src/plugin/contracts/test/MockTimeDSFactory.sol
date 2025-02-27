@@ -55,8 +55,7 @@ contract MockTimeDSFactory is IBasePluginV1Factory {
   }
 
   function _createPlugin(address pool) internal returns (address) {
-    MockTimeAlgebraBasePluginV1 volatilityOracle = new MockTimeAlgebraBasePluginV1(pool, algebraFactory, address(this));
-    volatilityOracle.changeFeeConfiguration(defaultFeeConfiguration);
+    MockTimeAlgebraBasePluginV1 volatilityOracle = new MockTimeAlgebraBasePluginV1(pool, algebraFactory, address(this), defaultFeeConfiguration);
     pluginByPool[pool] = address(volatilityOracle);
     return address(volatilityOracle);
   }
