@@ -308,6 +308,24 @@ const bribeFactoryV3Abi = [
       },
       {
         "internalType": "address",
+        "name": "_avm",
+        "type": "address"
+      }
+    ],
+    "name": "setBribeAVM",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "_bribe",
+        "type": "address[]"
+      },
+      {
+        "internalType": "address",
         "name": "_minter",
         "type": "address"
       }

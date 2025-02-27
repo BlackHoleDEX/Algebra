@@ -11,7 +11,6 @@ import "./interfaces/IVoterV3.sol";
 import "./interfaces/IVotingEscrow.sol";
 
 import { IBlackGovernor } from "./interfaces/IBlackGovernor.sol";
-import "@openzeppelin/contracts/governance/IGovernor.sol";
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
@@ -28,9 +27,8 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     uint public teamRate;  //EMISSION that goes to protocol
 
     uint public constant MAX_TEAM_RATE = 50; // 5%
-
-    uint256 public constant TAIL_START = 68 * 1e18; //TAIL EMISSIONS 
-    uint256 public tailEmissionRate; 
+    uint256 public constant TAIL_START = 8_969_150 * 1e18; //TAIL EMISSIONS 
+    uint256 public tailEmissionRate = 67;
     uint256 public constant NUDGE = 1; //delta added in tail emissions rate after voting
     uint256 public constant MAXIMUM_TAIL_RATE = 100; //maximum tail emissions rate after voting
     uint256 public constant MINIMUM_TAIL_RATE = 1; //maximum tail emissions rate after voting
@@ -53,6 +51,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     IVoterV3 public _voterV3;
     IVotingEscrow public _ve;
     IRewardsDistributor public _rewards_distributor;
+    IVoter _epoch_controller;
 
     mapping(uint256 => bool) public proposals;
 
@@ -84,7 +83,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
         _rewards_distributor = IRewardsDistributor(__rewards_distributor);
 
         active_period = ((block.timestamp + (2 * WEEK)) / WEEK) * WEEK;
-        weekly = 67 * 1e18; // represents a starting weekly emission of 10M BLACK (BLACK has 18 decimals)
+        weekly = 10_000_000 * 1e18; // represents a starting weekly emission of 10M BLACK (BLACK has 18 decimals)
         isFirstMint = true;
     }
 

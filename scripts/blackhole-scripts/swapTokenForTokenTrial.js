@@ -108,9 +108,7 @@ async function main () {
     {
         gasLimit: 21000000
     });
-    console.log('txTwo', txTwo)
     const awaitedTx = await txTwo.wait();
-    console.log("awwaitedTex", awaitedTx);// ends here
 
     const swappintTx = await RouterV2Contract.swapExactTokensForTokensSimple(
         swapIn,

@@ -2,7 +2,7 @@
 pragma solidity 0.8.13;
 
 import {IGovernor} from "@openzeppelin/contracts/governance/IGovernor.sol";
-import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
+import {IBlackHoleVotes} from "./interfaces/IBlackHoleVotes.sol";
 import {L2Governor, L2GovernorCountingSimple, L2GovernorVotes, L2GovernorVotesQuorumFraction} from "./governance/Governor.sol";
 
 contract BlackGovernor is
@@ -17,7 +17,7 @@ contract BlackGovernor is
     uint256 public proposalNumerator = 2; // start at 0.02%
 
     constructor(
-        IVotes _ve,
+        IBlackHoleVotes _ve,
         address _minter
     )
         L2Governor("Black Governor", _minter)

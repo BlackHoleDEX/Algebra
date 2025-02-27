@@ -109,6 +109,12 @@ contract BlackholePairAPIV2 is Initializable {
         Bribes[] bribes;
     }
 
+    struct swapRoute{
+        uint amountOut;
+        uint hops;
+        route[] routes;
+    }
+
     struct route {
         address pair;
         address from;
@@ -118,14 +124,15 @@ contract BlackholePairAPIV2 is Initializable {
     }
 
     struct TempData {
-        uint amountOut;
-        bool stable;
         address _pair1;
         address _pair2;
-        address token_0;
-        address token_1;
-        uint amount1;
-        uint amount2;
+        address _pairMid;
+        IPair ipair1;
+        IPair ipair2;
+        IPair ipairMid;
+        address otherToken1;
+        address otherToken2;
+        uint256 minAmount;
         bool foundPath;
     }
 
@@ -428,99 +435,106 @@ contract BlackholePairAPIV2 is Initializable {
         emit Voter(_oldVoter, _voter);
     }
 
-    function getAmountOut(uint amountIn, address tokenIn, address tokenOut) external view returns (uint amountOut, route[] memory routes) {
-
+    function getAmountOut1(uint amountIn, address tokenIn, address tokenOut) external view returns (swapRoute memory swapRoutes){
+        
         TempData memory temp;
-        (temp.amountOut, temp.stable) = routerV2.getAmountOut(amountIn, tokenIn, tokenOut);
+        bool stable;
 
-        if (temp.amountOut > 0) {
-            temp._pair1 = pairFactory.getPair(tokenIn, tokenOut, temp.stable);
-            routes = new route[](1);
-            routes[0] = _createRoute(temp._pair1, tokenIn, tokenOut, temp.stable, temp.amountOut);
-            amountOut = temp.amountOut;
-            return (amountOut, routes);
+        (temp.minAmount, stable) = routerV2.getAmountOut(amountIn, tokenIn, tokenOut);
+
+        if (temp.minAmount > 0) {
+            temp._pair1 = pairFactory.getPair(tokenIn, tokenOut, stable);
+
+            if(pairFactory.isPair(temp._pair1) && !pairFactory.isGenesis(temp._pair1)){
+                swapRoutes.routes = new route[](1);
+                swapRoutes.routes[0] = _createRoute(temp._pair1, tokenIn, tokenOut, stable, temp.minAmount);
+                swapRoutes.amountOut = temp.minAmount;
+                swapRoutes.hops = 1;
+                return swapRoutes;
+            }
         }
 
-        routes = new route[](2);
         uint totPairs = pairFactory.allPairsLength();
-
-        temp.amountOut = type(uint256).max;
+        uint i;
+        uint j;
+        uint256[] memory amounts;
+        temp.minAmount = type(uint256).max;
         temp.foundPath = false;
 
-        for(uint i=0; i < totPairs; i++){
+        for(i = 0; i < totPairs; i++){
             temp._pair1 = pairFactory.allPairs(i);
+            temp.ipair1 = IPair(temp._pair1);
 
-            IPair ipair = IPair(temp._pair1); 
-            temp.token_0 = ipair.token0();
-            temp.token_1 = ipair.token1();
+            if(pairFactory.isGenesis(temp._pair1)) continue;
+            if(tokenIn != temp.ipair1.token0() && tokenIn != temp.ipair1.token1()) continue;
 
-            if(temp.token_0 == tokenIn){
-                temp._pair2 = pairFactory.getPair(temp.token_1, tokenOut, true);
-                if(temp._pair2 != address(0)){
-                    (temp.amount1, temp.amount2) = _getAmountViaHopping(amountIn, tokenIn, temp.token_1, tokenOut);
-                    if(temp.amount2 != 0 && temp.amount2 < temp.amountOut){
-                        temp.amountOut = temp.amount2;
+            temp.otherToken1 = tokenIn == temp.ipair1.token0() ? temp.ipair1.token1() : temp.ipair1.token0();
+
+            for(j = i+1; j < totPairs; j++){
+                temp._pair2 = pairFactory.allPairs(j);
+                temp.ipair2 = IPair(temp._pair2);
+
+                if(pairFactory.isGenesis(temp._pair2)) continue;
+                if(tokenOut != temp.ipair2.token0() && tokenOut != temp.ipair2.token1()) continue;
+
+                temp.otherToken2 = tokenOut == temp.ipair2.token0() ? temp.ipair2.token1() : temp.ipair2.token0();
+
+                if(temp.otherToken1 == temp.otherToken2){
+                    amounts = _getAmountViaHopping(amountIn, tokenIn, temp.otherToken1, tokenOut);
+                    if(amounts[1] < temp.minAmount){
+                        temp.minAmount = amounts[1];
                         temp.foundPath = true;
-                        routes[0] = _createRoute(temp._pair1, tokenIn, temp.token_1, ipair.isStable(), temp.amount1);
-                        routes[1] = _createRoute(temp._pair2, temp.token_1, tokenOut, true, temp.amount2);
+                        swapRoutes.routes = new route[](2);
+                        swapRoutes.routes[0] = _createRoute(temp._pair1, tokenIn, temp.otherToken1, temp.ipair1.isStable(), amounts[0]);
+                        swapRoutes.routes[1] = _createRoute(temp._pair2, temp.otherToken1, tokenOut, temp.ipair2.isStable(), amounts[1]);
+                        swapRoutes.amountOut = amounts[1];
+                        swapRoutes.hops = 2;
                     }
+                    continue;
                 }
-                
-                temp._pair2 = pairFactory.getPair(temp.token_1, tokenOut, false);
-                if(temp._pair2 != address(0)){
-                    (temp.amount1, temp.amount2) = _getAmountViaHopping(amountIn, tokenIn, temp.token_1, tokenOut);
-                    if(temp.amount2 != 0 && temp.amount2 < temp.amountOut){
-                        temp.amountOut = temp.amount2;
-                        temp.foundPath = true;
-                        routes[0] = _createRoute(temp._pair1, tokenIn, temp.token_1, ipair.isStable(), temp.amount1);
-                        routes[1] = _createRoute(temp._pair2, temp.token_1, tokenOut, false, temp.amount2);
-                    }
-                }
-            }
-            else if(temp.token_1 == tokenIn){
-                temp._pair2 = pairFactory.getPair(temp.token_0, tokenOut, true);
-                if(temp._pair2 != address(0)){
-                    (temp.amount1, temp.amount2) = _getAmountViaHopping(amountIn, tokenIn, temp.token_0, tokenOut);
-                    if(temp.amount2 != 0 && temp.amount2 < temp.amountOut){
-                        temp.amountOut = temp.amount2;
-                        temp.foundPath = true;
-                        routes[0] = _createRoute(temp._pair1, tokenIn, temp.token_0, ipair.isStable(), temp.amount1);
-                        routes[1] = _createRoute(temp._pair2, temp.token_0, tokenOut, true, temp.amount2);
-                    }
-                }
-                
-                temp._pair2 = pairFactory.getPair(temp.token_0, tokenOut, false);
-                if(temp._pair2 != address(0)){
-                    (temp.amount1, temp.amount2) = _getAmountViaHopping(amountIn, tokenIn, temp.token_0, tokenOut);
-                    if(temp.amount2 != 0 && temp.amount2 < temp.amountOut){
-                        temp.amountOut = temp.amount2;
-                        temp.foundPath = true;
-                        routes[0] = _createRoute(temp._pair1, tokenIn, temp.token_0, ipair.isStable(), temp.amount1);
-                        routes[1] = _createRoute(temp._pair2, temp.token_0, tokenOut, true, temp.amount2);
-                    }
+
+                temp._pairMid = pairFactory.getPair(temp.otherToken1, temp.otherToken2, true);
+
+                if(!pairFactory.isPair(temp._pairMid)) continue;
+                if(pairFactory.isGenesis(temp._pairMid)) continue;
+
+                temp.ipairMid = IPair(temp._pairMid);
+
+                amounts = _getAmountViaHopping(amountIn, tokenIn, temp.otherToken1, temp.otherToken2, tokenOut);
+                if(amounts[2] < temp.minAmount){
+                    temp.minAmount = amounts[2];
+                    temp.foundPath = true;
+                    swapRoutes.routes = new route[](3);
+                    swapRoutes.routes[0] = _createRoute(temp._pair1, tokenIn, temp.otherToken1, temp.ipair1.isStable(), amounts[0]);
+                    swapRoutes.routes[1] = _createRoute(temp._pairMid, temp.otherToken1, temp.otherToken2, temp.ipairMid.isStable(), amounts[1]);
+                    swapRoutes.routes[2] = _createRoute(temp._pair2, temp.otherToken2, tokenOut, temp.ipair2.isStable(), amounts[2]);
+                    swapRoutes.amountOut = amounts[2];
+                    swapRoutes.hops = 3;
                 }
             }
         }
-
-        if(temp.foundPath == false){
-            temp.amountOut = 0;
-        }
-
-        return (temp.amountOut, routes);
-    }
-
-    function getAmountViaHopping(uint amountIn, address tokenIn, address tokenMid, address tokenOut) external view returns (uint amount1, uint amount2){
-        return _getAmountViaHopping(amountIn, tokenIn, tokenMid, tokenOut);
     }
 
 
-    function _getAmountViaHopping(uint amountIn, address tokenIn, address tokenMid, address tokenOut) internal view returns (uint amount1, uint amount2){
+    function _getAmountViaHopping(uint amountIn, address tokenIn, address tokenMid, address tokenOut) internal view returns (uint256[] memory amounts){
         bool stable;
-        
-        (amount1, stable) = routerV2.getAmountOut(amountIn, tokenIn, tokenMid);
-        (amount2, stable) = routerV2.getAmountOut(amount1, tokenMid, tokenOut);
+        amounts = new uint256[](2);
 
-        return (amount1, amount2);
+        (amounts[0], stable) = routerV2.getAmountOut(amountIn, tokenIn, tokenMid);
+        (amounts[1], stable) = routerV2.getAmountOut(amounts[0], tokenMid, tokenOut);
+
+        return amounts;
+    }
+
+    function _getAmountViaHopping(uint amountIn, address tokenIn, address tokenMid1, address tokenMid2, address tokenOut) internal view returns (uint256[] memory amounts){
+        bool stable;
+        amounts = new uint256[](3);
+
+        (amounts[0], stable) = routerV2.getAmountOut(amountIn, tokenIn, tokenMid1);
+        (amounts[1], stable) = routerV2.getAmountOut(amounts[0], tokenMid1, tokenMid2);
+        (amounts[2], stable) = routerV2.getAmountOut(amounts[1], tokenMid2, tokenOut);
+
+        return amounts;
     }
 
     function _createRoute(address pair, address from, address to, bool stable, uint amountOut) internal pure returns (route memory) {

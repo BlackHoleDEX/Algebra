@@ -512,6 +512,7 @@ const voterV3Abi = [
   {
     "inputs": [],
     "name": "blackGoverner",
+    "name": "avm",
     "outputs": [
       {
         "internalType": "address",
@@ -1318,6 +1319,13 @@ const voterV3Abi = [
       }
     ],
     "name": "reviveGauge",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "setAVM",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
