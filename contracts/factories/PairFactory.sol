@@ -40,7 +40,7 @@ contract PairFactory is IPairFactory {
         pairGenerator = _pairGenerator;
         stableFee = 4; // 0.04%
         volatileFee = 18; // 0.18%
-        stakingNFTFee = 3000; // 30% of stable/volatileFee
+        stakingNFTFee = 0; // 0% of stable/volatileFee, we can change it later if needed
     }
 
     function allPairsLength() external view returns (uint) {
