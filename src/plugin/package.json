@@ -5,9 +5,15 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "1.2.0",
+  "version": "1.2.1",
   "keywords": [
     "algebra"
+  ],
+  "files": [
+    "contracts/base/BasePlugin.sol",
+    "contracts/base/BasePluginFactory.sol",
+    "contracts/interfaces/IBasePlugin.sol",
+    "contracts/interfaces/IBasePluginFactory.sol"
   ],
   "repository": {
     "type": "git",
