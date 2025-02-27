@@ -260,7 +260,7 @@ contract Bribe is ReentrancyGuard {
         if(_owner == avm) {
             _owner = IAutomatedVotingManager(avm).originalOwner(tokenId);
         }
-        require(msg.sender == _owner || msg.sender == voter);
+        require(msg.sender == voter);
         uint256 _length = tokens.length;
         for (uint256 i = 0; i < _length; i++) {
             uint256 _reward = earned(tokenId, tokens[i]);

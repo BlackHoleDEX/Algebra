@@ -6,6 +6,7 @@ import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
 import "./interfaces/IVoterV3.sol";
 import "./interfaces/IVotingEscrow.sol";
 import "./interfaces/IBribe.sol";
+import "./interfaces/IRewardsDistributor.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
@@ -26,6 +27,7 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
     IVotingEscrow public votingEscrow;
     address public chainlinkExecutor;
     address public minter;
+    address public rewardsDistributor;
 
     int128 public minBalanceForAutovoting;
     uint256[] public tokenIds;
@@ -53,7 +55,7 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
     }
 
     /* ======= INITIALIZER ======= */
-    function initialize(address _voterV3, address _votingEscrow, address _chainlinkExecutor, address _minter) public initializer {
+    function initialize(address _voterV3, address _votingEscrow, address _chainlinkExecutor, address _minter, address _rewards_distributor) public initializer {
         __Ownable_init(); // ✅ Initialize Ownable
         __ReentrancyGuard_init(); // ✅ Initialize ReentrancyGuard
         
@@ -61,6 +63,7 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
         votingEscrow = IVotingEscrow(_votingEscrow);
         chainlinkExecutor = _chainlinkExecutor;
         minter = _minter;
+        rewardsDistributor = _rewards_distributor;
         minBalanceForAutovoting = 10*1e18; // decimals in black
 
         _transferOwnership(msg.sender); // ✅ Set contract owner correctly
@@ -86,6 +89,8 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
         require(originalOwner[lockId] == msg.sender, "Not original owner");
         require(!BlackTimeLibrary.isLastHour(block.timestamp), "Cannot disable in last hour before voting");
 
+        voterV3.reset(lockId);
+
         delete originalOwner[lockId];
         delete isAutoVotingEnabled[lockId];
 
@@ -97,28 +102,29 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
     }
 
     /// @notice Executes automated voting at the end of each epoch
-    function executeVotes(uint256 start, uint256 end) external onlyChainlink nonReentrant {
-        require(start < end && end <= tokenIds.length, "Invalid range");
+    function executeVotes() external onlyChainlink nonReentrant {
         require(BlackTimeLibrary.isLastHour(block.timestamp), "Not in last hour of epoch");
-        require(!hasVotedThisEpoch[BlackTimeLibrary.epochStart(block.timestamp)], "Already executed for this epoch");
+        require(!hasVotedThisEpoch[BlackTimeLibrary.epochStart(block.timestamp)], "Already executed for this epoch"); // is this needed? either this or the onlychainlink should be sufficient right?
         require(tokenIds.length > 0, "No auto-voting locks available");
         hasVotedThisEpoch[BlackTimeLibrary.epochStart(block.timestamp)] = true;
-        PoolsAndRewards[] memory poolsAndRewards = getRewardsPerVotingPower(topN);
+        PoolsAndRewards[] memory poolsAndRewards = getRewardsPerVotingPower(2);
         address[] memory poolAddresses = new address[](poolsAndRewards.length);
+
         for (uint256 i = 0; i < poolsAndRewards.length; i++) {
             poolAddresses[i] = poolsAndRewards[i].pool;
         }
 
-        uint256[] memory weights = getVoteWeightage(poolsAndRewards);
+        uint256[] memory weights = getVoteWeightage(poolsAndRewards); 
 
-        for (uint256 i = start; i < end; i++) {
+        for (uint256 i = 0; i < tokenIds.length; i++) {
             uint256 lockId = tokenIds[i];
             if (isAutoVotingEnabled[lockId]) {
+                IRewardsDistributor(rewardsDistributor).claim(lockId);
                 voterV3.vote(lockId, poolAddresses, weights);
             }
         }
 
-        emit VotesExecuted(BlackTimeLibrary.epochStart(block.timestamp), end - start);
+        emit VotesExecuted(BlackTimeLibrary.epochStart(block.timestamp), tokenIds.length);
     }
 
 
@@ -230,13 +236,5 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
         }
 
         return topNPools;
-    }
-
-    function _calculateWeights(uint256[] memory baseWeights, uint256 votingPower) internal pure returns (uint256[] memory) {
-        uint256[] memory adjustedWeights = new uint256[](baseWeights.length);
-        for (uint256 i = 0; i < baseWeights.length; i++) {
-            adjustedWeights[i] = baseWeights[i] * votingPower;
-        }
-        return adjustedWeights;
     }
 }
