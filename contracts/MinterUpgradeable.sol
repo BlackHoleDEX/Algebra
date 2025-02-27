@@ -163,8 +163,8 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
         uint blackSupply = _blackTotal + _superMassiveBonus;
         uint circulatingBlack = blackSupply - veBlackSupply;
         
-        uint rebase = ((_weeklyMint * circulatingBlack) /blackSupply)*((circulatingBlack/(2*blackSupply)));
-        return rebase;
+        uint256 rebaseAmount = ((_weeklyMint * circulatingBlack) / blackSupply) * (circulatingBlack) / (2 * blackSupply);
+        return rebaseAmount;
     }
     
     function nudge() external {
