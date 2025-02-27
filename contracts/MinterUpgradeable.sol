@@ -15,6 +15,7 @@ import { IBlackGovernor } from "./interfaces/IBlackGovernor.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 // codifies the minting rules as per ve(3,3), abstracted from the token to support any token that allows minting
+// 14 increment epochs followed by 52 decrement epochs after which we wil have vote based epochs
 
 contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     
@@ -28,13 +29,15 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
 
     uint public constant MAX_TEAM_RATE = 50; // 5%
     uint256 public constant TAIL_START = 8_969_150 * 1e18; //TAIL EMISSIONS 
-    uint256 public tailEmissionRate = 67;
+    uint256 public tailEmissionRate;
     uint256 public constant NUDGE = 1; //delta added in tail emissions rate after voting
     uint256 public constant MAXIMUM_TAIL_RATE = 100; //maximum tail emissions rate after voting
     uint256 public constant MINIMUM_TAIL_RATE = 1; //maximum tail emissions rate after voting
     uint256 public constant MAX_BPS = 10_000; 
     uint256 public constant WEEKLY_DECAY = 9_900; //for epoch 15 to 66 growth
     uint256 public constant WEEKLY_GROWTH = 10_300; //for epoch 1 to 14 growth
+    uint256 public constant PROPOSAL_INCREASE = 10_100; // 1% increment after the 67th epoch based on proposal
+    uint256 public constant PROPOSAL_DECREASE = 9_900; // 1% increment after the 67th epoch based on proposal
 
     uint public constant WEEK = 1800; // allows minting once per week (reset every Thursday 00:00 UTC)
     uint public weekly; // represents a starting weekly emission of 2.6M BLACK (BLACK has 18 decimals)
@@ -68,13 +71,13 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
 
         _initializer = msg.sender;
         team = msg.sender;
+        tailEmissionRate = 10000;
 
         teamRate = 30; // 300 bps = 3%
 
         EMISSION = 990; //BlackHole:: 
         TAIL_EMISSION = 2;
         REBASEMAX = 300;
-        tailEmissionRate = 67;
 
         _black = IBlack(IVotingEscrow(__ve).token());
         _voter = IVoter(__voter);
@@ -157,17 +160,14 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
         uint _smNFTBalance = IVotingEscrow(_ve).smNFTBalance();
         uint _superMassiveBonus = IVotingEscrow(_ve).calculate_sm_nft_bonus(_smNFTBalance);
 
-        uint numerator = _veTotal + _superMassiveBonus;
-        uint denominator = _blackTotal + _superMassiveBonus;
+        uint veBlackSupply = _veTotal + _smNFTBalance +_superMassiveBonus;
+        uint blackSupply = _blackTotal + _superMassiveBonus;
+        uint circulatingBlack = blackSupply - veBlackSupply;
         
-        uint rebaseShare =((((PRECISION * numerator) / denominator) * numerator) / denominator) / 2;
-        if(rebaseShare >= REBASEMAX){
-            return _weeklyMint * REBASEMAX / PRECISION;
-        }else{
-            return _weeklyMint * rebaseShare / PRECISION;
-        }
+        uint256 rebaseAmount = ((_weeklyMint * circulatingBlack) / blackSupply) * (circulatingBlack) / (2 * blackSupply);
+        return rebaseAmount;
     }
-
+    
     function nudge() external {
         address _epochGovernor = _voterV3.getBlackGovernor();
         require (msg.sender == _epochGovernor);
@@ -175,16 +175,14 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
         require (weekly < TAIL_START);
         uint256 _period = active_period;
         require (!proposals[_period]);
-        uint256 _newRate = tailEmissionRate;
-        uint256 _oldRate = _newRate;
 
-        if (_state != IBlackGovernor.ProposalState.Expired) {
-            if (_state == IBlackGovernor.ProposalState.Succeeded) {
-                _newRate = _oldRate + NUDGE > MAXIMUM_TAIL_RATE ? MAXIMUM_TAIL_RATE : _oldRate + NUDGE;
-            } else {
-                _newRate = _oldRate - NUDGE < MINIMUM_TAIL_RATE ? MINIMUM_TAIL_RATE : _oldRate - NUDGE;
-            }
-            tailEmissionRate = _newRate;
+        if (_state == IBlackGovernor.ProposalState.Succeeded) {
+            tailEmissionRate = PROPOSAL_INCREASE;
+        }
+        else if(_state == IBlackGovernor.ProposalState.Defeated) {
+            tailEmissionRate = PROPOSAL_DECREASE;
+        } else  {
+            tailEmissionRate = 10000;
         }
         proposals[_period] = true;
     }
@@ -199,11 +197,10 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
             active_period = _period;
             uint256 _weekly = weekly;
             uint256 _emission;
-            uint256 _totalSupply = _black.totalSupply();
             bool _tail = _weekly < TAIL_START;
 
             if (_tail) {
-                _emission = (_totalSupply * tailEmissionRate) / MAX_BPS;
+                _emission = (_weekly * tailEmissionRate) / MAX_BPS;
             } else {
                 _emission = _weekly;
                 if (epochCount < 15) {
@@ -213,6 +210,8 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
                 }
                 weekly = _weekly;
             }
+
+            tailEmissionRate = 10000;
 
             uint _rebase = calculate_rebase(_emission);
 

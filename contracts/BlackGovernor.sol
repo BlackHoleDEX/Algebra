@@ -94,4 +94,8 @@ contract BlackGovernor is
         );
         return _cancel(targets, values, calldatas, epochTimeHash);
     }
+
+    function quorum(uint256 blockTimestamp) public view override (L2GovernorVotesQuorumFraction, IGovernor) returns (uint256) {
+        return (token.getsmNFTPastTotalSupply() * quorumNumerator()) / quorumDenominator();
+    }
 }
