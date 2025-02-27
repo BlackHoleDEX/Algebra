@@ -97,13 +97,7 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
     }
 
     /// @notice Executes automated voting at the end of each epoch
-<<<<<<< Updated upstream
-    /// to test again...
-    function executeVotes(uint256 start, uint256 end) external onlyChainlink nonReentrant {
-        require(start < end && end <= tokenIds.length, "Invalid range");
-=======
     function executeVotes() external onlyChainlink nonReentrant {
->>>>>>> Stashed changes
         require(BlackTimeLibrary.isLastHour(block.timestamp), "Not in last hour of epoch");
         require(!hasVotedThisEpoch[BlackTimeLibrary.epochStart(block.timestamp)], "Already executed for this epoch"); // is this needed? either this or the onlychainlink should be sufficient right?
 
