@@ -97,31 +97,35 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
     }
 
     /// @notice Executes automated voting at the end of each epoch
+<<<<<<< Updated upstream
     /// to test again...
     function executeVotes(uint256 start, uint256 end) external onlyChainlink nonReentrant {
         require(start < end && end <= tokenIds.length, "Invalid range");
+=======
+    function executeVotes() external onlyChainlink nonReentrant {
+>>>>>>> Stashed changes
         require(BlackTimeLibrary.isLastHour(block.timestamp), "Not in last hour of epoch");
-        require(!hasVotedThisEpoch[BlackTimeLibrary.epochStart(block.timestamp)], "Already executed for this epoch");
-        require(tokenIds.length > 0, "No auto-voting locks available");
+        require(!hasVotedThisEpoch[BlackTimeLibrary.epochStart(block.timestamp)], "Already executed for this epoch"); // is this needed? either this or the onlychainlink should be sufficient right?
+
         hasVotedThisEpoch[BlackTimeLibrary.epochStart(block.timestamp)] = true;
-        PoolsAndRewards[] memory poolsAndRewards = getRewardsPerVotingPower(topN);
+        PoolsAndRewards[] memory poolsAndRewards = getRewardsPerVotingPower(2);
         address[] memory poolAddresses = new address[](poolsAndRewards.length);
+
         for (uint256 i = 0; i < poolsAndRewards.length; i++) {
             poolAddresses[i] = poolsAndRewards[i].pool;
         }
 
-        uint256[] memory weights = getVoteWeightage(poolsAndRewards);
+        uint256[] memory weights = getVoteWeightage(poolsAndRewards); 
 
-        for (uint256 i = start; i < end; i++) {
+        for (uint256 i = 0; i < tokenIds.length; i++) {
             uint256 lockId = tokenIds[i];
             if (isAutoVotingEnabled[lockId]) {
                 voterV3.vote(lockId, poolAddresses, weights);
             }
         }
 
-        emit VotesExecuted(BlackTimeLibrary.epochStart(block.timestamp), end - start);
+        emit VotesExecuted(BlackTimeLibrary.epochStart(block.timestamp), tokenIds.length);
     }
-
 
     function setOriginalOwner(uint256 tokenId, address owner) external onlyVotingEscrow {
         require(owner != address(0), "Invalid owner address");
