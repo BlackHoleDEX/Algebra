@@ -106,6 +106,7 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
         require(BlackTimeLibrary.isLastHour(block.timestamp), "Not in last hour of epoch");
         require(!hasVotedThisEpoch[BlackTimeLibrary.epochStart(block.timestamp)], "Already executed for this epoch"); // is this needed? either this or the onlychainlink should be sufficient right?
         require(tokenIds.length > 0, "No auto-voting locks available");
+
         hasVotedThisEpoch[BlackTimeLibrary.epochStart(block.timestamp)] = true;
         PoolsAndRewards[] memory poolsAndRewards = getRewardsPerVotingPower(2);
         address[] memory poolAddresses = new address[](poolsAndRewards.length);
@@ -126,7 +127,6 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
 
         emit VotesExecuted(BlackTimeLibrary.epochStart(block.timestamp), tokenIds.length);
     }
-
 
     function setOriginalOwner(uint256 tokenId, address owner) external onlyVotingEscrow {
         require(owner != address(0), "Invalid owner address");

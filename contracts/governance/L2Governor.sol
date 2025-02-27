@@ -211,6 +211,8 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
      */
     function _voteSucceeded(uint256 proposalId) internal view virtual returns (bool);
 
+    function _voteDefeated(uint256 proposalId) internal view virtual returns (bool);
+
     /**
      * @dev Get the voting weight of `account` at a specific `blockTimestamp`, for a vote as described by `params`.
      */
