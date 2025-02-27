@@ -35,6 +35,8 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     uint256 public constant MAX_BPS = 10_000; 
     uint256 public constant WEEKLY_DECAY = 9_900; //for epoch 15 to 66 growth
     uint256 public constant WEEKLY_GROWTH = 10_300; //for epoch 1 to 14 growth
+    uint256 public constant PROPOSAL_INCREASE = 10_100; // 1% increment after the 67th epoch based on proposal
+    uint256 public constant PROPOSAL_DECREASE = 9_900; // 1% increment after the 67th epoch based on proposal
 
     uint public constant WEEK = 1800; // allows minting once per week (reset every Thursday 00:00 UTC)
     uint public weekly; // represents a starting weekly emission of 2.6M BLACK (BLACK has 18 decimals)
@@ -172,15 +174,14 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
         require (weekly < TAIL_START);
         uint256 _period = active_period;
         require (!proposals[_period]);
-        uint256 _newRate = tailEmissionRate;
 
-        if (_state != IBlackGovernor.ProposalState.Expired) {
-            if (_state == IBlackGovernor.ProposalState.Succeeded) {
-                _newRate = 10100;
-            } else {
-                _newRate = 9900;
-            }
-            tailEmissionRate = _newRate;
+        if (_state == IBlackGovernor.ProposalState.Succeeded) {
+            tailEmissionRate = PROPOSAL_INCREASE;
+        }
+        else if(_state == IBlackGovernor.ProposalState.Defeated) {
+            tailEmissionRate = PROPOSAL_DECREASE;
+        } else  {
+            tailEmissionRate = 10000;
         }
         proposals[_period] = true;
     }
