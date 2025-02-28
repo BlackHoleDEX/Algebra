@@ -7,7 +7,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import "./interfaces/IGenesisPoolManager.sol";
-import './interfaces/IRouter01.sol';
+import './interfaces/IRouter.sol';
 import "./interfaces/IVoterV3.sol";
 import "./interfaces/IGauge.sol";
 import "./interfaces/IGenesisPoolBase.sol";
@@ -194,7 +194,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         pairFactory.setGenesisStatus(launchPoolInfo.poolAddress, false);
         IGenesisPool(_genesisPool).approveTokens(router);
 
-        (, , uint liquidity) = IRouter01(router).addLiquidity(launchPoolInfo.nativeToken, launchPoolInfo.fundingToken, launchPoolInfo.stable, launchPoolInfo.nativeDesired, launchPoolInfo.fundingDesired, 0, 0, address(this), block.timestamp + 100);
+        (, , uint liquidity) = IRouter(router).addLiquidity(launchPoolInfo.nativeToken, launchPoolInfo.fundingToken, launchPoolInfo.stable, launchPoolInfo.nativeDesired, launchPoolInfo.fundingDesired, 0, 0, address(this), block.timestamp + 100);
 
         IGenesisPool(_genesisPool).setLiquidity(liquidity);
         IGauge(launchPoolInfo.gaugeAddress).setGenesisPool(_genesisPool);

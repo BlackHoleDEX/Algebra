@@ -15,7 +15,7 @@ import '../interfaces/IVoter.sol';
 import '../interfaces/IVotingEscrow.sol';
 import '../../contracts/Pair.sol';
 import '../interfaces/IVoterV3.sol';
-import '../interfaces/IRouter01.sol';
+import '../interfaces/IRouter.sol';
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
@@ -136,7 +136,7 @@ contract BlackholePairAPIV2 is Initializable {
     IPairFactory public pairFactory;
     IVoter public voter;
     IVoterV3 public voterV3;
-    IRouter01 public routerV2;
+    IRouter public routerV2;
 
     address public underlyingToken;
 
@@ -156,7 +156,7 @@ contract BlackholePairAPIV2 is Initializable {
         voter = IVoter(_voter);
         voterV3 = IVoterV3(_voter);
 
-        routerV2 = IRouter01(_router);
+        routerV2 = IRouter(_router);
 
         pairFactory = IPairFactory(voter.factories()[0]);
         underlyingToken = IVotingEscrow(voter._ve()).token();

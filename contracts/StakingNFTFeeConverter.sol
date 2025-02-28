@@ -3,7 +3,7 @@ pragma solidity 0.8.13;
 
 import './libraries/Math.sol';
 import './interfaces/IERC20.sol';
-import './interfaces/IRouter01.sol';
+import './interfaces/IRouter.sol';
 import './interfaces/IMasterchef.sol';
 
 import "hardhat/console.sol";
@@ -33,7 +33,7 @@ contract StakingNFTFeeConverter  {
 
     mapping(address => bool) public isToken;
     mapping(address => uint256) internal tokenToPosition;
-    mapping(address => IRouter01.route) public tokenToRoutes;
+    mapping(address => IRouter.route) public tokenToRoutes;
     mapping(address => bool) public isKeeper;
 
     event StakingReward(uint256 _timestamp, uint256 _wbnbAmount);
@@ -89,8 +89,8 @@ contract StakingNFTFeeConverter  {
     }
 
     ///@notice swap any token. Used if SwapError() is emitted 
-    function swapManual(uint amountIn,uint amountOutMin, IRouter01.route[] calldata _routes,uint deadline) external keeper returns (uint[] memory amounts) {
-        amounts = IRouter01(router).swapExactTokensForTokens(amountIn, amountOutMin, _routes, address(this), deadline);
+    function swapManual(uint amountIn,uint amountOutMin, IRouter.route[] calldata _routes,uint deadline) external keeper returns (uint[] memory amounts) {
+        amounts = IRouter(router).swapExactTokensForTokens(amountIn, amountOutMin, _routes, address(this), deadline);
     }
 
 
@@ -111,7 +111,7 @@ contract StakingNFTFeeConverter  {
         address _token;
         uint256 i;
 
-        IRouter01.route[] memory _routes = new IRouter01.route[](1);
+        IRouter.route[] memory _routes = new IRouter.route[](1);
 
         for(i=0; i < tokens.length; i++){
             _token = tokens[i];
@@ -121,7 +121,7 @@ contract StakingNFTFeeConverter  {
             
                 _safeApprove(_token, router, 0);
                 _safeApprove(_token, router, _balance);
-                try IRouter01(router).swapExactTokensForTokens(_balance, 1, _routes, address(this), block.timestamp){}
+                try IRouter(router).swapExactTokensForTokens(_balance, 1, _routes, address(this), block.timestamp){}
                 catch{
                     emit SwapError(_token, _balance, block.timestamp);
                 }             
@@ -161,7 +161,7 @@ contract StakingNFTFeeConverter  {
         require(_token0 != address(0));
         require(_token1 != address(0));
 
-        IRouter01.route memory _routes;
+        IRouter.route memory _routes;
 
         if(_token0 != wbnb && isToken[_token0] == false){
             _routes.from = _token0;
@@ -208,7 +208,7 @@ contract StakingNFTFeeConverter  {
 
     }
 
-    function addToken(address token, IRouter01.route memory routes) external onlyOwner {
+    function addToken(address token, IRouter.route memory routes) external onlyOwner {
         require(token != address(0));
         require(isToken[token] == false);
         isToken[token] = true;
@@ -219,7 +219,7 @@ contract StakingNFTFeeConverter  {
 
 
 
-    function setRoutesFor(address token, IRouter01.route memory routes) external onlyOwner {
+    function setRoutesFor(address token, IRouter.route memory routes) external onlyOwner {
         require(token != address(0));
         require(isToken[token] == true);
         require(routes.from == token);
