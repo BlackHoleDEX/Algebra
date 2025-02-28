@@ -30,6 +30,8 @@ async function main() {
 
     await dsFactory.setFeeDiscountRegistry(feeDiscountRegistry.target);
 
+    await dsFactory.setSecurityRegistry(secRegistry.target);
+
     const factory = await hre.ethers.getContractAt('IAlgebraFactory', deploysData.factory)
 
     await factory.setDefaultPluginFactory(dsFactory.target)
