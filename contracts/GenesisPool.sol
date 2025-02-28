@@ -134,7 +134,6 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
     }
 
     function depositToken(address spender, uint256 amount) external onlyManager returns (bool) {
-        require(amount > 0, "0 amt");
         require(poolStatus == PoolStatus.PRE_LISTING || poolStatus == PoolStatus.PRE_LAUNCH, "!= status");
 
         uint256 _amount = allocationInfo.proposedFundingAmount - allocationInfo.allocatedFundingAmount;
@@ -150,9 +149,9 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
         userDeposits[spender] = userDeposits[spender] + _amount;
         totalDeposits += _amount;
 
-        uint256 nativeAmount = _getNativeTokenAmount(amount);
+        uint256 nativeAmount = _getNativeTokenAmount(totalDeposits);
         allocationInfo.allocatedFundingAmount += _amount;
-        allocationInfo.allocatedNativeAmount += nativeAmount;
+        allocationInfo.allocatedNativeAmount = nativeAmount;
 
         IAuction(auction).purchased(nativeAmount);
 

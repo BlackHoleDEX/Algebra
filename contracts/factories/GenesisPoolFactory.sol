@@ -43,6 +43,10 @@ contract GenesisPoolFactory is IGenesisPoolFactory, OwnableUpgradeable {
         return genesisPools.length;
     }
 
+    function removeGenesisPool(address nativeToken) external onlyManager {
+        getGenesisPool[nativeToken] = address(0);
+    }
+
     function createGenesisPool(address tokenOwner, address nativeToken, address fundingToken) external onlyManager returns (address genesisPool) {
         require(nativeToken != address(0), "0x"); 
         require(getGenesisPool[nativeToken] == address(0), "exists");

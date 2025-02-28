@@ -44,13 +44,17 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
     using SafeERC20 for IERC20;
 
     mapping(address => mapping(address => bool)) public whiteListedTokensToUser; 
-    address[] public proposedTokens;
+    address[] public nativeTokens;
     
     event WhiteListedTokenToUser(address proposedToken, address tokenOwner);
     event DespositedToken(address genesisPool, address sender, uint256 amount);
     modifier Governance() {
         require(IPermissionsRegistry(permissionRegistory).hasRole("GOVERNANCE",msg.sender), 'GOVERNANCE');
         _;
+    }
+
+    function _checkGovernance() internal view returns (bool) {
+        return IPermissionsRegistry(permissionRegistory).hasRole("GOVERNANCE",msg.sender);
     }
 
     constructor() {}
@@ -80,22 +84,21 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
 
     function depositNativeToken(address nativeToken, uint auctionIndex, GenesisInfo calldata genesisPoolInfo, TokenAllocation calldata allocationInfo) external nonReentrant returns(address genesisPool) {
         address _sender = msg.sender;
-        require(whiteListedTokensToUser[nativeToken][_sender] || _sender == owner(), "!listed");
+        require(whiteListedTokensToUser[nativeToken][_sender] || _checkGovernance(), "!listed");
         require(allocationInfo.proposedNativeAmount > 0, "0 native");
         require(allocationInfo.proposedFundingAmount > 0, "0 funding");
         require(genesisFactory.getGenesisPool(nativeToken) == address(0), "exists");
 
         address _fundingToken = genesisPoolInfo.fundingToken;
-        require(tokenHandler.isConnector(_fundingToken), "connector !=");
+        require(tokenHandler.isConnector(_fundingToken), "conn !=");
         bool _stable = genesisPoolInfo.stable;
-        require(pairFactory.getPair(nativeToken, _fundingToken, _stable) == address(0), "existing pair");
+        require(pairFactory.getPair(nativeToken, _fundingToken, _stable) == address(0), "exist pair");
 
         require(genesisPoolInfo.duration >= MIN_DURATION && genesisPoolInfo.threshold >= MIN_THRESHOLD && genesisPoolInfo.startPrice > 0, "genesis info");
-        require(genesisPoolInfo.supplyPercent >= 0 && genesisPoolInfo.supplyPercent <= 100, "inavlid supplyPercent");
+        require(genesisPoolInfo.supplyPercent > 0 && genesisPoolInfo.supplyPercent <= 10000, "supplyPercent"); 
         
-        require(genesisPoolInfo.nativeToken == nativeToken, "unequal protocol token");
-        // require(bytes(protocolInfo.tokenName).length > 0 && bytes(protocolInfo.tokenTicker).length > 0 && bytes(protocolInfo.protocolBanner).length > 0 && bytes(protocolInfo.protocolDesc).length > 0, "protocol info");
-
+        require(genesisPoolInfo.nativeToken == nativeToken, "!= nativeToken");
+        
         genesisPool = genesisFactory.createGenesisPool(_sender, nativeToken, _fundingToken);
         require(genesisPool != address(0), "0x");
 
@@ -105,7 +108,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         auction = auction == address(0) ? auctionFactory.auctions(0) : auction;
         IGenesisPool(genesisPool).setAuction(auction);
 
-        proposedTokens.push(nativeToken);
+        nativeTokens.push(nativeToken); 
         IGenesisPool(genesisPool).setGenesisPoolInfo(genesisPoolInfo, allocationInfo);
     }
 
@@ -115,6 +118,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         require(genesisPool != address(0), '0x pool');
 
         IGenesisPool(genesisPool).rejectPool();
+        genesisFactory.removeGenesisPool(nativeToken);
         
     }
 
@@ -150,12 +154,12 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
     function checkAtEpochFlip() external nonReentrant{
         require(epochController == msg.sender, "invalid access");
 
-        uint256 _proposedTokensCnt = proposedTokens.length;
+        uint256 _proposedTokensCnt = nativeTokens.length;
         uint256 i;
         address _genesisPool;
         PoolStatus _poolStatus;
         for(i = 0; i < _proposedTokensCnt; i++){
-            _genesisPool = genesisFactory.getGenesisPool(proposedTokens[i]);
+            _genesisPool = genesisFactory.getGenesisPool(nativeTokens[i]);
             _poolStatus = IGenesisPool(_genesisPool).poolStatus();
 
             if(_poolStatus == PoolStatus.PRE_LISTING && IGenesisPool(_genesisPool).eligbleForPreLaunchPool()){
@@ -213,12 +217,12 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
     function checkBeforeEpochFlip() external nonReentrant{
         require(epochController == msg.sender, "invalid access");
 
-        uint256 _proposedTokensCnt = proposedTokens.length;
+        uint256 _proposedTokensCnt = nativeTokens.length;
         uint256 i;
         address _genesisPool;
         PoolStatus _poolStatus;
         for(i = 0; i < _proposedTokensCnt; i++){
-            _genesisPool = genesisFactory.getGenesisPool(proposedTokens[i]);
+            _genesisPool = genesisFactory.getGenesisPool(nativeTokens[i]);
             _poolStatus = IGenesisPool(_genesisPool).poolStatus();
 
             if(_poolStatus == PoolStatus.PRE_LISTING && IGenesisPool(_genesisPool).eligbleForDisqualify()){
@@ -236,8 +240,8 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         IGenesisPool(_genesisPool).setAuction(_auction);
     }
 
-    function getAllProposedTokens() external view returns (address[] memory) {
-        return proposedTokens;
+    function getAllNaitveTokens() external view returns (address[] memory) {
+        return nativeTokens;
     }
 
     function setEpochController(address _epochController) external Governance {

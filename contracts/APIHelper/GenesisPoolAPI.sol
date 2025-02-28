@@ -48,7 +48,7 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
 
         genesisPools = new GenesisData[](_amounts);
 
-        address[] memory proposedTokens = genesisManager.getAllProposedTokens();
+        address[] memory proposedTokens = genesisManager.getAllNaitveTokens();
         
         uint i = _offset;
         hasNext = true;
