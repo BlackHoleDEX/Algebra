@@ -12,7 +12,10 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Timers.sol";
 import "@openzeppelin/contracts/governance/IGovernor.sol";
-import "@openzeppelin/contracts/governance/utils/IVotes.sol";
+import {IBlackHoleVotes} from "../interfaces/IBlackHoleVotes.sol";
+import {IMinter} from "../interfaces/IMinter.sol";
+
+import {BlackTimeLibrary} from "../libraries/BlackTimeLibrary.sol";
 
 
 
@@ -40,6 +43,7 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
         keccak256("ExtendedBallot(uint256 proposalId,uint8 support,string reason,bytes params)");
 
     struct ProposalCore {
+        address proposer;
         Timers.Timestamp voteStart;
         Timers.Timestamp voteEnd;
         bool executed;
@@ -47,10 +51,13 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
     }
 
     string private _name;
+    address public minter;
+    uint256 public proposalIdMain; //TODO:: Abhijeet remove this and make it local as used for testing
     
     ProposalState public status;
+    bytes32 public epochStart;  //TODO:: Abhijeet remove this and make it local as used for testing
 
-    mapping(uint256 => ProposalCore) private _proposals;
+    mapping(uint256 => ProposalCore) public _proposals;
 
     // This queue keeps track of the governor operating on itself. Calls to functions protected by the
     // {onlyGovernance} modifier needs to be whitelisted in this queue. Whitelisting is set in {_beforeExecute},
@@ -81,7 +88,8 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
     /**
      * @dev Sets the value for {name} and {version}
      */
-    constructor(string memory name_) EIP712(name_, version()) {
+    constructor(string memory name_, address minter_) EIP712(name_, version()) {
+        minter = minter_;
         _name = name_;
     }
 
@@ -140,9 +148,13 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
         address[] memory targets,
         uint256[] memory values,
         bytes[] memory calldatas,
-        bytes32 descriptionHash
+        bytes32 epochTimeHash
     ) public pure virtual override returns (uint256) {
-        return uint256(keccak256(abi.encode(targets, values, calldatas, descriptionHash)));
+        return uint256(keccak256(abi.encode(targets, values, calldatas, epochTimeHash)));
+    }
+
+    function proposalProposer(uint256 proposalId) public view virtual override returns (address) {
+        return _proposals[proposalId].proposer;
     }
 
     /**
@@ -174,11 +186,13 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
         if (deadline >= block.timestamp) {
             return ProposalState.Active;
         }
-
+        // quorum reached is basically a percentage check which is of the number specifie in constructor of the L2GovernorVotesQuorumFraction(4) // 4%
         if (_quorumReached(proposalId) && _voteSucceeded(proposalId)) {
             return ProposalState.Succeeded;
-        } else {
+        } else if (_quorumReached(proposalId) && _voteDefeated(proposalId)) {
             return ProposalState.Defeated;
+        } else {
+            return ProposalState.Expired;
         }
     }
 
@@ -212,6 +226,8 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
      * @dev Is the proposal successful or not.
      */
     function _voteSucceeded(uint256 proposalId) internal view virtual returns (bool);
+
+    function _voteDefeated(uint256 proposalId) internal view virtual returns (bool);
 
     /**
      * @dev Get the voting weight of `account` at a specific `blockTimestamp`, for a vote as described by `params`.
@@ -259,13 +275,18 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
             "Governor: proposer votes below proposal threshold"
         );
 
-        uint256 proposalId = hashProposal(targets, values, calldatas, keccak256(bytes(description)));
+        require(targets.length == 1, "GovernorSimple: only one target allowed");
+        require(address(targets[0]) == minter, "GovernorSimple: only minter allowed");
+        require(calldatas.length == 1, "GovernorSimple: only one calldata allowed");
+        require(bytes4(calldatas[0]) == IMinter.nudge.selector, "GovernorSimple: only nudge allowed");
 
-        require(targets.length == values.length, "Governor: invalid proposal length");
-        require(targets.length == calldatas.length, "Governor: invalid proposal length");
+        epochStart = bytes32(BlackTimeLibrary.epochNext(block.timestamp));
+
+        proposalIdMain = hashProposal(targets, values, calldatas, epochStart);
+
         require(targets.length > 0, "Governor: empty proposal");
 
-        ProposalCore storage proposal = _proposals[proposalId];
+        ProposalCore storage proposal = _proposals[proposalIdMain];
         require(proposal.voteStart.isUnset(), "Governor: proposal already exists");
 
         uint64 start = block.timestamp.toUint64() + votingDelay().toUint64();
@@ -273,9 +294,12 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
 
         proposal.voteStart.setDeadline(start);
         proposal.voteEnd.setDeadline(deadline);
+        proposal.proposer = _msgSender();
+
+        _proposals[proposalIdMain] = proposal;
 
         emit ProposalCreated(
-            proposalId,
+            proposalIdMain,
             _msgSender(),
             targets,
             values,
@@ -283,10 +307,10 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
             calldatas,
             start,
             deadline,
-            description
+            ""
         );
 
-        return proposalId;
+        return proposalIdMain;
     }
 
     /**
@@ -296,22 +320,22 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
         address[] memory targets,
         uint256[] memory values,
         bytes[] memory calldatas,
-        bytes32 descriptionHash
+        bytes32 epochTimeHash
     ) public payable virtual override returns (uint256) {
-        uint256 proposalId = hashProposal(targets, values, calldatas, descriptionHash);
+        uint256 proposalId = hashProposal(targets, values, calldatas, epochTimeHash);
 
         status = state(proposalId);
         require(
-            status == ProposalState.Succeeded || status == ProposalState.Queued,
-            "Governor: proposal not successful"
+            status == ProposalState.Succeeded || status == ProposalState.Defeated || status == ProposalState.Expired,
+            "Governor: proposal not successful or defeated"
         );
         _proposals[proposalId].executed = true;
 
         emit ProposalExecuted(proposalId);
 
-        _beforeExecute(proposalId, targets, values, calldatas, descriptionHash);
-        _execute(proposalId, targets, values, calldatas, descriptionHash);
-        _afterExecute(proposalId, targets, values, calldatas, descriptionHash);
+        _beforeExecute(proposalId, targets, values, calldatas, epochTimeHash);
+        _execute(proposalId, targets, values, calldatas, epochTimeHash);
+        _afterExecute(proposalId, targets, values, calldatas, epochTimeHash);
 
         return proposalId;
     }
@@ -379,9 +403,9 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
         address[] memory targets,
         uint256[] memory values,
         bytes[] memory calldatas,
-        bytes32 descriptionHash
+        bytes32 epochTimeHash
     ) internal virtual returns (uint256) {
-        uint256 proposalId = hashProposal(targets, values, calldatas, descriptionHash);
+        uint256 proposalId = hashProposal(targets, values, calldatas, epochTimeHash);
         ProposalState currentStatus = state(proposalId);
 
         require(
@@ -676,7 +700,12 @@ abstract contract L2GovernorCountingSimple is L2Governor {
     function _voteSucceeded(uint256 proposalId) internal view virtual override returns (bool) {
         ProposalVote storage proposalvote = _proposalVotes[proposalId];
 
-        return proposalvote.forVotes > proposalvote.againstVotes;
+        return proposalvote.forVotes > proposalvote.againstVotes && proposalvote.forVotes > proposalvote.abstainVotes;
+    }
+
+    function _voteDefeated(uint256 proposalId) internal view virtual override returns (bool) {
+        ProposalVote storage proposalVote = _proposalVotes[proposalId];
+        return proposalVote.againstVotes > proposalVote.forVotes && proposalVote.againstVotes > proposalVote.abstainVotes;
     }
 
     /**
@@ -716,9 +745,9 @@ abstract contract L2GovernorCountingSimple is L2Governor {
  * _Available since v4.3._
  */
 abstract contract L2GovernorVotes is L2Governor {
-    IVotes public immutable token;
+    IBlackHoleVotes public immutable token;
 
-    constructor(IVotes tokenAddress) {
+    constructor(IBlackHoleVotes tokenAddress) {
         token = tokenAddress;
     }
 
@@ -730,7 +759,7 @@ abstract contract L2GovernorVotes is L2Governor {
         uint256 blockTimestamp,
         bytes memory /*params*/
     ) internal view virtual override returns (uint256) {
-        return token.getPastVotes(account, blockTimestamp);
+        return token.getsmNFTPastVotes(account, blockTimestamp);
     }
 }
 
@@ -778,7 +807,7 @@ abstract contract L2GovernorVotesQuorumFraction is L2GovernorVotes {
      * @dev Returns the quorum for a block timestamp, in terms of number of votes: `supply * numerator / denominator`.
      */
     function quorum(uint256 blockTimestamp) public view virtual override returns (uint256) {
-        return (token.getPastTotalSupply(blockTimestamp) * quorumNumerator()) / quorumDenominator();
+        return (token.getsmNFTPastTotalSupply() * quorumNumerator()) / quorumDenominator();
     }
 
     /**
@@ -814,40 +843,5 @@ abstract contract L2GovernorVotesQuorumFraction is L2GovernorVotes {
         _quorumNumerator = newQuorumNumerator;
 
         emit QuorumNumeratorUpdated(oldQuorumNumerator, newQuorumNumerator);
-    }
-}
-
-abstract contract BlackGovernor is L2Governor, L2GovernorCountingSimple, L2GovernorVotes,  L2GovernorVotesQuorumFraction {
-    address public team;
-    uint256 public constant MAX_PROPOSAL_NUMERATOR = 50; // max 5%
-    uint256 public constant PROPOSAL_DENOMINATOR = 1000;
-    uint256 public proposalNumerator = 2; // start at 0.02%
-
-    // _quorum = 10 -> 10%
-    constructor(IVotes _ve, uint _quorum) L2Governor("Black Governor") L2GovernorVotes(_ve) L2GovernorVotesQuorumFraction(_quorum) {
-        team = msg.sender;
-    }
-
-    function votingDelay() public pure override(IGovernor) returns (uint256) {
-        return 15 minutes; // 1 block
-    }
-
-    function votingPeriod() public pure override(IGovernor) returns (uint256) {
-        return 1 weeks;
-    }
-
-    function setTeam(address newTeam) external {
-        require(msg.sender == team, "not team");
-        team = newTeam;
-    }
-
-    function setProposalNumerator(uint256 numerator) external {
-        require(msg.sender == team, "not team");
-        require(numerator <= MAX_PROPOSAL_NUMERATOR, "numerator too high");
-        proposalNumerator = numerator;
-    }
-
-    function proposalThreshold() public view override(L2Governor) returns (uint256) {
-        return (token.getPastTotalSupply(block.timestamp) * proposalNumerator) / PROPOSAL_DENOMINATOR;
     }
 }

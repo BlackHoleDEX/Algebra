@@ -12,6 +12,7 @@ import './interfaces/IPairInfo.sol';
 import './interfaces/IPairFactory.sol';
 import './interfaces/IVotingEscrow.sol';
 import './interfaces/IPermissionsRegistry.sol';
+import "./interfaces/IAutomatedVotingManager.sol";
 import './interfaces/ITokenHandler.sol';
 // import './interfaces/IAlgebraFactory.sol';
 // import "hardhat/console.sol";
@@ -28,6 +29,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     bool internal initflag;
 
     address public _ve;                                         // the ve token that governs these contracts
+    address public avm;
     address[] internal _factories;                                 // Array with all the pair factories
     address internal base;                                      // $the token
     address[] internal _gaugeFactories;                            // array with all the gauge factories
@@ -35,6 +37,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     address public minter;                                      // minter mints $the each epoch
     address public permissionRegistry;                          // registry to check accesses
     address[] public pools;                                     // all pools viable for incentives
+    address public blackGoverner;
     address public epochOwner;
     address public genesisManager;
     address public tokenHandler;                     
@@ -89,12 +92,14 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
     constructor() {}
 
-    function initialize(address __ve, address _pairFactory, address  _gaugeFactory, address _bribes, address _tokenHandler) initializer public {
+    // function initialize(address __ve, address _pairFactory, address  _gaugeFactory, address _bribes, address _tokenHandler) initializer public {
+    function initialize(address __ve, address _pairFactory, address  _gaugeFactory, address _bribes) initializer public {
         __Ownable_init();
         __ReentrancyGuard_init();
 
         _ve = __ve;
         base = IVotingEscrow(__ve).token();
+        avm = IVotingEscrow(__ve).avm();
 
         _factories.push(_pairFactory);
         isFactory[_pairFactory] = true;
@@ -106,7 +111,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
         minter = msg.sender;
         permissionRegistry = msg.sender;
-        tokenHandler = _tokenHandler;
+        // tokenHandler = _tokenHandler;
         genesisManager = address(0);
 
         maxVotingNum = 30;
@@ -191,6 +196,16 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         bribefactory = _bribeFactory;
     }
 
+
+    function getBlackGovernor() external view returns (address){
+        return blackGoverner;
+    }
+
+    function setBlackGovernor(address _blackGovernor) external onlyOwner {
+        require(_blackGovernor != address(0));
+        blackGoverner = _blackGovernor;
+    }
+
     function getAutomationRegistry() external view returns (address){
         return epochOwner;
     }
@@ -244,6 +259,10 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     function setMaxVotingNum(uint256 _maxVotingNum) external VoterAdmin {
         require (_maxVotingNum >= MIN_VOTING_NUM, "low voting");
         maxVotingNum = _maxVotingNum;
+    }
+
+    function setAVM() external VoterAdmin {
+        avm = IVotingEscrow(_ve).avm();
     }
     
     function addFactory(address _pairFactory, address _gaugeFactory) external VoterAdmin {
@@ -413,8 +432,8 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         require(_poolVote.length == _weights.length, "weights length !=");
         require(_poolVote.length <= maxVotingNum, "pool length exceeds maxVotingNum");
         uint256 _timestamp = block.timestamp;
-        if ((_timestamp > BlackTimeLibrary.epochVoteEnd(_timestamp)) && !ITokenHandler(tokenHandler).isWhitelistedNFT(_tokenId)){
-            revert("not whitelisted");
+        if ((_timestamp > BlackTimeLibrary.epochVoteEnd(_timestamp)) && !ITokenHandler(tokenHandler).isWhitelistedNFT(_tokenId) && msg.sender != avm){
+            revert("not whitelisted or avm");
         }
         _vote(_tokenId, _poolVote, _weights);
         lastVoted[_tokenId] = epochTimestamp() + 1;

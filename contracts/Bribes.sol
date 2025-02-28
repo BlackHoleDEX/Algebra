@@ -4,6 +4,7 @@ pragma solidity 0.8.13;
 import "./interfaces/IMinter.sol";
 import "./interfaces/IVoter.sol";
 import "./interfaces/IVotingEscrow.sol";
+import {IAutomatedVotingManager} from "./interfaces/IAutomatedVotingManager.sol";
 import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -37,6 +38,7 @@ contract Bribe is ReentrancyGuard {
     address public minter;
     address public immutable ve;
     address public owner;
+    address public avm; // does it need to be immutable?
 
     string public TYPE;
 
@@ -64,6 +66,7 @@ contract Bribe is ReentrancyGuard {
         firstBribeTimestamp = 0;
         ve = IVoter(_voter)._ve();
         minter = IVoter(_voter).minter();
+        avm = IVotingEscrow(ve).avm();
         require(minter != address(0));
         owner = _owner;
         TYPE = _type;
@@ -253,8 +256,11 @@ contract Bribe is ReentrancyGuard {
 
     /// @notice Claim the TOKENID rewards
     function getReward(uint256 tokenId, address[] memory tokens) external nonReentrant  {
+        address _owner = IVotingEscrow(ve).ownerOf(tokenId);
+        if(_owner == avm) {
+            _owner = IAutomatedVotingManager(avm).originalOwner(tokenId);
+        }
         require(msg.sender == voter);
-         address _owner = IVotingEscrow(ve).ownerOf(tokenId);
         uint256 _length = tokens.length;
         for (uint256 i = 0; i < _length; i++) {
             uint256 _reward = earned(tokenId, tokens[i]);
@@ -274,7 +280,6 @@ contract Bribe is ReentrancyGuard {
     function notifyRewardAmount(address _rewardsToken, uint256 reward) external nonReentrant {
         require(isRewardToken[_rewardsToken], "reward token not verified");
         IERC20(_rewardsToken).safeTransferFrom(msg.sender,address(this),reward);
-
         uint256 epochStart = BlackTimeLibrary.epochStart(block.timestamp);
         tokenRewardsPerEpoch[_rewardsToken][epochStart] += reward;
         emit RewardAdded(_rewardsToken, reward, epochStart);
@@ -333,6 +338,12 @@ contract Bribe is ReentrancyGuard {
     function setMinter(address _minter) external onlyAllowed {
         require(_minter != address(0));
         minter = _minter;
+    }
+
+    /// @notice Set a new AVM 
+    function setAVM(address _avm) external onlyAllowed {
+        require(_avm!=address(0));
+        avm = _avm;
     }
 
     /// @notice Set a new Owner

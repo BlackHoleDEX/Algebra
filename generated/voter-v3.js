@@ -1247,6 +1247,26 @@ const voterV3Abi = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "setAVM",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_blackGovernor",
+        "type": "address"
+      }
+    ],
+    "name": "setBlackGovernor",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",

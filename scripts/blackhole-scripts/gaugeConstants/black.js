@@ -306,4 +306,4 @@ const blackAbi =[
   }
 ]
 
-module.exports = { blackAbi, blackAddress };
+module.exports = { blackAbi, blackAddress };

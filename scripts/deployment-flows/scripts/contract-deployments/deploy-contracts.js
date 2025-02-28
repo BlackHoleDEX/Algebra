@@ -4,7 +4,7 @@ const { permissionsRegistryAbi } = require('../../../../generated/permissions-re
 const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants.js");
 const { blackholePairAPIV2Abi } = require('../../../../generated/blackhole-pair-apiv2');
 const { voterV3Abi } = require('../../../../generated/voter-v3');
-const { minterUpgradeableAbi } = require('../../../../generated/minter-upgradeable');
+const { minterUpgradeableAbi, minterUpgradeableAddress } = require('../../../../generated/minter-upgradeable');
 const { epochControllerAbi } = require('../../../../generated/epoch-controller')
 const { blackAbi } = require('../../../blackhole-scripts/gaugeConstants/black')
 const { votingEscrowAbi } = require('../../../../generated/voting-escrow');
@@ -171,7 +171,7 @@ const deployVotingEscrow = async(blackAddress) =>{
         generateConstantFile("VeArtProxyUpgradeable", veArtProxy.address);
 
         const VotingEscrowContract = await ethers.getContractFactory("VotingEscrow");
-        const veBlack = await VotingEscrowContract.deploy(blackAddress, veArtProxy.address);
+        const veBlack = await VotingEscrowContract.deploy(blackAddress, veArtProxy.address, ZERO_ADDRESS);
         txDeployed = await veBlack.deployed();
         console.log("veBlack Address: ", veBlack.address);
         generateConstantFile("VotingEscrow", veBlack.address);
@@ -193,7 +193,9 @@ const deployVoterV3AndSetInit = async (votingEscrowAddress, pairFactoryAddress, 
         console.log('VoterV3 address: ', VoterV3.address)
         generateConstantFile("VoterV3", VoterV3.address);
 
-        const initializeVoter = await VoterV3._init(permissionRegistryAddress, ownerAddress)
+        const initializeVoter = await VoterV3._init(permissionRegistryAddress, ownerAddress);
+        await initializeVoter.wait();
+
         console.log('VoterV3 init\n', )
         return VoterV3.address;
     } catch (error) {
@@ -371,10 +373,16 @@ const setChainLinkAddress = async (epocControllerAddress, chainlinkAutomationReg
 
 const addBlackToUserAddress = async (minterUpgradableAddress) => {
     try {
+        const accounts = await ethers.getSigners();
+        const owner = accounts[0];
         const minterContract = await ethers.getContractAt(minterUpgradeableAbi, minterUpgradableAddress);
         const amountAdd = BigNumber.from("5000").mul(BigNumber.from("1000000000000000000"));
-        await minterContract.transfer("0xa7243fc6FB83b0490eBe957941a339be4Db11c29", amountAdd);
-        console.log("transfer token successfully\n");
+
+        console.log("owner address", owner.address)
+        // await minterContract.transfer("0xa7243fc6FB83b0490eBe957941a339be4Db11c29", amountAdd);
+        await minterContract.transfer(owner.address, amountAdd);
+        console.log("transfer token successfully");
+
     } catch (error) {
         console.log("error in transfering token: ", error);
         process.exit(1);
@@ -405,6 +413,18 @@ const deployveNFT = async (voterV3Address, rewardsDistributorAddress, gaugeV2Add
     } catch (error) {
         console.log('deployed venftapi error ', error)
         process.exit(1);
+    }
+}
+
+const deployBlackGovernor = async(votingEscrowAddress, minterUpgradableAddress) => {
+    try {
+        const blackGovernorContract = await ethers.getContractFactory("BlackGovernor");
+        const BlackGovernor = await blackGovernorContract.deploy(votingEscrowAddress, minterUpgradableAddress);
+        const txDeployed = await BlackGovernor.deployed();
+        generateConstantFile("BlackGovernor", BlackGovernor.address);
+        console.log('BlackGovernor address: ', BlackGovernor.address);
+    } catch (error) {
+        console.log("error in deploying BlackGovernor: ", error);
     }
 }
 
@@ -555,6 +575,39 @@ const deployGenesisApi = async (genesisManagerAddress, genesisFactoryAddress) =>
     }
 }
 
+const checker = async (routerV2Address, pairFactoryAddress) => {
+
+    try {
+        const RouterContract = await ethers.getContractAt(routerV2Abi, routerV2Address);
+        const PairFactoryContract = await ethers.getContractAt(pairFactoryUpgradeableAbi, pairFactoryAddress);
+
+        const tokenA = addresses[1] < addresses[2] ? addresses[1] : addresses[2];
+        const tokenB = tokenA == addresses[1] ? addresses[2] : addresses[1];
+        const stable = false;
+
+        const tx = await PairFactoryContract.createPair(tokenA, tokenB, stable);
+        const receipt = await tx.wait(); 
+        const event = receipt.events.find(e => e.event === "PairCreated");
+        const deployedPair = event.args.pair;
+
+        const computedPair = await RouterContract.pairFor(tokenA, tokenB, stable);
+    
+        console.log("Deployed Pair:", deployedPair);
+        console.log("Computed Pair:", computedPair);
+
+
+        if (computedPair.toLowerCase() === deployedPair.toLowerCase()) {
+            console.log("✅ Addresses Match!");
+        } else {
+            console.log("❌ Address Mismatch!");
+        }
+
+    } catch (error) {
+        console.log("error genesis pool in genesis factory", error);
+        process.exit(1);
+    }
+}
+
 async function main () {
     accounts = await ethers.getSigners();
     owner = accounts[0];
@@ -630,13 +683,16 @@ async function main () {
     const epochControllerAddress = await deployEpochController(voterV3Address, minterUpgradableAddress);
 
     // set chainlink address
-    await setChainLinkAddress(epochControllerAddress, "0x03eb20259251F324f5b1cba988754656B6BbE96F");
+    // TODO: separate out the setting of chalink address 
+    await setChainLinkAddress(epochControllerAddress, "0xb2C2f24FcC2478f279B6B566419a739FA53c70D3");
 
     //add black to user Address
     await addBlackToUserAddress(minterUpgradableAddress);
 
     //set voterV3 in voting escrow
     await setVoterV3InVotingEscrow(voterV3Address, votingEscrowAddress);
+
+    await deployBlackGovernor(votingEscrowAddress,minterUpgradeableAddress);
 
     await pushDefaultRewardToken(bribeV3Address, blackAddress);
 
@@ -676,42 +732,13 @@ async function main () {
     await addLiquidity(routerV2Address, addresses[0], addresses[1], 100, 100);
     await addLiquidity(routerV2Address, addresses[1], addresses[2], 100, 100);
     await addLiquidity(routerV2Address, addresses[2], addresses[3], 100, 100);
+    await addLiquidity(routerV2Address, addresses[3], addresses[4], 10, 100);
+    await addLiquidity(routerV2Address, addresses[4], addresses[5], 100, 10);
+
+    console.log("DONE ADDING LIQUIDITY");
 
     // create Gauges
     await createGauges(voterV3Address, blackholeV2AbiAddress);
-}
-
-const checker = async (routerV2Address, pairFactoryAddress) => {
-
-    try {
-        const RouterContract = await ethers.getContractAt(routerV2Abi, routerV2Address);
-        const PairFactoryContract = await ethers.getContractAt(pairFactoryUpgradeableAbi, pairFactoryAddress);
-
-        const tokenA = addresses[1] < addresses[2] ? addresses[1] : addresses[2];
-        const tokenB = tokenA == addresses[1] ? addresses[2] : addresses[1];
-        const stable = false;
-
-        const tx = await PairFactoryContract.createPair(tokenA, tokenB, stable);
-        const receipt = await tx.wait(); 
-        const event = receipt.events.find(e => e.event === "PairCreated");
-        const deployedPair = event.args.pair;
-
-        const computedPair = await RouterContract.pairFor(tokenA, tokenB, stable);
-    
-        console.log("Deployed Pair:", deployedPair);
-        console.log("Computed Pair:", computedPair);
-
-
-        if (computedPair.toLowerCase() === deployedPair.toLowerCase()) {
-            console.log("✅ Addresses Match!");
-        } else {
-            console.log("❌ Address Mismatch!");
-        }
-
-    } catch (error) {
-        console.log("error genesis pool in genesis factory", error);
-        process.exit(1);
-    }
 }
 
 main()

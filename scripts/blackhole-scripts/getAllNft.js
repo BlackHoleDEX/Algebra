@@ -8,7 +8,7 @@ async function main () {
     owner = accounts[0];
 
     const voterContract = await ethers.getContractAt(votingEscrowAbi, votingEscrowAddress);
-    const getAllGauge = await voterContract.locked(2);
+    const getAllGauge = await voterContract.balanceOf(owner.address);
     console.log("getAllGauge", getAllGauge)
 }
 

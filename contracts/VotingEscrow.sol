@@ -2,12 +2,13 @@
 pragma solidity 0.8.13;
 
 import {IERC721, IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
-import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {IERC20} from "./interfaces/IERC20.sol";
+import {IBlackHoleVotes} from "./interfaces/IBlackHoleVotes.sol";
 import {IVeArtProxy} from "./interfaces/IVeArtProxy.sol";
 import {IVotingEscrow} from "./interfaces/IVotingEscrow.sol";
 import {IVoterV3} from "./interfaces/IVoterV3.sol";
+import {IAutomatedVotingManager} from "./interfaces/IAutomatedVotingManager.sol";
 
 /// @title Voting Escrow
 /// @notice veNFT implementation that escrows ERC-20 tokens in the form of an ERC-721 NFT
@@ -16,7 +17,7 @@ import {IVoterV3} from "./interfaces/IVoterV3.sol";
 /// @author Modified from Curve (https://github.com/curvefi/curve-dao-contracts/blob/master/contracts/VotingEscrow.vy)
 /// @author Modified from Nouns DAO (https://github.com/withtally/my-nft-dao-project/blob/main/contracts/ERC721Checkpointable.sol)
 /// @dev Vote weight decays linearly over time. Lock time cannot be more than `MAXTIME` (2 years).
-contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
+contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
     enum DepositType {
         DEPOSIT_FOR_TYPE,
         CREATE_LOCK_TYPE,
@@ -90,6 +91,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
     address public voter;
     address public team;
     address public artProxy;
+    address public avm;
     address public burnTokenAddress=0x000000000000000000000000000000000000dEaD;
 
     uint public SMNFT_BONUS = 1000;
@@ -114,11 +116,12 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
 
     /// @notice Contract constructor
     /// @param token_addr `BLACK` token address
-    constructor(address token_addr, address art_proxy) {
+    constructor(address token_addr, address art_proxy, address _avm) {
         token = token_addr;
         voter = msg.sender;
         team = msg.sender;
         artProxy = art_proxy;
+        avm = _avm;
 
         point_history[0].blk = block.number;
         point_history[0].ts = block.timestamp;
@@ -171,7 +174,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
     /// @dev Returns current token URI metadata
     /// @param _tokenId Token ID to fetch URI for.
     function tokenURI(uint _tokenId) external view returns (string memory) {
-        require(idToOwner[_tokenId] != address(0), "Query for nonexistent token");
+        require(idToOwner[_tokenId] != address(0), "Nonexistent token");
         LockedBalance memory _locked = locked[_tokenId];
         return IVeArtProxy(artProxy)._tokenURI(_tokenId,_balanceOfNFT(_tokenId, block.timestamp),_locked.end,uint(int256(_locked.amount)), _locked.isSMNFT);
     }
@@ -312,6 +315,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         require(attachments[_tokenId] == 0 && !voted[_tokenId], "attached");
         // Check requirements
         require(_isApprovedOrOwner(_sender, _tokenId), "caller is not owner nor approved");
+
         // Clear approval. Throws if `_from` is not the current owner
         _clearApproval(_from, _tokenId);
         // Remove NFT. Throws if `_tokenId` is not a valid NFT
@@ -322,6 +326,13 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         _addTokenTo(_to, _tokenId);
         // Set the block of ownership transfer (for Flash NFT protection)
         ownership_change[_tokenId] = block.number;
+
+        if (_to == avm) { 
+            // dont need additional check on originalOwner mapping
+            // Store original owner before AVM takes control
+            // used a setter fucntion and exposed that through the method, any ohter better method 
+            IAutomatedVotingManager(avm).setOriginalOwner(_tokenId, _from);
+        } 
         // Log the transfer
         emit Transfer(_from, _to, _tokenId);
     }
@@ -829,8 +840,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         uint unlock_time = (block.timestamp + _lock_duration) / WEEK * WEEK; // Locktime is rounded down to weeks
 
         require(_value > 0); // dev: need non-zero value
-        require(unlock_time > block.timestamp, 'Can only lock until time in the future');
-        require(unlock_time <= block.timestamp + MAXTIME, 'Voting lock can be 2 years max');
+        require(unlock_time > block.timestamp, 'Can only lock in future');
+        require(unlock_time <= block.timestamp + MAXTIME, '4 years max');
 
         ++tokenId;
         uint _tokenId = tokenId;
@@ -872,7 +883,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         LockedBalance memory _locked = locked[_tokenId];
 
         assert(_value > 0); // dev: need non-zero value
-        require(_locked.amount > 0, 'No existing lock found');
+        require(_locked.amount > 0, 'No lock');
         require(_locked.end > block.timestamp || _locked.isPermanent, 'Cannot add to expired lock. Withdraw');
         
         if (_locked.isSMNFT) smNFTBalance += _value;
@@ -899,7 +910,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         require(_locked.end > block.timestamp, 'Lock expired');
         require(_locked.amount > 0, 'Nothing is locked');
         require(unlock_time > _locked.end, 'Can only increase lock duration');
-        require(unlock_time <= block.timestamp + MAXTIME, 'Voting lock can be 2 years max');
+        require(unlock_time <= block.timestamp + MAXTIME, 'Voting 4 Years Max');
 
         if(isSMNFT) {
             _locked.isPermanent = true;
@@ -1202,6 +1213,11 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         voter = _voter;
     }
 
+    function setAVM(address _avm) external {
+        require(msg.sender == team);
+        avm = _avm;
+    }
+
     function voting(uint _tokenId) external {
         require(msg.sender == voter);
         voted[_tokenId] = true;
@@ -1272,60 +1288,6 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
             block.timestamp
         );
         emit MetadataUpdate(_to);
-    }
-
-
-    /**
-     * @notice split NFT into multiple
-     * @param amounts   % of split
-     * @param _tokenId  NFTs ID
-     */
-    function split(uint[] memory amounts, uint _tokenId) external {
-        //Not supporting split
-        /*
-        // check permission and vote
-        require(attachments[_tokenId] == 0 && !voted[_tokenId], "attached");
-        require(_isApprovedOrOwner(msg.sender, _tokenId), "caller is not owner nor approved");
-
-        // save old data and totalWeight
-        address _to = idToOwner[_tokenId];
-        LockedBalance memory _locked = locked[_tokenId];
-        uint end = _locked.end;
-        uint value = uint(int256(_locked.amount));
-        require(value > 0); // dev: need non-zero value
-        require(!_locked.isSMNFT, "can not split a SM NFT");
-        require(_locked.end > block.timestamp ||  _locked.isPermanent,"lock expired");
-        
-        // reset supply, _deposit_for increase it
-        supply = supply - value;
-
-        uint i;
-        uint totalWeight = 0;
-        for(i = 0; i < amounts.length; i++){
-            totalWeight += amounts[i];
-        }
-
-        // remove old data
-        locked[_tokenId] = LockedBalance(0, 0, false, false);
-        _checkpoint(_tokenId, _locked, LockedBalance(0, 0, false, false));
-        _burn(_tokenId);
-
-        // save end
-        uint unlock_time = end;
-        require(unlock_time > block.timestamp, 'Can only lock until time in the future');
-        require(unlock_time <= block.timestamp + MAXTIME, 'Voting lock can be 2 years max');
-        
-        // mint 
-        uint _value = 0;
-        for(i = 0; i < amounts.length; i++){   
-            ++tokenId;
-            _tokenId = tokenId;
-            _mint(_to, _tokenId);
-            _value = value * amounts[i] / totalWeight;
-            _deposit_for(_tokenId, _value, unlock_time, locked[_tokenId], DepositType.SPLIT_TYPE);
-        }
-        */     
-
     }
 
     /*///////////////////////////////////////////////////////////////
@@ -1428,8 +1390,30 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         return votes;
     }
 
+    function getsmNFTPastVotes(address account, uint timestamp) 
+        public
+        view
+        returns (uint)
+    {
+        uint32 _checkIndex = getPastVotesIndex(account, timestamp);
+        // Sum votes
+        uint[] storage _tokenIds = checkpoints[account][_checkIndex].tokenIds;
+        uint votes = 0;
+        for (uint i = 0; i < _tokenIds.length; i++) {
+            uint tId = _tokenIds[i];
+            if(!locked[tId].isSMNFT) continue;
+            // Use the provided input timestamp here to get the right decay
+            votes = votes + _balanceOfNFT(tId, timestamp);
+        }
+        return votes;
+    }
+
     function getPastTotalSupply(uint256 timestamp) external view returns (uint) {
         return totalSupplyAtT(timestamp);
+    }
+
+    function getsmNFTPastTotalSupply() external view returns (uint) {
+        return smNFTBalance;
     }
 
     /*///////////////////////////////////////////////////////////////
@@ -1474,7 +1458,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
                 // All the same plus _tokenId
                 require(
                     dstRepOld.length + 1 <= MAX_DELEGATES,
-                    "dstRep would have too many tokenIds"
+                    "too many tokenIds"
                 );
                 for (uint i = 0; i < dstRepOld.length; i++) {
                     uint tId = dstRepOld[i];
@@ -1544,7 +1528,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
                 uint ownerTokenCount = ownerToNFTokenCount[owner];
                 require(
                     dstRepOld.length + ownerTokenCount <= MAX_DELEGATES,
-                    "dstRep would have too many tokenIds"
+                    "too many tokenIds"
                 );
                 // All the same
                 for (uint i = 0; i < dstRepOld.length; i++) {
@@ -1610,15 +1594,15 @@ contract VotingEscrow is IERC721, IERC721Metadata, IVotes {
         address signatory = ecrecover(digest, v, r, s);
         require(
             signatory != address(0),
-            "VotingEscrow::delegateBySig: invalid signature"
+            "invalid signature"
         );
         require(
             nonce == nonces[signatory]++,
-            "VotingEscrow::delegateBySig: invalid nonce"
+            "invalid nonce"
         );
         require(
             block.timestamp <= expiry,
-            "VotingEscrow::delegateBySig: signature expired"
+            "signature expired"
         );
         return _delegate(signatory, delegatee);
     }

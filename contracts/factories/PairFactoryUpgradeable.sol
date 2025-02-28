@@ -45,8 +45,8 @@ contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
         feeManager = msg.sender;
         stableFee = 4; // 0.04%
         volatileFee = 18; // 0.18%
-        stakingNFTFee = 300; // 3% of stable/volatileFee
-        MAX_REFERRAL_FEE = 200; // 2%
+        stakingNFTFee = 0; // 0% of stable/volatileFee, we can change it later if needed
+        MAX_REFERRAL_FEE = 0; // 0%
         pairGenerator = _pairGenerator;
     }
 

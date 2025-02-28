@@ -12,6 +12,11 @@ const votingEscrowAbi = [
         "internalType": "address",
         "name": "art_proxy",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_avm",
+        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",
@@ -526,6 +531,19 @@ const votingEscrowAbi = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "avm",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -1021,6 +1039,43 @@ const votingEscrowAbi = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "getsmNFTPastTotalSupply",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "getsmNFTPastVotes",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -1399,6 +1454,19 @@ const votingEscrowAbi = [
     "inputs": [
       {
         "internalType": "address",
+        "name": "_avm",
+        "type": "address"
+      }
+    ],
+    "name": "setAVM",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "_operator",
         "type": "address"
       },
@@ -1495,24 +1563,6 @@ const votingEscrowAbi = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256[]",
-        "name": "amounts",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "split",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
