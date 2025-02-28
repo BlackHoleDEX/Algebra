@@ -21,7 +21,7 @@ async function main () {
   txDeployed = await wrappedbribeFactory.deployed();
   console.log("wrappedbribeFactory: ", wrappedbribeFactory.address)*/
 
-  data = await ethers.getContractFactory("PairFactoryUpgradeable");
+  data = await ethers.getContractFactory("PairFactory");
   pairFactory = await upgrades.deployProxy(data,[], {initializer: 'initialize'});
   txDeployed = await pairFactory.deployed();
   console.log("pairFactory: ", pairFactory.address)

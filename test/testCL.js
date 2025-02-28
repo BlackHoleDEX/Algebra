@@ -95,28 +95,28 @@ describe("Black - Deployment Section", function () {
     });
 
     
-    it("Should deploy GaugeFactoryV2.sol", async function() {
+    it("Should deploy GaugeFactory.sol", async function() {
 
         // deploy
-        data = await ethers.getContractFactory("GaugeFactoryV2");
+        data = await ethers.getContractFactory("GaugeFactory");
         input = [PermissionsRegistry.address]
-        GaugeFactoryV2 = await upgrades.deployProxy(data,input, {initializer: 'initialize'});
+        GaugeFactory = await upgrades.deployProxy(data,input, {initializer: 'initialize'});
 
-        txDeployed = await GaugeFactoryV2.deployed();
-        expect(await GaugeFactoryV2.owner()).to.equal(owner.address);
+        txDeployed = await GaugeFactory.deployed();
+        expect(await GaugeFactory.owner()).to.equal(owner.address);
 
     });
 
-    it("Should deploy GaugeFactoryV2_CL.sol", async function() {
+    it("Should deploy GaugeFactory_CL.sol", async function() {
 
         // deploy
-        data = await ethers.getContractFactory("GaugeFactoryV2_CL");
+        data = await ethers.getContractFactory("GaugeFactory_CL");
         input = [PermissionsRegistry.address, blackDeployer]
-        GaugeFactoryV2_CL = await upgrades.deployProxy(data,input, {initializer: 'initialize'});
+        GaugeFactory_CL = await upgrades.deployProxy(data,input, {initializer: 'initialize'});
 
-        txDeployed = await GaugeFactoryV2_CL.deployed();
-        //console.log("gaugeFactory: ", GaugeFactoryV2_CL.address)
-        expect(await GaugeFactoryV2_CL.owner()).to.equal(owner.address);
+        txDeployed = await GaugeFactory_CL.deployed();
+        //console.log("gaugeFactory: ", GaugeFactory_CL.address)
+        expect(await GaugeFactory_CL.owner()).to.equal(owner.address);
 
     });
 
@@ -125,7 +125,7 @@ describe("Black - Deployment Section", function () {
 
         // deploy
         data = await ethers.getContractFactory("VoterV3");
-        input = [veblack.address, pairFactoryAddress , GaugeFactoryV2.address,BribeFactoryV3.address]
+        input = [veblack.address, pairFactoryAddress , GaugeFactory.address,BribeFactoryV3.address]
         voter = await upgrades.deployProxy(data,input, {initializer: 'initialize'});
 
         txDeployed = await voter.deployed();
@@ -139,7 +139,7 @@ describe("Black - Deployment Section", function () {
         await voter._init([usdc.address, usdt.address], PermissionsRegistry.address, minterAddress)
         expect(await voter.isWhitelisted(usdc.address)).to.equal(true)
         expect(await voter.permissionRegistry()).to.equal(PermissionsRegistry.address)
-        await voter.addFactory(algebraFactoryAddress, GaugeFactoryV2_CL.address)
+        await voter.addFactory(algebraFactoryAddress, GaugeFactory_CL.address)
         expect(await voter.isFactory(algebraFactoryAddress)).to.equal(true)
 
         // bribe factory
@@ -236,7 +236,7 @@ describe("Black - Gauge Section", function () {
         expect(await GaugeExtraRewarder.owner()).to.equal(owner.address);
 
         
-        await GaugeFactoryV2_CL.setGaugeRewarder([gauge.address], [GaugeExtraRewarder.address])
+        await GaugeFactory_CL.setGaugeRewarder([gauge.address], [GaugeExtraRewarder.address])
 
         impersonator = BigHolder
         await hre.network.provider.request({method: "hardhat_impersonateAccount",params: [impersonator]});

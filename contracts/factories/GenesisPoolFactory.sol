@@ -34,13 +34,17 @@ contract GenesisPoolFactory is IGenesisPoolFactory, OwnableUpgradeable {
         voter = _voter;
     }
 
-    function SetGenesisManager(address _genesisManager) external onlyManager {
+    function setGenesisManager(address _genesisManager) external onlyManager {
         emit GenesisManagerChanged(genesisManager, _genesisManager);
         genesisManager = _genesisManager;
     }
 
     function genesisPoolsLength() external view returns (uint256){
         return genesisPools.length;
+    }
+
+    function removeGenesisPool(address nativeToken) external onlyManager {
+        getGenesisPool[nativeToken] = address(0);
     }
 
     function createGenesisPool(address tokenOwner, address nativeToken, address fundingToken) external onlyManager returns (address genesisPool) {

@@ -2,109 +2,94 @@
 pragma solidity 0.8.13;
 
 import '../interfaces/IPairFactory.sol';
+import '../interfaces/IPair.sol';
 import '../interfaces/IPairGenerator.sol';
 
-contract PairFactory is IPairFactory {
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
+contract PairFactory is IPairFactory, OwnableUpgradeable {
+    
     bool public isPaused;
-    address public pauser;
-    address public pendingPauser;
 
     uint256 public stableFee;
     uint256 public volatileFee;
     uint256 public stakingNFTFee;
-    uint256 public MAX_REFERRAL_FEE = 1200; // 12%
+    uint256 public MAX_REFERRAL_FEE; // 12%
     uint256 public constant MAX_FEE = 25; // 0.25%
 
     address public feeManager;
     address public pendingFeeManager;
-    address public dibs;                // referral fee handler
-    address public stakingFeeHandler;   // staking fee handler
+    address public dibs; // referral fee handler
+    address public stakingFeeHandler; // staking fee handler
     address public pairGenerator;
+    address public genesisManager;
 
     mapping(address => mapping(address => mapping(bool => address))) public getPair;
     address[] public allPairs;
-    mapping(address => bool) public isPair; // simplified check if its a pair, given that `stable` flag might not be available in peripherals
-    mapping(address => bool) public isGenesis;
-
-    // address internal _temp0;
-    // address internal _temp1;
-    // bool internal _temp;
+    mapping(address => bool) public isPair; 
+    mapping(address => uint256) public customFees; 
+    mapping(address => bool) public isGenesis; 
 
     event PairCreated(address indexed token0, address indexed token1, bool stable, address pair, uint);
 
-    constructor(address _pairGenerator) {
-        pauser = msg.sender;
+    modifier onlyManager() {
+        require(msg.sender == feeManager);
+        _;
+    }
+
+    constructor() {}
+
+    function initialize(address _pairGenerator) public initializer {
+        __Ownable_init();
         isPaused = false;
         feeManager = msg.sender;
-        pairGenerator = _pairGenerator;
         stableFee = 4; // 0.04%
         volatileFee = 18; // 0.18%
         stakingNFTFee = 0; // 0% of stable/volatileFee, we can change it later if needed
+        MAX_REFERRAL_FEE = 0; // 0%
+        pairGenerator = _pairGenerator;
     }
 
     function allPairsLength() external view returns (uint) {
         return allPairs.length;
     }
 
-    function pairs() external view returns(address[] memory ){
-        return allPairs;
-    }
-
-    function setPauser(address _pauser) external {
-        require(msg.sender == pauser);
-        pendingPauser = _pauser;
-    }
-
-    function acceptPauser() external {
-        require(msg.sender == pendingPauser);
-        pauser = pendingPauser;
-    }
-
     function setPause(bool _state) external {
-        require(msg.sender == pauser);
+        require(msg.sender == owner());
         isPaused = _state;
     }
 
-    function setFeeManager(address _feeManager) external {
-        require(msg.sender == feeManager, 'not fee manager');
+    function setFeeManager(address _feeManager) external onlyManager {
         pendingFeeManager = _feeManager;
     }
 
     function acceptFeeManager() external {
-        require(msg.sender == pendingFeeManager, 'not pending fee manager');
+        require(msg.sender == pendingFeeManager);
         feeManager = pendingFeeManager;
     }
 
-
-    function setStakingFees(uint256 _newFee) external {
-        require(msg.sender == feeManager, 'not fee manager');
+    function setStakingFees(uint256 _newFee) external onlyManager {
         require(_newFee <= 3000);
         stakingNFTFee = _newFee;
     }
 
-    function setStakingFeeAddress(address _feehandler) external {
-        require(msg.sender == feeManager, 'not fee manager');
-        require(_feehandler != address(0), 'addr 0');
+    function setStakingFeeAddress(address _feehandler) external onlyManager {
+        require(_feehandler != address(0));
         stakingFeeHandler = _feehandler;
     }
 
-    function setDibs(address _dibs) external {
-        require(msg.sender == feeManager, 'not fee manager');
-        require(_dibs != address(0), 'address zero');
+    function setDibs(address _dibs) external onlyManager {
+        require(_dibs != address(0));
         dibs = _dibs;
     }
 
-    function setReferralFee(uint256 _refFee) external {
-        require(msg.sender == feeManager, 'not fee manager');
+    function setReferralFee(uint256 _refFee) external onlyManager {
         MAX_REFERRAL_FEE = _refFee;
     }
 
-
-    function setFee(bool _stable, uint256 _fee) external {
-        require(msg.sender == feeManager, 'not fee manager');
-        require(_fee <= MAX_FEE, 'fee too high');
-        require(_fee != 0, 'fee must be nonzero');
+    function setFee(bool _stable, uint256 _fee) external onlyManager {
+        require(_fee <= MAX_FEE, "fee");
+        require(_fee != 0);
         if (_stable) {
             stableFee = _fee;
         } else {
@@ -112,24 +97,52 @@ contract PairFactory is IPairFactory {
         }
     }
 
-    function getFee(bool _stable) public view returns(uint256) {
+    function setCustomFees(address _pairAddress, uint256 _fees) external onlyManager {
+        require(_fees <= MAX_FEE, "ve");
+        require(isPair[_pairAddress], "Inv pair");
+        customFees[_pairAddress] = _fees;
+    }
+
+    function getFee(address _pairAddress, bool _stable) public view returns (uint256) {
+        if (customFees[_pairAddress] > 0) { 
+            return customFees[_pairAddress];
+        }
         return _stable ? stableFee : volatileFee;
     }
 
+    function getIsGenesis(address _pairAddress) public view returns (bool) {
+        return isGenesis[_pairAddress];
+    }
+
+    function setIsGenesis(address _pairAddress, bool status) external onlyManager {
+        require(_pairAddress != address(0) && isPair[_pairAddress], "Inv pair");
+        isGenesis[_pairAddress] = status;
+    }
+
     function pairCodeHash() external view returns (bytes32) {
-        return IPairGenerator(pairGenerator).pairCodeHash(); 
+        return IPairGenerator(pairGenerator).pairCodeHash();
     }
 
     function createPair(address tokenA, address tokenB, bool stable) external returns (address pair) {
-        require(tokenA != tokenB, 'IA'); // Pair: IDENTICAL_ADDRESSES
+        require(tokenA != tokenB, "0"); // Pair: IDENTICAL_ADDRESSES
         (address token0, address token1) = tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
-        require(token0 != address(0), 'ZA'); // Pair: ZERO_ADDRESS
-        require(getPair[token0][token1][stable] == address(0), 'PE'); // Pair: PAIR_EXISTS - single check is sufficient
+        require(token0 != address(0), "0"); // Pair: ZERO_ADDRESS
+        require(getPair[token0][token1][stable] == address(0), "0");
         pair = IPairGenerator(pairGenerator).createPair(token0, token1, stable);
-        getPair[token0][token1][stable] = pair;
-        getPair[token1][token0][stable] = pair; // populate mapping in the reverse direction
+        getPair[tokenA][tokenB][stable] = pair;
+        getPair[tokenB][tokenA][stable] = pair; // Store in reverse direction
         allPairs.push(pair);
         isPair[pair] = true;
+
         emit PairCreated(token0, token1, stable, pair, allPairs.length);
+    }
+
+    function setGenesisManager(address _genesisManager) external onlyManager {
+        genesisManager = _genesisManager;
+    }
+
+    function setGenesisStatus(address _pair, bool status) external {
+        require(msg.sender == genesisManager || msg.sender == feeManager,  "invalid access");
+        isGenesis[_pair] = status;
     }
 }

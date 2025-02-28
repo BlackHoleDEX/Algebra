@@ -28,8 +28,8 @@ contract TokenHandler is  ITokenHandler {
         _;
     }
 
-    modifier GenesisManager() {
-        require(IPermissionsRegistry(permissionRegistry).hasRole("GENESIS_MANAGER", msg.sender), 'GENESIS_MANAGER');
+    modifier GovernanceOrGenesisManager() {
+        require(IPermissionsRegistry(permissionRegistry).hasRole("GENESIS_MANAGER", msg.sender) || IPermissionsRegistry(permissionRegistry).hasRole("GOVERNANCE",msg.sender), 'GOVERNANCE GENESIS_MANAGER');
         _;
     }
 
@@ -45,14 +45,14 @@ contract TokenHandler is  ITokenHandler {
     }
 
     /// @notice Whitelist a token for gauge creation
-    function whitelist(address[] memory _tokens) external GenesisManager {
+    function whitelistTokens(address[] memory _tokens) external {
         uint256 i = 0;
         for(i = 0; i < _tokens.length; i++){
             _whitelist(_tokens[i]);
         }
     }
 
-    function whitelist(address _token) external GenesisManager {
+    function whitelistToken(address _token) external {
         _whitelist(_token);
     }
        
@@ -65,14 +65,14 @@ contract TokenHandler is  ITokenHandler {
     }
     
     /// @notice Blacklist a malicious token
-    function blacklist(address[] memory _token) external GenesisManager {
+    function blacklistTokens(address[] memory _token) external GovernanceOrGenesisManager {
         uint256 i = 0;
         for(i = 0; i < _token.length; i++){
             _blacklist(_token[i]);
         }
     }
 
-    function blacklist(address _token) external GenesisManager {
+    function blacklistToken(address _token) external GovernanceOrGenesisManager {
         _blacklist(_token);
     }
        
@@ -104,7 +104,18 @@ contract TokenHandler is  ITokenHandler {
         emit BlacklistNFT(msg.sender, _tokenId);
     }
 
+    function whitelistConnectors(address[] memory _tokens) external Governance {
+        uint256 i = 0;
+        for(i = 0; i < _tokens.length; i++){
+            _whitelistConnector(_tokens[i]);
+        }
+    }
+
     function whitelistConnector(address _token) external Governance() {
+        _whitelistConnector(_token);
+    }
+
+    function _whitelistConnector(address _token) internal {
         require(isWhitelisted[_token], "out");
         require(_token.code.length > 0, "!contract");
         isConnector[_token] = true;

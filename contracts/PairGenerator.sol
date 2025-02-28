@@ -5,6 +5,8 @@ import './Pair.sol';
 import './interfaces/IPairGenerator.sol';
 
 contract PairGenerator is IPairGenerator {
+
+    event PairCreated(address indexed token0, address indexed token1, bool stable, address pair);
     
     constructor(){}
 
@@ -16,5 +18,6 @@ contract PairGenerator is IPairGenerator {
         address factory = msg.sender;
         bytes32 salt = keccak256(abi.encodePacked(token0, token1, stable)); // notice salt includes stable as well, 3 parameters
         pair = address(new Pair{salt: salt}(factory, token0, token1, stable));
+        emit PairCreated(token0, token1, stable, pair);
     }
 }

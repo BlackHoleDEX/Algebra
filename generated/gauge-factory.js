@@ -1,6 +1,6 @@
-const gaugeFactoryV2Address = "0x584a233A576bD5c207115acAd51779C65E17184A";
+const gaugeFactoryAddress = "0x40F782cC2d89D70937CAa13A96373201BcAf6B3e";
 
-const gaugeFactoryV2Abi = [
+const gaugeFactoryAbi = [
   {
     "inputs": [],
     "stateMutability": "nonpayable",
@@ -94,7 +94,7 @@ const gaugeFactoryV2Abi = [
         "type": "address"
       }
     ],
-    "name": "createGaugeV2",
+    "name": "createGauge",
     "outputs": [
       {
         "internalType": "address",
@@ -303,4 +303,4 @@ const gaugeFactoryV2Abi = [
   }
 ];
 
-module.exports = {gaugeFactoryV2Address, gaugeFactoryV2Abi};
+module.exports = {gaugeFactoryAddress, gaugeFactoryAbi};

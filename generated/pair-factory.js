@@ -1,6 +1,6 @@
-const pairFactoryUpgradeableAddress = "0xa86A68427E2964606E955dC4dBfdaf1b33913419";
+const pairFactoryAddress = "0xFC76adE906177491dF04EB602ADB0914fcCAeaA7";
 
-const pairFactoryUpgradeableAbi = [
+const pairFactoryAbi = [
   {
     "inputs": [],
     "stateMutability": "nonpayable",
@@ -216,7 +216,7 @@ const pairFactoryUpgradeableAbi = [
   },
   {
     "inputs": [],
-    "name": "genesisPool",
+    "name": "genesisManager",
     "outputs": [
       {
         "internalType": "address",
@@ -488,11 +488,11 @@ const pairFactoryUpgradeableAbi = [
     "inputs": [
       {
         "internalType": "address",
-        "name": "_genesisPool",
+        "name": "_genesisManager",
         "type": "address"
       }
     ],
-    "name": "setGenesisPool",
+    "name": "setGenesisManager",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -652,4 +652,4 @@ const pairFactoryUpgradeableAbi = [
   }
 ];
 
-module.exports = {pairFactoryUpgradeableAddress, pairFactoryUpgradeableAbi};
+module.exports = {pairFactoryAddress, pairFactoryAbi};
