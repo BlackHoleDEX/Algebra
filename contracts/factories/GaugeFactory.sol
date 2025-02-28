@@ -4,7 +4,7 @@ pragma solidity 0.8.13;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import '../interfaces/IPermissionsRegistry.sol';
-import '../interfaces/IGaugeFactoryV2.sol';
+import '../interfaces/IGaugeFactory.sol';
 import '../GaugeV2.sol';
 
 
@@ -19,7 +19,7 @@ interface IGauge{
 }
 
 
-contract GaugeFactoryV2 is IGaugeFactory, OwnableUpgradeable {
+contract GaugeFactory is IGaugeFactory, OwnableUpgradeable {
     address public last_gauge;
     address public permissionsRegistry;
 
@@ -45,7 +45,7 @@ contract GaugeFactoryV2 is IGaugeFactory, OwnableUpgradeable {
     }
 
 
-    function createGaugeV2(address _rewardToken,address _ve,address _token,address _distribution, address _internal_bribe, address _external_bribe, bool _isPair, address genesisManager) external returns (address) {
+    function createGauge(address _rewardToken,address _ve,address _token,address _distribution, address _internal_bribe, address _external_bribe, bool _isPair, address genesisManager) external returns (address) {
         last_gauge = address(new GaugeV2(_rewardToken,_ve,_token,_distribution,_internal_bribe,_external_bribe,_isPair, genesisManager) );
         __gauges.push(last_gauge);
         return last_gauge;

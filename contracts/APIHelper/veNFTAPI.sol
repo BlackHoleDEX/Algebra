@@ -11,7 +11,7 @@ import '../interfaces/IPairFactory.sol';
 import '../interfaces/IVoter.sol';
 import '../interfaces/IVotingEscrow.sol';
 import '../interfaces/IRewardsDistributor.sol';
-import '../interfaces/IGaugeFactoryV2.sol';
+import '../interfaces/IGaugeFactory.sol';
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
@@ -109,7 +109,7 @@ contract veNFTAPI is Initializable {
     uint256 public constant WEEK = 1800; 
 
     IVoter public voter;
-    IGaugeFactory public gaugeFactoryV2;
+    IGaugeFactory public gaugeFactory;
     address public underlyingToken;
     
 
@@ -132,7 +132,7 @@ contract veNFTAPI is Initializable {
         owner = msg.sender;
         voter = IVoter(_voter);
         rewardDisitributor = IRewardsDistributor(_rewarddistro);
-        gaugeFactoryV2 = IGaugeFactory(_gaugeFactory);
+        gaugeFactory = IGaugeFactory(_gaugeFactory);
 
         require(rewardDisitributor.voting_escrow() == voter._ve(), 've!=ve');
         
@@ -279,8 +279,8 @@ contract veNFTAPI is Initializable {
     }  
 
     function _getRewardsForNft(uint nftId) internal view returns (PairReward[] memory pairReward) {
-        address[] memory allGauges = gaugeFactoryV2.gauges();
-        uint gaugesLength = gaugeFactoryV2.length();
+        address[] memory allGauges = gaugeFactory.gauges();
+        uint gaugesLength = gaugeFactory.length();
         uint maxPairRewardCount = 0;
         PairReward[] memory _pairRewards = new PairReward[](gaugesLength);
 

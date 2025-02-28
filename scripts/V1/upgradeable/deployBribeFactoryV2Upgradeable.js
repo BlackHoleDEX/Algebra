@@ -19,10 +19,10 @@ async function main () {
   txDeployed = await bribeFactory.deployed();
   console.log("BribeFactoryUpgradeable: ", bribeFactory.address)*/
 
-  data = await ethers.getContractFactory("GaugeFactoryV2");
-  GaugeFactoryV2 = await upgrades.deployProxy(data,[], {initializer: 'initialize'});
-  txDeployed = await GaugeFactoryV2.deployed();
-  console.log("GaugeFactoryUpgradeable: ", GaugeFactoryV2.address)
+  data = await ethers.getContractFactory("GaugeFactory");
+  GaugeFactory = await upgrades.deployProxy(data,[], {initializer: 'initialize'});
+  txDeployed = await GaugeFactory.deployed();
+  console.log("GaugeFactoryUpgradeable: ", GaugeFactory.address)
 
 
 }

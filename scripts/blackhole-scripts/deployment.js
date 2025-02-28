@@ -220,12 +220,12 @@ const deployBribeV3Factory = async (permissionRegistryAddress) => {
 
 const deployGaugeV2Factory = async (permissionRegistryAddress) => {
     try {
-        const gaugeContractFactory = await ethers.getContractFactory("GaugeFactoryV2");
+        const gaugeContractFactory = await ethers.getContractFactory("GaugeFactory");
         const input = [permissionRegistryAddress]
-        const GaugeFactoryV2 = await upgrades.deployProxy(gaugeContractFactory, input, {initializer: 'initialize'});
-        const txDeployed = await GaugeFactoryV2.deployed();
-        console.log('deployed GaugeFactoryV2: ', GaugeFactoryV2.address)
-        return GaugeFactoryV2.address
+        const GaugeFactory = await upgrades.deployProxy(gaugeContractFactory, input, {initializer: 'initialize'});
+        const txDeployed = await GaugeFactory.deployed();
+        console.log('deployed GaugeFactory: ', GaugeFactory.address)
+        return GaugeFactory.address
     } catch (error) {
         console.log("error in deploying gaugeV2: ", error)
     }
