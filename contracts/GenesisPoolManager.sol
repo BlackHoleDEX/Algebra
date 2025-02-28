@@ -78,7 +78,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         emit WhiteListedTokenToUser(proposedToken, tokenOwner);
     }
 
-    function depositNativeToken(address nativeToken, uint auctionIndex, GenesisInfo calldata genesisPoolInfo, ProtocolInfo calldata protocolInfo, TokenAllocation calldata allocationInfo) external nonReentrant returns(address genesisPool) {
+    function depositNativeToken(address nativeToken, uint auctionIndex, GenesisInfo calldata genesisPoolInfo, TokenAllocation calldata allocationInfo) external nonReentrant returns(address genesisPool) {
         address _sender = msg.sender;
         require(whiteListedTokensToUser[nativeToken][_sender] || _sender == owner(), "!listed");
         require(allocationInfo.proposedNativeAmount > 0, "0 native");
@@ -87,13 +87,13 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
 
         address _fundingToken = genesisPoolInfo.fundingToken;
         require(tokenHandler.isConnector(_fundingToken), "connector !=");
-        bool _stable = protocolInfo.stable;
+        bool _stable = genesisPoolInfo.stable;
         require(pairFactory.getPair(nativeToken, _fundingToken, _stable) == address(0), "existing pair");
 
         require(genesisPoolInfo.duration >= MIN_DURATION && genesisPoolInfo.threshold >= MIN_THRESHOLD && genesisPoolInfo.startPrice > 0, "genesis info");
         require(genesisPoolInfo.supplyPercent >= 0 && genesisPoolInfo.supplyPercent <= 100, "inavlid supplyPercent");
         
-        require(protocolInfo.tokenAddress == nativeToken, "unequal protocol token");
+        require(genesisPoolInfo.nativeToken == nativeToken, "unequal protocol token");
         // require(bytes(protocolInfo.tokenName).length > 0 && bytes(protocolInfo.tokenTicker).length > 0 && bytes(protocolInfo.protocolBanner).length > 0 && bytes(protocolInfo.protocolDesc).length > 0, "protocol info");
 
         genesisPool = genesisFactory.createGenesisPool(_sender, nativeToken, _fundingToken);
@@ -106,7 +106,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         IGenesisPool(genesisPool).setAuction(auction);
 
         proposedTokens.push(nativeToken);
-        IGenesisPool(genesisPool).setGenesisPoolInfo(genesisPoolInfo, protocolInfo, allocationInfo);
+        IGenesisPool(genesisPool).setGenesisPoolInfo(genesisPoolInfo, allocationInfo);
     }
 
     function rejectGenesisPool(address nativeToken) external Governance nonReentrant {
@@ -125,7 +125,8 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
 
         tokenHandler.whitelistToken(nativeToken);
 
-        address pairAddress = pairFactory.createPair(nativeToken, IGenesisPool(genesisPool).getGenesisInfo().fundingToken, IGenesisPool(genesisPool).getProtocolInfo().stable);
+        GenesisInfo memory genesisInfo =  IGenesisPool(genesisPool).getGenesisInfo();
+        address pairAddress = pairFactory.createPair(nativeToken, genesisInfo.fundingToken, genesisInfo.stable);
         pairFactory.setGenesisStatus(pairAddress, true);
 
         IGenesisPool(genesisPool).approvePool(pairAddress);

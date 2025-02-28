@@ -17,7 +17,6 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
         TokenAllocation tokenAllocation;
         TokenIncentiveInfo incentiveInfo;
         GenesisInfo genesisInfo;
-        ProtocolInfo protocolInfo;
         LiquidityPool liquidityPool;
         PoolStatus poolStatus;
     }
@@ -68,7 +67,6 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
             genesisPools[i - _offset].tokenAllocation = IGenesisPool(genesisPool).getAllocationInfo();
             genesisPools[i - _offset].incentiveInfo = IGenesisPool(genesisPool).getIncentivesInfo();
             genesisPools[i - _offset].genesisInfo = IGenesisPool(genesisPool).getGenesisInfo();
-            genesisPools[i - _offset].protocolInfo = IGenesisPool(genesisPool).getProtocolInfo();
             genesisPools[i - _offset].liquidityPool = IGenesisPool(genesisPool).getLiquidityPoolInfo();
             genesisPools[i - _offset].poolStatus = IGenesisPool(genesisPool).poolStatus();
         }

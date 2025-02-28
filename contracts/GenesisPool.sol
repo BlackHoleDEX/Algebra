@@ -24,7 +24,6 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
 
     TokenAllocation public allocationInfo;
     GenesisInfo public genesisInfo;
-    ProtocolInfo public protocolInfo;
     PoolStatus public poolStatus;
     LiquidityPool public liquidityPoolInfo;
 
@@ -62,7 +61,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
         __ReentrancyGuard_init();
         
         allocationInfo.tokenOwner = _tokenOwner;
-        protocolInfo.tokenAddress = _nativeToken;    
+        genesisInfo.nativeToken = _nativeToken;    
         genesisInfo.fundingToken = _fundingToken;
 
         factory = _factory;
@@ -76,9 +75,8 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
     }
 
 
-    function setGenesisPoolInfo(GenesisInfo calldata _genesisInfo, ProtocolInfo calldata _protocolInfo, TokenAllocation calldata _allocationInfo) external onlyManager(){
+    function setGenesisPoolInfo(GenesisInfo calldata _genesisInfo, TokenAllocation calldata _allocationInfo) external onlyManager(){
         genesisInfo = _genesisInfo;
-        protocolInfo = _protocolInfo;
 
         genesisInfo.duration = BlackTimeLibrary.epochMultiples(genesisInfo.duration);
         genesisInfo.startTime = BlackTimeLibrary.epochNext(block.timestamp);
@@ -91,7 +89,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
 
         poolStatus = PoolStatus.NATIVE_TOKEN_DEPOSITED;
 
-        emit DepositedNativeToken(_protocolInfo.tokenAddress, allocationInfo.tokenOwner, address(this), _allocationInfo.proposedNativeAmount, _allocationInfo.proposedFundingAmount);
+        emit DepositedNativeToken(_genesisInfo.nativeToken, allocationInfo.tokenOwner, address(this), _allocationInfo.proposedNativeAmount, _allocationInfo.proposedFundingAmount);
     }
 
     function addIncentives(address[] calldata _incentivesToken, uint256[] calldata _incentivesAmount) external {
@@ -107,7 +105,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
             require(_incentivesToken[i] != address(0), "0x incen");
             require(_incentivesAmount[i] > 0, "0 incen");
 
-            if(_incentivesToken[i] == protocolInfo.tokenAddress) continue;
+            if(_incentivesToken[i] == genesisInfo.nativeToken) continue;
 
             require(tokenHandler.isConnector(_incentivesToken[i]), "!=  connector");
         }
@@ -120,19 +118,19 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
             incentives[_incentivesToken[i]] += _incentivesAmount[i];
         }
 
-        emit AddedIncentives(protocolInfo.tokenAddress, _incentivesToken, _incentivesAmount);
+        emit AddedIncentives(genesisInfo.nativeToken, _incentivesToken, _incentivesAmount);
     }
 
     function rejectPool() external onlyManager {
         poolStatus = PoolStatus.NOT_QUALIFIED;
         allocationInfo.refundableNativeAmount = allocationInfo.proposedFundingAmount;
-        emit RejectedGenesisPool(protocolInfo.tokenAddress);
+        emit RejectedGenesisPool(genesisInfo.nativeToken);
     }
 
     function approvePool(address _pairAddress) external onlyManager {
         liquidityPoolInfo.pairAddress = _pairAddress;
         poolStatus = PoolStatus.PRE_LISTING;
-        emit ApprovedGenesisPool(protocolInfo.tokenAddress);
+        emit ApprovedGenesisPool(genesisInfo.nativeToken);
     }
 
     function depositToken(address spender, uint256 amount) external onlyManager returns (bool) {
@@ -204,13 +202,13 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
     }
 
     function getLaunchInfo() external view returns (LaunchPoolInfo memory lauchPoolInfo){
-        lauchPoolInfo.nativeToken = protocolInfo.tokenAddress;
+        lauchPoolInfo.nativeToken = genesisInfo.nativeToken;
         lauchPoolInfo.fundingToken = genesisInfo.fundingToken;
         lauchPoolInfo.nativeDesired = allocationInfo.allocatedNativeAmount;
         lauchPoolInfo.fundingDesired = allocationInfo.allocatedFundingAmount;
         lauchPoolInfo.poolAddress = liquidityPoolInfo.pairAddress;
         lauchPoolInfo.gaugeAddress = liquidityPoolInfo.gaugeAddress;
-        lauchPoolInfo.stable = protocolInfo.stable;
+        lauchPoolInfo.stable = genesisInfo.stable;
         lauchPoolInfo.tokenOwner = allocationInfo.tokenOwner;
     }
 
@@ -233,7 +231,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
     }
 
     function approveTokens(address router) onlyManager external {
-        IERC20(protocolInfo.tokenAddress).approve(router, allocationInfo.allocatedNativeAmount);
+        IERC20(genesisInfo.nativeToken).approve(router, allocationInfo.allocatedNativeAmount);
         IERC20(genesisInfo.fundingToken).approve(router, allocationInfo.allocatedFundingAmount);
     }
 
@@ -252,14 +250,14 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
 
         if(poolStatus == PoolStatus.PARTIALLY_LAUNCHED){
             if(msg.sender == allocationInfo.tokenOwner){
-                addresses[0] = protocolInfo.tokenAddress;
+                addresses[0] = genesisInfo.nativeToken;
                 amounts[0] = allocationInfo.refundableNativeAmount;
             } 
         }else if(poolStatus == PoolStatus.NOT_QUALIFIED){
             addresses[0] = genesisInfo.fundingToken;
             amounts[0] = userDeposits[msg.sender];
             if(msg.sender == allocationInfo.tokenOwner){
-                addresses[1] = protocolInfo.tokenAddress;
+                addresses[1] = genesisInfo.nativeToken;
                 amounts[1] = allocationInfo.refundableNativeAmount;
             }
         }
@@ -277,7 +275,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
                 allocationInfo.refundableNativeAmount = 0;
 
                 if(_amount > 0){
-                    assert(IERC20(protocolInfo.tokenAddress).transfer(msg.sender, _amount));
+                    assert(IERC20(genesisInfo.nativeToken).transfer(msg.sender, _amount));
                 }
             } 
         }else if(poolStatus == PoolStatus.NOT_QUALIFIED){
@@ -286,7 +284,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
                 allocationInfo.refundableNativeAmount = 0;
 
                 if(_amount > 0){
-                    assert(IERC20(protocolInfo.tokenAddress).transfer(msg.sender, _amount));
+                    assert(IERC20(genesisInfo.nativeToken).transfer(msg.sender, _amount));
                 }
             }
 
@@ -381,9 +379,6 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
 
     function getGenesisInfo() external view returns (IGenesisPoolBase.GenesisInfo memory){
         return genesisInfo;
-    }
-    function getProtocolInfo() external view returns (IGenesisPoolBase.ProtocolInfo memory){
-        return protocolInfo;
     }
 
     function getLiquidityPoolInfo() external view returns (IGenesisPoolBase.LiquidityPool memory){

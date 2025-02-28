@@ -18,23 +18,14 @@ interface IGenesisPoolBase {
     }
 
     struct GenesisInfo{
+        address nativeToken;
         address fundingToken;
-        address nativeTokenAddress;
+        bool stable;
         uint256 duration;
         uint8 threshold; // multiplied by 100 to support 2 decimals
         uint256 supplyPercent; 
         uint256 startPrice;
         uint256 startTime;
-    }
-
-    struct ProtocolInfo {
-        address tokenAddress;
-        // string tokenName;
-        // string tokenTicker;
-        // string tokenIcon;
-        bool stable;
-        // string protocolDesc;
-        // string protocolBanner;
     }
 
     struct LiquidityPool {

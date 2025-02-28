@@ -7,12 +7,11 @@ interface IGenesisPool {
     function getAllocationInfo() external view returns (IGenesisPoolBase.TokenAllocation memory);
     function getIncentivesInfo() external view returns (IGenesisPoolBase.TokenIncentiveInfo memory);
     function getGenesisInfo() external view returns (IGenesisPoolBase.GenesisInfo memory);
-    function getProtocolInfo() external view returns (IGenesisPoolBase.ProtocolInfo memory);
     function getLiquidityPoolInfo() external view returns (IGenesisPoolBase.LiquidityPool memory);
     function poolStatus() external view returns (IGenesisPoolBase.PoolStatus);
     function userDeposits(address _user) external view returns (uint256);
 
-    function setGenesisPoolInfo(IGenesisPoolBase.GenesisInfo calldata _genesisInfo, IGenesisPoolBase.ProtocolInfo calldata _protocolInfo, IGenesisPoolBase.TokenAllocation calldata _allocationInfo) external;
+    function setGenesisPoolInfo(IGenesisPoolBase.GenesisInfo calldata _genesisInfo, IGenesisPoolBase.TokenAllocation calldata _allocationInfo) external;
     function rejectPool() external;
     function approvePool(address _pairAddress) external;
     function depositToken(address spender, uint256 amount) external returns (bool);
