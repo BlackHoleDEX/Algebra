@@ -7,7 +7,7 @@ async function main () {
     const owner = (await ethers.getSigners())[0];
     console.log('owner', owner)
     console.log('Deploying Pairfactory Contract...');
-    data = await ethers.getContractFactory("PairFactory");
+    data = await ethers.getContractFactory("PairFactoryUpgradeable");
     let pairFactory = await data.deploy();
     txDeployed = await pairFactory.deployed();
     console.log("pairFactory: ", pairFactory.address)
