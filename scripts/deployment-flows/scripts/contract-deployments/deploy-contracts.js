@@ -26,6 +26,7 @@ const jsonData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8'));
 const addresses = jsonData.map(obj => obj.address);
 
 const deployedTokens = require('../../token-constants/deployed-tokens.json');
+const { routerV2Abi } = require("../../../../generated/router-v2");
 const blackAddress = deployedTokens[0].address;
 console.log("Extracted Addresses: ", addresses);
 
@@ -91,7 +92,7 @@ const deployPairGenerator = async () => {
         const pairGeneratorContract = await ethers.getContractFactory("PairGenerator");
         const pairGenerator = await pairGeneratorContract.deploy();
         txDeployed = await pairGenerator.deployed();
-        console.log("pairFactory: ", pairGenerator.address)
+        console.log("PairGenerator: ", pairGenerator.address)
         generateConstantFile("PairGenerator", pairGenerator.address);
         return pairGenerator.address;
     } catch (error) {
@@ -116,11 +117,11 @@ const deployPairFactory = async (pairGeneratorAddress) => {
     
 }
 
-const deployRouterV2 = async(pairFactoryAddress) => {
+const deployRouterV2 = async(pairFactoryAddress, pairGeneratorAddress) => {
     try {
         const wETH = '0x4200000000000000000000000000000000000006'
         const routerV2Contract = await ethers.getContractFactory("RouterV2");
-        const routerV2 = await routerV2Contract.deploy(pairFactoryAddress, wETH);
+        const routerV2 = await routerV2Contract.deploy(pairFactoryAddress, pairGeneratorAddress, wETH);
         txDeployed = await routerV2.deployed();
         console.log("routerV2 address: ", routerV2.address)
         generateConstantFile("RouterV2", routerV2.address);
@@ -495,9 +496,9 @@ const setGenesisManagerInGenesisFactory = async (genesisFactoryAddress, genesisM
     try {
         const genesisFactoryContract = await ethers.getContractAt(genesisPoolFactoryAbi, genesisFactoryAddress);
         await genesisFactoryContract.setGenesisManager(genesisManagerAddress);
-        console.log("set genesis pool in genesis factory\n");
+        console.log("set genesis manager in genesis factory\n");
     } catch (error) {
-        console.log("error genesis pool in genesis factory", error);
+        console.log("error genesis manager in genesis factory", error);
         process.exit(1);
     }
 }
@@ -532,9 +533,9 @@ const setGenesisPoolManagerInPairFactory = async(pairFactoryAddress, genesisMana
     try {
         const PairFactoryContract = await ethers.getContractAt(pairFactoryUpgradeableAbi, pairFactoryAddress);
         await PairFactoryContract.setGenesisManager(genesisManagerAddress);
-        console.log("set genesis pool in pair factory\n");
+        console.log("set genesis manager in pair factory\n");
     } catch (error) {
-        console.log("error genesis pool in pair factory", error);
+        console.log("error genesis manager in pair factory", error);
         process.exit(1);
     }
 };
@@ -561,7 +562,7 @@ async function main () {
 
     console.log("Black token address is: ", blackAddress);
 
-    //deploy permissionRegistry
+    // deploy permissionRegistry
     const permissionRegistryAddress = await deployPermissionRegistry();
 
     //set owner roles in permission registry
@@ -577,9 +578,9 @@ async function main () {
     const pairFactoryAddress = await deployPairFactory(pairGeneratorAddress);
 
     //deploy router V2
-    const routerV2Address = await deployRouterV2(pairFactoryAddress);
+    const routerV2Address = await deployRouterV2(pairFactoryAddress, pairGeneratorAddress);
 
-    //setDibs
+    // setDibs
     await setDibs(pairFactoryAddress);
 
     //deploy voting  escrow
@@ -655,7 +656,7 @@ async function main () {
     const genesisManagerAddress = await deployGenesisManager(epochControllerAddress, routerV2Address, permissionRegistryAddress, voterV3Address, pairFactoryAddress, genesisFactoryAddress, auctionFactoryAddress, tokenHandlerAddress);
 
     //set genesisManager in genesisFactory
-    await setGenesisManagerInGenesisFactory(genesisFactoryAddress, genesisManagerAddress); //  abi
+    await setGenesisManagerInGenesisFactory(genesisFactoryAddress, genesisManagerAddress);
 
     //assign genesisManager role of GENESIS_MANAGER
     await setGenesisManagerRole(permissionRegistryAddress, genesisManagerAddress);
@@ -669,13 +670,48 @@ async function main () {
     //deploy GenesisApi
     await deployGenesisApi(genesisManagerAddress, genesisFactoryAddress);
 
-    //createPairs two by default
+    // await checker(routerV2Address, pairFactoryAddress);
+
+    // createPairs two by default
     await addLiquidity(routerV2Address, addresses[0], addresses[1], 100, 100);
     await addLiquidity(routerV2Address, addresses[1], addresses[2], 100, 100);
     await addLiquidity(routerV2Address, addresses[2], addresses[3], 100, 100);
 
     // create Gauges
     await createGauges(voterV3Address, blackholeV2AbiAddress);
+}
+
+const checker = async (routerV2Address, pairFactoryAddress) => {
+
+    try {
+        const RouterContract = await ethers.getContractAt(routerV2Abi, routerV2Address);
+        const PairFactoryContract = await ethers.getContractAt(pairFactoryUpgradeableAbi, pairFactoryAddress);
+
+        const tokenA = addresses[1] < addresses[2] ? addresses[1] : addresses[2];
+        const tokenB = tokenA == addresses[1] ? addresses[2] : addresses[1];
+        const stable = false;
+
+        const tx = await PairFactoryContract.createPair(tokenA, tokenB, stable);
+        const receipt = await tx.wait(); 
+        const event = receipt.events.find(e => e.event === "PairCreated");
+        const deployedPair = event.args.pair;
+
+        const computedPair = await RouterContract.pairFor(tokenA, tokenB, stable);
+    
+        console.log("Deployed Pair:", deployedPair);
+        console.log("Computed Pair:", computedPair);
+
+
+        if (computedPair.toLowerCase() === deployedPair.toLowerCase()) {
+            console.log("✅ Addresses Match!");
+        } else {
+            console.log("❌ Address Mismatch!");
+        }
+
+    } catch (error) {
+        console.log("error genesis pool in genesis factory", error);
+        process.exit(1);
+    }
 }
 
 main()

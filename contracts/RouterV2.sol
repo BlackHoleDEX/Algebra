@@ -10,11 +10,14 @@
 
 pragma solidity 0.8.13;
 
+interface IPairGenerator {
+    function pairCodeHash() external pure returns (bytes32);
+}
+
 
 interface IBaseV1Factory {
     function allPairsLength() external view returns (uint);
     function isPair(address pair) external view returns (bool);
-    function pairCodeHash() external view returns (bytes32);
     function getPair(address tokenA, address token, bool stable) external view returns (address);
     function createPair(address tokenA, address tokenB, bool stable) external returns (address pair);
     function isGenesis(address pair) external view returns (bool);
@@ -43,6 +46,7 @@ interface erc20 {
 
 interface IPairFactory {
     function getFee(bool _stable) external view returns(uint256);
+    function getPair(address tokenA, address token, bool stable) external view returns (address);
     function MAX_REFERRAL_FEE() external view returns(uint256);
 }
 
@@ -88,6 +92,7 @@ contract RouterV2 {
     }
 
     address public immutable factory;
+    address public immutable pairGenerator;
     IWETH public immutable wETH;
     uint internal constant MINIMUM_LIQUIDITY = 10**3;
     bytes32 immutable pairCodeHash;
@@ -100,9 +105,10 @@ contract RouterV2 {
         _;
     }
 
-    constructor(address _factory, address _wETH) {
+    constructor(address _factory, address _pairGenerator, address _wETH) {
         factory = _factory;
-        pairCodeHash = IBaseV1Factory(_factory).pairCodeHash();
+        pairGenerator = _pairGenerator;
+        pairCodeHash = IPairGenerator(_pairGenerator).pairCodeHash();
         wETH = IWETH(_wETH);
     }
 
@@ -119,12 +125,7 @@ contract RouterV2 {
     // calculates the CREATE2 address for a pair without making any external calls
     function pairFor(address tokenA, address tokenB, bool stable) public view returns (address pair) {
         (address token0, address token1) = sortTokens(tokenA, tokenB);
-        pair = address(uint160(uint256(keccak256(abi.encodePacked(
-            hex'ff',
-            factory,
-            keccak256(abi.encodePacked(token0, token1, stable)),
-            pairCodeHash // init code hash
-        )))));
+        return IPairFactory(factory).getPair(token0, token1, stable);
     }
 
     // given some amount of an asset and pair reserves, returns an equivalent amount of the other asset
