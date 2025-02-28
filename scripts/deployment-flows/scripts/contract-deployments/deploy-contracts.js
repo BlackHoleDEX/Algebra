@@ -10,7 +10,7 @@ const { blackAbi } = require('../../../blackhole-scripts/gaugeConstants/black')
 const { votingEscrowAbi } = require('../../../../generated/voting-escrow');
 const { tokenHandlerAbi } = require('../../../../generated/token-handler');
 const { rewardsDistributorAbi } = require('../../../../generated/rewards-distributor');
-const { pairFactoryUpgradeableAbi } = require('../../../../generated/pair-factory-upgradeable');
+const { pairFactoryAbi } = require('../../../../generated/pair-factory');
 const { genesisPoolFactoryAbi } = require('../../../../generated/genesis-pool-factory');
 const { addLiquidity } = require('../../../blackhole-scripts/addLiquidity')
 const { BigNumber } = require("ethers");
@@ -136,7 +136,7 @@ const deployRouterV2 = async(pairFactoryAddress, pairGeneratorAddress) => {
 const setDibs = async (pairFactoryAddress) =>{
    try {
         const owner = await ethers.getSigners();
-        const PairFactoryContract = await ethers.getContractAt(pairFactoryUpgradeableAbi, pairFactoryAddress);
+        const PairFactoryContract = await ethers.getContractAt(pairFactoryAbi, pairFactoryAddress);
         const tx = await PairFactoryContract.setDibs(owner[0].address);
         await tx.wait();
         console.log("setDibs\n");
