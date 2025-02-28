@@ -20,7 +20,7 @@ const generateConstantFile = (contract, address) => {
         const filename = contract.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
         const pathname = `${dirPath}/${filename}.js`
         fs.writeFileSync(pathname, contractData);
-        console.log(`Data written to ${pathname}`);
+        console.log(`Data written to ${pathname}\n`);
 
     } catch (error) {
         console.error("Error fetching pairs data: ", error);

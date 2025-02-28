@@ -1,4 +1,4 @@
-const veNFTAPIAddress = "0x64D302e04D83f688c341A6df2A2EbC4142840186";
+const veNFTAPIAddress = "0x476B959fD6511a6699ef7EABF323d57Ce6e9be2c";
 
 const veNFTAPIAbi = [
   {
@@ -79,7 +79,7 @@ const veNFTAPIAbi = [
   },
   {
     "inputs": [],
-    "name": "gaugeFactoryV2",
+    "name": "gaugeFactory",
     "outputs": [
       {
         "internalType": "contract IGaugeFactory",
@@ -726,19 +726,6 @@ const veNFTAPIAbi = [
     "outputs": [
       {
         "internalType": "contract IVoter",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "voterV3",
-    "outputs": [
-      {
-        "internalType": "contract IVoterV3",
         "name": "",
         "type": "address"
       }

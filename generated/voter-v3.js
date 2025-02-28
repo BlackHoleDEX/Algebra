@@ -1,4 +1,4 @@
-const voterV3Address = "0x505CB4852A9A9BBBD29B0ce473b99784f8CD835a";
+const voterV3Address = "0x42683C41d87c09EA707C6C48BB2BB365632F67Ae";
 
 const voterV3Abi = [
   {
@@ -885,6 +885,11 @@ const voterV3Abi = [
       {
         "internalType": "address",
         "name": "_bribes",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_tokenHandler",
         "type": "address"
       }
     ],

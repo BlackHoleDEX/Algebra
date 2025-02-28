@@ -1,5 +1,8 @@
 const { ethers  } = require('hardhat');
-const { pairFactoryAbi, routerV2Abi, tokenOne, tokenTwo, tokenAbi, tokenFive, tokenThree, tokenFour, tokenEight, tokenTen, tokenNine } = require("./dexAbi");
+const { routerV2Abi } = require("../../generated/router-v2");
+const { tokenAbi } = require("./dexAbi");
+
+
 
 
 

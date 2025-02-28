@@ -1,10 +1,48 @@
-const epochControllerAddress = "0x00d98F583925044df21832AEd1f306ccdE172500";
+const genesisPoolFactoryAddress = "0x230ad3920BF11Bf1CF5262011439d273Edcd4B44";
 
-const epochControllerAbi = [
+const genesisPoolFactoryAbi = [
   {
     "inputs": [],
     "stateMutability": "nonpayable",
     "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "nativeToken",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "fundingToken",
+        "type": "address"
+      }
+    ],
+    "name": "GenesisCreated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "oldManager",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newManager",
+        "type": "address"
+      }
+    ],
+    "name": "GenesisManagerChanged",
+    "type": "event"
   },
   {
     "anonymous": false,
@@ -17,49 +55,6 @@ const epochControllerAbi = [
       }
     ],
     "name": "Initialized",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "addr",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "timestamp",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "blocknbr",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "bool",
-        "name": "x1",
-        "type": "bool"
-      },
-      {
-        "indexed": false,
-        "internalType": "bool",
-        "name": "x2",
-        "type": "bool"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "msg",
-        "type": "string"
-      }
-    ],
-    "name": "Logger",
     "type": "event"
   },
   {
@@ -82,8 +77,37 @@ const epochControllerAbi = [
     "type": "event"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "tokenOwner",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "nativeToken",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "fundingToken",
+        "type": "address"
+      }
+    ],
+    "name": "createGenesisPool",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "genesisPool",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
-    "name": "automationRegistry",
+    "name": "genesisManager",
     "outputs": [
       {
         "internalType": "address",
@@ -97,22 +121,30 @@ const epochControllerAbi = [
   {
     "inputs": [
       {
-        "internalType": "bytes",
+        "internalType": "uint256",
         "name": "",
-        "type": "bytes"
+        "type": "uint256"
       }
     ],
-    "name": "checkUpkeep",
+    "name": "genesisPools",
     "outputs": [
       {
-        "internalType": "bool",
-        "name": "upkeepNeeded",
-        "type": "bool"
-      },
-      {
-        "internalType": "bytes",
+        "internalType": "address",
         "name": "",
-        "type": "bytes"
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "genesisPoolsLength",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -122,7 +154,26 @@ const epochControllerAbi = [
     "inputs": [
       {
         "internalType": "address",
-        "name": "_minter",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "getGenesisPool",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_tokenHandler",
         "type": "address"
       },
       {
@@ -134,19 +185,6 @@ const epochControllerAbi = [
     "name": "initialize",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "minter",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -165,12 +203,12 @@ const epochControllerAbi = [
   {
     "inputs": [
       {
-        "internalType": "bytes",
-        "name": "",
-        "type": "bytes"
+        "internalType": "address",
+        "name": "nativeToken",
+        "type": "address"
       }
     ],
-    "name": "performUpkeep",
+    "name": "removeGenesisPool",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -186,39 +224,26 @@ const epochControllerAbi = [
     "inputs": [
       {
         "internalType": "address",
-        "name": "_automationRegistry",
+        "name": "_genesisManager",
         "type": "address"
       }
     ],
-    "name": "setAutomationRegistry",
+    "name": "setGenesisManager",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [
+    "inputs": [],
+    "name": "tokenHandler",
+    "outputs": [
       {
         "internalType": "address",
-        "name": "_minter",
+        "name": "",
         "type": "address"
       }
     ],
-    "name": "setMinter",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_voter",
-        "type": "address"
-      }
-    ],
-    "name": "setVoter",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -249,4 +274,4 @@ const epochControllerAbi = [
   }
 ];
 
-module.exports = {epochControllerAddress, epochControllerAbi};
+module.exports = {genesisPoolFactoryAddress, genesisPoolFactoryAbi};

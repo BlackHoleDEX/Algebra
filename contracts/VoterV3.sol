@@ -14,8 +14,6 @@ import './interfaces/IVotingEscrow.sol';
 import './interfaces/IPermissionsRegistry.sol';
 import "./interfaces/IAutomatedVotingManager.sol";
 import './interfaces/ITokenHandler.sol';
-// import './interfaces/IAlgebraFactory.sol';
-// import "hardhat/console.sol";
 import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -93,7 +91,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     constructor() {}
 
     // function initialize(address __ve, address _pairFactory, address  _gaugeFactory, address _bribes, address _tokenHandler) initializer public {
-    function initialize(address __ve, address _pairFactory, address  _gaugeFactory, address _bribes) initializer public {
+    function initialize(address __ve, address _pairFactory, address  _gaugeFactory, address _bribes, address _tokenHandler) initializer public {
         __Ownable_init();
         __ReentrancyGuard_init();
 
@@ -111,9 +109,8 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
         minter = msg.sender;
         permissionRegistry = msg.sender;
-        // tokenHandler = _tokenHandler;
+        tokenHandler = _tokenHandler;
         genesisManager = address(0);
-
         maxVotingNum = 30;
 
         VOTE_DELAY = 0;
@@ -591,8 +588,6 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         } 
         if(_gaugeType == 1) {
             // removed due to code size
-            // address _pool_factory = IAlgebraFactory(_factory).poolByPair(tokenA, tokenB);
-            // address _pool_hyper = IHypervisor(_pool).pool();
             // require(_pool_hyper == _pool_factory, 'wrong tokens');    
             isPair = true;
         } else {
@@ -616,7 +611,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         _external_bribe = IBribeFactory(bribefactory).createBribe(_owner, tokenA, tokenB, _type);
 
         // create gauge
-        _gauge = IGaugeFactory(_gaugeFactory).createGaugeV2(base, _ve, _pool, address(this), _internal_bribe, _external_bribe, isPair, genesisManager);
+        _gauge = IGaugeFactory(_gaugeFactory).createGauge(base, _ve, _pool, address(this), _internal_bribe, _external_bribe, isPair, genesisManager);
      
         // approve spending for $the
         IERC20(base).approve(_gauge, type(uint256).max);

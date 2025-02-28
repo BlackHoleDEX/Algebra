@@ -1,4 +1,4 @@
-const minterUpgradeableAddress = "0x6E9b3B8fd7a5fF42F3c6965466C02EDf12F09F99";
+const minterUpgradeableAddress = "0x2Eaf051CE12F6b1028396360313146802D55D2bc";
 
 const minterUpgradeableAbi = [
   {
@@ -345,19 +345,6 @@ const minterUpgradeableAbi = [
     "outputs": [
       {
         "internalType": "contract IVoter",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "_voterV3",
-    "outputs": [
-      {
-        "internalType": "contract IVoterV3",
         "name": "",
         "type": "address"
       }

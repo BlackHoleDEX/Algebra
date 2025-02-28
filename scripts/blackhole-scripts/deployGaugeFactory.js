@@ -2,11 +2,11 @@ const { ethers } = require("hardhat")
 const { permissionsRegistryAddress } = require("./gaugeConstants/permissions-registry")
 
 async function main () {
-    data = await ethers.getContractFactory("GaugeFactoryV2");
+    data = await ethers.getContractFactory("GaugeFactory");
     input = [permissionsRegistryAddress]
-    GaugeFactoryV2 = await upgrades.deployProxy(data, input, {initializer: 'initialize'});
-    txDeployed = await GaugeFactoryV2.deployed();
-    console.log('deployed GaugeFactoryV2: ', GaugeFactoryV2.address, txDeployed)
+    GaugeFactory = await upgrades.deployProxy(data, input, {initializer: 'initialize'});
+    txDeployed = await GaugeFactory.deployed();
+    console.log('deployed GaugeFactory: ', GaugeFactory.address, txDeployed)
 }
 
 main()

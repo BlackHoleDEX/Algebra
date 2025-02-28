@@ -16,10 +16,10 @@ contract EpochController is AutomationCompatibleInterface, OwnableUpgradeable  {
 
     constructor() {}
 
-    function initialize() public initializer {
+    function initialize(address _minter, address _voter) public initializer {
         __Ownable_init();
-        minter = address(0x86069FEb223EE303085a1A505892c9D4BdBEE996);
-        voter = address(0x62Ee96e6365ab515Ec647C065c2707d1122d7b26);
+        minter = _minter;
+        voter = _voter;
         automationRegistry = address(0x02777053d6764996e594c3E88AF1D58D5363a2e6);
     }
 
