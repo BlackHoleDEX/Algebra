@@ -2,7 +2,7 @@
 pragma solidity 0.8.13;
 
 import "../Pair.sol";
-import "../factories/PairFactoryUpgradeable.sol";
+import "../factories/PairFactory.sol";
 import "../PairFees.sol";
 
 contract TradeHelper {
@@ -17,7 +17,7 @@ contract TradeHelper {
 
     constructor(address _factory) {
         factory = _factory;
-        pairCodeHash = PairFactoryUpgradeable(_factory).pairCodeHash();
+        pairCodeHash = PairFactory(_factory).pairCodeHash();
     }
 
     function _sortTokens(address tokenA, address tokenB) internal pure returns (address token0, address token1) {
@@ -55,12 +55,12 @@ contract TradeHelper {
 
     function getAmountOutStable(uint amountIn, address tokenIn, address tokenOut) public view returns (uint amount) {
         address pair = _pairFor(tokenIn, tokenOut, true);
-        return (PairFactoryUpgradeable(factory).isPair(pair)) ? Pair(pair).getAmountOut(amountIn, tokenIn) : 0;
+        return (PairFactory(factory).isPair(pair)) ? Pair(pair).getAmountOut(amountIn, tokenIn) : 0;
     }
 
     function getAmountOutVolatile(uint amountIn, address tokenIn, address tokenOut) public view returns (uint amount) {
         address pair = _pairFor(tokenIn, tokenOut, false);
-        return (PairFactoryUpgradeable(factory).isPair(pair)) ? Pair(pair).getAmountOut(amountIn, tokenIn) : 0;
+        return (PairFactory(factory).isPair(pair)) ? Pair(pair).getAmountOut(amountIn, tokenIn) : 0;
     }
 
     function getAmountOut(uint amountIn, address tokenIn, address tokenOut) public view returns (uint amount, bool stable) {
@@ -82,7 +82,7 @@ contract TradeHelper {
         address pair = _pairFor(tokenIn, tokenOut, true);
 
         amountIn = type(uint256).max;
-        if(PairFactoryUpgradeable(factory).isPair(pair)) {
+        if(PairFactory(factory).isPair(pair)) {
             Pair p = Pair(pair);
 
             uint decimalsIn = 10**IERC20(tokenIn).decimals();
@@ -124,7 +124,7 @@ contract TradeHelper {
             } 
             //amountIn = (new_x_amount - old_x_amount) * (1+fees)
             uint amountInNoFees =  ((reserveIn - x_1) * decimalsOut / 1e18);
-            amountIn = amountInNoFees * (10000 + PairFactoryUpgradeable(factory).getFee(pair, true)) / 10000;
+            amountIn = amountInNoFees * (10000 + PairFactory(factory).getFee(pair, true)) / 10000;
         }
     }
 
@@ -132,13 +132,13 @@ contract TradeHelper {
         address pair = _pairFor(tokenIn, tokenOut, false);
         amountIn = type(uint256).max;
 
-        if(PairFactoryUpgradeable(factory).isPair(pair)) {
+        if(PairFactory(factory).isPair(pair)) {
             Pair p = Pair(pair);
 
             uint reserveIn = (tokenIn == p.token0()) ? p.reserve0() : p.reserve1();
             uint reserveOut = (tokenOut == p.token0()) ? p.reserve0() : p.reserve1();
                 
-            amountIn = (amountOut * reserveIn / (reserveOut - amountOut)) * (10000 + PairFactoryUpgradeable(factory).getFee(pair,false)) / 10000;
+            amountIn = (amountOut * reserveIn / (reserveOut - amountOut)) * (10000 + PairFactory(factory).getFee(pair,false)) / 10000;
         }
     }
 

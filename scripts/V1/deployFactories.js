@@ -8,7 +8,7 @@ async function main () {
 
   console.log('Deploying Contract...');
 
-  data = await ethers.getContractFactory("PairFactoryUpgradeable");
+  data = await ethers.getContractFactory("PairFactory");
   console.log('data', data)
   pairFactory = await data.deploy();
   console.log('paurFactory', pairFactory);

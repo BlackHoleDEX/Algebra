@@ -7,7 +7,7 @@ import '../interfaces/IPairGenerator.sol';
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-contract PairFactoryUpgradeable is IPairFactory, OwnableUpgradeable {
+contract PairFactory is IPairFactory, OwnableUpgradeable {
     
     bool public isPaused;
 

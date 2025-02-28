@@ -43,12 +43,12 @@ const deployPairGenerator = async () => {
 
 const deployPairFactory = async (pairGeneratorAddress) => {
     try {
-        const pairFactoryContract = await ethers.getContractFactory("PairFactoryUpgradeable");
+        const pairFactoryContract = await ethers.getContractFactory("PairFactory");
         const inputs = [pairGeneratorAddress];
         const pairFactory = await upgrades.deployProxy(pairFactoryContract,inputs,{initializer: 'initialize'});
         txDeployed = await pairFactory.deployed();
         console.log("pairFactory: ", pairFactory.address)
-        generateConstantFile("PairFactoryUpgradeable", pairFactory.address);
+        generateConstantFile("PairFactory", pairFactory.address);
         return pairFactory.address;
     } catch (error) {
         console.log("error in deploying pairFactory: ", error)
