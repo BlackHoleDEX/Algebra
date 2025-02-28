@@ -1,4 +1,4 @@
-const voterV3Address = "0x3De59Cb33168184ce76d6814FbB1902A873226Df";
+const voterV3Address = "0xB7f5AaD0f8ABF2c653F9d3CD7549D1765cC220Bf";
 
 const voterV3Abi = [
   {
@@ -468,6 +468,32 @@ const voterV3Abi = [
   },
   {
     "inputs": [],
+    "name": "avm",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "blackGoverner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "bribefactory",
     "outputs": [
       {
@@ -803,6 +829,19 @@ const voterV3Abi = [
   {
     "inputs": [],
     "name": "getAutomationRegistry",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getBlackGovernor",
     "outputs": [
       {
         "internalType": "address",

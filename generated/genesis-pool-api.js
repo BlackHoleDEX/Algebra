@@ -1,4 +1,4 @@
-const genesisPoolAPIAddress = "0xdb2aC6783eF2934e0fb9181469C40Dda3d435661";
+const genesisPoolAPIAddress = "0xd662497e11499d83105F035Ef18538A2499a91C1";
 
 const genesisPoolAPIAbi = [
   {
@@ -158,8 +158,18 @@ const genesisPoolAPIAbi = [
             "components": [
               {
                 "internalType": "address",
+                "name": "nativeToken",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
                 "name": "fundingToken",
                 "type": "address"
+              },
+              {
+                "internalType": "bool",
+                "name": "stable",
+                "type": "bool"
               },
               {
                 "internalType": "uint256",
@@ -189,48 +199,6 @@ const genesisPoolAPIAbi = [
             ],
             "internalType": "struct IGenesisPoolBase.GenesisInfo",
             "name": "genesisInfo",
-            "type": "tuple"
-          },
-          {
-            "components": [
-              {
-                "internalType": "address",
-                "name": "tokenAddress",
-                "type": "address"
-              },
-              {
-                "internalType": "string",
-                "name": "tokenName",
-                "type": "string"
-              },
-              {
-                "internalType": "string",
-                "name": "tokenTicker",
-                "type": "string"
-              },
-              {
-                "internalType": "string",
-                "name": "tokenIcon",
-                "type": "string"
-              },
-              {
-                "internalType": "bool",
-                "name": "stable",
-                "type": "bool"
-              },
-              {
-                "internalType": "string",
-                "name": "protocolDesc",
-                "type": "string"
-              },
-              {
-                "internalType": "string",
-                "name": "protocolBanner",
-                "type": "string"
-              }
-            ],
-            "internalType": "struct IGenesisPoolBase.ProtocolInfo",
-            "name": "protocolInfo",
             "type": "tuple"
           },
           {

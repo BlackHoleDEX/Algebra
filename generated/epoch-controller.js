@@ -1,4 +1,4 @@
-const epochControllerAddress = "0xE49Bd2dE1b23b4a0615043e08191Ad4CFb7afb2F";
+const epochControllerAddress = "0x0e6809900f97F6111c8fd9cF7308c06DAC6ed195";
 
 const epochControllerAbi = [
   {
@@ -119,7 +119,18 @@ const epochControllerAbi = [
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_minter",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_voter",
+        "type": "address"
+      }
+    ],
     "name": "initialize",
     "outputs": [],
     "stateMutability": "nonpayable",

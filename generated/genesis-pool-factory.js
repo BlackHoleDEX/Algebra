@@ -1,4 +1,4 @@
-const genesisPoolFactoryAddress = "0xac319eC616Af39D44A41b6F9557D6578a1fd74cb";
+const genesisPoolFactoryAddress = "0x2A1be56307Fd5a62E2D3d9a472a301EBb4F603aB";
 
 const genesisPoolFactoryAbi = [
   {
@@ -198,6 +198,19 @@ const genesisPoolFactoryAbi = [
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "nativeToken",
+        "type": "address"
+      }
+    ],
+    "name": "removeGenesisPool",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

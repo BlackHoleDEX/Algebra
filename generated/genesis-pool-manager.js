@@ -1,4 +1,4 @@
-const genesisPoolManagerAddress = "0x22A12659ccEa9E22F43f0f1cB0BA07979f312122";
+const genesisPoolManagerAddress = "0x1AF74C433D48b1F2f8b788013b55f6D8Eb81965D";
 
 const genesisPoolManagerAbi = [
   {
@@ -177,8 +177,18 @@ const genesisPoolManagerAbi = [
         "components": [
           {
             "internalType": "address",
+            "name": "nativeToken",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
             "name": "fundingToken",
             "type": "address"
+          },
+          {
+            "internalType": "bool",
+            "name": "stable",
+            "type": "bool"
           },
           {
             "internalType": "uint256",
@@ -208,48 +218,6 @@ const genesisPoolManagerAbi = [
         ],
         "internalType": "struct IGenesisPoolBase.GenesisInfo",
         "name": "genesisPoolInfo",
-        "type": "tuple"
-      },
-      {
-        "components": [
-          {
-            "internalType": "address",
-            "name": "tokenAddress",
-            "type": "address"
-          },
-          {
-            "internalType": "string",
-            "name": "tokenName",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "tokenTicker",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "tokenIcon",
-            "type": "string"
-          },
-          {
-            "internalType": "bool",
-            "name": "stable",
-            "type": "bool"
-          },
-          {
-            "internalType": "string",
-            "name": "protocolDesc",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "protocolBanner",
-            "type": "string"
-          }
-        ],
-        "internalType": "struct IGenesisPoolBase.ProtocolInfo",
-        "name": "protocolInfo",
         "type": "tuple"
       },
       {
@@ -347,7 +315,7 @@ const genesisPoolManagerAbi = [
   },
   {
     "inputs": [],
-    "name": "getAllProposedTokens",
+    "name": "getAllNaitveTokens",
     "outputs": [
       {
         "internalType": "address[]",
@@ -407,6 +375,25 @@ const genesisPoolManagerAbi = [
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "nativeTokens",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "owner",
     "outputs": [
@@ -435,25 +422,6 @@ const genesisPoolManagerAbi = [
   {
     "inputs": [],
     "name": "permissionRegistory",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "proposedTokens",
     "outputs": [
       {
         "internalType": "address",

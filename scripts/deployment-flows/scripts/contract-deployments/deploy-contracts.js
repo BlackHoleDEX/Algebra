@@ -343,16 +343,17 @@ const initializeMinter = async (minterUpgradableAddress) => {
 const deployEpochController = async(voterV3Address, minterUpgradableAddress) =>{
     try {
         data = await ethers.getContractFactory("EpochController");
-        const EpochController = await upgrades.deployProxy(data, [], {initializer: 'initialize'});
+        const inputs = [voterV3Address, minterUpgradableAddress];
+        const EpochController = await upgrades.deployProxy(data, inputs, {initializer: 'initialize'});
         txDeployed = await EpochController.deployed();
 
         console.log('deployed EpochController: ', EpochController.address);
         generateConstantFile("EpochController", EpochController.address);
 
-        await EpochController.setVoter(voterV3Address);
-        console.log('Voter set in EpochController');
-        await EpochController.setMinter(minterUpgradableAddress);
-        console.log('minter set in EpochController\n');
+        // await EpochController.setVoter(voterV3Address);
+        // console.log('Voter set in EpochController');
+        // await EpochController.setMinter(minterUpgradableAddress);
+        // console.log('minter set in EpochController\n');
         return EpochController.address;
     } catch (error) {
         console.log("error in deploying EpochController: ", error);

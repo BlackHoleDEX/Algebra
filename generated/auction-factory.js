@@ -1,4 +1,4 @@
-const auctionFactoryAddress = "0x01eD87a6c2eAE3Ebc12A14D1106FadAc5Af43aa1";
+const auctionFactoryAddress = "0x3531730cc87faC6972F9a93C2E3831f8fc5235A0";
 
 const auctionFactoryAbi = [
   {
@@ -181,7 +181,7 @@ const auctionFactoryAbi = [
         "type": "uint256"
       }
     ],
-    "name": "removeFactory",
+    "name": "removeAuction",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -206,7 +206,7 @@ const auctionFactoryAbi = [
         "type": "uint256"
       }
     ],
-    "name": "replaceFactory",
+    "name": "replaceAuction",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
