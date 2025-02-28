@@ -8,7 +8,7 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 
 import "./interfaces/IGenesisPoolManager.sol";
 import './interfaces/IRouter.sol';
-import "./interfaces/IVoterV3.sol";
+import "./interfaces/IVoter.sol";
 import "./interfaces/IGauge.sol";
 import "./interfaces/IGenesisPoolBase.sol";
 import "./interfaces/ITokenHandler.sol";
@@ -35,7 +35,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
     address public permissionRegistory;
     address public router;
     IBaseV1Factory public pairFactory;
-    IVoterV3 public voter;
+    IVoter public voter;
     ITokenHandler public _tokenManager;
 
     IGenesisPoolFactory public genesisFactory;
@@ -61,7 +61,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         epochController = _epochController;
         router = _router;
         permissionRegistory = _permissionRegistory;
-        voter = IVoterV3(_voter);
+        voter = IVoter(_voter);
         pairFactory = IBaseV1Factory(_pairFactory);
         genesisFactory = IGenesisPoolFactory(_genesisFactory);
         auctionFactory = IAuctionFactory(_auctionFactory);

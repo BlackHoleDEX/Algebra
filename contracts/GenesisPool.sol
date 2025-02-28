@@ -9,7 +9,7 @@ import "./interfaces/IGenesisPool.sol";
 import "./interfaces/IGenesisPoolBase.sol";
 import "./interfaces/ITokenHandler.sol";
 import "./interfaces/IAuction.sol";
-import "./interfaces/IVoterV3.sol";
+import "./interfaces/IVoter.sol";
 import "./interfaces/IBribe.sol";
 
 contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeable {
@@ -20,7 +20,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
     address immutable internal genesisManager;
     ITokenHandler immutable internal tokenHandler;
     IAuction internal auction;
-    IVoterV3 immutable internal voter;
+    IVoter immutable internal voter;
 
     TokenAllocation public allocationInfo;
     GenesisInfo public genesisInfo;
@@ -66,7 +66,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
         factory = _factory;
         genesisManager = _genesisManager;
         tokenHandler = ITokenHandler(_tokenHandler);
-        voter = IVoterV3(_voter);
+        voter = IVoter(_voter);
 
         totalDeposits = 0;
         liquidity = 0;

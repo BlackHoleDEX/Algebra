@@ -11,7 +11,6 @@ import '../interfaces/IPairFactory.sol';
 import '../interfaces/IVoter.sol';
 import '../interfaces/IVotingEscrow.sol';
 import '../interfaces/IRewardsDistributor.sol';
-import '../interfaces/IVoterV3.sol';
 import '../interfaces/IGaugeFactoryV2.sol';
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -110,7 +109,6 @@ contract veNFTAPI is Initializable {
     uint256 public constant WEEK = 1800; 
 
     IVoter public voter;
-    IVoterV3 public voterV3;
     IGaugeFactory public gaugeFactoryV2;
     address public underlyingToken;
     
@@ -133,7 +131,6 @@ contract veNFTAPI is Initializable {
     function initialize(address _voter, address _rewarddistro, address _gaugeFactory) initializer public {
         owner = msg.sender;
         voter = IVoter(_voter);
-        voterV3 = IVoterV3(_voter);
         rewardDisitributor = IRewardsDistributor(_rewarddistro);
         gaugeFactoryV2 = IGaugeFactory(_gaugeFactory);
 
@@ -218,7 +215,7 @@ contract veNFTAPI is Initializable {
         venft.voting_amount = ve.balanceOfNFT(id);
         venft.rebase_amount = rewardDisitributor.claimable(id);
         venft.lockEnd = _lockedBalance.end;
-        venft.vote_ts = voterV3.lastVotedTimestamp(id);
+        venft.vote_ts = voter.lastVotedTimestamp(id);
         venft.votes = votes;
         venft.token = ve.token();
         venft.tokenSymbol =  IERC20( ve.token() ).symbol();
@@ -228,7 +225,7 @@ contract veNFTAPI is Initializable {
         venft.isPermanent = _lockedBalance.isPermanent;
         
         venft.voted = ve.voted(id);
-        venft.hasVotedForEpoch = (voterV3.epochTimestamp() < venft.vote_ts) && (venft.vote_ts < voterV3.epochTimestamp() + WEEK);
+        venft.hasVotedForEpoch = (voter.epochTimestamp() < venft.vote_ts) && (venft.vote_ts < voter.epochTimestamp() + WEEK);
     }
 
     // used only for sAMM and vAMM    

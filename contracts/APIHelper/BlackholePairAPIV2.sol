@@ -14,7 +14,6 @@ import '../interfaces/IPairFactory.sol';
 import '../interfaces/IVoter.sol';
 import '../interfaces/IVotingEscrow.sol';
 import '../../contracts/Pair.sol';
-import '../interfaces/IVoterV3.sol';
 import '../interfaces/IRouter.sol';
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -135,7 +134,6 @@ contract BlackholePairAPIV2 is Initializable {
 
     IPairFactory public pairFactory;
     IVoter public voter;
-    IVoterV3 public voterV3;
     IRouter public routerV2;
 
     address public underlyingToken;
@@ -154,7 +152,6 @@ contract BlackholePairAPIV2 is Initializable {
         owner = msg.sender;
 
         voter = IVoter(_voter);
-        voterV3 = IVoterV3(_voter);
 
         routerV2 = IRouter(_router);
 
@@ -335,7 +332,7 @@ contract BlackholePairAPIV2 is Initializable {
         _pairInfo.account_gauge_earned = earned;
 
         // votes
-        _pairInfo.votes = voterV3.weights(_pair);     
+        _pairInfo.votes = voter.weights(_pair);     
     }
 
     // read all the bribe available for a pair
