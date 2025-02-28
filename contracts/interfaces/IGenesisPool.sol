@@ -17,14 +17,12 @@ interface IGenesisPool {
     function depositToken(address spender, uint256 amount) external returns (bool);
     function transferIncentives(address gauge, address external_bribe, address internal_bribe) external;
     function eligbleForPreLaunchPool() external view returns (bool);
-    function eligbleForCompleteLaunch() external view returns (bool);
     function eligbleForDisqualify() external view returns (bool);
-    function getLaunchInfo() external view returns (IGenesisPoolBase.LaunchPoolInfo memory);
     function setPoolStatus(IGenesisPoolBase.PoolStatus status) external;
-    function setLiquidity(uint256 liquidity) external;
-    function approveTokens(address router) external;
     function balanceOf(address account) external view returns (uint256);
     function deductAmount(address account, uint256 amount) external;
     function deductAllAmount(address account) external;
     function setAuction(address _auction) external;
+
+    function launch(address router, uint256 maturityTime) external;
 }

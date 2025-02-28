@@ -7,9 +7,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import "./interfaces/IGenesisPoolManager.sol";
-import './interfaces/IRouter01.sol';
 import "./interfaces/IVoterV3.sol";
-import "./interfaces/IGauge.sol";
 import "./interfaces/IGenesisPoolBase.sol";
 import "./interfaces/ITokenHandler.sol";
 import "./interfaces/IPermissionsRegistry.sol";
@@ -179,38 +177,8 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
     }
 
     function _launchPool(address _genesisPool) internal {
-        if(IGenesisPool(_genesisPool).eligbleForCompleteLaunch()){
-            _completelyLaunchPool(_genesisPool);
-        }else{
-            _partiallyLaunchPool(_genesisPool);
-        }
-    }
-
-    function _completelyLaunchPool(address _genesisPool) internal {
-        IGenesisPool(_genesisPool).setPoolStatus(PoolStatus.LAUNCH);
-        LaunchPoolInfo memory launchPoolInfo = IGenesisPool(_genesisPool).getLaunchInfo();
-        _addLiquidityAndDistribute(_genesisPool, launchPoolInfo);
-    }
-
-
-    function _partiallyLaunchPool(address _genesisPool) internal {
-        IGenesisPool(_genesisPool).setPoolStatus(PoolStatus.PARTIALLY_LAUNCHED);
-         LaunchPoolInfo memory launchPoolInfo = IGenesisPool(_genesisPool).getLaunchInfo();
-
-        _addLiquidityAndDistribute(_genesisPool, launchPoolInfo);
-    }
-
-    function _addLiquidityAndDistribute(address _genesisPool, LaunchPoolInfo memory launchPoolInfo) internal {
-
-        pairFactory.setGenesisStatus(launchPoolInfo.poolAddress, false);
-        IGenesisPool(_genesisPool).approveTokens(router);
-
-        (, , uint liquidity) = IRouter01(router).addLiquidity(launchPoolInfo.nativeToken, launchPoolInfo.fundingToken, launchPoolInfo.stable, launchPoolInfo.nativeDesired, launchPoolInfo.fundingDesired, 0, 0, address(this), block.timestamp + 100);
-
-        IGenesisPool(_genesisPool).setLiquidity(liquidity);
-        IGauge(launchPoolInfo.gaugeAddress).setGenesisPool(_genesisPool);
-        IERC20(launchPoolInfo.poolAddress).approve(launchPoolInfo.gaugeAddress, liquidity);
-        IGauge(launchPoolInfo.gaugeAddress).depositsForGenesis(launchPoolInfo.tokenOwner, block.timestamp + MATURITY_TIME, liquidity);
+        pairFactory.setGenesisStatus(IGenesisPool(_genesisPool).getLiquidityPoolInfo().pairAddress, false);
+        IGenesisPool(_genesisPool).launch(router, MATURITY_TIME);
     }
     
     // before 3 hrs

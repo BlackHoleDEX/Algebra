@@ -78,8 +78,8 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
         _;
     }
 
-    modifier onlyGenesisManager() {
-        require(msg.sender == genesisManager, "!= genesisManager");
+    modifier onlyGenesisPool() {
+        require(msg.sender == genesisPool, "!= genesisManager");
         _;
     }
 
@@ -212,7 +212,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     --------------------------------------------------------------------------------
     ----------------------------------------------------------------------------- */
 
-    function depositsForGenesis(address _tokenOwner, uint256 _timestamp, uint256 _totalAmount) external onlyGenesisManager nonReentrant { 
+    function depositsForGenesis(address _tokenOwner, uint256 _timestamp, uint256 _totalAmount) external onlyGenesisPool nonReentrant { 
         require(_tokenOwner != address(0), "0x owner");
         require(_totalAmount > 0, "0 amt");
         _depositsForGenesis(_tokenOwner, _timestamp, _totalAmount);
@@ -370,7 +370,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
         DURATION = _duration;
     }
 
-    function setGenesisPool(address _genesisPool) external onlyGenesisManager{
+    function setGenesisPool(address _genesisPool) external onlyGenesisPool{
         genesisPool = _genesisPool;
     }
 
