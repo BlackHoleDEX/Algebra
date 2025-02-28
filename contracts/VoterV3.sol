@@ -14,8 +14,6 @@ import './interfaces/IVotingEscrow.sol';
 import './interfaces/IPermissionsRegistry.sol';
 import "./interfaces/IAutomatedVotingManager.sol";
 import './interfaces/ITokenHandler.sol';
-// import './interfaces/IAlgebraFactory.sol';
-// import "hardhat/console.sol";
 import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -591,8 +589,6 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         } 
         if(_gaugeType == 1) {
             // removed due to code size
-            // address _pool_factory = IAlgebraFactory(_factory).poolByPair(tokenA, tokenB);
-            // address _pool_hyper = IHypervisor(_pool).pool();
             // require(_pool_hyper == _pool_factory, 'wrong tokens');    
             isPair = true;
         } else {

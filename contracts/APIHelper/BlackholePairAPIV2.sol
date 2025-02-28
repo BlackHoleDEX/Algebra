@@ -23,15 +23,6 @@ import "hardhat/console.sol";
 
 import {BlackTimeLibrary} from "../libraries/BlackTimeLibrary.sol";
 
-interface IHypervisor{
-    function pool() external view returns(address);
-    function getTotalAmounts() external view returns(uint tot0,uint tot1);
-}
-
-interface IAlgebraFactory{
-    function poolByPair(address, address) external view returns(address);
-}
-
 contract BlackholePairAPIV2 is Initializable {
 
     struct pairInfo {
@@ -143,7 +134,6 @@ contract BlackholePairAPIV2 is Initializable {
 
 
     IPairFactory public pairFactory;
-    IAlgebraFactory public algebraFactory;
     IVoter public voter;
     IVoterV3 public voterV3;
     IRouter01 public routerV2;
@@ -170,8 +160,6 @@ contract BlackholePairAPIV2 is Initializable {
 
         pairFactory = IPairFactory(voter.factories()[0]);
         underlyingToken = IVotingEscrow(voter._ve()).token();
-
-        algebraFactory = IAlgebraFactory(address(0x306F06C147f064A010530292A1EB6737c3e378e4));
     }
 
     function getClaimable(address _account, address _pair) internal view returns(uint claimable0, uint claimable1){
@@ -283,7 +271,6 @@ contract BlackholePairAPIV2 is Initializable {
         
         if(_type == false){
             // hypervisor totalAmounts = algebra.pool + gamma.unused
-            // (r0,r1) = IHypervisor(_pair).getTotalAmounts();
         } else {
             (r0,r1,) = ipair.getReserves();
         }
