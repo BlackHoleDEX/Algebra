@@ -23,7 +23,7 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
     }
 
     /* ======= STATE VARIABLES ======= */
-    IVoterV public voter;
+    IVoter public voter;
     IVotingEscrow public votingEscrow;
     address public chainlinkExecutor;
     address public minter;
