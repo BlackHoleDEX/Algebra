@@ -1,4 +1,4 @@
-const fixedAuctionAddress = "0x682317F5BFEF5a1a7bEEc7b5C73705c9ac71950e";
+const fixedAuctionAddress = "0xfa3e76838A4Cf3f3942c1753f55B093Aca5d6C89";
 
 const fixedAuctionAbi = [
   {

@@ -1,4 +1,4 @@
-const genesisPoolManagerAddress = "0x1AF74C433D48b1F2f8b788013b55f6D8Eb81965D";
+const genesisPoolManagerAddress = "0xD0E4161E5c1cA6a83Aa39d3BfA4b03CbB0d11bCF";
 
 const genesisPoolManagerAbi = [
   {
@@ -566,7 +566,7 @@ const genesisPoolManagerAbi = [
     "name": "voter",
     "outputs": [
       {
-        "internalType": "contract IVoterV3",
+        "internalType": "contract IVoter",
         "name": "",
         "type": "address"
       }

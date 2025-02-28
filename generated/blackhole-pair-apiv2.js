@@ -1,4 +1,4 @@
-const blackholePairAPIV2Address = "0x5Da8306427A75C2e545B3492E3D8bd23181b5739";
+const blackholePairAPIV2Address = "0x1D4fEb4fCf6B1529FE5920EF2155e64340E1dE23";
 
 const blackholePairAPIV2Abi = [
   {
@@ -123,19 +123,6 @@ const blackholePairAPIV2Abi = [
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "algebraFactory",
-    "outputs": [
-      {
-        "internalType": "contract IAlgebraFactory",
-        "name": "",
-        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -748,7 +735,7 @@ const blackholePairAPIV2Abi = [
     "name": "routerV2",
     "outputs": [
       {
-        "internalType": "contract IRouter01",
+        "internalType": "contract IRouter",
         "name": "",
         "type": "address"
       }
@@ -801,19 +788,6 @@ const blackholePairAPIV2Abi = [
     "outputs": [
       {
         "internalType": "contract IVoter",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "voterV3",
-    "outputs": [
-      {
-        "internalType": "contract IVoterV3",
         "name": "",
         "type": "address"
       }
