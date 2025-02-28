@@ -3,7 +3,7 @@ pragma solidity 0.8.13;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
-import "./interfaces/IVoterV3.sol";
+import "./interfaces/IVoter.sol";
 import "./interfaces/IVotingEscrow.sol";
 import "./interfaces/IBribe.sol";
 import "./interfaces/IRewardsDistributor.sol";
@@ -23,7 +23,7 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
     }
 
     /* ======= STATE VARIABLES ======= */
-    IVoterV3 public voterV3;
+    IVoter public voter;
     IVotingEscrow public votingEscrow;
     address public chainlinkExecutor;
     address public minter;
@@ -55,11 +55,11 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
     }
 
     /* ======= INITIALIZER ======= */
-    function initialize(address _voterV3, address _votingEscrow, address _chainlinkExecutor, address _minter, address _rewards_distributor) public initializer {
+    function initialize(address _voter, address _votingEscrow, address _chainlinkExecutor, address _minter, address _rewards_distributor) public initializer {
         __Ownable_init(); // ✅ Initialize Ownable
         __ReentrancyGuard_init(); // ✅ Initialize ReentrancyGuard
         
-        voterV3 = IVoterV3(_voterV3);
+        voter = IVoter(_voter);
         votingEscrow = IVotingEscrow(_votingEscrow);
         chainlinkExecutor = _chainlinkExecutor;
         minter = _minter;
@@ -89,7 +89,7 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
         require(originalOwner[lockId] == msg.sender, "Not original owner");
         require(!BlackTimeLibrary.isLastHour(block.timestamp), "Cannot disable in last hour before voting");
 
-        voterV3.reset(lockId);
+        voter.reset(lockId);
 
         delete originalOwner[lockId];
         delete isAutoVotingEnabled[lockId];
@@ -121,7 +121,7 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
             uint256 lockId = tokenIds[i];
             if (isAutoVotingEnabled[lockId]) {
                 IRewardsDistributor(rewardsDistributor).claim(lockId);
-                voterV3.vote(lockId, poolAddresses, weights);
+                voter.vote(lockId, poolAddresses, weights);
             }
         }
 
@@ -147,16 +147,16 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
     /* ======= PUBLIC VIEW FUNCTIONS ======= */
     /// @notice Fetches rewards per voting power and returns the top N pools based on rewards
     function getRewardsPerVotingPower(uint256 topN) public view returns (PoolsAndRewards[] memory) {
-        // address[] memory pools = voterV3.pools(); // to use voterV3.length() and then iterate over it
-        uint256 numPools = voterV3.length();
+        // address[] memory pools = voter.pools(); // to use voter.length() and then iterate over it
+        uint256 numPools = voter.length();
         PoolsAndRewards[] memory poolRewards = new PoolsAndRewards[](numPools);
         uint256 epochStart = BlackTimeLibrary.epochStart(block.timestamp);
 
         for (uint256 i = 0; i < numPools; i++) {
-            address pool = voterV3.pools(i);
-            address gauge = voterV3.gauges(pool);
-            address bribeInternal = voterV3.internal_bribes(gauge);
-            address bribeExternal = voterV3.external_bribes(gauge);
+            address pool = voter.pools(i);
+            address gauge = voter.gauges(pool);
+            address bribeInternal = voter.internal_bribes(gauge);
+            address bribeExternal = voter.external_bribes(gauge);
             uint256 totalRewardsPerVotingPower = 0;
 
             for (uint256 j = 0; j < IBribe(bribeInternal).rewardsListLength(); j++) {
@@ -171,7 +171,7 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
                 totalRewardsPerVotingPower += (externalBribes);
             }
 
-            uint256 totalVotes = voterV3.weights(pool);
+            uint256 totalVotes = voter.weights(pool);
             uint256 rewardsPerVotingPower;
             // to account for pools that have no votes, so even the smallest amount of voting power voted on them can cause a huge apr
             if (totalVotes == 0 && totalRewardsPerVotingPower > 0) {

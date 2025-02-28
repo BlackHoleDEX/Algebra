@@ -9,9 +9,9 @@ import "./interfaces/IGenesisPool.sol";
 import "./interfaces/IGenesisPoolBase.sol";
 import "./interfaces/ITokenHandler.sol";
 import "./interfaces/IAuction.sol";
-import "./interfaces/IVoterV3.sol";
+import "./interfaces/IVoter.sol";
 import "./interfaces/IBribe.sol";
-import "./interfaces/IRouter01.sol";
+import "./interfaces/IRouter.sol";
 import "./interfaces/IGauge.sol";
 
 contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeable {
@@ -22,7 +22,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
     address immutable internal genesisManager;
     ITokenHandler immutable internal tokenHandler;
     IAuction internal auction;
-    IVoterV3 immutable internal voter;
+    IVoter immutable internal voter;
 
     TokenAllocation public allocationInfo;
     GenesisInfo public genesisInfo;
@@ -69,7 +69,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
         factory = _factory;
         genesisManager = _genesisManager;
         tokenHandler = ITokenHandler(_tokenHandler);
-        voter = IVoterV3(_voter);
+        voter = IVoter(_voter);
 
         totalDeposits = 0;
         liquidity = 0;
@@ -223,7 +223,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
     }
 
     function _addLiquidityAndDistribute(address _router, uint256 nativeDesired, uint256 fundingDesired, uint256 maturityTime) internal {
-        (, , uint _liquidity) = IRouter01(_router).addLiquidity(genesisInfo.nativeToken, genesisInfo.fundingToken, genesisInfo.stable, nativeDesired, fundingDesired, 0, 0, address(this), block.timestamp + 100);
+        (, , uint _liquidity) = IRouter(_router).addLiquidity(genesisInfo.nativeToken, genesisInfo.fundingToken, genesisInfo.stable, nativeDesired, fundingDesired, 0, 0, address(this), block.timestamp + 100);
         liquidity = _liquidity;
         IGauge(liquidityPoolInfo.gaugeAddress).setGenesisPool(address(this));
         IERC20(liquidityPoolInfo.pairAddress).approve(liquidityPoolInfo.gaugeAddress, liquidity);

@@ -7,7 +7,7 @@ import {IERC20} from "./interfaces/IERC20.sol";
 import {IBlackHoleVotes} from "./interfaces/IBlackHoleVotes.sol";
 import {IVeArtProxy} from "./interfaces/IVeArtProxy.sol";
 import {IVotingEscrow} from "./interfaces/IVotingEscrow.sol";
-import {IVoterV3} from "./interfaces/IVoterV3.sol";
+import {IVoter} from "./interfaces/IVoter.sol";
 import {IAutomatedVotingManager} from "./interfaces/IAutomatedVotingManager.sol";
 
 /// @title Voting Escrow
@@ -828,7 +828,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         _deposit_for(_tokenId, _value, 0, _locked, DepositType.DEPOSIT_FOR_TYPE);
             
         if(voted[_tokenId]) {
-            IVoterV3(voter).poke(_tokenId);
+            IVoter(voter).poke(_tokenId);
         }
     }
 
@@ -892,7 +892,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
 
         // poke for the gained voting power 
         if(voted[_tokenId]) {
-            IVoterV3(voter).poke(_tokenId);
+            IVoter(voter).poke(_tokenId);
         }
         emit MetadataUpdate(_tokenId);
     }
@@ -927,7 +927,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
 
         // poke for the gained voting power 
         if(voted[_tokenId]) {
-            IVoterV3(voter).poke(_tokenId);
+            IVoter(voter).poke(_tokenId);
         }
         emit MetadataUpdate(_tokenId);
     }

@@ -4,7 +4,7 @@ const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants.js");
 
 
 async function main () {
-    // data = await ethers.getContractFactory("GaugeFactoryV2");
+    // data = await ethers.getContractFactory("GaugeFactory");
     // input = [permissionRegistry]
     // gaugeFactory = await upgrades.deployProxy(data, input, {initializer: 'initialize'});
     // txDeployed = await gaugeFactory.deployed();

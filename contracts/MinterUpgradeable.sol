@@ -6,8 +6,6 @@ import "./interfaces/IMinter.sol";
 import "./interfaces/IRewardsDistributor.sol";
 import "./interfaces/IBlack.sol";
 import "./interfaces/IVoter.sol";
-import "./interfaces/IVoterV3.sol";
-
 import "./interfaces/IVotingEscrow.sol";
 
 import { IBlackGovernor } from "./interfaces/IBlackGovernor.sol";
@@ -51,10 +49,8 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     
     IBlack public _black;
     IVoter public _voter;
-    IVoterV3 public _voterV3;
     IVotingEscrow public _ve;
     IRewardsDistributor public _rewards_distributor;
-    IVoter _epoch_controller;
 
     mapping(uint256 => bool) public proposals;
 
@@ -84,7 +80,6 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
         _black = IBlack(IVotingEscrow(__ve).token());
         _voter = IVoter(__voter);
         _ve = IVotingEscrow(__ve);
-        _voterV3 = IVoterV3(__voter);
         _rewards_distributor = IRewardsDistributor(__rewards_distributor);
 
         active_period = ((block.timestamp + (2 * WEEK)) / WEEK) * WEEK;
@@ -171,7 +166,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     }
     
     function nudge() external {
-        address _epochGovernor = _voterV3.getBlackGovernor();
+        address _epochGovernor = _voter.getBlackGovernor();
         require (msg.sender == _epochGovernor);
         IBlackGovernor.ProposalState _state = IBlackGovernor(_epochGovernor).status();
         require (weekly < TAIL_START);
