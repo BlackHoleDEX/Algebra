@@ -117,11 +117,11 @@ const deployPairFactory = async (pairGeneratorAddress) => {
     
 }
 
-const deployRouterV2 = async(pairFactoryAddress, pairGeneratorAddress) => {
+const deployRouterV2 = async(pairFactoryAddress) => {
     try {
         const wETH = '0x4200000000000000000000000000000000000006'
         const routerV2Contract = await ethers.getContractFactory("RouterV2");
-        const routerV2 = await routerV2Contract.deploy(pairFactoryAddress, pairGeneratorAddress, wETH);
+        const routerV2 = await routerV2Contract.deploy(pairFactoryAddress, wETH);
         txDeployed = await routerV2.deployed();
         console.log("routerV2 address: ", routerV2.address)
         generateConstantFile("RouterV2", routerV2.address);
@@ -632,7 +632,7 @@ async function main () {
     const pairFactoryAddress = await deployPairFactory(pairGeneratorAddress);
 
     //deploy router V2
-    const routerV2Address = await deployRouterV2(pairFactoryAddress, pairGeneratorAddress);
+    const routerV2Address = await deployRouterV2(pairFactoryAddress);
 
     // setDibs
     await setDibs(pairFactoryAddress);
