@@ -84,6 +84,8 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
     function depositNativeToken(address nativeToken, uint auctionIndex, GenesisInfo calldata genesisPoolInfo, TokenAllocation calldata allocationInfo) external nonReentrant returns(address genesisPool) {
         address _sender = msg.sender;
         require(whiteListedTokensToUser[nativeToken][_sender] || _checkGovernance(), "!listed");
+        require(nativeToken == genesisPoolInfo.nativeToken, "!= native");
+        require(_sender == allocationInfo.tokenOwner, "!= owner");
         require(allocationInfo.proposedNativeAmount > 0, "0 native");
         require(allocationInfo.proposedFundingAmount > 0, "0 funding");
         require(genesisFactory.getGenesisPool(nativeToken) == address(0), "exists");

@@ -1,0 +1,30 @@
+[
+  {
+    "name": "SHIBA INU",
+    "ticker": "SHIB",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x239b9c1f24f3423062b0d364796e07ee905e9fce/logo.svg",
+    "decimal": 18,
+    "address": "0xB2d52F3cC9796ea606a383f00cB49e66D599B688"
+  },
+  {
+    "name": "DOGE COIN",
+    "ticker": "DOGE",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x67f0870bb897f5e1c369976b4a2962d527b9562c/logo.svg",
+    "decimal": 18,
+    "address": "0xBCB0199126614eAa14e1F6dA26953c2a814a6cE5"
+  },
+  {
+    "name": "MORPHO",
+    "ticker": "MOR",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x7431ada8a591c955a994a21710752ef9b882b8e3/logo.svg",
+    "decimal": 18,
+    "address": "0xF3Eb1EB1F7dEE67b51f8aCB008f11cC89b3f78AB"
+  },
+  {
+    "name": "PEPE",
+    "ticker": "PEPE",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x52b492a33e447cdb854c7fc19f1e57e8bfa1777d/logo.svg",
+    "decimal": 18,
+    "address": "0x4772D355dE34ad2B3b089797AC81f28532A8edBc"
+  }
+]

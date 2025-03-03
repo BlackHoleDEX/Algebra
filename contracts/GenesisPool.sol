@@ -82,7 +82,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
 
         genesisInfo.duration = BlackTimeLibrary.epochMultiples(genesisInfo.duration);
         genesisInfo.startTime = BlackTimeLibrary.epochNext(block.timestamp);
-
+        
         allocationInfo.proposedNativeAmount = _allocationInfo.proposedNativeAmount;
         allocationInfo.proposedFundingAmount = _allocationInfo.proposedFundingAmount;
         allocationInfo.allocatedNativeAmount = 0;
