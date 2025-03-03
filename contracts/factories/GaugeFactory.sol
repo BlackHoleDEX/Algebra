@@ -45,8 +45,8 @@ contract GaugeFactory is IGaugeFactory, OwnableUpgradeable {
     }
 
 
-    function createGauge(address _rewardToken,address _ve,address _token,address _distribution, address _internal_bribe, address _external_bribe, bool _isPair, address genesisManager) external returns (address) {
-        last_gauge = address(new GaugeV2(_rewardToken,_ve,_token,_distribution,_internal_bribe,_external_bribe,_isPair, genesisManager) );
+    function createGauge(address _rewardToken,address _ve,address _token,address _distribution, address _internal_bribe, address _external_bribe, bool _isPair) external returns (address) {
+        last_gauge = address(new GaugeV2(_rewardToken,_ve,_token,_distribution,_internal_bribe,_external_bribe,_isPair) );
         __gauges.push(last_gauge);
         return last_gauge;
     }

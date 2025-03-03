@@ -611,7 +611,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         _external_bribe = IBribeFactory(bribefactory).createBribe(_owner, tokenA, tokenB, _type);
 
         // create gauge
-        _gauge = IGaugeFactory(_gaugeFactory).createGauge(base, _ve, _pool, address(this), _internal_bribe, _external_bribe, isPair, genesisManager);
+        _gauge = IGaugeFactory(_gaugeFactory).createGauge(base, _ve, _pool, address(this), _internal_bribe, _external_bribe, isPair);
      
         // approve spending for $the
         IERC20(base).approve(_gauge, type(uint256).max);

@@ -43,7 +43,6 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     uint256 public lastUpdateTime;
     uint256 public rewardPerTokenStored;
 
-    address public genesisManager;
     address public genesisPool;
 
     mapping(address => uint256) public userRewardPerTokenPaid;
@@ -79,7 +78,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     }
 
     modifier onlyGenesisPool() {
-        require(msg.sender == genesisPool, "!= genesisManager");
+        require(msg.sender == genesisPool, "!= genesisPool");
         _;
     }
 
@@ -88,7 +87,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
         _;
     }
 
-    constructor(address _rewardToken,address _ve,address _token,address _distribution, address _internal_bribe, address _external_bribe, bool _isForPair, address _genesisManager) {
+    constructor(address _rewardToken,address _ve,address _token,address _distribution, address _internal_bribe, address _external_bribe, bool _isForPair) {
         rewardToken = IERC20(_rewardToken);     // main reward
         VE = _ve;                               // vested
         TOKEN = IERC20(_token);                 // underlying (LP)
@@ -97,8 +96,6 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
 
         internal_bribe = _internal_bribe;       // lp fees goes here
         external_bribe = _external_bribe;       // bribe fees goes here
-
-        genesisManager = _genesisManager;
 
         isForPair = _isForPair;                 // pair boolean, if false no claim_fees
 
