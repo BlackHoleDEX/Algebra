@@ -12,6 +12,7 @@ import {BlackTimeLibrary} from "../libraries/BlackTimeLibrary.sol";
 contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
 
     struct GenesisData {
+        address genesisPool;
         address protocolToken;
         uint256 userDeposit;
         TokenAllocation tokenAllocation;
@@ -62,6 +63,7 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
 
             genesisPool = genesisPoolFactory.getGenesisPool(proposedTokens[i]);
 
+            genesisPools[i - _offset].genesisPool = genesisPool;
             genesisPools[i - _offset].protocolToken = proposedTokens[i];
             genesisPools[i - _offset].userDeposit = IGenesisPool(genesisPool).userDeposits(_user);
             genesisPools[i - _offset].tokenAllocation = IGenesisPool(genesisPool).getAllocationInfo();
