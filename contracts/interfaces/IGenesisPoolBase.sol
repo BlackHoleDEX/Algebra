@@ -22,7 +22,7 @@ interface IGenesisPoolBase {
         address fundingToken;
         bool stable;
         uint256 duration;
-        uint8 threshold; // multiplied by 100 to support 2 decimals
+        uint256 threshold; // multiplied by 100 to support 2 decimals
         uint256 supplyPercent; 
         uint256 startPrice;
         uint256 startTime;

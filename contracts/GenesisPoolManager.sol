@@ -107,10 +107,8 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
 
         address auction = auctionFactory.auctions(auctionIndex);
         auction = auction == address(0) ? auctionFactory.auctions(0) : auction;
-        IGenesisPool(genesisPool).setAuction(auction);
-
         nativeTokens.push(nativeToken); 
-        IGenesisPool(genesisPool).setGenesisPoolInfo(genesisPoolInfo, allocationInfo);
+        IGenesisPool(genesisPool).setGenesisPoolInfo(genesisPoolInfo, allocationInfo, auction);
     }
 
     function rejectGenesisPool(address nativeToken) external Governance nonReentrant {

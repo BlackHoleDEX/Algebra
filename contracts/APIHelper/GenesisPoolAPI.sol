@@ -39,7 +39,7 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
     }
 
 
-    function getAllGenesisPools(address _user, uint _amounts, uint _offset) external view returns(uint totPairs, bool hasNext, GenesisData[] memory genesisPools){
+    function getAllGenesisPools(address _user, uint _amounts, uint _offset) external view returns(uint totalPools, bool hasNext, GenesisData[] memory genesisPools){
          
         if(_user == address(0)) {
             return (0,false,genesisPools);
@@ -50,13 +50,14 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
         genesisPools = new GenesisData[](_amounts);
 
         address[] memory proposedTokens = genesisManager.getAllNaitveTokens();
-        
+        totalPools = proposedTokens.length;
+
         uint i = _offset;
         hasNext = true;
         address genesisPool;
 
         for(i; i < _offset + _amounts; i++){
-            if(i >= totPairs) {
+            if(i >= totalPools) {
                 hasNext = false;
                 break;
             }

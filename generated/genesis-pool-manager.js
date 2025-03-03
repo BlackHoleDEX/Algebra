@@ -1,4 +1,4 @@
-const genesisPoolManagerAddress = "0xD0E4161E5c1cA6a83Aa39d3BfA4b03CbB0d11bCF";
+const genesisPoolManagerAddress = "0x8D31FC1731Ae3DC4F7B40f5546Db7FF8d9498f86";
 
 const genesisPoolManagerAbi = [
   {
@@ -196,9 +196,9 @@ const genesisPoolManagerAbi = [
             "type": "uint256"
           },
           {
-            "internalType": "uint8",
+            "internalType": "uint256",
             "name": "threshold",
-            "type": "uint8"
+            "type": "uint256"
           },
           {
             "internalType": "uint256",

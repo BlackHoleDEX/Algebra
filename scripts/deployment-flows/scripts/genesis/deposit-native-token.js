@@ -1,8 +1,9 @@
 const { genesisPoolManagerAddress, genesisPoolManagerAbi } = require('../../../../generated/genesis-pool-manager');
+const { customTokenAbi } = require('../../../../generated/custom-token');
 const { ethers } = require("hardhat");
 const fs = require('fs');
 const path = require('path');
-
+const { BigNumber } = require("ethers");
 
 async function main () {
 
@@ -21,7 +22,7 @@ async function main () {
 
         const nativeToken = addresses[0];
         const tokenOwner = accounts[1].address;
-        const auctionIndex = 1;
+        const auctionIndex = 0;
 
         const genesisPoolInfo = {
             nativeToken : nativeToken,
@@ -30,7 +31,7 @@ async function main () {
             duration : 1209600,
             threshold : 5000,
             supplyPercent : 100, 
-            startPrice : BigNumber.from(0.01).mul(BigNumber.from("1000000000000000000")),
+            startPrice : (BigInt(1) * BigInt(10 ** 16)).toString(),
             startTime : 1741020000
         }
 
@@ -39,8 +40,8 @@ async function main () {
 
         const tokenAllocation = {
             tokenOwner : tokenOwner,
-            proposedNativeAmount : BigNumber.from(proposedNativeAmount).mul(BigNumber.from("1000000000000000000")),
-            proposedFundingAmount : BigNumber.from(proposedFundingAmount).mul(BigNumber.from("1000000000000000000")),
+            proposedNativeAmount : (BigInt(proposedNativeAmount) * BigInt(10 ** 18)).toString(),
+            proposedFundingAmount : (BigInt(proposedFundingAmount) * BigInt(10 ** 18)).toString(),
             allocatedNativeAmount : 0,
             allocatedFundingAmount : 0,
             refundableNativeAmount : 0
@@ -48,8 +49,16 @@ async function main () {
 
         console.log("nativeToken : ", nativeToken, "tokenOwner : ", tokenOwner);
 
+        const approvalAmountString = (BigInt(proposedNativeAmount) * BigInt(10 ** 18)).toString();
+        const tokenContract = await ethers.getContractAt(customTokenAbi, nativeToken);
+        const tokenSigner = tokenContract.connect(accounts[1]);
+        const txApproval = await tokenSigner.approve(genesisPoolManagerAddress, approvalAmountString);
+        await txApproval.wait();
+
         const GenesisManagerContract = await ethers.getContractAt(genesisPoolManagerAbi, genesisPoolManagerAddress);
-        await GenesisManagerContract.depositNativeToken(nativeToken, auctionIndex, genesisPoolInfo, tokenAllocation);
+        const genesisSigner = GenesisManagerContract.connect(accounts[1]);
+        const txt = await genesisSigner.depositNativeToken(nativeToken, auctionIndex, genesisPoolInfo, tokenAllocation);
+        console.log("txt : ", txt);
     }
     catch(error){
         console.log("Error in deposit native token : ", error)

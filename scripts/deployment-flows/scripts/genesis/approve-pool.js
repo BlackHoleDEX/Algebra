@@ -23,7 +23,7 @@ async function main () {
         await GenesisManagerContract.approveGenesisPool(nativeToken);
     }
     catch(error){
-        console.log("Error in whitelisting token : ", error)
+        console.log("Error in aprrove token : ", error)
     }
 }
 

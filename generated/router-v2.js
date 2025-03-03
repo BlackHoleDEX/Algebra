@@ -1,4 +1,4 @@
-const routerV2Address = "0x9063A6E4ea4121F3215b82138BA0dEf743c281D4";
+const routerV2Address = "0x4e2E5115dd6bE773F1971b7131E15dB57bbBF7dD";
 
 const routerV2Abi = [
   {
@@ -6,11 +6,6 @@ const routerV2Abi = [
       {
         "internalType": "address",
         "name": "_factory",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_pairGenerator",
         "type": "address"
       },
       {
@@ -402,19 +397,6 @@ const routerV2Abi = [
       {
         "internalType": "address",
         "name": "pair",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "pairGenerator",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
         "type": "address"
       }
     ],

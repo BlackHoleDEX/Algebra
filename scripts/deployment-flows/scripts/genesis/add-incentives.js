@@ -1,8 +1,9 @@
 const { genesisPoolAbi } = require('../../../../generated/genesis-pool');
+const { customTokenAbi } = require('../../../../generated/custom-token');
 const { ethers } = require("hardhat");
 const fs = require('fs');
 const path = require('path');
-
+const { BigNumber } = require("ethers");
 
 async function main () {
 
@@ -23,21 +24,27 @@ async function main () {
         const deployedTokens = require('../../token-constants/deployed-tokens.json');
         const blackAddress = deployedTokens[0].address;
 
-        const genesisPoolAddress = "";
+        const genesisPoolAddress = "0x430009405636602E290a4c53a70bDc9dF4a7E8E7";
 
         const nativeToken = nativeAddresses[0];
         const incentivesTokens = [addresses[0], addresses[1], blackAddress, nativeToken];
         const incentivesAmounts = [
-            BigNumber.from(100).mul(BigNumber.from("1000000000000000000")),
-            BigNumber.from(20).mul(BigNumber.from("1000000000000000000")),
-            BigNumber.from(100).mul(BigNumber.from("1000000000000000000")),
-            BigNumber.from(50).mul(BigNumber.from("1000000000000000000"))
-        ]
-       
-        const tokenOwner = accounts[1].address;
+            (BigInt(100) * BigInt(10 ** 18)).toString(),
+            (BigInt(20) * BigInt(10 ** 18)).toString(),
+            (BigInt(70) * BigInt(10 ** 18)).toString(),
+            (BigInt(50) * BigInt(10 ** 18)).toString(),
+        ];
+
+        for(let i=0;i<incentivesTokens.length;i++){
+          const tokenContract = await ethers.getContractAt(customTokenAbi, incentivesTokens[i]);
+          const tokenSigner = tokenContract.connect(accounts[1]);
+          const txApproval = await tokenSigner.approve(genesisPoolAddress, incentivesAmounts[i]);
+          await txApproval.wait();
+        }
 
         const GenesisPoolContract = await ethers.getContractAt(genesisPoolAbi, genesisPoolAddress);
-        await GenesisPoolContract.addIncentives(incentivesTokens, incentivesAmounts);
+        const genesisSigner = GenesisPoolContract.connect(accounts[1]);
+        await genesisSigner.addIncentives(incentivesTokens, incentivesAmounts);
     }
     catch(error){
         console.log("Error in deposit native token : ", error)

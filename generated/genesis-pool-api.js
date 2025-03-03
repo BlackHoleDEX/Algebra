@@ -1,4 +1,4 @@
-const genesisPoolAPIAddress = "0xb6c95AD6788d5fD0f1ea4721EbF4abCc6D44e8FB";
+const genesisPoolAPIAddress = "0xdF21FC476F575fDA01b00A8bfE3D3F2925DdA702";
 
 const genesisPoolAPIAbi = [
   {
@@ -80,7 +80,7 @@ const genesisPoolAPIAbi = [
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "totPairs",
+        "name": "totalPools",
         "type": "uint256"
       },
       {
@@ -90,6 +90,11 @@ const genesisPoolAPIAbi = [
       },
       {
         "components": [
+          {
+            "internalType": "address",
+            "name": "genesisPool",
+            "type": "address"
+          },
           {
             "internalType": "address",
             "name": "protocolToken",
@@ -177,9 +182,9 @@ const genesisPoolAPIAbi = [
                 "type": "uint256"
               },
               {
-                "internalType": "uint8",
+                "internalType": "uint256",
                 "name": "threshold",
-                "type": "uint8"
+                "type": "uint256"
               },
               {
                 "internalType": "uint256",

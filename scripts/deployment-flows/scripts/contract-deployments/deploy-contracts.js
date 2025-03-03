@@ -552,7 +552,7 @@ const setGenesisPoolManagerInVoter = async(voterV3Address, genesisManagerAddress
 
 const setGenesisPoolManagerInPairFactory = async(pairFactoryAddress, genesisManagerAddress) => {
     try {
-        const PairFactoryContract = await ethers.getContractAt(pairFactoryUpgradeableAbi, pairFactoryAddress);
+        const PairFactoryContract = await ethers.getContractAt(pairFactoryAbi, pairFactoryAddress);
         await PairFactoryContract.setGenesisManager(genesisManagerAddress);
         console.log("set genesis manager in pair factory\n");
     } catch (error) {

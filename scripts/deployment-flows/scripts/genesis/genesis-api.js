@@ -2,6 +2,7 @@ const { genesisPoolAPIAbi, genesisPoolAPIAddress } = require('../../../../genera
 const { ethers } = require("hardhat");
 const fs = require('fs');
 const path = require('path');
+const { genesisPoolManagerAbi, genesisPoolManagerAddress } = require('../../../../generated/genesis-pool-manager');
 
 async function main () {
 
@@ -14,14 +15,20 @@ async function main () {
         const GenesisPoolApi = await ethers.getContractAt(genesisPoolAPIAbi, genesisPoolAPIAddress);
         const genesisPoolsData = await GenesisPoolApi.getAllGenesisPools(ownerAddress, 10, 0);
 
-        const genesisPools = genesisPoolsData[0];
+        console.log("genesisPool : ", genesisPoolsData);
 
-        for(const genesisPool of genesisPools){
-            console.log("genesisPool : ", genesisPool);
-        }
+        const GenesisPoolManager = await ethers.getContractAt(genesisPoolManagerAbi, genesisPoolManagerAddress);
+        const nativeTokens = await GenesisPoolManager.getAllNaitveTokens();
+
+        console.log("nativeTokens : ", nativeTokens);
+        // const genesisPools = genesisPoolsData[0];
+
+        // for(const genesisPool of genesisPools){
+        //     console.log("genesisPool : ", genesisPool);
+        // }
     }
     catch(error){
-        console.log("Error in whitelisting token : ", error)
+        console.log("Error in genesis api : ", error)
     }
 }
 
