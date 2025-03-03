@@ -140,4 +140,12 @@ contract TokenHandler is  ITokenHandler {
 
         emit BlacklistConnector(msg.sender, _token);
     }
+
+    function whiteListedTokensLength() external view returns(uint256) {
+        return whiteListed.length;
+    }
+
+    function connectorTokensLength() external view returns(uint256) {
+        return connectors.length;
+    }
 }

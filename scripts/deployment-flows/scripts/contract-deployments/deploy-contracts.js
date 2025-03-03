@@ -274,10 +274,10 @@ const createGauges = async(voterV3Address, blackholeV2AbiAddress) => {
     console.log('done creation of gauge tx\n')
 }
 
-const deployBribeV3Factory = async (permissionRegistryAddress) => {
+const deployBribeV3Factory = async (permissionRegistryAddress, tokenHandlerAddress) => {
     try {
         const bribeContractFactory = await ethers.getContractFactory("BribeFactoryV3");
-        const input = [ZERO_ADDRESS, permissionRegistryAddress]
+        const input = [ZERO_ADDRESS, permissionRegistryAddress, tokenHandlerAddress]
         const BribeFactoryV3 = await upgrades.deployProxy(bribeContractFactory, input, {initializer: 'initialize'});
         const txDeployed = await BribeFactoryV3.deployed();
         console.log('deployed bribefactory v3: ', BribeFactoryV3.address)
@@ -641,7 +641,7 @@ async function main () {
     const votingEscrowAddress = await deployVotingEscrow(blackAddress);
     
     //deploy bribeV3
-    const bribeV3Address = await deployBribeV3Factory(permissionRegistryAddress);
+    const bribeV3Address = await deployBribeV3Factory(permissionRegistryAddress, tokenHandlerAddress);
 
     //deploygaugeV2
     const gaugeV2Address = await deployGaugeV2Factory(permissionRegistryAddress);
