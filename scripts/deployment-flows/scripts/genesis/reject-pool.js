@@ -16,12 +16,11 @@ async function main () {
         const addresses = jsonData.map(obj => obj.address);
 
         const nativeToken = addresses[0];
-        const tokenOwner = accounts[1].address;
 
         console.log("nativeToken : ", nativeToken, "tokenOwner : ", tokenOwner);
 
         const GenesisManagerContract = await ethers.getContractAt(genesisPoolManagerAbi, genesisPoolManagerAddress);
-        await GenesisManagerContract.whiteListUserAndToken(tokenOwner, nativeToken);
+        await GenesisManagerContract.rejectGenesisPool(nativeToken);
     }
     catch(error){
         console.log("Error in whitelisting token : ", error)
