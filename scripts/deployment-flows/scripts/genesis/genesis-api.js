@@ -13,7 +13,7 @@ async function main () {
 
     try{
         const GenesisPoolApi = await ethers.getContractAt(genesisPoolAPIAbi, genesisPoolAPIAddress);
-        const genesisPoolsData = await GenesisPoolApi.getAllGenesisPools(ownerAddress, 1, 0);
+        const genesisPoolsData = await GenesisPoolApi.getAllGenesisPools(ownerAddress, 2, 0);
 
         console.log("genesisPool : ", genesisPoolsData);
 

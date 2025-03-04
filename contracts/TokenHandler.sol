@@ -45,14 +45,14 @@ contract TokenHandler is  ITokenHandler {
     }
 
     /// @notice Whitelist a token for gauge creation
-    function whitelistTokens(address[] memory _tokens) external {
+    function whitelistTokens(address[] memory _tokens) external GovernanceOrGenesisManager {
         uint256 i = 0;
         for(i = 0; i < _tokens.length; i++){
             _whitelist(_tokens[i]);
         }
     }
 
-    function whitelistToken(address _token) external {
+    function whitelistToken(address _token) external GovernanceOrGenesisManager {
         _whitelist(_token);
     }
        

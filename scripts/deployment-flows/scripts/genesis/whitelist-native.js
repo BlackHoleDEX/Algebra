@@ -15,7 +15,7 @@ async function main () {
         const jsonData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8'));
         const addresses = jsonData.map(obj => obj.address);
 
-        const nativeToken = addresses[0];
+        const nativeToken = addresses[1];
         const tokenOwner = accounts[1].address;
 
         console.log("nativeToken : ", nativeToken, "tokenOwner : ", tokenOwner);

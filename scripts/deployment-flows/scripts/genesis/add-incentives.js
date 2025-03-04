@@ -24,7 +24,7 @@ async function main () {
         const deployedTokens = require('../../token-constants/deployed-tokens.json');
         const blackAddress = deployedTokens[0].address;
 
-        const genesisPoolAddress = "0xf6BDc4656298b9512620B7f4cd46D2221C3a5DfD";
+        const genesisPoolAddress = "0xB9503F775F07b60E61ABC2ef0EFEBAe51de0716f";
 
         const nativeToken = nativeAddresses[0];
         const incentivesTokens = [addresses[0], addresses[1], blackAddress, nativeToken];

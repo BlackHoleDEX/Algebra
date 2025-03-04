@@ -13,7 +13,7 @@ async function main () {
   console.log("ownerAddress : ", ownerAddress)
 
     try{
-        const genesisPoolAddress = "0xf6BDc4656298b9512620B7f4cd46D2221C3a5DfD";
+        const genesisPoolAddress = "0x0d30356720feCeEFf74b35d416a50893fB8af23e";
 
         const GenesisPoolContract = await ethers.getContractAt(genesisPoolAbi, genesisPoolAddress);
         const genesisSigner = GenesisPoolContract.connect(accounts[1]);

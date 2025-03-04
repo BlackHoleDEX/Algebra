@@ -79,7 +79,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
         genesisInfo = _genesisInfo;
 
         genesisInfo.duration = BlackTimeLibrary.epochMultiples(genesisInfo.duration);
-        genesisInfo.startTime = BlackTimeLibrary.epochNext(block.timestamp);
+        genesisInfo.startTime = BlackTimeLibrary.epochStart(block.timestamp);
         
         allocationInfo.proposedNativeAmount = _allocationInfo.proposedNativeAmount;
         allocationInfo.proposedFundingAmount = _allocationInfo.proposedFundingAmount;
@@ -135,6 +135,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
 
     function depositToken(address spender, uint256 amount) external onlyManager returns (bool) {
         require(poolStatus == PoolStatus.PRE_LISTING || poolStatus == PoolStatus.PRE_LAUNCH, "!= status");
+        require(block.timestamp >= genesisInfo.startTime, "! started");
 
         uint256 _amount = allocationInfo.proposedFundingAmount - allocationInfo.allocatedFundingAmount;
         _amount = _amount < amount ? _amount : amount;

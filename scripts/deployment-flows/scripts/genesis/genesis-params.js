@@ -1,7 +1,5 @@
 const { genesisPoolManagerAddress, genesisPoolManagerAbi } = require('../../../../generated/genesis-pool-manager');
 const { ethers } = require("hardhat");
-const fs = require('fs');
-const path = require('path');
 
 async function main () {
 
@@ -11,17 +9,16 @@ async function main () {
   console.log("ownerAddress : ", ownerAddress)
 
     try{
-        const jsonFilePath = path.join(__dirname, '../../token-constants/genesis-tokens.json'); 
-        const jsonData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8'));
-        const addresses = jsonData.map(obj => obj.address);
-
-        const nativeToken = addresses[1];
 
         const GenesisManagerContract = await ethers.getContractAt(genesisPoolManagerAbi, genesisPoolManagerAddress);
-        await GenesisManagerContract.approveGenesisPool(nativeToken);
+        const txt1 = await GenesisManagerContract.setMinimumDuration(1800);
+        console.log("txt : ", txt1);
+
+        const txt2 = await GenesisManagerContract.setMaturityTime(900);
+        console.log("txt : ", txt2);
     }
     catch(error){
-        console.log("Error in aprrove token : ", error)
+        console.log("Error in deposit native token : ", error)
     }
 }
 

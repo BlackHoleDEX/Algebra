@@ -20,34 +20,34 @@ async function main () {
         const deployedTokens = require('../../token-constants/deployed-tokens.json');
         const blackAddress = deployedTokens[0].address;
 
-        const nativeToken = addresses[0];
+        const nativeToken = addresses[1];
         const fundingToken = blackAddress;
-        let depositAmount = 100;
-        const genesisPoolAddress = "0xf6BDc4656298b9512620B7f4cd46D2221C3a5DfD";
+        let depositAmount = 5;
+        const genesisPoolAddress = "0xB9503F775F07b60E61ABC2ef0EFEBAe51de0716f";
 
-        let approvalAmountString = (BigInt(depositAmount) * BigInt(10 ** 18)).toString();
+        // let approvalAmountString = (BigInt(depositAmount) * BigInt(10 ** 18)).toString();
         const tokenContract = await ethers.getContractAt(customTokenAbi, fundingToken);
-        let tokenSigner = tokenContract.connect(accounts[1]);
-        let txApproval = await tokenSigner.approve(genesisPoolManagerAddress, approvalAmountString);
-        await txApproval.wait();
+        // let tokenSigner = tokenContract.connect(accounts[1]);
+        // let txApproval = await tokenSigner.approve(genesisPoolAddress, approvalAmountString);
+        // await txApproval.wait();
 
         const GenesisManagerContract = await ethers.getContractAt(genesisPoolManagerAbi, genesisPoolManagerAddress);
-        let genesisSigner = GenesisManagerContract.connect(accounts[1]);
-        let txt = await genesisSigner.depositToken(genesisPoolAddress, approvalAmountString);
-        await txt.wait();
-        console.log("deposited from owner");
+        // let genesisSigner = GenesisManagerContract.connect(accounts[1]);
+        // let txt = await genesisSigner.depositToken(genesisPoolAddress, approvalAmountString);
+        // await txt.wait();
+        // console.log("deposited from owner");
 
-        depositAmount = 50;
+        // depositAmount = 50;
 
         approvalAmountString = (BigInt(depositAmount) * BigInt(10 ** 18)).toString();
         tokenSigner = tokenContract.connect(accounts[0]);
-        txApproval = await tokenSigner.approve(genesisPoolManagerAddress, approvalAmountString);
+        txApproval = await tokenSigner.approve(genesisPoolAddress, approvalAmountString);
         await txApproval.wait();
 
         genesisSigner = GenesisManagerContract.connect(accounts[0]);
         txt = await genesisSigner.depositToken(genesisPoolAddress, approvalAmountString);
         await txt.wait();
-        console.log("deposited from owner");
+        console.log("deposited from funder");
     }
     catch(error){
         console.log("Error in deposit funding token : ", error)
