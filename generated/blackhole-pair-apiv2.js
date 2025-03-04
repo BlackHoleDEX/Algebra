@@ -1,4 +1,4 @@
-const blackholePairAPIV2Address = "0x374E0D4eE005E16ff96d76eD4E992C35e428c3aA";
+const blackholePairAPIV2Address = "0x14f020d69b6F28db32cE2386FFb4645E0751Bddb";
 
 const blackholePairAPIV2Abi = [
   {
@@ -396,7 +396,7 @@ const blackholePairAPIV2Abi = [
         "type": "address"
       }
     ],
-    "name": "getAmountOut1",
+    "name": "getAmountOut",
     "outputs": [
       {
         "components": [

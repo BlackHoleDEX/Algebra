@@ -1,4 +1,4 @@
-const veArtProxyUpgradeableAddress = "0xFccf679992005d83670D5856b2e08B60683E3d6A";
+const veArtProxyUpgradeableAddress = "0x3cEC2955aebc3d17EFC3494F37aCEd806310eab3";
 
 const veArtProxyUpgradeableAbi = [
   {

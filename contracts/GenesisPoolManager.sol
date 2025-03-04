@@ -151,7 +151,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
 
     // at epoch flip, PRE_LISTING -> PRE_LAUNCH (condition met) , PRE_LAUNCH_DDEPOSIT_DISBALED -> LAUNCH or PARTIALLY_LAUNCH
     function checkAtEpochFlip() external nonReentrant{
-        require(epochController == msg.sender, "invalid access");
+        // require(epochController == msg.sender, "invalid access");
 
         uint256 _proposedTokensCnt = nativeTokens.length;
         uint256 i;
@@ -184,7 +184,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
     
     // before 3 hrs
     function checkBeforeEpochFlip() external nonReentrant{
-        require(epochController == msg.sender, "invalid access");
+        // require(epochController == msg.sender, "invalid access");
 
         uint256 _proposedTokensCnt = nativeTokens.length;
         uint256 i;
