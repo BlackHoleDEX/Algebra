@@ -465,7 +465,7 @@ contract BlackholePairAPIV2 is Initializable {
 
                 if(temp.otherToken1 == temp.otherToken2){
                     amounts = _getAmountViaHopping(amountIn, tokenIn, temp.otherToken1, tokenOut);
-                    if(amounts[1] < temp.minAmount){
+                    if(amounts[0] > 0 && amounts[1] > 0 && amounts[1] < temp.minAmount){
                         temp.minAmount = amounts[1];
                         temp.foundPath = true;
                         swapRoutes.routes = new route[](2);
@@ -485,7 +485,7 @@ contract BlackholePairAPIV2 is Initializable {
                 temp.ipairMid = IPair(temp._pairMid);
 
                 amounts = _getAmountViaHopping(amountIn, tokenIn, temp.otherToken1, temp.otherToken2, tokenOut);
-                if(amounts[2] < temp.minAmount){
+                if(amounts[0] > 0 && amounts[1] > 0 && amounts[2] > 0 && amounts[2] < temp.minAmount){
                     temp.minAmount = amounts[2];
                     temp.foundPath = true;
                     swapRoutes.routes = new route[](3);
