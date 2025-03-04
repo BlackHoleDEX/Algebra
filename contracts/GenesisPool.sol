@@ -120,12 +120,14 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
     }
 
     function rejectPool() external onlyManager {
+        require(poolStatus == PoolStatus.NATIVE_TOKEN_DEPOSITED, "!= status");
         poolStatus = PoolStatus.NOT_QUALIFIED;
-        allocationInfo.refundableNativeAmount = allocationInfo.proposedFundingAmount;
+        allocationInfo.refundableNativeAmount = allocationInfo.proposedNativeAmount;
         emit RejectedGenesisPool(genesisInfo.nativeToken);
     }
 
     function approvePool(address _pairAddress) external onlyManager {
+        require(poolStatus == PoolStatus.NATIVE_TOKEN_DEPOSITED, "!= status");
         liquidityPoolInfo.pairAddress = _pairAddress;
         poolStatus = PoolStatus.PRE_LISTING;
         emit ApprovedGenesisPool(genesisInfo.nativeToken);

@@ -17,8 +17,6 @@ async function main () {
 
         const nativeToken = addresses[0];
 
-        console.log("nativeToken : ", nativeToken, "tokenOwner : ", tokenOwner);
-
         const GenesisManagerContract = await ethers.getContractAt(genesisPoolManagerAbi, genesisPoolManagerAddress);
         await GenesisManagerContract.approveGenesisPool(nativeToken);
     }

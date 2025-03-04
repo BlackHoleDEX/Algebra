@@ -419,7 +419,7 @@ contract BlackholePairAPIV2 is Initializable {
         emit Voter(_oldVoter, _voter);
     }
 
-    function getAmountOut1(uint amountIn, address tokenIn, address tokenOut) external view returns (swapRoute memory swapRoutes){
+    function getAmountOut(uint amountIn, address tokenIn, address tokenOut) external view returns (swapRoute memory swapRoutes){
         
         TempData memory temp;
         bool stable;
