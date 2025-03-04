@@ -14,6 +14,7 @@ import "./interfaces/IPermissionsRegistry.sol";
 import "./interfaces/IGenesisPoolFactory.sol";
 import './interfaces/IGenesisPool.sol';
 import './interfaces/IAuctionFactory.sol';
+import './interfaces/IGauge.sol';
 
 interface IBaseV1Factory {
     function isPair(address pair) external view returns (bool);
@@ -178,7 +179,9 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
     }
 
     function _launchPool(address _genesisPool) internal {
-        pairFactory.setGenesisStatus(IGenesisPool(_genesisPool).getLiquidityPoolInfo().pairAddress, false);
+        LiquidityPool memory liquidityPool = IGenesisPool(_genesisPool).getLiquidityPoolInfo();
+        pairFactory.setGenesisStatus(liquidityPool.pairAddress, false);
+        IGauge(liquidityPool.gaugeAddress).setGenesisPool(_genesisPool);
         IGenesisPool(_genesisPool).launch(router, MATURITY_TIME);
     }
     

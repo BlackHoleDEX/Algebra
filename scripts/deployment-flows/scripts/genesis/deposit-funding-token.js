@@ -20,10 +20,10 @@ async function main () {
         const deployedTokens = require('../../token-constants/deployed-tokens.json');
         const blackAddress = deployedTokens[0].address;
 
-        const nativeToken = addresses[1];
+        const nativeToken = addresses[2];
         const fundingToken = blackAddress;
-        let depositAmount = 55;
-        const genesisPoolAddress = "0x3fD0D1763De7378E236008cBd26c506E7CDA1B64";
+        let depositAmount = 5;
+        const genesisPoolAddress = "0x1f16fF8886A322f2f8d3EA5498763958BE44a8B1";
 
         // let approvalAmountString = (BigInt(depositAmount) * BigInt(10 ** 18)).toString();
         const tokenContract = await ethers.getContractAt(customTokenAbi, fundingToken);
@@ -40,11 +40,11 @@ async function main () {
         // depositAmount = 50;
 
         approvalAmountString = (BigInt(depositAmount) * BigInt(10 ** 18)).toString();
-        tokenSigner = tokenContract.connect(accounts[0]);
+        tokenSigner = tokenContract.connect(accounts[1]);
         txApproval = await tokenSigner.approve(genesisPoolAddress, approvalAmountString);
         await txApproval.wait();
 
-        genesisSigner = GenesisManagerContract.connect(accounts[0]);
+        genesisSigner = GenesisManagerContract.connect(accounts[1]);
         txt = await genesisSigner.depositToken(genesisPoolAddress, approvalAmountString);
         await txt.wait();
         console.log("deposited from funder");

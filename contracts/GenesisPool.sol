@@ -228,7 +228,6 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
     function _addLiquidityAndDistribute(address _router, uint256 nativeDesired, uint256 fundingDesired, uint256 maturityTime) internal {
         (, , uint _liquidity) = IRouter(_router).addLiquidity(genesisInfo.nativeToken, genesisInfo.fundingToken, genesisInfo.stable, nativeDesired, fundingDesired, 0, 0, address(this), block.timestamp + 100);
         liquidity = _liquidity;
-        IGauge(liquidityPoolInfo.gaugeAddress).setGenesisPool(address(this));
         IERC20(liquidityPoolInfo.pairAddress).approve(liquidityPoolInfo.gaugeAddress, liquidity);
         IGauge(liquidityPoolInfo.gaugeAddress).depositsForGenesis(allocationInfo.tokenOwner, block.timestamp + maturityTime, liquidity);
     }

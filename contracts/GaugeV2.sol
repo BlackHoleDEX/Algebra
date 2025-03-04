@@ -44,6 +44,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     uint256 public rewardPerTokenStored;
 
     address public genesisPool;
+    address public genesisManager;
 
     mapping(address => uint256) public userRewardPerTokenPaid;
     mapping(address => uint256) public rewards;
@@ -82,12 +83,17 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
         _;
     }
 
+    modifier onlyGenesisManager() {
+        require(msg.sender == genesisManager, "!= genesisManager");
+        _;
+    }
+
     modifier isNotEmergency() {
         require(emergency == false, "emergency");
         _;
     }
 
-    constructor(address _rewardToken,address _ve,address _token,address _distribution, address _internal_bribe, address _external_bribe, bool _isForPair) {
+    constructor(address _rewardToken,address _ve,address _token,address _distribution, address _internal_bribe, address _external_bribe, bool _isForPair, address _genesisManager) {
         rewardToken = IERC20(_rewardToken);     // main reward
         VE = _ve;                               // vested
         TOKEN = IERC20(_token);                 // underlying (LP)
@@ -96,6 +102,8 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
 
         internal_bribe = _internal_bribe;       // lp fees goes here
         external_bribe = _external_bribe;       // bribe fees goes here
+
+        genesisManager = _genesisManager;
 
         isForPair = _isForPair;                 // pair boolean, if false no claim_fees
 
@@ -367,7 +375,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
         DURATION = _duration;
     }
 
-    function setGenesisPool(address _genesisPool) external onlyGenesisPool{
+    function setGenesisPool(address _genesisPool) external onlyGenesisManager{
         genesisPool = _genesisPool;
     }
 

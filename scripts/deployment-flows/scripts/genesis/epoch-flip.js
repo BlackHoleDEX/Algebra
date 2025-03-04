@@ -20,10 +20,10 @@ async function main () {
         let txt = await GenesisManagerContract.checkAtEpochFlip();
         console.log("txt1 : ", txt);
 
-        // const genesisPoolAddress = "0x3fD0D1763De7378E236008cBd26c506E7CDA1B64"
+        // const genesisPoolAddress = "0x1f16fF8886A322f2f8d3EA5498763958BE44a8B1"
 
         // const GenesisPoolContract = await ethers.getContractAt(genesisPoolAbi, genesisPoolAddress);
-        // const eligible = await GenesisPoolContract.eligbleForPreLaunchPool();
+        // const eligible = await GenesisPoolContract.liquidityPoolInfo();
         // console.log("eligible : ", eligible);
 
         // const TokenHandler = await ethers.getContractAt(tokenHandlerAbi, tokenHandlerAddress);
