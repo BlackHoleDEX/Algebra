@@ -5,6 +5,7 @@ const { ethers } = require("hardhat");
 const fs = require('fs');
 const path = require('path');
 const { BigNumber } = require("ethers");
+// const { generateConstantFile } = require('../../../blackhole-scripts/postDeployment/generator');
 
 async function main () {
 
@@ -15,21 +16,21 @@ async function main () {
 
     try{
 
-        // const GenesisManagerContract = await ethers.getContractAt(genesisPoolManagerAbi, genesisPoolManagerAddress);
-        // let txt = await GenesisManagerContract.checkAtEpochFlip();
-        // console.log("txt1 : ", txt);
+        const GenesisManagerContract = await ethers.getContractAt(genesisPoolManagerAbi, genesisPoolManagerAddress);
+        let txt = await GenesisManagerContract.checkAtEpochFlip();
+        console.log("txt1 : ", txt);
 
-        // const genesisPoolAddress = "0xB9503F775F07b60E61ABC2ef0EFEBAe51de0716f"
+        // const genesisPoolAddress = "0x3fD0D1763De7378E236008cBd26c506E7CDA1B64"
 
         // const GenesisPoolContract = await ethers.getContractAt(genesisPoolAbi, genesisPoolAddress);
         // const eligible = await GenesisPoolContract.eligbleForPreLaunchPool();
         // console.log("eligible : ", eligible);
 
-        const TokenHandler = await ethers.getContractAt(tokenHandlerAbi, tokenHandlerAddress);
-        const len = await TokenHandler.whiteListedTokensLength();
-        for(let i=0;i<len;i++){
-          console.log("data : ", await TokenHandler.whiteListed(i));
-        }
+        // const TokenHandler = await ethers.getContractAt(tokenHandlerAbi, tokenHandlerAddress);
+        // const len = await TokenHandler.whiteListedTokensLength();
+        // for(let i=0;i<len;i++){
+        //   console.log("data : ", await TokenHandler.whiteListed(i));
+        // }
     }
     catch(error){
         console.log("Error in deposit native token : ", error)

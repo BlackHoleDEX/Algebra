@@ -122,19 +122,6 @@ const genesisPoolAbi = [
     "inputs": [
       {
         "indexed": false,
-        "internalType": "uint8",
-        "name": "version",
-        "type": "uint8"
-      }
-    ],
-    "name": "Initialized",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
         "internalType": "address",
         "name": "native",
         "type": "address"
@@ -411,9 +398,9 @@ const genesisPoolAbi = [
         "type": "uint256"
       },
       {
-        "internalType": "uint8",
+        "internalType": "uint256",
         "name": "threshold",
-        "type": "uint8"
+        "type": "uint256"
       },
       {
         "internalType": "uint256",
@@ -506,9 +493,9 @@ const genesisPoolAbi = [
             "type": "uint256"
           },
           {
-            "internalType": "uint8",
+            "internalType": "uint256",
             "name": "threshold",
-            "type": "uint8"
+            "type": "uint256"
           },
           {
             "internalType": "uint256",
@@ -755,9 +742,9 @@ const genesisPoolAbi = [
             "type": "uint256"
           },
           {
-            "internalType": "uint8",
+            "internalType": "uint256",
             "name": "threshold",
-            "type": "uint8"
+            "type": "uint256"
           },
           {
             "internalType": "uint256",
@@ -815,6 +802,11 @@ const genesisPoolAbi = [
         "internalType": "struct IGenesisPoolBase.TokenAllocation",
         "name": "_allocationInfo",
         "type": "tuple"
+      },
+      {
+        "internalType": "address",
+        "name": "_auction",
+        "type": "address"
       }
     ],
     "name": "setGenesisPoolInfo",

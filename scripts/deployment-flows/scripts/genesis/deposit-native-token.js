@@ -32,7 +32,7 @@ async function main () {
             threshold : 5000,
             supplyPercent : 100, 
             startPrice : (BigInt(1) * BigInt(10 ** 16)).toString(),
-            startTime : 1741087800
+            startTime : 1741098600
         }
 
         proposedNativeAmount = "200";

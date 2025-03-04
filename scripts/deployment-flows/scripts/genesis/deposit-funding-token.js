@@ -22,8 +22,8 @@ async function main () {
 
         const nativeToken = addresses[1];
         const fundingToken = blackAddress;
-        let depositAmount = 5;
-        const genesisPoolAddress = "0xB9503F775F07b60E61ABC2ef0EFEBAe51de0716f";
+        let depositAmount = 55;
+        const genesisPoolAddress = "0x3fD0D1763De7378E236008cBd26c506E7CDA1B64";
 
         // let approvalAmountString = (BigInt(depositAmount) * BigInt(10 ** 18)).toString();
         const tokenContract = await ethers.getContractAt(customTokenAbi, fundingToken);

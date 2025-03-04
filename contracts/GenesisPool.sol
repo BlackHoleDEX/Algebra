@@ -194,6 +194,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
             _amount = incentives[incentiveTokens[i]];
             if(_amount > 0)
             {
+                IERC20(incentiveTokens[i]).approve(external_bribe, _amount);
                 IBribe(external_bribe).notifyRewardAmount(incentiveTokens[i], _amount);
             }
         }
