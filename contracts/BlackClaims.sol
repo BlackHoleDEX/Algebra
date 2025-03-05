@@ -211,7 +211,7 @@ contract BlackClaims is IBlackClaims {
 
             _season.remaining_reward_amount += forfeit_amount;
 
-            staked_reward = (credit_amount * _reward)/100;
+            staked_reward = (credit_amount * percent)/100;
             uint256 claimed_reward = credit_amount - staked_reward;
             bool transfer_success = token.transfer(msg.sender, claimed_reward);
             require(transfer_success, "FAILED TRANSFER");
