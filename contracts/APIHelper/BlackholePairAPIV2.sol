@@ -423,6 +423,7 @@ contract BlackholePairAPIV2 is Initializable {
         
         TempData memory temp;
         bool stable;
+        temp.minAmount = 0;
 
         (temp.minAmount, stable) = routerV2.getAmountOut(amountIn, tokenIn, tokenOut);
 
@@ -495,7 +496,6 @@ contract BlackholePairAPIV2 is Initializable {
 
     function _getSwapRoutesFromMultiHop(TempData memory temp, uint amountIn, address tokenIn, address tokenOut) internal view returns (swapRoute memory swapRoutes){
         uint256[] memory amounts;
-        bool isValid = false;
 
         if(!pairFactory.isPair(temp._pairMid)) return swapRoutes;
         if(pairFactory.isGenesis(temp._pairMid)) return swapRoutes;
@@ -505,7 +505,6 @@ contract BlackholePairAPIV2 is Initializable {
         amounts = _getAmountViaHopping(amountIn, tokenIn, temp.otherToken1, temp.otherToken2, tokenOut);
         if(amounts[0] > 0 && amounts[1] > 0 && amounts[2] > 0 && amounts[2] > temp.minAmount){
             temp.minAmount = amounts[2];
-            isValid = true;
             temp.foundPath = true;
             swapRoutes.routes = new route[](3);
             swapRoutes.routes[0] = _createRoute(temp._pair1, tokenIn, temp.otherToken1, temp.ipair1.isStable(), amounts[0]);
