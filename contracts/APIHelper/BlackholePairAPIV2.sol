@@ -454,7 +454,8 @@ contract BlackholePairAPIV2 is Initializable {
 
             temp.otherToken1 = tokenIn == temp.ipair1.token0() ? temp.ipair1.token1() : temp.ipair1.token0();
 
-            for(j = i+1; j < totPairs; j++){
+            for(j = 0; j < totPairs; j++){
+                if(j == i )continue;
                 temp._pair2 = pairFactory.allPairs(j);
                 temp.ipair2 = IPair(temp._pair2);
 
@@ -473,12 +474,14 @@ contract BlackholePairAPIV2 is Initializable {
                 }
 
                 temp._pairMid = pairFactory.getPair(temp.otherToken1, temp.otherToken2, true);
+                if(temp._pairMid == temp._pair1 || temp._pairMid == temp._pair2)continue;
                 temp.foundPath = false;
                 swapRoute1 = _getSwapRoutesFromThreeHop(temp, amountIn, tokenIn, tokenOut);
                 if(temp.foundPath){
                     swapRoutes = swapRoute1;
                 }
                 temp._pairMid = pairFactory.getPair(temp.otherToken1, temp.otherToken2, false);
+                if(temp._pairMid == temp._pair1 || temp._pairMid == temp._pair2)continue;
                 temp.foundPath = false;
                 swapRoute1 =  _getSwapRoutesFromThreeHop(temp, amountIn, tokenIn, tokenOut);
                 if(temp.foundPath){
