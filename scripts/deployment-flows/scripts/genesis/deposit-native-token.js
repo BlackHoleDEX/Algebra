@@ -20,7 +20,7 @@ async function main () {
         const deployedTokens = require('../../token-constants/deployed-tokens.json');
         const blackAddress = deployedTokens[0].address;
 
-        const nativeToken = addresses[2];
+        const nativeToken = addresses[0];
         const tokenOwner = accounts[1].address;
         const auctionIndex = 0;
 
@@ -32,7 +32,7 @@ async function main () {
             threshold : 5000,
             supplyPercent : 100, 
             startPrice : (BigInt(1) * BigInt(10 ** 16)).toString(),
-            startTime : 1741115900
+            startTime : 1741151000
         }
 
         proposedNativeAmount = "200";
