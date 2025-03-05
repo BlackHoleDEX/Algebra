@@ -343,7 +343,7 @@ const initializeMinter = async (minterUpgradableAddress) => {
 const deployEpochController = async(voterV3Address, minterUpgradableAddress) =>{
     try {
         data = await ethers.getContractFactory("EpochController");
-        const inputs = [voterV3Address, minterUpgradableAddress];
+        const inputs = [minterUpgradableAddress, voterV3Address];
         const EpochController = await upgrades.deployProxy(data, inputs, {initializer: 'initialize'});
         txDeployed = await EpochController.deployed();
 
@@ -552,7 +552,7 @@ const setGenesisPoolManagerInVoter = async(voterV3Address, genesisManagerAddress
 
 const setGenesisPoolManagerInPairFactory = async(pairFactoryAddress, genesisManagerAddress) => {
     try {
-        const PairFactoryContract = await ethers.getContractAt(pairFactoryUpgradeableAbi, pairFactoryAddress);
+        const PairFactoryContract = await ethers.getContractAt(pairFactoryAbi, pairFactoryAddress);
         await PairFactoryContract.setGenesisManager(genesisManagerAddress);
         console.log("set genesis manager in pair factory\n");
     } catch (error) {
