@@ -8,4 +8,9 @@ interface ITokenHandler {
 
     function whitelistToken(address _token) external;
     function blacklistToken(address _token) external;
+
+    function whiteListed(uint256 index) external returns (address);
+    function connectors(uint256 index) external returns (address);
+    function whiteListedTokensLength() external returns (uint256);
+    function connectorTokensLength() external returns (uint256);
 }
