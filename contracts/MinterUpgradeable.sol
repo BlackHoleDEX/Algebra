@@ -33,7 +33,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     uint256 public constant PROPOSAL_INCREASE = 10_100; // 1% increment after the 67th epoch based on proposal
     uint256 public constant PROPOSAL_DECREASE = 9_900; // 1% increment after the 67th epoch based on proposal
 
-    uint public constant WEEK = 1800; // allows minting once per week (reset every Thursday 00:00 UTC)
+    uint public constant WEEK = 7 days; // allows minting once per week (reset every Thursday 00:00 UTC)
     uint public weekly; // represents a starting weekly emission of 2.6M BLACK (BLACK has 18 decimals)
     uint public active_period;
     uint public constant LOCK = 86400 * 7 * 52 * 4;
@@ -207,10 +207,6 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
 
     function circulating_supply() public view returns (uint) {
         return _black.totalSupply() - _black.balanceOf(address(_ve)) - _black.balanceOf(address(burnTokenAddress));
-    }
-
-    function transfer(address _to, uint _amount) external {
-        _black.transfer(_to, _amount);
     }
 
     function check() external view returns(bool){

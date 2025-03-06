@@ -2,7 +2,7 @@
 pragma solidity 0.8.13;
 
 library BlackTimeLibrary {
-    uint256 internal constant WEEK = 1800;
+    uint256 internal constant WEEK = 7 days;
 
     /// @dev Returns start of epoch based on current timestamp
     function epochStart(uint256 timestamp) internal pure returns (uint256) {

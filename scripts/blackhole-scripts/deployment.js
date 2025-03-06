@@ -329,48 +329,61 @@ async function main () {
     owner = accounts[0];
     const ownerAddress = owner.address;
 
-    //deploy Black
+    //deploy Black token: Protocol Native token.
     const blackAddress = await deployBlack();
 
     //deploy pairFactory
+    // PairFactory is responsible for creating new pair token with predefined stable/volatile pair trading Fees. 
     const pairFactoryAddress = await deployPairFactory();
 
-    //deploy router V2
+    //deploy RouterV2
+    // RouterV2 is resposible for Add/remove liquidity in LP pair, Swap, quoteLiquidity. 
     const routerV2Address = await deployRouterV2(pairFactoryAddress);
 
     //setDibs
+    // A certain percentage of trading fee goes to platform, so setting that address here. (Not decided whether we're going with functionality or not.)
     await setDibs(pairFactoryAddress);
 
     //deploy permissionRegistry
+    // Permission Registry to set GOVERNANCE, VOTER_ADMIN, GAUGE_ADMIN, BRIBE_ADMIN, FEE_MANAGER
     const permissionRegistryAddress = await deployPermissionRegistry();
 
-    //deploy voting  escrow
+    //deploy VeArtProxyUpgradeable: It's being used to provide tokenURI for each of veToken. 
     const votingEscrowAddress = await deployVotingEscrow(blackAddress);
 
     //set owner roles in permission registry
+    // For now giving all above roles to owner.
     await setPermissionRegistryRoles(permissionRegistryAddress, ownerAddress);
     
     //deploy bribeV3
+    // Bribe Contract is responsible for collecting external/internal bribe which will be available to voters in next epoch. 
     const bribeV3Address = await deployBribeV3Factory(permissionRegistryAddress);
 
-    //deploygaugeV2
+    // deploygaugeV2
+    // Gauges are responsible for black token emission. It has staked Pair token info and based onf the proportions emission get distributed.
     const gaugeV2Address = await deployGaugeV2Factory(permissionRegistryAddress);
 
     // //deploy voterV3 and initialize
+    // VoterV3 is being used to createGauge/Vote/Claim Voting Reward
+    // VoterV3 has voting info data
     const voterV3Address = await deployVoterV3AndSetInit(votingEscrowAddress, permissionRegistryAddress, pairFactoryAddress, ownerAddress, bribeV3Address, gaugeV2Address);
 
     //setVoter in bribe factory
     await setVoterBribeV3(voterV3Address, bribeV3Address);
 
     //blackholeV2Abi deployment
+    // BlackholePair Api is being users has an interface which client uses to fetch all the lp pair info
     const blackholeV2AbiAddress = await deployBloackholeV2Abi(voterV3Address);
 
     //deploy rewardsDistributor
+    // It's being used to distribute rebase reward
     const rewardsDistributorAddress = await deployRewardsDistributor(votingEscrowAddress);
 
     //set depositor
 
     //deploy minterUpgradable
+    // MinterUpgradable calculates the number of black token needs for emission in upcoming epoch. 
+    // It checks the current Black Token balance minterUpgradable address has, if it's not sufficient then it mints the required tokens.
     const minterUpgradableAddress = await deployMinterUpgradeable(votingEscrowAddress, voterV3Address, rewardsDistributorAddress);
 
     //set MinterUpgradable in VoterV3
