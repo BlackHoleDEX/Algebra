@@ -271,11 +271,6 @@ contract Bribe is ReentrancyGuard {
         }
     }
 
-    /// BLACKHOLE: need to change duration for testing purpose currently 20 minutes
-    function setRewardDuration(uint256 _duration) external {
-        WEEK = _duration;
-    }
-
     /// @dev Rewards are saved into NEXT EPOCH mapping. 
     function notifyRewardAmount(address _rewardsToken, uint256 reward) external nonReentrant {
         require(isRewardToken[_rewardsToken], "reward token not verified");

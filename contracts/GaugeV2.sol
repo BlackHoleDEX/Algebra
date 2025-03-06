@@ -365,11 +365,6 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     --------------------------------------------------------------------------------
     ----------------------------------------------------------------------------- */
 
-    /// BLACKHOLE: need to change duration for testing purpose currently 20 minutes
-    function setRewardDuration(uint256 _duration) external {
-        DURATION = _duration;
-    }
-
     function setGenesisPool(address _genesisPool) external onlyGenesisPool{
         genesisPool = _genesisPool;
     }
