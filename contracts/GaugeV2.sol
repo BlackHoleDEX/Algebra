@@ -312,7 +312,9 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
         uint256 gaugeDeduction =  _amount - genesisDeduction;
 
         _balances[msg.sender] = _balances[msg.sender] - gaugeDeduction;
-        IGenesisPool(genesisPool).deductAmount(msg.sender, genesisDeduction);
+        if(genesisPool != address(0)){
+            IGenesisPool(genesisPool).deductAmount(msg.sender, genesisDeduction);
+        }
     }
 
     ///@notice withdraw all TOKEN and harvest rewardToken
