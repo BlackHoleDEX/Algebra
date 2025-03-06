@@ -474,19 +474,23 @@ contract BlackholePairAPIV2 is Initializable {
                 }
 
                 temp._pairMid = pairFactory.getPair(temp.otherToken1, temp.otherToken2, true);
-                if(temp._pairMid == temp._pair1 || temp._pairMid == temp._pair2)continue;
-                temp.foundPath = false;
-                swapRoute1 = _getSwapRoutesFromThreeHop(temp, amountIn, tokenIn, tokenOut);
-                if(temp.foundPath){
-                    swapRoutes = swapRoute1;
+                if(temp._pairMid != temp._pair1 && temp._pairMid != temp._pair2){
+                    temp.foundPath = false;
+                    swapRoute1 = _getSwapRoutesFromThreeHop(temp, amountIn, tokenIn, tokenOut);
+                    if(temp.foundPath){
+                        swapRoutes = swapRoute1;
+                    }
                 }
+            
                 temp._pairMid = pairFactory.getPair(temp.otherToken1, temp.otherToken2, false);
-                if(temp._pairMid == temp._pair1 || temp._pairMid == temp._pair2)continue;
-                temp.foundPath = false;
-                swapRoute1 =  _getSwapRoutesFromThreeHop(temp, amountIn, tokenIn, tokenOut);
-                if(temp.foundPath){
-                    swapRoutes = swapRoute1;
+                if(temp._pairMid != temp._pair1 && temp._pairMid != temp._pair2){
+                    temp.foundPath = false;
+                    swapRoute1 =  _getSwapRoutesFromThreeHop(temp, amountIn, tokenIn, tokenOut);
+                    if(temp.foundPath){
+                        swapRoutes = swapRoute1;
+                    }
                 }
+
             }
         }
     }
@@ -499,7 +503,7 @@ contract BlackholePairAPIV2 is Initializable {
 
         temp.ipairMid = IPair(temp._pairMid);
 
-        amounts = _getAmountViaHopping(amountIn, tokenIn, temp.otherToken1, temp.otherToken2, tokenOut);
+        amounts = _getAmountViaHopping(amountIn, tokenIn, temp.otherToken1, temp.otherToken2, temp);
         if(amounts[0] > 0 && amounts[1] > 0 && amounts[2] > 0 && amounts[2] > temp.minAmount){
             temp.minAmount = amounts[2];
             temp.foundPath = true;
@@ -514,7 +518,7 @@ contract BlackholePairAPIV2 is Initializable {
     }
 
     function _getSwapRoutesFromTwoHop(TempData memory temp, uint amountIn, address tokenIn, address tokenOut) internal view returns (swapRoute memory swapRoutes){
-        uint256[] memory amounts = _getAmountViaHopping(amountIn, tokenIn, temp.otherToken1, tokenOut);
+        uint256[] memory amounts = _getAmountViaHopping(amountIn, tokenIn, temp.otherToken1, temp);
         if(amounts[0] > 0 && amounts[1] > 0 && amounts[1] > temp.minAmount){
             temp.minAmount = amounts[1];
             temp.foundPath = true;
@@ -528,23 +532,21 @@ contract BlackholePairAPIV2 is Initializable {
     }
 
 
-    function _getAmountViaHopping(uint amountIn, address tokenIn, address tokenMid, address tokenOut) internal view returns (uint256[] memory amounts){
-        bool stable;
+    function _getAmountViaHopping(uint amountIn, address tokenIn, address tokenMid, TempData memory tempData) internal view returns (uint256[] memory amounts){
         amounts = new uint256[](2);
 
-        (amounts[0], stable) = routerV2.getAmountOut(amountIn, tokenIn, tokenMid);
-        (amounts[1], stable) = routerV2.getAmountOut(amounts[0], tokenMid, tokenOut);
+        amounts[0] = routerV2.getPoolAmountOut(amountIn, tokenIn, tempData._pair1);
+        amounts[1] = routerV2.getPoolAmountOut(amounts[0], tokenMid, tempData._pair2);
 
         return amounts;
     }
 
-    function _getAmountViaHopping(uint amountIn, address tokenIn, address tokenMid1, address tokenMid2, address tokenOut) internal view returns (uint256[] memory amounts){
-        bool stable;
+    function _getAmountViaHopping(uint amountIn, address tokenIn, address tokenMid1, address tokenMid2, TempData memory tempData) internal view returns (uint256[] memory amounts){
         amounts = new uint256[](3);
 
-        (amounts[0], stable) = routerV2.getAmountOut(amountIn, tokenIn, tokenMid1);
-        (amounts[1], stable) = routerV2.getAmountOut(amounts[0], tokenMid1, tokenMid2);
-        (amounts[2], stable) = routerV2.getAmountOut(amounts[1], tokenMid2, tokenOut);
+        amounts[0] = routerV2.getPoolAmountOut(amountIn, tokenIn, tempData._pair1);
+        amounts[1] = routerV2.getPoolAmountOut(amounts[0], tokenMid1, tempData._pairMid);
+        amounts[2] = routerV2.getPoolAmountOut(amounts[1], tokenMid2, tempData._pair2);
 
         return amounts;
     }
