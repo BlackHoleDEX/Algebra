@@ -235,10 +235,6 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
         return _period;
     }
 
-    function transfer(address _to, uint _amount) external {
-        _black.transfer(_to, _amount);
-    }
-
     function check() external view returns(bool){
         uint _period = active_period;
         return (block.timestamp >= _period + WEEK && _initializer == address(0));
