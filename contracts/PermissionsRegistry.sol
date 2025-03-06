@@ -62,7 +62,6 @@ contract PermissionsRegistry {
 
         _roles.push(bytes("GENESIS_MANAGER"));
         _checkRole[(bytes("GENESIS_MANAGER"))] = true;
-
     }
 
     modifier onlyBlackMultisig() {
