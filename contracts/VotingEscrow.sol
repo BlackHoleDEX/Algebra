@@ -980,7 +980,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         _newLocked.isPermanent = true;
         _checkpoint(_tokenId, locked[_tokenId], _newLocked);
         locked[_tokenId] = _newLocked;
-
+        if(voted[_tokenId]) {
+            IVoter(voter).poke(_tokenId);
+        }
         emit LockPermanent(sender, _tokenId, _amount, block.timestamp);
         emit MetadataUpdate(_tokenId);
     }
