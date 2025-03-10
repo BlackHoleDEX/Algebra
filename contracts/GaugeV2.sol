@@ -50,6 +50,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     mapping(address => uint256) public rewards;
 
     uint256 internal _totalSupply;
+    uint internal _emissions;
     mapping(address => uint256) internal _balances;
     mapping(address => uint256) public maturityTime;
 
@@ -434,6 +435,11 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
         }
     }
 
+    function setCurrentEmissions (uint amount) external {
+        _emissions = amount;
+    }
 
-
+    function getCurrentEmissions() external view returns (uint) {
+        return _emissions;
+    }
 }

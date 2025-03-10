@@ -50,6 +50,7 @@ contract BlackholePairAPIV2 is Initializable {
         address gauge; 				    // pair gauge address
         uint gauge_total_supply; 		// pair staked tokens (less/eq than/to pair total supply)
         uint emissions; 			    // pair emissions (per second)
+        uint totalEmissions; 			// total pair emissions (per second)
         address emissions_token; 		// pair emissions token address
         uint emissions_token_decimals; 	// pair emissions token decimals
 
@@ -290,6 +291,7 @@ contract BlackholePairAPIV2 is Initializable {
                 }
                 gaugeTotalSupply = _gauge.totalSupply();
                 emissions = _gauge.rewardRate();
+
             }
         }
         

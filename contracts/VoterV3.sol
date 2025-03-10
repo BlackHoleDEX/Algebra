@@ -743,10 +743,14 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
             // distribute only if claimable is > 0, currentEpoch != lastepoch and gauge is alive
             if (_claimable > 0 && isAlive[_gauge]) {
+                IGauge(_gauge).setCurrentEmissions(_claimable);
                 claimable[_gauge] = 0;
                 gaugesDistributionTimestmap[_gauge] = currentTimestamp;
                 IGauge(_gauge).notifyRewardAmount(base, _claimable);
                 emit DistributeReward(msg.sender, _gauge, _claimable);
+            }
+            else if(isAlive[_gauge]){
+                IGauge(_gauge).setCurrentEmissions(_claimable);
             }
         }
     }
