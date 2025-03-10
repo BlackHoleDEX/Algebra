@@ -11,4 +11,5 @@ interface IGaugeAPI {
     function isForPair() external view returns (bool);
     function totalSupply() external view returns (uint);
     function earned(address account) external view returns (uint);
+    
 }

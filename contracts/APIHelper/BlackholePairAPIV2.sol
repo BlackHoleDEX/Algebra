@@ -5,6 +5,8 @@ pragma solidity 0.8.13;
 import '../libraries/Math.sol';
 import '../interfaces/IBribeAPI.sol';
 import '../interfaces/IGaugeAPI.sol';
+import '../interfaces/IGauge.sol';
+
 import '../interfaces/IGaugeFactory.sol';
 import '../interfaces/IERC20.sol';
 import '../interfaces/IMinter.sol';
@@ -50,7 +52,7 @@ contract BlackholePairAPIV2 is Initializable {
         address gauge; 				    // pair gauge address
         uint gauge_total_supply; 		// pair staked tokens (less/eq than/to pair total supply)
         uint emissions; 			    // pair emissions (per second)
-        uint totalEmissions; 			// total pair emissions (per second)
+        uint total_emissions; 			// total pair emissions (per second)
         address emissions_token; 		// pair emissions token address
         uint emissions_token_decimals; 	// pair emissions token decimals
 
@@ -291,7 +293,7 @@ contract BlackholePairAPIV2 is Initializable {
                 }
                 gaugeTotalSupply = _gauge.totalSupply();
                 emissions = _gauge.rewardRate();
-
+                _pairInfo.total_emissions = IGauge(voter.gauges(_pair)).getCurrentEmissions();
             }
         }
         
