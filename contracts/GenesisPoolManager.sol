@@ -45,6 +45,8 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
 
     mapping(address => mapping(address => bool)) public whiteListedTokensToUser; 
     address[] public nativeTokens;
+    address[] public liveNativeTokens;
+    mapping(address => uint256) internal liveNativeTokensIndex;
     
     event WhiteListedTokenToUser(address proposedToken, address tokenOwner);
     event DespositedToken(address genesisPool, address sender, uint256 amount);
@@ -133,6 +135,9 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         address pairAddress = pairFactory.createPair(nativeToken, genesisInfo.fundingToken, genesisInfo.stable);
         pairFactory.setGenesisStatus(pairAddress, true);
 
+        liveNativeTokensIndex[nativeToken] = liveNativeTokens.length;
+        liveNativeTokens.push(nativeToken);
+
         IGenesisPool(genesisPool).approvePool(pairAddress);
     }
 
@@ -165,7 +170,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
             if(_poolStatus == PoolStatus.PRE_LISTING && IGenesisPool(_genesisPool).eligbleForPreLaunchPool()){
                 _preLaunchPool(_genesisPool);
             }else if(_poolStatus == PoolStatus.PRE_LAUNCH_DEPOSIT_DISABLED){
-                _launchPool(_genesisPool);
+                _launchPool(nativeTokens[i], _genesisPool);
             }
         }
     }
@@ -178,11 +183,19 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         IGenesisPool(genesisPool).transferIncentives(_gauge, _external_bribe, _internal_bribe);
     }
 
-    function _launchPool(address _genesisPool) internal {
+    function _launchPool(address _nativeToken, address _genesisPool) internal {
         LiquidityPool memory liquidityPool = IGenesisPool(_genesisPool).getLiquidityPoolInfo();
         pairFactory.setGenesisStatus(liquidityPool.pairAddress, false);
         IGauge(liquidityPool.gaugeAddress).setGenesisPool(_genesisPool);
         IGenesisPool(_genesisPool).launch(router, MATURITY_TIME);
+
+        uint index = liveNativeTokensIndex[_nativeToken];
+        uint length = liveNativeTokens.length;
+        if(length > 0)
+        {
+            liveNativeTokens[index] = liveNativeTokens[length - 1];
+            liveNativeTokens.pop();
+        }
     }
     
     // before 3 hrs
@@ -214,6 +227,10 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
 
     function getAllNaitveTokens() external view returns (address[] memory) {
         return nativeTokens;
+    }
+
+    function getLiveNaitveTokens() external view returns (address[] memory) {
+        return liveNativeTokens;
     }
 
     function setEpochController(address _epochController) external Governance {
