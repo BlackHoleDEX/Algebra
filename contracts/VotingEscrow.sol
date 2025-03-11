@@ -1432,9 +1432,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                     ? checkpoints[srcRep][srcRepNum - 1].tokenIds
                     : checkpoints[srcRep][0].tokenIds;
                 uint32 nextSrcRepNum = _findWhatCheckpointToWrite(srcRep);
-                uint[] storage srcRepNew = checkpoints[srcRep][
-                    nextSrcRepNum
-                ].tokenIds;
+                Checkpoint storage cpSrcRep = checkpoints[srcRep][nextSrcRepNum];
+                uint[] storage srcRepNew = cpSrcRep.tokenIds;
+                cpSrcRep.timestamp = block.timestamp;
                 // All the same except _tokenId
                 for (uint i = 0; i < srcRepOld.length; i++) {
                     uint tId = srcRepOld[i];
@@ -1443,7 +1443,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                     }
                 }
 
-                numCheckpoints[srcRep] = srcRepNum + 1;
+                numCheckpoints[srcRep] = nextSrcRepNum + 1;
             }
 
             if (dstRep != address(0)) {
@@ -1452,9 +1452,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                     ? checkpoints[dstRep][dstRepNum - 1].tokenIds
                     : checkpoints[dstRep][0].tokenIds;
                 uint32 nextDstRepNum = _findWhatCheckpointToWrite(dstRep);
-                uint[] storage dstRepNew = checkpoints[dstRep][
-                    nextDstRepNum
-                ].tokenIds;
+                Checkpoint storage cpDstRep = checkpoints[dstRep][nextDstRepNum];
+                uint[] storage dstRepNew = cpDstRep.tokenIds;
+                cpDstRep.timestamp = block.timestamp;
                 // All the same plus _tokenId
                 require(
                     dstRepOld.length + 1 <= MAX_DELEGATES,
@@ -1466,7 +1466,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                 }
                 dstRepNew.push(_tokenId);
 
-                numCheckpoints[dstRep] = dstRepNum + 1;
+                numCheckpoints[dstRep] = nextDstRepNum + 1;
             }
         }
     }
@@ -1502,9 +1502,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                     ? checkpoints[srcRep][srcRepNum - 1].tokenIds
                     : checkpoints[srcRep][0].tokenIds;
                 uint32 nextSrcRepNum = _findWhatCheckpointToWrite(srcRep);
-                uint[] storage srcRepNew = checkpoints[srcRep][
-                    nextSrcRepNum
-                ].tokenIds;
+                Checkpoint storage cpSrcRep = checkpoints[srcRep][nextSrcRepNum];
+                uint[] storage srcRepNew = cpSrcRep.tokenIds;
+                cpSrcRep.timestamp = block.timestamp;
                 // All the same except what owner owns
                 for (uint i = 0; i < srcRepOld.length; i++) {
                     uint tId = srcRepOld[i];
@@ -1513,7 +1513,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                     }
                 }
 
-                numCheckpoints[srcRep] = srcRepNum + 1;
+                numCheckpoints[srcRep] = nextSrcRepNum + 1;
             }
 
             if (dstRep != address(0)) {
@@ -1522,9 +1522,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                     ? checkpoints[dstRep][dstRepNum - 1].tokenIds
                     : checkpoints[dstRep][0].tokenIds;
                 uint32 nextDstRepNum = _findWhatCheckpointToWrite(dstRep);
-                uint[] storage dstRepNew = checkpoints[dstRep][
-                    nextDstRepNum
-                ].tokenIds;
+                Checkpoint storage cpDstRep = checkpoints[dstRep][nextDstRepNum];
+                uint[] storage dstRepNew = cpDstRep.tokenIds;
+                cpDstRep.timestamp = block.timestamp;
                 uint ownerTokenCount = ownerToNFTokenCount[owner];
                 require(
                     dstRepOld.length + ownerTokenCount <= MAX_DELEGATES,
@@ -1541,7 +1541,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                     dstRepNew.push(tId);
                 }
 
-                numCheckpoints[dstRep] = dstRepNum + 1;
+                numCheckpoints[dstRep] = nextDstRepNum + 1;
             }
         }
     }
