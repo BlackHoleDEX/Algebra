@@ -1,4 +1,4 @@
-const genesisPoolAPIAddress = "0x3A01d5EEd58F59952C420Ba40479e3E745C498DE";
+const genesisPoolAPIAddress = "0x98C5eF81AE4C8d06cF2A55a9105369DA2b069247";
 
 const genesisPoolAPIAbi = [
   {
@@ -113,6 +113,11 @@ const genesisPoolAPIAbi = [
           {
             "internalType": "uint256",
             "name": "userDeposit",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "estimatedNativeAmount",
             "type": "uint256"
           },
           {
@@ -300,6 +305,11 @@ const genesisPoolAPIAbi = [
             "type": "uint256"
           },
           {
+            "internalType": "uint256",
+            "name": "estimatedNativeAmount",
+            "type": "uint256"
+          },
+          {
             "components": [
               {
                 "internalType": "address",
@@ -484,6 +494,11 @@ const genesisPoolAPIAbi = [
             "type": "uint256"
           },
           {
+            "internalType": "uint256",
+            "name": "estimatedNativeAmount",
+            "type": "uint256"
+          },
+          {
             "components": [
               {
                 "internalType": "address",
@@ -665,6 +680,11 @@ const genesisPoolAPIAbi = [
           {
             "internalType": "uint256",
             "name": "userDeposit",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "estimatedNativeAmount",
             "type": "uint256"
           },
           {
