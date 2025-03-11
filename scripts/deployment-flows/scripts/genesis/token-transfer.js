@@ -1,4 +1,4 @@
-const { genesisPoolManagerAddress, genesisPoolManagerAbi } = require('../../../../generated/genesis-pool-manager');
+const { customTokenAbi } = require('../../../../generated/custom-token');
 const { ethers } = require("hardhat");
 const fs = require('fs');
 const path = require('path');
@@ -15,18 +15,16 @@ async function main () {
         const jsonData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8'));
         const addresses = jsonData.map(obj => obj.address);
 
-        const tokenOwner = accounts[1].address;
+        const tranferAmount = (BigInt("1000000000") * BigInt(10 ** 18)).toString();
 
-        const GenesisManagerContract = await ethers.getContractAt(genesisPoolManagerAbi, genesisPoolManagerAddress);
-
-        for(let i=1;i<addresses.length;i++){
-          const nativeToken = addresses[i];
-          console.log("nativeToken : ", nativeToken, "tokenOwner : ", tokenOwner);
-          await GenesisManagerContract.whiteListUserAndToken(tokenOwner, nativeToken);
+        for(let i=1; i<addresses.length; i++){
+            const TokenContract = await ethers.getContractAt(customTokenAbi, addresses[i]);
+            await TokenContract.approve(accounts[1].address, tranferAmount);
+            await TokenContract.transfer(accounts[1].address, tranferAmount);
         }
     }
     catch(error){
-        console.log("Error in whitelisting token : ", error)
+        console.log("Error in aprrove token : ", error)
     }
 }
 
