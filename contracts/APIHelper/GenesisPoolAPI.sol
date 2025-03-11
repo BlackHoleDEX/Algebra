@@ -15,9 +15,13 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
     struct GenesisData {
         address genesisPool;
         address nativeToken;
+
         uint nativeTokensDecimal;
         uint fundingTokensDecimal;
+
         uint256 userDeposit;
+        uint256 estimatedNativeAmount;
+
         TokenAllocation tokenAllocation;
         TokenIncentiveInfo incentiveInfo;
         GenesisInfo genesisInfo;
@@ -69,13 +73,18 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
         GenesisInfo memory genesisInfo = IGenesisPool(genesisPool).getGenesisInfo();
         address fundingToken = genesisInfo.fundingToken;
         address nativeToken = genesisInfo.nativeToken;
+        uint256 userDeposit;
 
         genesisData.nativeToken = nativeToken;
+        genesisData.genesisPool = genesisPool;
+
         genesisData.nativeTokensDecimal = IERC20(nativeToken).decimals();
         genesisData.fundingTokensDecimal = IERC20(fundingToken).decimals();
-        genesisData.nativeToken = genesisInfo.nativeToken;
-        genesisData.genesisPool = genesisPool;
-        genesisData.userDeposit = IGenesisPool(genesisPool).userDeposits(_user);
+
+        userDeposit = _user != address(0) ? IGenesisPool(genesisPool).userDeposits(_user) : 0;
+        genesisData.userDeposit = userDeposit;
+        genesisData.estimatedNativeAmount = userDeposit > 0 ? IGenesisPool(genesisPool).getNativeTokenAmount(userDeposit) : 0;
+
         genesisData.tokenAllocation = IGenesisPool(genesisPool).getAllocationInfo();
         genesisData.incentiveInfo = IGenesisPool(genesisPool).getIncentivesInfo();
         genesisData.genesisInfo = genesisInfo;
@@ -96,6 +105,7 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
         address genesisPool;
         address nativeToken;
         GenesisInfo memory genesisInfo;
+        uint256 userDeposit;
 
         for(i; i < _offset + _amounts; i++){
             if(i >= totalPools) {
@@ -114,7 +124,10 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
             genesisPools[i - _offset].nativeTokensDecimal = IERC20(nativeToken).decimals();
             genesisPools[i - _offset].fundingTokensDecimal = IERC20(genesisInfo.fundingToken).decimals();
 
-            genesisPools[i - _offset].userDeposit = _user != address(0) ? IGenesisPool(genesisPool).userDeposits(_user) : 0;
+            userDeposit = _user != address(0) ? IGenesisPool(genesisPool).userDeposits(_user) : 0;
+            genesisPools[i - _offset].userDeposit = userDeposit;
+            genesisPools[i - _offset].estimatedNativeAmount = userDeposit > 0 ? IGenesisPool(genesisPool).getNativeTokenAmount(userDeposit) : 0;
+            
             genesisPools[i - _offset].tokenAllocation = IGenesisPool(genesisPool).getAllocationInfo();
             genesisPools[i - _offset].incentiveInfo = IGenesisPool(genesisPool).getIncentivesInfo();
             genesisPools[i - _offset].genesisInfo = genesisInfo;
@@ -180,7 +193,9 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
             genesisPools[index].nativeTokensDecimal = IERC20(nativeToken).decimals();
             genesisPools[index].fundingTokensDecimal = IERC20(genesisInfo.fundingToken).decimals();
 
-            genesisPools[index].userDeposit = _user != address(0) ? IGenesisPool(genesisPool).userDeposits(_user) : 0;
+            genesisPools[index].userDeposit = userDeposit;
+            genesisPools[index].estimatedNativeAmount = userDeposit > 0 ? IGenesisPool(genesisPool).getNativeTokenAmount(userDeposit) : 0;
+
             genesisPools[index].tokenAllocation = tokenAllocation;
             genesisPools[index].incentiveInfo = IGenesisPool(genesisPool).getIncentivesInfo();
             genesisPools[index].genesisInfo = genesisInfo;

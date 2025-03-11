@@ -370,7 +370,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
     }
 
     function getNativeTokenAmount(uint256 depositAmount) external view returns (uint256){
-        require(depositAmount > 0, "0 amt");
+        if(depositAmount <= 0) return 0;
         return _getNativeTokenAmount(depositAmount);
     }
 

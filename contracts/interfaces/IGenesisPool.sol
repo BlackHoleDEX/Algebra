@@ -23,6 +23,7 @@ interface IGenesisPool {
     function deductAmount(address account, uint256 amount) external;
     function deductAllAmount(address account) external;
     function setAuction(address _auction) external;
+    function getNativeTokenAmount(uint256 depositAmount) external view returns (uint256);
 
     function launch(address router, uint256 maturityTime) external;
 }
