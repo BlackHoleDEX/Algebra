@@ -11,20 +11,69 @@
     "ticker": "DOGE",
     "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x67f0870bb897f5e1c369976b4a2962d527b9562c/logo.svg",
     "decimal": 18,
-    "address": "0xBCB0199126614eAa14e1F6dA26953c2a814a6cE5"
+    "address": "0xC28D9764E59c13bfbc7fe1dFf4346b66fF32FfAE"
   },
   {
     "name": "MORPHO",
     "ticker": "MOR",
     "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x7431ada8a591c955a994a21710752ef9b882b8e3/logo.svg",
     "decimal": 18,
-    "address": "0xF3Eb1EB1F7dEE67b51f8aCB008f11cC89b3f78AB"
+    "address": "0xf9b53f75AE3cE042bE135d377e275d01FCFeA250"
   },
   {
     "name": "PEPE",
     "ticker": "PEPE",
     "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x52b492a33e447cdb854c7fc19f1e57e8bfa1777d/logo.svg",
     "decimal": 18,
-    "address": "0x4772D355dE34ad2B3b089797AC81f28532A8edBc"
+    "address": "0x8f64Dd3894d259aD65a77Bc79c0d0b8d7DD9c8C6"
+  },
+  {
+    "name": "ANZ",
+    "ticker": "ANZ",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0xeec468333ccc16d4bf1cef497a56cf8c0aae4ca3/logo.svg",
+    "decimal": 18,
+    "address": "0x2E2551f9979DaEC88D00dD405C9022D30F70fCaC"
+  },
+  {
+    "name": "CLANKER",
+    "ticker": "CLANKER",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x1bc0c42215582d5a085795f4badbac3ff36d1bcb/logo.svg",
+    "decimal": 18,
+    "address": "0xDf36C5e5e4bEB2F9e95257e98E5664873080eD2a"
+  },
+  {
+    "name": "ANON",
+    "ticker": "ANON",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x79bbf4508b1391af3a0f4b30bb5fc4aa9ab0e07c/logo.sv",
+    "decimal": 18,
+    "address": "0xFF94f43F0d6aE54F48E557399bF9CDbd1330C708"
+  },
+  {
+    "name": "WNTX",
+    "ticker": "WNTX",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x3e31966d4f81c72d2a55310a6365a56a4393e98d/logo.svg",
+    "decimal": 18,
+    "address": "0x774D315016CC3A752e2259263a935b5EFe8Df9BF"
+  },
+  {
+    "name": "CTX",
+    "ticker": "CTX",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0xbb22ff867f8ca3d5f2251b4084f6ec86d4666e14/logo.svg",
+    "decimal": 18,
+    "address": "0x45785E725Ebd0f89f623229ff6C2C8F96468CF7e"
+  },
+  {
+    "name": "DRV",
+    "ticker": "DRV",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x9d0e8f5b25384c7310cb8c6ae32c8fbeb645d083/logo.svg",
+    "decimal": 18,
+    "address": "0xC0a2C97B633DF5aE41C75c506864D79400c880a8"
+  },
+  {
+    "name": "GAME",
+    "ticker": "GAME",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x1c4cca7c5db003824208adda61bd749e55f463a3/logo.svg",
+    "decimal": 18,
+    "address": "0xe75a01793A7ED23A85860644Ed117A6D91d53c6e"
   }
 ]
