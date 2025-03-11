@@ -1,4 +1,4 @@
-const genesisPoolAPIAddress = "0x962105d7e54720a6187A825492b312c72d75f350";
+const genesisPoolAPIAddress = "0x386113F0F0057DF273d1c915a339052783796670";
 
 const genesisPoolAPIAbi = [
   {
@@ -436,6 +436,214 @@ const genesisPoolAPIAbi = [
         "internalType": "struct GenesisPoolAPI.GenesisData",
         "name": "genesisData",
         "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "nativeToken",
+        "type": "address"
+      }
+    ],
+    "name": "getGenesisPoolFromNative",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "genesisPool",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "nativeToken",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "nativeTokensDecimal",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "fundingTokensDecimal",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "userDeposit",
+            "type": "uint256"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "tokenOwner",
+                "type": "address"
+              },
+              {
+                "internalType": "uint256",
+                "name": "proposedNativeAmount",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "proposedFundingAmount",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "allocatedNativeAmount",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "allocatedFundingAmount",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "refundableNativeAmount",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct IGenesisPoolBase.TokenAllocation",
+            "name": "tokenAllocation",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address[]",
+                "name": "incentivesToken",
+                "type": "address[]"
+              },
+              {
+                "internalType": "uint256[]",
+                "name": "incentivesAmount",
+                "type": "uint256[]"
+              }
+            ],
+            "internalType": "struct IGenesisPoolBase.TokenIncentiveInfo",
+            "name": "incentiveInfo",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "nativeToken",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
+                "name": "fundingToken",
+                "type": "address"
+              },
+              {
+                "internalType": "bool",
+                "name": "stable",
+                "type": "bool"
+              },
+              {
+                "internalType": "uint256",
+                "name": "duration",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "threshold",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "supplyPercent",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "startPrice",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "startTime",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct IGenesisPoolBase.GenesisInfo",
+            "name": "genesisInfo",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "pairAddress",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
+                "name": "gaugeAddress",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
+                "name": "internal_bribe",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
+                "name": "external_bribe",
+                "type": "address"
+              }
+            ],
+            "internalType": "struct IGenesisPoolBase.LiquidityPool",
+            "name": "liquidityPool",
+            "type": "tuple"
+          },
+          {
+            "internalType": "enum IGenesisPoolBase.PoolStatus",
+            "name": "poolStatus",
+            "type": "uint8"
+          }
+        ],
+        "internalType": "struct GenesisPoolAPI.GenesisData",
+        "name": "genesisData",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      },
+      {
+        "internalType": "address[]",
+        "name": "tokenAddresses",
+        "type": "address[]"
+      }
+    ],
+    "name": "getTokenBalances",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "amounts",
+        "type": "uint256[]"
       }
     ],
     "stateMutability": "view",

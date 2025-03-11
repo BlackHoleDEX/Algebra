@@ -5854,6 +5854,21 @@
       "address": "0x962105d7e54720a6187A825492b312c72d75f350",
       "txHash": "0xbda109fd26591779b65df686d8eb33f01d8d18381e0d7015ab8c32fcf28e16e9",
       "kind": "transparent"
+    },
+    {
+      "address": "0x60334558E5828aA447cA072e14A0E1699555Ca18",
+      "txHash": "0xd60100d93541c870d6276b834ddaf42aa2755f8a0e1c5b0b047ea66911f5086b",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x3Ce462e448307136495F9B386C43F613D3E2d318",
+      "txHash": "0x4deb63b4932c99079b65e7534429e9040b333a90fd3a67d429b0c5102061d9ad",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x386113F0F0057DF273d1c915a339052783796670",
+      "txHash": "0x2fb163fd541a10737759732f99242da1c6c369150b71450d2430046ee27dd4c7",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -47817,6 +47832,225 @@
             "numberOfBytes": "20"
           },
           "t_contract(IGenesisPoolManager)25121": {
+            "label": "contract IGenesisPoolManager",
+            "numberOfBytes": "20"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "b18792fd1fd31e90893cf6c4e5099307510414fa5e617ef387a8b7de3267c576": {
+      "address": "0x17A0753a50dD5a4F47D767e9DbDa14EF2dBe781E",
+      "txHash": "0xea46f3ebf800c3ea712ad567b87931c4031d9ac721088692fcebcf45f0746f9c",
+      "layout": {
+        "solcVersion": "0.8.13",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "owner",
+            "offset": 2,
+            "slot": "0",
+            "type": "t_address",
+            "contract": "GenesisPoolAPI",
+            "src": "contracts/APIHelper/GenesisPoolAPI.sol:28"
+          },
+          {
+            "label": "genesisManager",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_contract(IGenesisPoolManager)1277",
+            "contract": "GenesisPoolAPI",
+            "src": "contracts/APIHelper/GenesisPoolAPI.sol:29"
+          },
+          {
+            "label": "genesisPoolFactory",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_contract(IGenesisPoolFactory)1261",
+            "contract": "GenesisPoolAPI",
+            "src": "contracts/APIHelper/GenesisPoolAPI.sol:30"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IGenesisPoolFactory)1261": {
+            "label": "contract IGenesisPoolFactory",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IGenesisPoolManager)1277": {
+            "label": "contract IGenesisPoolManager",
+            "numberOfBytes": "20"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "7edb44b049a8b4db7f6fa218aed6c0f41edf6144029074aa9bed62a026920e41": {
+      "address": "0xECC9F994E19f2a0277d9Dc530bf7E52C1b20aCe1",
+      "txHash": "0xa15a6afd7e34b5a3514db25e1f06e04b2495da26619e77e76ab0ab6a41664a6c",
+      "layout": {
+        "solcVersion": "0.8.13",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "owner",
+            "offset": 2,
+            "slot": "0",
+            "type": "t_address",
+            "contract": "GenesisPoolAPI",
+            "src": "contracts/APIHelper/GenesisPoolAPI.sol:28"
+          },
+          {
+            "label": "genesisManager",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_contract(IGenesisPoolManager)1325",
+            "contract": "GenesisPoolAPI",
+            "src": "contracts/APIHelper/GenesisPoolAPI.sol:29"
+          },
+          {
+            "label": "genesisPoolFactory",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_contract(IGenesisPoolFactory)1309",
+            "contract": "GenesisPoolAPI",
+            "src": "contracts/APIHelper/GenesisPoolAPI.sol:30"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IGenesisPoolFactory)1309": {
+            "label": "contract IGenesisPoolFactory",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IGenesisPoolManager)1325": {
+            "label": "contract IGenesisPoolManager",
+            "numberOfBytes": "20"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "784c36b7f99e1d3bf1658247b885d2fca37eba511fdcfe9ed383ccb5197edd63": {
+      "address": "0xE7FbBd8ffcB5eB50c1F58F54C73F81864fE79636",
+      "txHash": "0x963ae76e0a4139daea5e80587a1e3c35aff98ff1d1a3235687f7159e4209f0ca",
+      "layout": {
+        "solcVersion": "0.8.13",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "owner",
+            "offset": 2,
+            "slot": "0",
+            "type": "t_address",
+            "contract": "GenesisPoolAPI",
+            "src": "contracts/APIHelper/GenesisPoolAPI.sol:28"
+          },
+          {
+            "label": "genesisManager",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_contract(IGenesisPoolManager)1399",
+            "contract": "GenesisPoolAPI",
+            "src": "contracts/APIHelper/GenesisPoolAPI.sol:29"
+          },
+          {
+            "label": "genesisPoolFactory",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_contract(IGenesisPoolFactory)1383",
+            "contract": "GenesisPoolAPI",
+            "src": "contracts/APIHelper/GenesisPoolAPI.sol:30"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IGenesisPoolFactory)1383": {
+            "label": "contract IGenesisPoolFactory",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IGenesisPoolManager)1399": {
             "label": "contract IGenesisPoolManager",
             "numberOfBytes": "20"
           },

@@ -41,7 +41,31 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
         genesisPoolFactory = IGenesisPoolFactory(_genesisPoolFactory);
     }
 
+    function getTokenBalances(address _user, address[] memory tokenAddresses) external view returns (uint256[] memory amounts){
+        uint256 length = tokenAddresses.length;
+        amounts = new uint256[](length);
+
+        if(_user == address(0)) return amounts;
+        
+        uint256 i;
+        for(i = 0; i < length; i++){
+            amounts[i] = tokenAddresses[i] != address(0) ? IERC20(tokenAddresses[i]).balanceOf(_user) : 0;
+        }
+        return amounts;
+    }
+
+    function getGenesisPoolFromNative(address _user, address nativeToken) external view returns (GenesisData memory genesisData){
+        address genesisPool = genesisPoolFactory.getGenesisPool(nativeToken);
+        if(genesisPool == address(0)) return genesisData;
+
+        return _getGenesisPool(_user, genesisPool);
+    }
+
     function getGenesisPool(address _user, address genesisPool) external view returns (GenesisData memory genesisData){
+        return _getGenesisPool(_user, genesisPool);
+    }
+
+    function _getGenesisPool(address _user, address genesisPool) internal view returns (GenesisData memory genesisData){
         GenesisInfo memory genesisInfo = IGenesisPool(genesisPool).getGenesisInfo();
         address fundingToken = genesisInfo.fundingToken;
         address nativeToken = genesisInfo.nativeToken;
@@ -60,11 +84,6 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
     }
 
     function getAllGenesisPools(address _user, uint _amounts, uint _offset) external view returns(uint totalPools, bool hasNext, GenesisData[] memory genesisPools){
-         
-        if(_user == address(0)) {
-            return (0,false,genesisPools);
-        }
-
         require(_amounts <= MAX_POOLS, 'too many pools');
 
         genesisPools = new GenesisData[](_amounts);
@@ -95,7 +114,7 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
             genesisPools[i - _offset].nativeTokensDecimal = IERC20(nativeToken).decimals();
             genesisPools[i - _offset].fundingTokensDecimal = IERC20(genesisInfo.fundingToken).decimals();
 
-            genesisPools[i - _offset].userDeposit = IGenesisPool(genesisPool).userDeposits(_user);
+            genesisPools[i - _offset].userDeposit = _user != address(0) ? IGenesisPool(genesisPool).userDeposits(_user) : 0;
             genesisPools[i - _offset].tokenAllocation = IGenesisPool(genesisPool).getAllocationInfo();
             genesisPools[i - _offset].incentiveInfo = IGenesisPool(genesisPool).getIncentivesInfo();
             genesisPools[i - _offset].genesisInfo = genesisInfo;
