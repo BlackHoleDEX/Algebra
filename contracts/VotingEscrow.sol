@@ -156,7 +156,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
     //////////////////////////////////////////////////////////////*/
 
     string constant public name = "veBlack";
-    string constant public symbol = "veTHE";
+    string constant public symbol = "veBLACK";
     string constant public version = "1.0.0";
     uint8 constant public decimals = 18;
 
@@ -909,7 +909,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
 
         require(_locked.end > block.timestamp, 'Lock expired');
         require(_locked.amount > 0, 'Nothing is locked');
-        require(unlock_time > _locked.end, 'Can only increase lock duration');
+        require(isSMNFT || unlock_time > _locked.end, 'Can only increase lock duration');
         require(unlock_time <= block.timestamp + MAXTIME, 'Voting 4 Years Max');
 
         if(isSMNFT) {
