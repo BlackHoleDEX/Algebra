@@ -189,5 +189,6 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
             index++;
         }
 
+        totalPools = count;
     }
 }
