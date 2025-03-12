@@ -5994,6 +5994,11 @@
       "address": "0x98C5eF81AE4C8d06cF2A55a9105369DA2b069247",
       "txHash": "0xbeb006a8bf09642d56b820933956bed2a480c4d0e9d297286af8d1a022a1a502",
       "kind": "transparent"
+    },
+    {
+      "address": "0x9e15870969d5E3eB32CCb9ce8a4e5A5ba4586ce7",
+      "txHash": "0x8f225b55c368da0b39666fd47584ee36766cf0dbf8e72985b8ef030e23a1881f",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -48717,6 +48722,79 @@
             "numberOfBytes": "20"
           },
           "t_contract(IGenesisPoolManager)8354": {
+            "label": "contract IGenesisPoolManager",
+            "numberOfBytes": "20"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "939083d0b5ea1739b64628adc6bacca815ed59abbe2ffcd801d1df8f3ab63f3c": {
+      "address": "0x4EcE2Ec564E18Da3e58F5e52B86CC06a81076855",
+      "txHash": "0xde2b42d9d328d23a1a309d12b4c805854af03182df6cdad81f7e41f46cbd38b1",
+      "layout": {
+        "solcVersion": "0.8.13",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "owner",
+            "offset": 2,
+            "slot": "0",
+            "type": "t_address",
+            "contract": "GenesisPoolAPI",
+            "src": "contracts/APIHelper/GenesisPoolAPI.sol:32"
+          },
+          {
+            "label": "genesisManager",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_contract(IGenesisPoolManager)1826",
+            "contract": "GenesisPoolAPI",
+            "src": "contracts/APIHelper/GenesisPoolAPI.sol:33"
+          },
+          {
+            "label": "genesisPoolFactory",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_contract(IGenesisPoolFactory)1804",
+            "contract": "GenesisPoolAPI",
+            "src": "contracts/APIHelper/GenesisPoolAPI.sol:34"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IGenesisPoolFactory)1804": {
+            "label": "contract IGenesisPoolFactory",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IGenesisPoolManager)1826": {
             "label": "contract IGenesisPoolManager",
             "numberOfBytes": "20"
           },

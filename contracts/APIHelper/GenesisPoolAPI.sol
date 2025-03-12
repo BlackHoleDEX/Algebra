@@ -127,7 +127,7 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
             userDeposit = _user != address(0) ? IGenesisPool(genesisPool).userDeposits(_user) : 0;
             genesisPools[i - _offset].userDeposit = userDeposit;
             genesisPools[i - _offset].estimatedNativeAmount = userDeposit > 0 ? IGenesisPool(genesisPool).getNativeTokenAmount(userDeposit) : 0;
-            
+
             genesisPools[i - _offset].tokenAllocation = IGenesisPool(genesisPool).getAllocationInfo();
             genesisPools[i - _offset].incentiveInfo = IGenesisPool(genesisPool).getIncentivesInfo();
             genesisPools[i - _offset].genesisInfo = genesisInfo;
@@ -170,6 +170,7 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
         genesisPools = new GenesisData[](count);
         GenesisInfo memory genesisInfo;
         uint index = 0;
+        i = 0;
 
         for(i; i < totalPools; i++){
             nativeToken = proposedTokens[i];
