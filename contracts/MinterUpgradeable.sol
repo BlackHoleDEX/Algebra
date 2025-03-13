@@ -21,7 +21,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
 
     uint public teamRate;  //EMISSION that goes to protocol
 
-    uint public constant MAX_TEAM_RATE = 1000; // 10%
+    uint public constant MAX_TEAM_RATE = 500; // 5%
     uint256 public constant TAIL_START = 8_969_150 * 1e18; //TAIL EMISSIONS 
     uint256 public tailEmissionRate; 
     uint256 public constant NUDGE = 1; //delta added in tail emissions rate after voting
