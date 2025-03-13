@@ -91,7 +91,6 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         require(_sender == allocationInfo.tokenOwner, "!= owner");
         require(allocationInfo.proposedNativeAmount > 0, "0 native");
         require(allocationInfo.proposedFundingAmount > 0, "0 funding");
-        require(genesisFactory.getGenesisPool(nativeToken) == address(0), "exists");
 
         address _fundingToken = genesisPoolInfo.fundingToken;
         require(tokenHandler.isConnector(_fundingToken), "conn !=");
@@ -103,9 +102,11 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         
         require(genesisPoolInfo.nativeToken == nativeToken, "!= nativeToken");
         
-        genesisPool = genesisFactory.createGenesisPool(_sender, nativeToken, _fundingToken);
-        require(genesisPool != address(0), "0x");
+        genesisPool = genesisFactory.getGenesisPool(nativeToken);
+        if(genesisPool == address(0))
+            genesisPool = genesisFactory.createGenesisPool(_sender, nativeToken, _fundingToken);
 
+        require(genesisPool != address(0), "0x");
         assert(IERC20(nativeToken).transferFrom(_sender, genesisPool, allocationInfo.proposedNativeAmount));
 
         address auction = auctionFactory.auctions(auctionIndex);
@@ -120,7 +121,6 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         require(genesisPool != address(0), '0x pool');
 
         IGenesisPool(genesisPool).rejectPool();
-        genesisFactory.removeGenesisPool(nativeToken);
 
         uint index = liveNativeTokensIndex[nativeToken];
         uint length = liveNativeTokens.length;

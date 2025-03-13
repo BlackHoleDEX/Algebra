@@ -137,8 +137,10 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
         require(poolStatus == PoolStatus.PRE_LISTING || poolStatus == PoolStatus.PRE_LAUNCH, "!= status");
         require(block.timestamp >= genesisInfo.startTime, "! started");
 
-        uint256 _amount = allocationInfo.proposedFundingAmount - allocationInfo.allocatedFundingAmount;
-        _amount = _amount < amount ? _amount : amount;
+        uint256 _fundingLeft = allocationInfo.proposedFundingAmount - allocationInfo.allocatedFundingAmount;
+        uint256 _maxFundingLeft = _getFundingTokenAmount(allocationInfo.proposedNativeAmount - allocationInfo.allocatedNativeAmount);
+        uint _amount = _maxFundingLeft <= _fundingLeft ? _maxFundingLeft : _fundingLeft;
+        _amount = _amount <= amount ? _amount : amount;
         require(_amount > 0, "max amt");
 
         assert(IERC20(genesisInfo.fundingToken).transferFrom(spender, address(this), _amount));
@@ -376,6 +378,15 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
 
     function _getNativeTokenAmount(uint256 depositAmount) internal view returns (uint256){
         return auction.getNativeTokenAmount(depositAmount);
+    }
+
+    function getFundingTokenAmount(uint256 nativeAmount) external view returns (uint256){
+        if(nativeAmount <= 0) return 0;
+        return _getFundingTokenAmount(nativeAmount);
+    }
+
+    function _getFundingTokenAmount(uint256 nativeAmount) internal view returns (uint256){
+        return auction.getFundingTokenAmount(nativeAmount);
     }
 
     function getAllocationInfo() external view returns (TokenAllocation memory){

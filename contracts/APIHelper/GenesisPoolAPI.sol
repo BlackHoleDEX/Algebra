@@ -137,9 +137,9 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
 
     }
    
-    function getAllUserRelatedGenesisPools(address _user) external view returns(uint totalPools, GenesisData[] memory genesisPools){
+    function getAllUserRelatedGenesisPools(address _user) external view returns(uint totalTokens, GenesisData[] memory genesisPools){
         address[] memory proposedTokens = genesisManager.getAllNaitveTokens();
-        totalPools = proposedTokens.length;
+        totalTokens = proposedTokens.length;
 
         uint i = 0;
         uint count = 0;
@@ -150,7 +150,7 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
         PoolStatus poolStatus;
         uint256 userDeposit;
 
-        for(i; i < totalPools; i++){
+        for(i; i < totalTokens; i++){
             nativeToken = proposedTokens[i];
 
             genesisPool = genesisPoolFactory.getGenesisPool(nativeToken);
@@ -173,7 +173,7 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
         uint index = 0;
         i = 0;
 
-        for(i; i < totalPools; i++){
+        for(i; i < totalTokens; i++){
             nativeToken = proposedTokens[i];
 
             genesisPool = genesisPoolFactory.getGenesisPool(nativeToken);
@@ -206,7 +206,7 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
             }
         }
 
-        totalPools = count;
+        totalTokens = count;
     }
 
     function _hasClaimbaleForOwner(address _user, PoolStatus poolStatus, TokenAllocation memory tokenAllocation, TokenIncentiveInfo memory incentiveInfo) internal pure returns (bool) {
@@ -223,6 +223,7 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
             else if(poolStatus == PoolStatus.PARTIALLY_LAUNCHED){
                 return tokenAllocation.refundableNativeAmount > 0;
             }
+            return false;
         }
         return false;
     }
