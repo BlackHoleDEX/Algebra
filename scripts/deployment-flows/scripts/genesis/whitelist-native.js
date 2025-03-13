@@ -19,7 +19,7 @@ async function main () {
 
         const GenesisManagerContract = await ethers.getContractAt(genesisPoolManagerAbi, genesisPoolManagerAddress);
 
-        for(let i=1;i<addresses.length;i++){
+        for(let i=0;i<addresses.length;i++){
           const nativeToken = addresses[i];
           console.log("nativeToken : ", nativeToken, "tokenOwner : ", tokenOwner);
           await GenesisManagerContract.whiteListUserAndToken(tokenOwner, nativeToken);

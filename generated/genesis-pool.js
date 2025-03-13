@@ -467,6 +467,25 @@ const genesisPoolAbi = [
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "nativeAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "getFundingTokenAmount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "getGenesisInfo",
     "outputs": [

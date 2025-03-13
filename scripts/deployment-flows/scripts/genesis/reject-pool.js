@@ -15,7 +15,7 @@ async function main () {
         const jsonData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8'));
         const addresses = jsonData.map(obj => obj.address);
 
-        const nativeToken = addresses[0];
+        const nativeToken = "0xB2d52F3cC9796ea606a383f00cB49e66D599B688"
 
         console.log("nativeToken : ", nativeToken);
 

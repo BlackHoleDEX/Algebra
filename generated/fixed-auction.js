@@ -1,4 +1,4 @@
-const fixedAuctionAddress = "0x2ab256CFA9D101DB4D31A81aa3cC408634d2Bddb";
+const fixedAuctionAddress = "0x39192aF59e32ECfE54C5d371A3aEE74Baa27e20b";
 
 const fixedAuctionAbi = [
   {
@@ -37,6 +37,25 @@ const fixedAuctionAbi = [
     ],
     "name": "OwnershipTransferred",
     "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "depositAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "getFundingTokenAmount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [],

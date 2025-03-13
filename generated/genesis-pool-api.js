@@ -1,4 +1,4 @@
-const genesisPoolAPIAddress = "0x2aDDf8E7fd7829827633129Ab2a66bA61AD6070B";
+const genesisPoolAPIAddress = "0x31c15f2e4FBA2db369f59d730F8aca340590098D";
 
 const genesisPoolAPIAbi = [
   {
@@ -274,7 +274,7 @@ const genesisPoolAPIAbi = [
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "totalPools",
+        "name": "totalTokens",
         "type": "uint256"
       },
       {

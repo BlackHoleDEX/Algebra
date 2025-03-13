@@ -13,9 +13,9 @@ async function main () {
 
     try{
         const GenesisPoolApi = await ethers.getContractAt(genesisPoolAPIAbi, genesisPoolAPIAddress);
-        const genesisPoolsData = await GenesisPoolApi.getAllGenesisPools(ownerAddress, 2, 0);
+        // const genesisPoolsData = await GenesisPoolApi.getAllUserRelatedGenesisPools(ownerAddress);
 
-        console.log("genesisPool : ", genesisPoolsData);
+        // console.log("genesisPool : ", genesisPoolsData);
 
         const GenesisPoolManager = await ethers.getContractAt(genesisPoolManagerAbi, genesisPoolManagerAddress);
         const nativeTokens = await GenesisPoolManager.getAllNaitveTokens();
