@@ -121,7 +121,14 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
 
         IGenesisPool(genesisPool).rejectPool();
         genesisFactory.removeGenesisPool(nativeToken);
-        
+
+        uint index = liveNativeTokensIndex[nativeToken];
+        uint length = liveNativeTokens.length;
+        if(length > 0 && index >= 1 && index <= length)
+        {
+            liveNativeTokens[index-1] = liveNativeTokens[length - 1];
+            liveNativeTokens.pop();
+        }
     }
 
     function approveGenesisPool(address nativeToken) external Governance nonReentrant {
@@ -135,8 +142,8 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         address pairAddress = pairFactory.createPair(nativeToken, genesisInfo.fundingToken, genesisInfo.stable);
         pairFactory.setGenesisStatus(pairAddress, true);
 
-        liveNativeTokensIndex[nativeToken] = liveNativeTokens.length;
         liveNativeTokens.push(nativeToken);
+        liveNativeTokensIndex[nativeToken] = liveNativeTokens.length; // becuase default valie is 0, so starting with 1
 
         IGenesisPool(genesisPool).approvePool(pairAddress);
     }
@@ -191,9 +198,9 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
 
         uint index = liveNativeTokensIndex[_nativeToken];
         uint length = liveNativeTokens.length;
-        if(length > 0)
+        if(length > 0 && index >= 1 && index <= length)
         {
-            liveNativeTokens[index] = liveNativeTokens[length - 1];
+            liveNativeTokens[index - 1] = liveNativeTokens[length - 1];
             liveNativeTokens.pop();
         }
     }
