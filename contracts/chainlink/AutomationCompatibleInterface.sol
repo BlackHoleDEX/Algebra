@@ -20,6 +20,7 @@ interface AutomationCompatibleInterface {
    * `abi.encode`.
    */
   function checkUpkeep(bytes calldata checkData) external returns (bool upkeepNeeded, bytes memory performData);
+  function checkUpPrekeep(bytes calldata checkData) external returns (bool preUpkeepNeeded, bytes memory performData);
 
   /**
    * @notice method that is actually executed by the keepers, via the registry.
@@ -38,4 +39,5 @@ interface AutomationCompatibleInterface {
    * validated against the contract's current state.
    */
   function performUpkeep(bytes calldata performData) external;
+  function performPreUpkeep(bytes calldata performData) external;
 }

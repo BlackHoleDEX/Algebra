@@ -361,10 +361,11 @@ const deployEpochController = async(minterUpgradableAddress, voterV3Address) =>{
     }
 }
 
-const setChainLinkAddress = async (epocControllerAddress, chainlinkAutomationRegistryAddress) => {
+const setChainLinkAddress = async (epocControllerAddress, chainlinkAutomationAddress1, chainlinkAutomationAddress2) => {
     try{
         const epochController = await ethers.getContractAt(epochControllerAbi, epocControllerAddress);
-        await epochController.setAutomationRegistry(chainlinkAutomationRegistryAddress);
+        await epochController.setAutomationRegistry(chainlinkAutomationAddress1);
+        await epochController.setAutomationRegistry2(chainlinkAutomationAddress2);
         console.log("setChainLinkAddress succes\n");
     } catch(error){
         console.log("setChainLinkAddress failed: ", error);
@@ -561,6 +562,17 @@ const setGenesisPoolManagerInPairFactory = async(pairFactoryAddress, genesisMana
     }
 };
 
+const setGenesisPoolManagerInEpochController = async (epochControllerAddress, genesisManagerAddress) => {
+    try {
+        const EpochControllerContract = await ethers.getContractAt(epochControllerAbi, epochControllerAddress);
+        await EpochControllerContract.setGenesisManager(genesisManagerAddress);
+        console.log("set genesis manager in epoch controller\n");
+    } catch (error) {
+        console.log("error genesis manager in epoch controller", error);
+        process.exit(1);
+    }
+}
+
 const deployGenesisApi = async (genesisManagerAddress, genesisFactoryAddress) => {
     try {
         data = await ethers.getContractFactory("GenesisPoolAPI");
@@ -685,7 +697,7 @@ async function main () {
 
     // set chainlink address
     // TODO: separate out the setting of chalink address 
-    await setChainLinkAddress(epochControllerAddress, "0xb2C2f24FcC2478f279B6B566419a739FA53c70D3");
+    await setChainLinkAddress(epochControllerAddress, "0x564A03937972861f3864176e61BE28A977aeae0E", "0x564A03937972861f3864176e61BE28A977aeae0E");
 
     //add black to user Address
     await addBlackToUserAddress(minterUpgradableAddress);
@@ -723,6 +735,9 @@ async function main () {
 
     //set genesisManager in pairFactory
     await setGenesisPoolManagerInPairFactory(pairFactoryAddress, genesisManagerAddress);
+
+    //set genesisManager in epochController
+    await setGenesisPoolManagerInEpochController(epochControllerAddress, genesisManagerAddress);
 
     //deploy GenesisApi
     await deployGenesisApi(genesisManagerAddress, genesisFactoryAddress);

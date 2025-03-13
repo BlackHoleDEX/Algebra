@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
 
 import "./interfaces/IGenesisPoolManager.sol";
 import "./interfaces/IVoter.sol";
@@ -40,6 +41,9 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
 
     IGenesisPoolFactory public genesisFactory;
     IAuctionFactory public auctionFactory;
+
+    uint public constant WEEK = 1800;
+    uint public active_period; // 2 : 30 of every thursday
 
     using SafeERC20 for IERC20;
 
@@ -77,6 +81,13 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         MIN_DURATION = 7 days; 
         MIN_THRESHOLD = 50 * 10 ** 2; 
         MATURITY_TIME = 90 days;
+
+        active_period = ((block.timestamp / WEEK) * WEEK) + (5 * 60);
+    }
+
+    function check() external view returns (bool) {
+        uint _period = active_period;
+        return block.timestamp >= _period + WEEK;
     }
 
     function whiteListUserAndToken(address tokenOwner, address proposedToken) external Governance nonReentrant{
@@ -164,7 +175,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
 
     // at epoch flip, PRE_LISTING -> PRE_LAUNCH (condition met) , PRE_LAUNCH_DDEPOSIT_DISBALED -> LAUNCH or PARTIALLY_LAUNCH
     function checkAtEpochFlip() external nonReentrant{
-        // require(epochController == msg.sender, "invalid access");
+        require(epochController == msg.sender, "invalid access");
 
         uint256 _proposedTokensCnt = nativeTokens.length;
         uint256 i;
@@ -207,23 +218,30 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
     
     // before 3 hrs
     function checkBeforeEpochFlip() external nonReentrant{
-        // require(epochController == msg.sender, "invalid access");
+        require(epochController == msg.sender, "invalid access");
 
-        uint256 _proposedTokensCnt = nativeTokens.length;
-        uint256 i;
-        address _genesisPool;
-        PoolStatus _poolStatus;
-        for(i = 0; i < _proposedTokensCnt; i++){
-            _genesisPool = genesisFactory.getGenesisPool(nativeTokens[i]);
-            _poolStatus = IGenesisPool(_genesisPool).poolStatus();
+        uint _period = active_period;
+        if (block.timestamp >= _period + WEEK) { 
+            
+            uint256 _proposedTokensCnt = nativeTokens.length;
+            uint256 i;
+            address _genesisPool;
+            PoolStatus _poolStatus;
+            for(i = 0; i < _proposedTokensCnt; i++){
+                _genesisPool = genesisFactory.getGenesisPool(nativeTokens[i]);
+                _poolStatus = IGenesisPool(_genesisPool).poolStatus();
 
-            if(_poolStatus == PoolStatus.PRE_LISTING && IGenesisPool(_genesisPool).eligbleForDisqualify()){
-                pairFactory.setGenesisStatus(IGenesisPool(_genesisPool).getLiquidityPoolInfo().pairAddress, false);
-                IGenesisPool(_genesisPool).setPoolStatus(PoolStatus.NOT_QUALIFIED);
+                if(_poolStatus == PoolStatus.PRE_LISTING && IGenesisPool(_genesisPool).eligbleForDisqualify()){
+                    pairFactory.setGenesisStatus(IGenesisPool(_genesisPool).getLiquidityPoolInfo().pairAddress, false);
+                    IGenesisPool(_genesisPool).setPoolStatus(PoolStatus.NOT_QUALIFIED);
+                }
+                else if(_poolStatus == PoolStatus.PRE_LAUNCH){
+                    IGenesisPool(_genesisPool).setPoolStatus(PoolStatus.PRE_LAUNCH_DEPOSIT_DISABLED);
+                }
             }
-            else if(_poolStatus == PoolStatus.PRE_LAUNCH){
-                IGenesisPool(_genesisPool).setPoolStatus(PoolStatus.PRE_LAUNCH_DEPOSIT_DISABLED);
-            }
+
+            _period = (block.timestamp / WEEK) * WEEK;
+            active_period = _period;
         }
     }
 
@@ -241,6 +259,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
     }
 
     function setEpochController(address _epochController) external Governance {
+        require(_epochController != address(0), "Ox");
         epochController = _epochController;
     }
 
