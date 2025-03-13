@@ -681,7 +681,7 @@ async function main () {
     await setMinterInRewardDistributer(minterUpgradableAddress, rewardsDistributorAddress); //set as depositor
 
     // deploy epoch controller here.
-    const epochControllerAddress = await deployEpochController(voterV3Address, minterUpgradableAddress);
+    const epochControllerAddress = await deployEpochController(minterUpgradableAddress, voterV3Address);
 
     // set chainlink address
     // TODO: separate out the setting of chalink address 
