@@ -47,7 +47,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     IVoter public _voter;
     IVotingEscrow public _ve;
     IRewardsDistributor public _rewards_distributor;
-    address public burnTokenAddress=0x000000000000000000000000000000000000dEaD;
+    address public burnTokenAddress;
 
     mapping(uint256 => bool) public proposals;
 
@@ -65,6 +65,8 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
         _initializer = msg.sender;
         team = msg.sender;
         tailEmissionRate = MAX_BPS;
+
+        burnTokenAddress=0x000000000000000000000000000000000000dEaD;
 
         teamRate = 500; // 500 bps = 5%
 
