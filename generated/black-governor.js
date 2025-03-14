@@ -1,4 +1,4 @@
-const blackGovernorAddress = "0x22d27F55E3553336e4C1E83022e4c600651FA8d3";
+const blackGovernorAddress = "0x568C9BE9aD4A221C91b82df81B318f0904B46b51";
 
 const blackGovernorAbi = [
   {
@@ -107,6 +107,12 @@ const blackGovernorAbi = [
         "internalType": "uint256",
         "name": "voteEnd",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "description",
+        "type": "string"
       }
     ],
     "name": "ProposalCreated",
@@ -1083,6 +1089,11 @@ const blackGovernorAbi = [
         "internalType": "bytes[]",
         "name": "calldatas",
         "type": "bytes[]"
+      },
+      {
+        "internalType": "string",
+        "name": "description",
+        "type": "string"
       }
     ],
     "name": "propose",

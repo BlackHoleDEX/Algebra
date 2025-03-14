@@ -614,132 +614,132 @@ async function main () {
     owner = accounts[0];
     const ownerAddress = owner.address;
 
-    console.log("Black token address is: ", blackAddress);
+    // console.log("Black token address is: ", blackAddress);
 
-    // deploy permissionRegistry
-    const permissionRegistryAddress = await deployPermissionRegistry();
+    // // deploy permissionRegistry
+    // const permissionRegistryAddress = await deployPermissionRegistry();
 
-    //set owner roles in permission registry
-    await setPermissionRegistryRoles(permissionRegistryAddress, ownerAddress);
+    // //set owner roles in permission registry
+    // await setPermissionRegistryRoles(permissionRegistryAddress, ownerAddress);
 
-    //deploy token handler & whitelist tokens and connectors
-    const tokenHandlerAddress = await deployTokenHanlder(permissionRegistryAddress);
+    // //deploy token handler & whitelist tokens and connectors
+    // const tokenHandlerAddress = await deployTokenHanlder(permissionRegistryAddress);
 
-    //deploy pairGenerator
-    const pairGeneratorAddress = await deployPairGenerator();
+    // //deploy pairGenerator
+    // const pairGeneratorAddress = await deployPairGenerator();
 
-    //deploy pairFactory
-    const pairFactoryAddress = await deployPairFactory(pairGeneratorAddress);
+    // //deploy pairFactory
+    // const pairFactoryAddress = await deployPairFactory(pairGeneratorAddress);
 
-    //deploy router V2
-    const routerV2Address = await deployRouterV2(pairFactoryAddress, pairGeneratorAddress);
+    // //deploy router V2
+    // const routerV2Address = await deployRouterV2(pairFactoryAddress, pairGeneratorAddress);
 
-    // setDibs
-    await setDibs(pairFactoryAddress);
+    // // setDibs
+    // await setDibs(pairFactoryAddress);
 
-    //deploy voting  escrow
-    const votingEscrowAddress = await deployVotingEscrow(blackAddress);
+    // //deploy voting  escrow
+    // const votingEscrowAddress = await deployVotingEscrow(blackAddress);
     
-    //deploy bribeV3
-    const bribeV3Address = await deployBribeV3Factory(permissionRegistryAddress);
+    // //deploy bribeV3
+    // const bribeV3Address = await deployBribeV3Factory(permissionRegistryAddress);
 
-    //deploygaugeV2
-    const gaugeV2Address = await deployGaugeV2Factory(permissionRegistryAddress);
+    // //deploygaugeV2
+    // const gaugeV2Address = await deployGaugeV2Factory(permissionRegistryAddress);
 
-    // //deploy voterV3 and initialize
-    const voterV3Address = await deployVoterV3AndSetInit(votingEscrowAddress, pairFactoryAddress, gaugeV2Address, bribeV3Address, tokenHandlerAddress, permissionRegistryAddress, ownerAddress);
+    // // //deploy voterV3 and initialize
+    // const voterV3Address = await deployVoterV3AndSetInit(votingEscrowAddress, pairFactoryAddress, gaugeV2Address, bribeV3Address, tokenHandlerAddress, permissionRegistryAddress, ownerAddress);
 
-    //setVoter in bribe factory
-    await setVoterBribeV3(voterV3Address, bribeV3Address);
+    // //setVoter in bribe factory
+    // await setVoterBribeV3(voterV3Address, bribeV3Address);
 
-    // // blackholeV2Abi deployment
-    const blackholeV2AbiAddress = await deployBloackholeV2Abi(voterV3Address, routerV2Address);
+    // // // blackholeV2Abi deployment
+    // const blackholeV2AbiAddress = await deployBloackholeV2Abi(voterV3Address, routerV2Address);
 
-    //deploy rewardsDistributor
-    const rewardsDistributorAddress = await deployRewardsDistributor(votingEscrowAddress);
+    // //deploy rewardsDistributor
+    // const rewardsDistributorAddress = await deployRewardsDistributor(votingEscrowAddress);
 
-    //deploy veNFT
-    await deployveNFT(voterV3Address, rewardsDistributorAddress, gaugeV2Address);
+    // //deploy veNFT
+    // await deployveNFT(voterV3Address, rewardsDistributorAddress, gaugeV2Address);
 
-    //deploy minterUpgradable
-    const minterUpgradableAddress = await deployMinterUpgradeable(votingEscrowAddress, voterV3Address, rewardsDistributorAddress);
+    // //deploy minterUpgradable
+    // const minterUpgradableAddress = await deployMinterUpgradeable(votingEscrowAddress, voterV3Address, rewardsDistributorAddress);
 
-    //set MinterUpgradable in VoterV3
-    await setMinterUpgradableInVoterV3(voterV3Address, minterUpgradableAddress);
+    // //set MinterUpgradable in VoterV3
+    // await setMinterUpgradableInVoterV3(voterV3Address, minterUpgradableAddress);
 
-    //set minter in black
-    await setMinterInBlack(minterUpgradableAddress, blackAddress);
+    // //set minter in black
+    // await setMinterInBlack(minterUpgradableAddress, blackAddress);
 
-    // await logActivePeriod();
+    // // await logActivePeriod();
 
-    // call _initialize
-    await initializeMinter(minterUpgradableAddress);
+    // // call _initialize
+    // await initializeMinter(minterUpgradableAddress);
 
-    // await logActivePeriod();
+    // // await logActivePeriod();
 
-    //set minter in reward distributer in depositer
-    await setMinterInRewardDistributer(minterUpgradableAddress, rewardsDistributorAddress); //set as depositor
+    // //set minter in reward distributer in depositer
+    // await setMinterInRewardDistributer(minterUpgradableAddress, rewardsDistributorAddress); //set as depositor
 
-    // deploy epoch controller here.
-    const epochControllerAddress = await deployEpochController(voterV3Address, minterUpgradableAddress);
+    // // deploy epoch controller here.
+    // const epochControllerAddress = await deployEpochController(voterV3Address, minterUpgradableAddress);
 
     // set chainlink address
     // TODO: separate out the setting of chalink address 
     await setChainLinkAddress(epochControllerAddress, "0xb2C2f24FcC2478f279B6B566419a739FA53c70D3");
 
     //add black to user Address
-    await addBlackToUserAddress(minterUpgradableAddress);
+    // await addBlackToUserAddress(minterUpgradableAddress);
 
-    //set voterV3 in voting escrow
-    await setVoterV3InVotingEscrow(voterV3Address, votingEscrowAddress);
+    // //set voterV3 in voting escrow
+    // await setVoterV3InVotingEscrow(voterV3Address, votingEscrowAddress);
 
-    await deployBlackGovernor(votingEscrowAddress,minterUpgradeableAddress);
+    // await deployBlackGovernor(votingEscrowAddress,minterUpgradeableAddress);
 
-    await pushDefaultRewardToken(bribeV3Address, blackAddress);
+    // await pushDefaultRewardToken(bribeV3Address, blackAddress);
 
-    //deploy blackClaim
-    const blackClaimAddress = await deployBlackClaim(votingEscrowAddress, ownerAddress);
+    // //deploy blackClaim
+    // const blackClaimAddress = await deployBlackClaim(votingEscrowAddress, ownerAddress);
 
-    //deploy fixedAuction
-    const fixedAuctionAddress = await deployFixedAuction();
+    // //deploy fixedAuction
+    // const fixedAuctionAddress = await deployFixedAuction();
 
-    //deploy auctionFactory
-    const auctionFactoryAddress = await deployAuctionFacotry(fixedAuctionAddress);
+    // //deploy auctionFactory
+    // const auctionFactoryAddress = await deployAuctionFacotry(fixedAuctionAddress);
 
-    //deploy genesisFactory
-    const genesisFactoryAddress = await deployGenesisFactory(tokenHandlerAddress, voterV3Address);
+    // //deploy genesisFactory
+    // const genesisFactoryAddress = await deployGenesisFactory(tokenHandlerAddress, voterV3Address);
 
-    //deploy genesisManager
-    const genesisManagerAddress = await deployGenesisManager(epochControllerAddress, routerV2Address, permissionRegistryAddress, voterV3Address, pairFactoryAddress, genesisFactoryAddress, auctionFactoryAddress, tokenHandlerAddress);
+    // //deploy genesisManager
+    // const genesisManagerAddress = await deployGenesisManager(epochControllerAddress, routerV2Address, permissionRegistryAddress, voterV3Address, pairFactoryAddress, genesisFactoryAddress, auctionFactoryAddress, tokenHandlerAddress);
 
-    //set genesisManager in genesisFactory
-    await setGenesisManagerInGenesisFactory(genesisFactoryAddress, genesisManagerAddress);
+    // //set genesisManager in genesisFactory
+    // await setGenesisManagerInGenesisFactory(genesisFactoryAddress, genesisManagerAddress);
 
-    //assign genesisManager role of GENESIS_MANAGER
-    await setGenesisManagerRole(permissionRegistryAddress, genesisManagerAddress);
+    // //assign genesisManager role of GENESIS_MANAGER
+    // await setGenesisManagerRole(permissionRegistryAddress, genesisManagerAddress);
 
-    //set genesisManager in VoterV3
-    await setGenesisPoolManagerInVoter(voterV3Address, genesisManagerAddress);
+    // //set genesisManager in VoterV3
+    // await setGenesisPoolManagerInVoter(voterV3Address, genesisManagerAddress);
 
-    //set genesisManager in pairFactory
-    await setGenesisPoolManagerInPairFactory(pairFactoryAddress, genesisManagerAddress);
+    // //set genesisManager in pairFactory
+    // await setGenesisPoolManagerInPairFactory(pairFactoryAddress, genesisManagerAddress);
 
-    //deploy GenesisApi
-    await deployGenesisApi(genesisManagerAddress, genesisFactoryAddress);
+    // //deploy GenesisApi
+    // await deployGenesisApi(genesisManagerAddress, genesisFactoryAddress);
 
-    // await checker(routerV2Address, pairFactoryAddress);
+    // // await checker(routerV2Address, pairFactoryAddress);
 
-    // createPairs two by default
-    await addLiquidity(routerV2Address, addresses[0], addresses[1], 100, 100);
-    await addLiquidity(routerV2Address, addresses[1], addresses[2], 100, 100);
-    await addLiquidity(routerV2Address, addresses[2], addresses[3], 100, 100);
-    await addLiquidity(routerV2Address, addresses[3], addresses[4], 10, 100);
-    await addLiquidity(routerV2Address, addresses[4], addresses[5], 100, 10);
+    // // createPairs two by default
+    // await addLiquidity(routerV2Address, addresses[0], addresses[1], 100, 100);
+    // await addLiquidity(routerV2Address, addresses[1], addresses[2], 100, 100);
+    // await addLiquidity(routerV2Address, addresses[2], addresses[3], 100, 100);
+    // await addLiquidity(routerV2Address, addresses[3], addresses[4], 10, 100);
+    // await addLiquidity(routerV2Address, addresses[4], addresses[5], 100, 10);
 
-    console.log("DONE ADDING LIQUIDITY");
+    // console.log("DONE ADDING LIQUIDITY");
 
-    // create Gauges
-    await createGauges(voterV3Address, blackholeV2AbiAddress);
+    // // create Gauges
+    // await createGauges(voterV3Address, blackholeV2AbiAddress);
 }
 
 main()

@@ -1,4 +1,4 @@
-const routerV2Address = "0xB0dCdFCdF823650A72d72534c101FdC10D3a9549";
+const routerV2Address = "0x333625C19d96877313159155360689f0A91cDFe8";
 
 const routerV2Abi = [
   {
@@ -321,6 +321,35 @@ const routerV2Abi = [
         "internalType": "uint256[]",
         "name": "amounts",
         "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amountIn",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "tokenIn",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "pair",
+        "type": "address"
+      }
+    ],
+    "name": "getPoolAmountOut",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
