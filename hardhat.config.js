@@ -27,7 +27,7 @@ module.exports = {
 
   networks: {
     baseSepolia: {
-      url: "",
+      url: "https://base-sepolia.g.alchemy.com/v2/zY8fO9bbJbzywRt0xRheXQWpWjWiCqop",
       chainId: 84532, // Sepolia's Chain ID
       accounts: [PRIVATEKEY, SECONDPRIVATEKEY, THIRDPRIVATEKEY],
       gas: 21000000,
