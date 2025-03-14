@@ -1,4 +1,4 @@
-const genesisPoolManagerAddress = "0xB47ba8e78868A7F77bA991d7F03f9a7d9cc9c75F";
+const genesisPoolManagerAddress = "0xF6c64e5cBe8fafb44eAb82353245e890EBcE943c";
 
 const genesisPoolManagerAbi = [
   {
@@ -122,6 +122,32 @@ const genesisPoolManagerAbi = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "WEEK",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "active_period",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -142,6 +168,19 @@ const genesisPoolManagerAbi = [
         "internalType": "contract IAuctionFactory",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "check",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
