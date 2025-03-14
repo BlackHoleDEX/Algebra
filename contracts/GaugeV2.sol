@@ -93,7 +93,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
         VE = _ve;                               // vested
         TOKEN = IERC20(_token);                 // underlying (LP)
         DISTRIBUTION = _distribution;           // distro address (voter)
-        DURATION = 1800;                      // BlachHole:: temperory value need to chage it back to 7 days
+        DURATION = 3600;                      
 
         internal_bribe = _internal_bribe;       // lp fees goes here
         external_bribe = _external_bribe;       // bribe fees goes here
@@ -312,7 +312,9 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
         uint256 gaugeDeduction =  _amount - genesisDeduction;
 
         _balances[msg.sender] = _balances[msg.sender] - gaugeDeduction;
-        IGenesisPool(genesisPool).deductAmount(msg.sender, genesisDeduction);
+        if(genesisPool != address(0)){
+            IGenesisPool(genesisPool).deductAmount(msg.sender, genesisDeduction);
+        }
     }
 
     ///@notice withdraw all TOKEN and harvest rewardToken
@@ -364,11 +366,6 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     --------------------------------------------------------------------------------
     --------------------------------------------------------------------------------
     ----------------------------------------------------------------------------- */
-
-    /// BLACKHOLE: need to change duration for testing purpose currently 20 minutes
-    function setRewardDuration(uint256 _duration) external {
-        DURATION = _duration;
-    }
 
     function setGenesisPool(address _genesisPool) external onlyGenesisPool{
         genesisPool = _genesisPool;

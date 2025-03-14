@@ -1,4 +1,4 @@
-const blackClaimsAddress = "0x1687e0a3AdC7899c696Bb0a6214bFcD6e4CDdbFD";
+const blackClaimsAddress = "0x813Cd7B6B6B74eB4386bd1525C9aCE3084b0A174";
 
 const blackClaimsAbi = [
   {

@@ -19,13 +19,9 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     
     bool public isFirstMint;
 
-    uint public EMISSION;
-    uint public TAIL_EMISSION;
-    uint public REBASEMAX;
-    uint public constant PRECISION = 1000;
     uint public teamRate;  //EMISSION that goes to protocol
 
-    uint public constant MAX_TEAM_RATE = 50; // 5%
+    uint public constant MAX_TEAM_RATE = 1000; // 10%
     uint256 public constant TAIL_START = 8_969_150 * 1e18; //TAIL EMISSIONS 
     uint256 public tailEmissionRate; 
     uint256 public constant NUDGE = 1; //delta added in tail emissions rate after voting
@@ -37,7 +33,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     uint256 public constant PROPOSAL_INCREASE = 10_100; // 1% increment after the 67th epoch based on proposal
     uint256 public constant PROPOSAL_DECREASE = 9_900; // 1% increment after the 67th epoch based on proposal
 
-    uint public constant WEEK = 1800; // allows minting once per week (reset every Thursday 00:00 UTC)
+    uint public constant WEEK = 3600; // allows minting once per week (reset every Thursday 00:00 UTC)
     uint public weekly; // represents a starting weekly emission of 2.6M BLACK (BLACK has 18 decimals)
     uint public active_period;
     uint public constant LOCK = 86400 * 7 * 52 * 4;
@@ -51,6 +47,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     IVoter public _voter;
     IVotingEscrow public _ve;
     IRewardsDistributor public _rewards_distributor;
+    address public burnTokenAddress;
 
     mapping(uint256 => bool) public proposals;
 
@@ -67,15 +64,11 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
 
         _initializer = msg.sender;
         team = msg.sender;
-        tailEmissionRate = 10000;
+        tailEmissionRate = MAX_BPS;
 
-        teamRate = 30; // 300 bps = 3%
+        burnTokenAddress=0x000000000000000000000000000000000000dEaD;
 
-        EMISSION = 990; //BlackHole:: 
-        TAIL_EMISSION = 2;
-        REBASEMAX = 300;
-
-        tailEmissionRate = 67;
+        teamRate = 500; // 500 bps = 5%
 
         _black = IBlack(IVotingEscrow(__ve).token());
         _voter = IVoter(__voter);
@@ -127,29 +120,6 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
         teamRate = _teamRate;
     }
 
-    function setEmission(uint _emission) external {
-        require(msg.sender == team, "not team");
-        require(_emission <= PRECISION, "rate too high");
-        EMISSION = _emission;
-    }
-
-
-    function setRebase(uint _rebase) external {
-        require(msg.sender == team, "not team");
-        require(_rebase <= PRECISION, "rate too high");
-        REBASEMAX = _rebase;
-    }
-
-    // calculate circulating supply as total token supply - locked supply
-    function circulating_supply() public view returns (uint) {
-        return _black.totalSupply() - _black.balanceOf(address(_ve));
-    }
-
-    // calculates tail end (infinity) emissions as 0.2% of total supply
-    function circulating_emission() public view returns (uint) {
-        return (circulating_supply() * TAIL_EMISSION) / PRECISION;
-    }
-
     // calculate inflation and adjust ve balances accordingly
     function calculate_rebase(uint _weeklyMint) public view returns (uint) {
         uint _veTotal = _black.balanceOf(address(_ve));
@@ -198,6 +168,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
 
             if (_tail) {
                 _emission = (_weekly * tailEmissionRate) / MAX_BPS;
+                weekly = _emission;
             } else {
                 _emission = _weekly;
                 if (epochCount < 15) {
@@ -208,11 +179,11 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
                 weekly = _weekly;
             }
 
-            tailEmissionRate = 10000;
+            tailEmissionRate = MAX_BPS;
 
             uint _rebase = calculate_rebase(_emission);
 
-            uint _teamEmissions = _emission * teamRate / PRECISION;
+            uint _teamEmissions = _emission * teamRate / MAX_BPS;
 
             uint _gauge = _emission - _rebase - _teamEmissions;
 
@@ -230,13 +201,17 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
             _black.approve(address(_voter), _gauge);
             _voter.notifyRewardAmount(_gauge);
 
-            emit Mint(msg.sender, weekly, circulating_supply(), circulating_emission());
+            emit Mint(msg.sender, _emission, _rebase, circulating_supply());
         }
         return _period;
     }
 
     function transfer(address _to, uint _amount) external {
         _black.transfer(_to, _amount);
+    }
+
+    function circulating_supply() public view returns (uint) {
+        return _black.totalSupply() - _black.balanceOf(address(_ve)) - _black.balanceOf(address(burnTokenAddress));
     }
 
     function check() external view returns(bool){

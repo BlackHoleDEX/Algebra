@@ -1,4 +1,4 @@
-const votingEscrowAddress = "0x0aC6138BD41D893DafA38759D76D4d1Cf3687Ef1";
+const votingEscrowAddress = "0x0aE170d98826742eb43626021705ec09bA22B71A";
 
 const votingEscrowAbi = [
   {
@@ -631,19 +631,6 @@ const votingEscrowAbi = [
   },
   {
     "inputs": [],
-    "name": "block_number",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "burnTokenAddress",
     "outputs": [
       {
@@ -1206,25 +1193,6 @@ const votingEscrowAbi = [
         "internalType": "bool",
         "name": "isSMNFT",
         "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "locked__end",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
