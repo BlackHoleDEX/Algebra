@@ -107,12 +107,6 @@ const blackGovernorAbi = [
         "internalType": "uint256",
         "name": "voteEnd",
         "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "description",
-        "type": "string"
       }
     ],
     "name": "ProposalCreated",
@@ -1089,11 +1083,6 @@ const blackGovernorAbi = [
         "internalType": "bytes[]",
         "name": "calldatas",
         "type": "bytes[]"
-      },
-      {
-        "internalType": "string",
-        "name": "description",
-        "type": "string"
       }
     ],
     "name": "propose",

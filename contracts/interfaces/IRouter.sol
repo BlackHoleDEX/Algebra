@@ -13,4 +13,5 @@ interface IRouter {
     function isPair(address pair) external view returns (bool);
     function getReserves(address tokenA, address tokenB, bool stable) external view returns (uint reserveA, uint reserveB);
     function getAmountOut(uint amountIn, address tokenIn, address tokenOut) external view returns (uint amount, bool stable);
+    function getPoolAmountOut(uint amountIn, address tokenIn, address pair) external view returns (uint amount);
 }

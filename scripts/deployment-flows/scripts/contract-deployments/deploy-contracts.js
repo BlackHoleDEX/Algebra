@@ -343,7 +343,7 @@ const initializeMinter = async (minterUpgradableAddress) => {
 const deployEpochController = async(voterV3Address, minterUpgradableAddress) =>{
     try {
         data = await ethers.getContractFactory("EpochController");
-        const inputs = [voterV3Address, minterUpgradableAddress];
+        const inputs = [minterUpgradableAddress, voterV3Address];
         const EpochController = await upgrades.deployProxy(data, inputs, {initializer: 'initialize'});
         txDeployed = await EpochController.deployed();
 
