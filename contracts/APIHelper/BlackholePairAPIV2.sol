@@ -70,6 +70,8 @@ contract BlackholePairAPIV2 is Initializable {
         // bribes
         Bribes internal_bribes;
         Bribes external_bribes;
+
+        bool isGenesisRunning;
     }
 
     struct tokenBribe {
@@ -332,7 +334,10 @@ contract BlackholePairAPIV2 is Initializable {
         _pairInfo.account_gauge_earned = earned;
 
         // votes
-        _pairInfo.votes = voter.weights(_pair);     
+        _pairInfo.votes = voter.weights(_pair);   
+
+        // genesis
+        _pairInfo.isGenesisRunning = pairFactory.isGenesis(_pair);
     }
 
     // read all the bribe available for a pair

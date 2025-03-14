@@ -1,4 +1,4 @@
-const blackholePairAPIV2Address = "0xe10680eb50745c445b2eeb5703f1Bd87171B1173";
+const blackholePairAPIV2Address = "0xaea29c77fA57BDb01c6ca250B4c2Df2ECC9A125d";
 
 const blackholePairAPIV2Abi = [
   {
@@ -368,6 +368,11 @@ const blackholePairAPIV2Abi = [
             "internalType": "struct BlackholePairAPIV2.Bribes",
             "name": "external_bribes",
             "type": "tuple"
+          },
+          {
+            "internalType": "bool",
+            "name": "isGenesisRunning",
+            "type": "bool"
           }
         ],
         "internalType": "struct BlackholePairAPIV2.pairInfo[]",
@@ -676,6 +681,11 @@ const blackholePairAPIV2Abi = [
             "internalType": "struct BlackholePairAPIV2.Bribes",
             "name": "external_bribes",
             "type": "tuple"
+          },
+          {
+            "internalType": "bool",
+            "name": "isGenesisRunning",
+            "type": "bool"
           }
         ],
         "internalType": "struct BlackholePairAPIV2.pairInfo",
