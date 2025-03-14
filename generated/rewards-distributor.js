@@ -1,4 +1,4 @@
-const rewardsDistributorAddress = "0x56834BF0878638C26B0Ce777cd07fEF22Dd3E941";
+const rewardsDistributorAddress = "0x9034f5b1c3635089260CDEF7aF780405b7420ea6";
 
 const rewardsDistributorAbi = [
   {

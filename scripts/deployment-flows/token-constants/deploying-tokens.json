@@ -4,48 +4,48 @@
     "ticker": "CHAMP",
     "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens/8453/0xeb6d78148f001f3aa2f588997c5e102e489ad341/logo.svg",
     "decimal": 18,
-    "address": "0x211d660cd36d7F5e99De1fEdCB01Cd98a681b815"
+    "address": "0x77e17a64fEfC4EA082C6202afeCadBd02E51C7e4"
   },
   {
     "name": "SUPER",
     "ticker": "SUPER",
     "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens/8453/0xdbfefd2e8460a6ee4955a68582f85708baea60a3/logo.svg",
     "decimal": 18,
-    "address": "0x7AB5594D8cf8193e74D92CCC2e18C6566C9600B0"
+    "address": "0xd61b8Ce3805adD1e6Ab3F3620fc597dea15698BC"
   },
   {
     "name": "XAI",
     "ticker": "XAI",
     "logo": "https://coin-images.coingecko.com/coins/images/34258/large/round_icon_2048_px.png?1719523838",
     "decimal": 18,
-    "address": "0x84A6c290B9763E5BD32C2862C6accfcf5659B9f7"
+    "address": "0xFa4dE976c325c7E63D3f6d9f9629077227B0c6C0"
   },
   {
     "name": "VIRTUALS",
     "ticker": "VIRTUALS",
     "logo": "https://coin-images.coingecko.com/coins/images/34057/large/LOGOMARK.png?1708356054",
     "decimal": 18,
-    "address": "0xf4b98e4eb14e46A96aD22cbe9832952f514a7052"
+    "address": "0x782fBFA4BDf775e664012E76A7935e37b889F2cd"
   },
   {
     "name": "YGG",
     "ticker": "YGG",
     "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens/8453/0xaac78d1219c08aecc8e37e03858fe885f5ef1799/logo.svg",
     "decimal": 18,
-    "address": "0x803F1d2EBb2d59ab200b89a9Ff49640a3dEC3341"
+    "address": "0x0B112E7c48174473987d199d91f3dD9eF6EC0dD7"
   },
   {
     "name": "cbBTC",
     "ticker": "cbBTC",
     "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens/8453/0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf/logo.svg",
     "decimal": 18,
-    "address": "0x2d00F52F329445510135459f933ebd648d9997Fe"
+    "address": "0xc8251e648734e116e91600C8E561eB5f507bD21e"
   },
   {
     "name": "DAI",
     "ticker": "DAI",
     "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens/8453/0x50c5725949a6f0c72e6c4a641f24049a917db0cb/logo.svg",
     "decimal": 18,
-    "address": "0x4F7E0068bB0E0fB20A3306efcf45D1e6690F3d54"
+    "address": "0x3072758d718Fb9B977cB48C3229833878fa1Ba6B"
   }
 ]
