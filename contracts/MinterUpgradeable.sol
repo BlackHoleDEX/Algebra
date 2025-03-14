@@ -204,6 +204,10 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
         return _period;
     }
 
+    function transfer(address _to, uint _amount) external {
+        _black.transfer(_to, _amount);
+    }
+
     function circulating_supply() public view returns (uint) {
         return _black.totalSupply() - _black.balanceOf(address(_ve)) - _black.balanceOf(address(burnTokenAddress));
     }
