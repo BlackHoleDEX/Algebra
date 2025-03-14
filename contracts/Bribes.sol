@@ -15,7 +15,7 @@ import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 contract Bribe is ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    uint256 public WEEK = 7 days; 
+    uint256 public WEEK = 3600; 
     uint256 public firstBribeTimestamp;
 
     /* ========== STATE VARIABLES ========== */
