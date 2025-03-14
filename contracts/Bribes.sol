@@ -16,7 +16,7 @@ import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 contract Bribe is ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    uint256 public WEEK = 1800; // BlackHole:: temperory value need to changed it back to 7 days
+    uint256 public WEEK = 1800; 
     uint256 public firstBribeTimestamp;
 
     /* ========== STATE VARIABLES ========== */
@@ -292,11 +292,6 @@ contract Bribe is ReentrancyGuard {
                 IERC20(tokens[i]).safeTransfer(_owner, _reward);
             }
         }
-    }
-
-    /// BLACKHOLE: need to change duration for testing purpose currently 20 minutes
-    function setRewardDuration(uint256 _duration) external {
-        WEEK = _duration;
     }
 
     /// @dev Rewards are saved into NEXT EPOCH mapping. 

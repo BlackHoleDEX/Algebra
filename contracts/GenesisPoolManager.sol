@@ -77,9 +77,9 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         auctionFactory = IAuctionFactory(_auctionFactory);
         tokenHandler = ITokenHandler(_tokenHandler);
 
-        MIN_DURATION = 7 days; 
+        MIN_DURATION = 2 * WEEK; 
         MIN_THRESHOLD = 50 * 10 ** 2; 
-        MATURITY_TIME = 90 days;
+        MATURITY_TIME = 900;
 
         active_period = ((block.timestamp / WEEK) * WEEK) + (5 * 60);
     }

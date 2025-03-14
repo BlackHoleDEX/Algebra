@@ -11,7 +11,7 @@ async function main () {
     try{
 
         const GenesisManagerContract = await ethers.getContractAt(genesisPoolManagerAbi, genesisPoolManagerAddress);
-        const txt1 = await GenesisManagerContract.setMinimumDuration(1800);
+        const txt1 = await GenesisManagerContract.setMinimumDuration(2 * 3600);
         console.log("txt : ", txt1);
 
         const txt2 = await GenesisManagerContract.setMaturityTime(900);
