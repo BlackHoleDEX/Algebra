@@ -47,7 +47,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     IVoter public _voter;
     IVotingEscrow public _ve;
     IRewardsDistributor public _rewards_distributor;
-    address public burnTokenAddress=0x000000000000000000000000000000000000dEaD;
+    address public burnTokenAddress;
 
     mapping(uint256 => bool) public proposals;
 
@@ -76,6 +76,8 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
         active_period = ((block.timestamp + (2 * WEEK)) / WEEK) * WEEK;
         weekly = 10_000_000 * 1e18; // represents a starting weekly emission of 10M BLACK (BLACK has 18 decimals)
         isFirstMint = true;
+
+        burnTokenAddress=0x000000000000000000000000000000000000dEaD;
     }
 
     function _initialize(
