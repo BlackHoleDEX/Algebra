@@ -439,6 +439,9 @@ contract BlackholePairAPIV2 is Initializable {
                 swapRoutes.amountOut = temp.minAmount;
                 swapRoutes.hops = 1;
             }
+            else{
+                temp.minAmount = 0;
+            }
         }
 
         uint totPairs = pairFactory.allPairsLength();
