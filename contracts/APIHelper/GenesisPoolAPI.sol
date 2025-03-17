@@ -45,19 +45,6 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
         genesisPoolFactory = IGenesisPoolFactory(_genesisPoolFactory);
     }
 
-    function getTokenBalances(address _user, address[] memory tokenAddresses) external view returns (uint256[] memory amounts){
-        uint256 length = tokenAddresses.length;
-        amounts = new uint256[](length);
-
-        if(_user == address(0)) return amounts;
-        
-        uint256 i;
-        for(i = 0; i < length; i++){
-            amounts[i] = tokenAddresses[i] != address(0) ? IERC20(tokenAddresses[i]).balanceOf(_user) : 0;
-        }
-        return amounts;
-    }
-
     function getGenesisPoolFromNative(address _user, address nativeToken) external view returns (GenesisData memory genesisData){
         address genesisPool = genesisPoolFactory.getGenesisPool(nativeToken);
         if(genesisPool == address(0)) return genesisData;

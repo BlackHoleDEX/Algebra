@@ -588,6 +588,21 @@ const deployGenesisApi = async (genesisManagerAddress, genesisFactoryAddress) =>
     }
 }
 
+const deployTokenApi = async (tokenHandlerAddress) => {
+    try {
+        data = await ethers.getContractFactory("TokenAPI");
+        input = [tokenHandlerAddress] 
+        const tokenApi = await upgrades.deployProxy(data, input, {initializer: 'initialize', gasLimit:210000000});
+        txDeployed = await tokenApi.deployed();
+
+        console.log('deployed token API address: ', tokenApi.address);
+        generateConstantFile("TokenAPI", tokenApi.address);
+    } catch (error) {
+        console.log('error Token API  ', error);
+        process.exit(1);
+    }
+}
+
 const checker = async (routerV2Address, pairFactoryAddress) => {
 
     try {
@@ -742,6 +757,9 @@ async function main () {
     //deploy GenesisApi
     await deployGenesisApi(genesisManagerAddress, genesisFactoryAddress);
 
+    //deploy GenesisApi
+    await deployTokenApi(tokenHandlerAddress);
+
     // await checker(routerV2Address, pairFactoryAddress);
 
     // createPairs two by default
@@ -755,6 +773,8 @@ async function main () {
 
     // create Gauges
     await createGauges(voterV3Address, blackholeV2AbiAddress);
+
+    generateConstantFile("Bribe", "");
 }
 
 main()

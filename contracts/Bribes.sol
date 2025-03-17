@@ -210,6 +210,15 @@ contract Bribe is ReentrancyGuard {
         }
         return lower;
     }
+
+    function isRewardToken(address _rewardsToken) external view returns (bool) {
+        return _isRewardToken(_rewardsToken);
+    }
+
+    function _isRewardToken(address _rewardsToken) internal view returns (bool) {
+        bool verifiedToken = _rewardsToken == token0 || _rewardsToken == token1 || tokenHandler.isConnector(_rewardsToken);
+        return verifiedToken;
+    }
  
     /* ========== MUTATIVE FUNCTIONS ========== */
 
@@ -296,8 +305,7 @@ contract Bribe is ReentrancyGuard {
 
     /// @dev Rewards are saved into NEXT EPOCH mapping. 
     function notifyRewardAmount(address _rewardsToken, uint256 reward) external nonReentrant {
-        bool verifiedToken = _rewardsToken == token0 || _rewardsToken == token1 || tokenHandler.isConnector(_rewardsToken);
-        require(verifiedToken, "reward token not verified");
+        require(_isRewardToken((_rewardsToken)), "reward token not verified");
         IERC20(_rewardsToken).safeTransferFrom(msg.sender,address(this),reward);
         uint256 epochStart = BlackTimeLibrary.epochStart(block.timestamp);
         tokenRewardsPerEpoch[_rewardsToken][epochStart] += reward;
