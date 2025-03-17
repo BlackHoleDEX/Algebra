@@ -428,7 +428,4 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
             emit ClaimFees(msg.sender, claimed0, claimed1);
         }
     }
-
-
-
 }
