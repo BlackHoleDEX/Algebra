@@ -192,16 +192,11 @@ contract GlobalRouter {
     /// @param  _type       boolean true := sAMM/vAMM pools, false := algebra v3 
     function swapExactTokensForTokens(uint amountIn,uint amountOutMin, ITradeHelper.Route[] calldata routes,address to,uint deadline, bool _type) external ensure(deadline) returns (uint[] memory amounts){
         
-        if(_type == false){
-            
-
-        } else {
-            amounts = tradeHelper.getAmountsOut(amountIn, routes);
-            require(amounts[amounts.length - 1] >= amountOutMin, 'BaseV1Router: INSUFFICIENT_OUTPUT_AMOUNT');
-            address _pair = tradeHelper.pairFor(routes[0].from, routes[0].to, routes[0].stable);
-            _safeTransferFrom( routes[0].from, msg.sender, _pair, amounts[0] );
-            _swap(amounts, routes, to);
-        }
+        amounts = tradeHelper.getAmountsOut(amountIn, routes);
+        require(amounts[amounts.length - 1] >= amountOutMin, 'BaseV1Router: INSUFFICIENT_OUTPUT_AMOUNT');
+        address _pair = tradeHelper.pairFor(routes[0].from, routes[0].to, routes[0].stable);
+        _safeTransferFrom( routes[0].from, msg.sender, _pair, amounts[0] );
+        _swap(amounts, routes, to);
 
     }
 
