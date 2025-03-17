@@ -124,7 +124,7 @@ contract TradeHelper {
             } 
             //amountIn = (new_x_amount - old_x_amount) * (1+fees)
             uint amountInNoFees =  ((reserveIn - x_1) * decimalsOut / 1e18);
-            amountIn = amountInNoFees * (10000 + PairFactory(factory).getFee(pair, true)) / 10000;
+            amountIn = amountInNoFees * 10000 / (10000 - PairFactory(factory).getFee(pair, true));
         }
     }
 
@@ -138,7 +138,7 @@ contract TradeHelper {
             uint reserveIn = (tokenIn == p.token0()) ? p.reserve0() : p.reserve1();
             uint reserveOut = (tokenOut == p.token0()) ? p.reserve0() : p.reserve1();
                 
-            amountIn = (amountOut * reserveIn / (reserveOut - amountOut)) * (10000 + PairFactory(factory).getFee(pair,false)) / 10000;
+            amountIn = (amountOut * reserveIn / (reserveOut - amountOut)) * 10000 / (10000 - PairFactory(factory).getFee(pair,false));
         }
     }
 

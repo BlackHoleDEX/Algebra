@@ -43,16 +43,6 @@ contract BlackGovernor is
         team = newTeam;
     }
 
-    //TODO:: Abhijeet remove this function as used for testing and variable in Governor.sol
-    function epochStarts() external view returns (bytes32){
-        return epochStart;
-    }
-
-    //TODO:: Abhijeet remove this function as used for testing and variable in Governor.sol
-    function getProposalId() external view returns (uint256){
-        return proposalIdMain;
-    }
-
     function setProposalNumerator(uint256 numerator) external {
         require(msg.sender == team, "not team");
         require(numerator <= MAX_PROPOSAL_NUMERATOR, "numerator too high");

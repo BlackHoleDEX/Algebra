@@ -416,13 +416,13 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
             (address _token0, address _token1) = IPair(_token).tokens();
 
             if (_fees0  > 0) {
-                IERC20(_token0).approve(internal_bribe, 0);
-                IERC20(_token0).approve(internal_bribe, _fees0);
+                IERC20(_token0).safeApprove(internal_bribe, 0);
+                IERC20(_token0).safeApprove(internal_bribe, _fees0);
                 IBribe(internal_bribe).notifyRewardAmount(_token0, _fees0);
             } 
             if (_fees1  > 0) {
-                IERC20(_token1).approve(internal_bribe, 0);
-                IERC20(_token1).approve(internal_bribe, _fees1);
+                IERC20(_token1).safeApprove(internal_bribe, 0);
+                IERC20(_token1).safeApprove(internal_bribe, _fees1);
                 IBribe(internal_bribe).notifyRewardAmount(_token1, _fees1);
             } 
             emit ClaimFees(msg.sender, claimed0, claimed1);
