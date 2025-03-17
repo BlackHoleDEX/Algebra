@@ -768,11 +768,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         (old_locked.amount, old_locked.end, old_locked.isPermanent, old_locked.isSMNFT) = (_locked.amount, _locked.end, _locked.isPermanent, _locked.isSMNFT);
         // Adding to existing lock, or if a lock is expired - creating a new one
         if(old_locked.isSMNFT) {
-            if(deposit_type == DepositType.INCREASE_UNLOCK_TIME) {
-                _locked.amount = int128(int256(_value + _calculate_sm_nft_bonus(_value)));
-            } else {
-                _locked.amount += int128(int256(_value + _calculate_sm_nft_bonus(_value)));
-            }
+            _locked.amount += int128(int256(_value + _calculate_sm_nft_bonus(_value)));
         } else {
             _locked.amount += int128(int256(_value));
         }
@@ -913,23 +909,29 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         require(unlock_time <= block.timestamp + MAXTIME, 'Voting 4 Years Max');
 
         if(isSMNFT) {
-            _locked.isPermanent = true;
-            _locked.isSMNFT = true;
-            uint _amount = uint(int256(_locked.amount));
-            smNFTBalance += _amount;
-            _locked.end = 0;
-            unlock_time=0;
-            _checkpoint(_tokenId, locked[_tokenId], _locked);
-            locked[_tokenId] = _locked;
+            updateToSMNFT(_tokenId, _locked);
+        } else {
+            _deposit_for(_tokenId, 0, unlock_time, _locked, DepositType.INCREASE_UNLOCK_TIME);
         }
-
-        _deposit_for(_tokenId, 0, unlock_time, _locked, DepositType.INCREASE_UNLOCK_TIME);
 
         // poke for the gained voting power 
         if(voted[_tokenId]) {
             IVoter(voter).poke(_tokenId);
         }
         emit MetadataUpdate(_tokenId);
+    }
+
+    function updateToSMNFT (uint _tokenId, LockedBalance memory _locked) internal {
+        _locked.isPermanent = true;
+        _locked.isSMNFT = true;
+        uint _amount = uint(int256(_locked.amount));
+        smNFTBalance += _amount;
+        _locked.end = 0;
+        uint _value = uint256(uint128(_locked.amount));
+        _locked.amount = int128(int256(_value + _calculate_sm_nft_bonus(_value)));
+        _checkpoint(_tokenId, locked[_tokenId], _locked);
+        locked[_tokenId] = _locked;
+        assert(IERC20(token).transfer(burnTokenAddress, _value));
     }
 
     /// @notice Withdraw all tokens for `_tokenId`
@@ -978,7 +980,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         _newLocked.isPermanent = true;
         _checkpoint(_tokenId, locked[_tokenId], _newLocked);
         locked[_tokenId] = _newLocked;
-
+        if(voted[_tokenId]) {
+            IVoter(voter).poke(_tokenId);
+        }
         emit LockPermanent(sender, _tokenId, _amount, block.timestamp);
         emit MetadataUpdate(_tokenId);
     }
