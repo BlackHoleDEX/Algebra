@@ -79,7 +79,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
         genesisInfo = _genesisInfo;
 
         genesisInfo.duration = BlackTimeLibrary.epochMultiples(genesisInfo.duration);
-        genesisInfo.startTime = BlackTimeLibrary.epochStart(block.timestamp);
+        genesisInfo.startTime = BlackTimeLibrary.epochStart(genesisInfo.startTime);
         
         allocationInfo.proposedNativeAmount = _allocationInfo.proposedNativeAmount;
         allocationInfo.proposedFundingAmount = _allocationInfo.proposedFundingAmount;
