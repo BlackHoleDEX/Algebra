@@ -113,10 +113,7 @@ contract BlackGovernor is
         require(address(targets[0]) == minter, "GovernorSimple: only minter allowed");
         require(calldatas.length == 1, "GovernorSimple: only one calldata allowed");
         require(bytes4(calldatas[0]) == IMinter.nudge.selector, "GovernorSimple: only nudge allowed");
-
-        uint256 proposalId;
-        proposalId = createProposal(targets, values, calldatas);
-        return proposalId;
+        return _proposal(targets, values, calldatas);
     }
 
 }
