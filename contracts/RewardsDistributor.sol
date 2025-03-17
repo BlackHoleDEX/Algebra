@@ -197,8 +197,8 @@ contract RewardsDistributor is IRewardsDistributor {
         for (uint i = 0; i < 50; i++) {
             if (week_cursor >= _last_token_time) break;
 
-            int128 dt = int128(int256(week_cursor + WEEK - 1 - old_user_point.ts));
-            uint balance_of = Math.max(uint(int256(old_user_point.bias - dt * old_user_point.slope + int256(old_user_point.permanent + old_user_point.smNFT + old_user_point.smNFTBonus))), 0);
+            int128 dt = int128(int256(week_cursor + WEEK - 1 - user_point.ts));
+            uint balance_of = Math.max(uint(int256(user_point.bias - dt * user_point.slope + int256(user_point.permanent + user_point.smNFT + user_point.smNFTBonus))), 0);
             supply = ve_supply[week_cursor];
             supply = supply == 0 ? 1 : supply;
             to_distribute += balance_of * tokens_per_week[week_cursor] / supply;
@@ -237,16 +237,13 @@ contract RewardsDistributor is IRewardsDistributor {
         if (week_cursor == 0) week_cursor = user_point.ts / WEEK * WEEK;
         if (week_cursor >= last_token_time) return 0;
         if (week_cursor < _start_time) week_cursor = _start_time;
-
-        IVotingEscrow.Point memory old_user_point;
         uint supply;
 
         for (uint i = 0; i < 50; i++) {
             if (week_cursor >= _last_token_time) break;
-
-            int128 dt = int128(int256(week_cursor + WEEK - 1 - old_user_point.ts));
-            uint balance_of = Math.max(uint(int256(old_user_point.bias - dt * old_user_point.slope + int256(old_user_point.permanent + old_user_point.smNFT + old_user_point.smNFTBonus))), 0);
-            supply = ve_supply[week_cursor];
+            int128 dt = int128(int256(week_cursor + WEEK - 1 - user_point.ts));
+            uint balance_of = Math.max(uint(int256(user_point.bias - dt * user_point.slope + int256(user_point.permanent + user_point.smNFT + user_point.smNFTBonus))), 0);
+            supply = ve_supply[week_cursor + WEEK -1];
             supply = supply == 0 ? 1 : supply;
             to_distribute += balance_of * tokens_per_week[week_cursor] / supply;
             week_cursor += WEEK;
