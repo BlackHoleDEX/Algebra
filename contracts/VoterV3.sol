@@ -43,10 +43,10 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
     uint256 internal index;                                        // gauge index
     uint256 public maxVotingNum;
-    uint256 internal constant DURATION = 7 days;                   // rewards are released over 7 days
+    uint256 internal constant DURATION = 3600;                   // rewards are released over 7 days
     uint256 public VOTE_DELAY;                                     // delay between votes in seconds
-    uint256 public constant MAX_VOTE_DELAY = 7 days;               // Max vote delay allowed
-    uint public constant EPOCH_DURATION = 7 days;
+    uint256 public constant MAX_VOTE_DELAY = 3600;               // Max vote delay allowed
+    uint public constant EPOCH_DURATION = 3600;
     uint256 internal constant MIN_OF_MAX_VOTING_NUM = 10;
     uint256 internal constant MIN_VOTING_NUM = 10;
 

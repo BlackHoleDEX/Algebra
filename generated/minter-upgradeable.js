@@ -1,4 +1,4 @@
-const minterUpgradeableAddress = "0x2Eaf051CE12F6b1028396360313146802D55D2bc";
+const minterUpgradeableAddress = "0xbcD68Eb1013fA1bd147eFe8646EaB9Ff27FDf272";
 
 const minterUpgradeableAbi = [
   {
@@ -68,19 +68,6 @@ const minterUpgradeableAbi = [
     ],
     "name": "OwnershipTransferred",
     "type": "event"
-  },
-  {
-    "inputs": [],
-    "name": "EMISSION",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
   },
   {
     "inputs": [],
@@ -162,19 +149,6 @@ const minterUpgradeableAbi = [
   },
   {
     "inputs": [],
-    "name": "PRECISION",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "PROPOSAL_DECREASE",
     "outputs": [
       {
@@ -189,32 +163,6 @@ const minterUpgradeableAbi = [
   {
     "inputs": [],
     "name": "PROPOSAL_INCREASE",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "REBASEMAX",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "TAIL_EMISSION",
     "outputs": [
       {
         "internalType": "uint256",
@@ -373,6 +321,19 @@ const minterUpgradeableAbi = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "burnTokenAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -399,19 +360,6 @@ const minterUpgradeableAbi = [
         "internalType": "bool",
         "name": "",
         "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "circulating_emission",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -547,32 +495,6 @@ const minterUpgradeableAbi = [
   {
     "inputs": [],
     "name": "renounceOwnership",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_emission",
-        "type": "uint256"
-      }
-    ],
-    "name": "setEmission",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_rebase",
-        "type": "uint256"
-      }
-    ],
-    "name": "setRebase",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
