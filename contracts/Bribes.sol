@@ -41,9 +41,6 @@ contract Bribe is ReentrancyGuard {
 
     string public TYPE;
 
-    mapping(address => mapping(address => uint256)) public userRewardPerTokenPaid;
-    mapping(address => mapping(address => uint256)) public userTimestamp;
-
     uint256 public totalSupply;
     mapping(uint256 => uint256) public balanceOf;
 
@@ -267,11 +264,6 @@ contract Bribe is ReentrancyGuard {
                 IERC20(tokens[i]).safeTransfer(_owner, _reward);
             }
         }
-    }
-
-    /// BLACKHOLE: need to change duration for testing purpose currently 20 minutes
-    function setRewardDuration(uint256 _duration) external {
-        WEEK = _duration;
     }
 
     /// @dev Rewards are saved into Current EPOCH mapping. 
