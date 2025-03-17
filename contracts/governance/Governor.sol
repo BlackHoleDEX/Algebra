@@ -264,7 +264,8 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
     function _proposal(
         address[] memory targets,
         uint256[] memory values,
-        bytes[] memory calldatas
+        bytes[] memory calldatas,
+        string memory description
     ) internal virtual returns (uint256) {
         require(
             getVotes(_msgSender(), block.number - 1) >= proposalThreshold(),
