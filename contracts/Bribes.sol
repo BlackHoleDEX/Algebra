@@ -266,7 +266,7 @@ contract Bribe is ReentrancyGuard {
         }
     }
 
-    /// @dev Rewards are saved into NEXT EPOCH mapping. 
+    /// @dev Rewards are saved into Current EPOCH mapping. 
     function notifyRewardAmount(address _rewardsToken, uint256 reward) external nonReentrant {
         require(isRewardToken[_rewardsToken], "reward token not verified");
         IERC20(_rewardsToken).safeTransferFrom(msg.sender,address(this),reward);

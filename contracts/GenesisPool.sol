@@ -122,7 +122,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase, ReentrancyGuardUpgradeab
 
     function rejectPool() external onlyManager {
         poolStatus = PoolStatus.NOT_QUALIFIED;
-        allocationInfo.refundableNativeAmount = allocationInfo.proposedFundingAmount;
+        allocationInfo.refundableNativeAmount = allocationInfo.proposedNativeAmount;
         emit RejectedGenesisPool(genesisInfo.nativeToken);
     }
 
