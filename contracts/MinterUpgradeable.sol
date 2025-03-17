@@ -195,7 +195,6 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
             
             require(_black.transfer(address(_rewards_distributor), _rebase));
             _rewards_distributor.checkpoint_token(); // checkpoint token balance that was just minted in rewards distributor
-            _rewards_distributor.checkpoint_total_supply(); // checkpoint supply
 
             _black.approve(address(_voter), _gauge);
             _voter.notifyRewardAmount(_gauge);
