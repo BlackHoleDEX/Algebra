@@ -1,4 +1,4 @@
-const genesisPoolAPIAddress = "0xfbD014Ebf7536252BE8b9AA28D1aeBd1a2Aa0cA4";
+const genesisPoolAPIAddress = "0x6f1666C193dEF8e50c8fcFCA57a6Cdd53b64AAe3";
 
 const genesisPoolAPIAbi = [
   {
@@ -824,30 +824,6 @@ const genesisPoolAPIAbi = [
         "internalType": "struct GenesisPoolAPI.GenesisData",
         "name": "genesisData",
         "type": "tuple"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_user",
-        "type": "address"
-      },
-      {
-        "internalType": "address[]",
-        "name": "tokenAddresses",
-        "type": "address[]"
-      }
-    ],
-    "name": "getTokenBalances",
-    "outputs": [
-      {
-        "internalType": "uint256[]",
-        "name": "amounts",
-        "type": "uint256[]"
       }
     ],
     "stateMutability": "view",

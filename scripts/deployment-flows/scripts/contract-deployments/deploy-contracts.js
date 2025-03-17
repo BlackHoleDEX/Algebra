@@ -773,8 +773,6 @@ async function main () {
 
     // create Gauges
     await createGauges(voterV3Address, blackholeV2AbiAddress);
-
-    generateConstantFile("Bribe", "");
 }
 
 main()

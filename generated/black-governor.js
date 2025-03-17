@@ -1,4 +1,4 @@
-const blackGovernorAddress = "0xb0D9e445B0D78cB7639B36e761299dA0bE68b1eD";
+const blackGovernorAddress = "0x8733344AaE6f9eCAE64491dC59D3809D3D94e795";
 
 const blackGovernorAbi = [
   {
@@ -627,32 +627,6 @@ const blackGovernorAbi = [
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "epochStart",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "epochStarts",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "address[]",
@@ -684,19 +658,6 @@ const blackGovernorAbi = [
       }
     ],
     "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getProposalId",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -957,19 +918,6 @@ const blackGovernorAbi = [
       }
     ],
     "name": "proposalDeadline",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "proposalIdMain",
     "outputs": [
       {
         "internalType": "uint256",
