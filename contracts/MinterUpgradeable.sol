@@ -65,10 +65,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
         _initializer = msg.sender;
         team = msg.sender;
         tailEmissionRate = MAX_BPS;
-
         teamRate = 500; // 500 bps = 5%
-
-        tailEmissionRate = 67;
 
         _black = IBlack(IVotingEscrow(__ve).token());
         _voter = IVoter(__voter);
@@ -168,6 +165,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
 
             if (_tail) {
                 _emission = (_weekly * tailEmissionRate) / MAX_BPS;
+                weekly = _emission;
             } else {
                 _emission = _weekly;
                 if (epochCount < 15) {
