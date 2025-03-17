@@ -43,9 +43,6 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
     uint256 internal index;                                        // gauge index
     uint256 public maxVotingNum;
-    uint256 internal constant DURATION = 3600;                   // rewards are released over 7 days
-    uint256 public VOTE_DELAY;                                     // delay between votes in seconds
-    uint256 public constant MAX_VOTE_DELAY = 3600;               // Max vote delay allowed
     uint public constant EPOCH_DURATION = 3600;
     uint256 internal constant MIN_OF_MAX_VOTING_NUM = 10;
     uint256 internal constant MIN_VOTING_NUM = 10;
@@ -114,7 +111,6 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         genesisManager = address(0);
         maxVotingNum = 30;
 
-        VOTE_DELAY = 0;
         initflag = false;
     }
 
@@ -160,14 +156,6 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     --------------------------------------------------------------------------------
     --------------------------------------------------------------------------------
     ----------------------------------------------------------------------------- */
-
-    /// @notice set vote delay in seconds
-    function setVoteDelay(uint256 _delay) external VoterAdmin {
-        require(_delay != VOTE_DELAY, "already set");
-        require(_delay <= MAX_VOTE_DELAY, "max delay");
-        emit SetVoteDelay(VOTE_DELAY, _delay);
-        VOTE_DELAY = _delay;
-    }
     
 
     /// @notice Set a new Minter
@@ -508,26 +496,6 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
             IBribe(_fees[i]).getReward(_tokenId, _tokens[i]);
         }
     }
-
-    // /// @notice claim bribes rewards given an address
-    // function claimBribes(address[] memory _bribes, address[][] memory _tokens) external {
-    //     for (uint256 i = 0; i < _bribes.length; i++) {
-    //         IBribe(_bribes[i]).getRewardForAddress(msg.sender, _tokens[i]);
-    //     }
-    // }
-
-    /// @notice claim fees rewards given an address
-    // function claimFees(address[] memory _bribes, address[][] memory _tokens) external {
-    //     for (uint256 i = 0; i < _bribes.length; i++) {
-    //         IBribe(_bribes[i]).getRewardForAddress(msg.sender, _tokens[i]);
-    //     }
-    // }    
-
-  
-    /// @notice check if user can vote
-    // function _voteDelay(uint256 _tokenId) internal view {
-    //     require(block.timestamp > lastVoted[_tokenId] + VOTE_DELAY, "ERR: VOTE_DELAY");
-    // }
 
     modifier onlyNewEpoch(uint256 _tokenId) {
         // ensure new epoch since last vote
