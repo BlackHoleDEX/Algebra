@@ -50,7 +50,6 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     mapping(address => uint256) public rewards;
 
     uint256 internal _totalSupply;
-    uint internal _emissions;
     mapping(address => uint256) internal _balances;
     mapping(address => uint256) public maturityTime;
 
@@ -195,7 +194,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     }
 
     ///@notice get total reward for the duration
-function rewardForDuration() external view returns (uint256) {
+    function rewardForDuration() external view returns (uint256) {
         return rewardRate * DURATION;
     }
 
