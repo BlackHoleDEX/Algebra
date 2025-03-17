@@ -21,14 +21,14 @@ library BlackTimeLibrary {
     /// @dev Returns start of voting window
     function epochVoteStart(uint256 timestamp) internal pure returns (uint256) {
         unchecked {
-            return timestamp - (timestamp % WEEK) + 3600;
+            return timestamp - (timestamp % WEEK) + 300;
         }
     }
 
     /// @dev Returns end of voting window / beginning of unrestricted voting window
     function epochVoteEnd(uint256 timestamp) internal pure returns (uint256) {
         unchecked {
-            return timestamp - (timestamp % WEEK) + WEEK - 3600;
+            return timestamp - (timestamp % WEEK) + WEEK - 300;
         }
     }
 
