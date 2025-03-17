@@ -20,8 +20,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     bool public isFirstMint;
 
     uint public teamRate;  //EMISSION that goes to protocol
-
-    uint public constant MAX_TEAM_RATE = 1000; // 10%
+    uint public constant MAX_TEAM_RATE = 500; // 5%
     uint256 public constant TAIL_START = 8_969_150 * 1e18; //TAIL EMISSIONS 
     uint256 public tailEmissionRate; 
     uint256 public constant NUDGE = 1; //delta added in tail emissions rate after voting
@@ -65,9 +64,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
         _initializer = msg.sender;
         team = msg.sender;
         tailEmissionRate = MAX_BPS;
-
         burnTokenAddress=0x000000000000000000000000000000000000dEaD;
-
         teamRate = 500; // 500 bps = 5%
 
         _black = IBlack(IVotingEscrow(__ve).token());
@@ -204,10 +201,6 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
             emit Mint(msg.sender, _emission, _rebase, circulating_supply());
         }
         return _period;
-    }
-
-    function transfer(address _to, uint _amount) external {
-        _black.transfer(_to, _amount);
     }
 
     function circulating_supply() public view returns (uint) {

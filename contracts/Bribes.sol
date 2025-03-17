@@ -15,8 +15,7 @@ import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 contract Bribe is ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    uint256 public WEEK = 3600; 
-    uint256 public firstBribeTimestamp;
+    uint256 public WEEK = 7 days; 
 
     /* ========== STATE VARIABLES ========== */
 
@@ -42,9 +41,6 @@ contract Bribe is ReentrancyGuard {
 
     string public TYPE;
 
-    mapping(address => mapping(address => uint256)) public userRewardPerTokenPaid;
-    mapping(address => mapping(address => uint256)) public userTimestamp;
-
     uint256 public totalSupply;
     mapping(uint256 => uint256) public balanceOf;
 
@@ -63,7 +59,6 @@ contract Bribe is ReentrancyGuard {
         require(_bribeFactory != address(0) && _voter != address(0) && _owner != address(0));
         voter = _voter;
         bribeFactory = _bribeFactory;
-        firstBribeTimestamp = 0;
         ve = IVoter(_voter)._ve();
         minter = IVoter(_voter).minter();
         avm = IVotingEscrow(ve).avm();
@@ -271,7 +266,7 @@ contract Bribe is ReentrancyGuard {
         }
     }
 
-    /// @dev Rewards are saved into NEXT EPOCH mapping. 
+    /// @dev Rewards are saved into Current EPOCH mapping. 
     function notifyRewardAmount(address _rewardsToken, uint256 reward) external nonReentrant {
         require(isRewardToken[_rewardsToken], "reward token not verified");
         IERC20(_rewardsToken).safeTransferFrom(msg.sender,address(this),reward);

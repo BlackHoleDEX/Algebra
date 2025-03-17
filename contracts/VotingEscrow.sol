@@ -1035,7 +1035,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         if (_epoch == 0) {
             return 0;
         } else {
-            Point memory last_point = user_point_history[_tokenId][_epoch];
+            uint userEpoch = getPastUserPointIndex(_epoch, _tokenId, _t);
+            Point memory last_point = user_point_history[_tokenId][userEpoch];
             if (last_point.smNFT != 0){
                 return last_point.smNFT + last_point.smNFTBonus;
             }
@@ -1050,6 +1051,23 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                 return uint(int256(last_point.bias));
             }
         }
+    }
+
+    function getPastUserPointIndex(uint _epoch, uint _tokenId,uint _t) internal view returns (uint256){
+        uint lower = 0;
+        uint upper = _epoch;
+        while (upper > lower) {
+            uint center = upper - (upper - lower) / 2; // ceil, avoiding overflow
+            Point memory userPoint = user_point_history[_tokenId][center];
+            if (userPoint.ts == _t) {
+                return center;
+            } else if (userPoint.ts < _t) {
+                lower = center;
+            } else {
+                upper = center - 1;
+            }
+        }
+        return lower;
     }
 
     function balanceOfNFT(uint _tokenId) external view returns (uint) {
@@ -1422,9 +1440,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                     ? checkpoints[srcRep][srcRepNum - 1].tokenIds
                     : checkpoints[srcRep][0].tokenIds;
                 uint32 nextSrcRepNum = _findWhatCheckpointToWrite(srcRep);
-                uint[] storage srcRepNew = checkpoints[srcRep][
-                    nextSrcRepNum
-                ].tokenIds;
+                Checkpoint storage cpSrcRep = checkpoints[srcRep][nextSrcRepNum];
+                uint[] storage srcRepNew = cpSrcRep.tokenIds;
+                cpSrcRep.timestamp = block.timestamp;
                 // All the same except _tokenId
                 for (uint i = 0; i < srcRepOld.length; i++) {
                     uint tId = srcRepOld[i];
@@ -1433,7 +1451,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                     }
                 }
 
-                numCheckpoints[srcRep] = srcRepNum + 1;
+                numCheckpoints[srcRep] = nextSrcRepNum + 1;
             }
 
             if (dstRep != address(0)) {
@@ -1442,9 +1460,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                     ? checkpoints[dstRep][dstRepNum - 1].tokenIds
                     : checkpoints[dstRep][0].tokenIds;
                 uint32 nextDstRepNum = _findWhatCheckpointToWrite(dstRep);
-                uint[] storage dstRepNew = checkpoints[dstRep][
-                    nextDstRepNum
-                ].tokenIds;
+                Checkpoint storage cpDstRep = checkpoints[dstRep][nextDstRepNum];
+                uint[] storage dstRepNew = cpDstRep.tokenIds;
+                cpDstRep.timestamp = block.timestamp;
                 // All the same plus _tokenId
                 require(
                     dstRepOld.length + 1 <= MAX_DELEGATES,
@@ -1456,7 +1474,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                 }
                 dstRepNew.push(_tokenId);
 
-                numCheckpoints[dstRep] = dstRepNum + 1;
+                numCheckpoints[dstRep] = nextDstRepNum + 1;
             }
         }
     }
@@ -1492,9 +1510,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                     ? checkpoints[srcRep][srcRepNum - 1].tokenIds
                     : checkpoints[srcRep][0].tokenIds;
                 uint32 nextSrcRepNum = _findWhatCheckpointToWrite(srcRep);
-                uint[] storage srcRepNew = checkpoints[srcRep][
-                    nextSrcRepNum
-                ].tokenIds;
+                Checkpoint storage cpSrcRep = checkpoints[srcRep][nextSrcRepNum];
+                uint[] storage srcRepNew = cpSrcRep.tokenIds;
+                cpSrcRep.timestamp = block.timestamp;
                 // All the same except what owner owns
                 for (uint i = 0; i < srcRepOld.length; i++) {
                     uint tId = srcRepOld[i];
@@ -1503,7 +1521,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                     }
                 }
 
-                numCheckpoints[srcRep] = srcRepNum + 1;
+                numCheckpoints[srcRep] = nextSrcRepNum + 1;
             }
 
             if (dstRep != address(0)) {
@@ -1512,9 +1530,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                     ? checkpoints[dstRep][dstRepNum - 1].tokenIds
                     : checkpoints[dstRep][0].tokenIds;
                 uint32 nextDstRepNum = _findWhatCheckpointToWrite(dstRep);
-                uint[] storage dstRepNew = checkpoints[dstRep][
-                    nextDstRepNum
-                ].tokenIds;
+                Checkpoint storage cpDstRep = checkpoints[dstRep][nextDstRepNum];
+                uint[] storage dstRepNew = cpDstRep.tokenIds;
+                cpDstRep.timestamp = block.timestamp;
                 uint ownerTokenCount = ownerToNFTokenCount[owner];
                 require(
                     dstRepOld.length + ownerTokenCount <= MAX_DELEGATES,
@@ -1531,7 +1549,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                     dstRepNew.push(tId);
                 }
 
-                numCheckpoints[dstRep] = dstRepNum + 1;
+                numCheckpoints[dstRep] = nextDstRepNum + 1;
             }
         }
     }

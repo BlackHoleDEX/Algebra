@@ -5,6 +5,7 @@ pragma solidity 0.8.13;
 import '../libraries/Math.sol';
 import '../interfaces/IBribeAPI.sol';
 import '../interfaces/IGaugeAPI.sol';
+
 import '../interfaces/IGaugeFactory.sol';
 import '../interfaces/IERC20.sol';
 import '../interfaces/IMinter.sol';
@@ -50,6 +51,7 @@ contract BlackholePairAPIV2 is Initializable {
         address gauge; 				    // pair gauge address
         uint gauge_total_supply; 		// pair staked tokens (less/eq than/to pair total supply)
         uint emissions; 			    // pair emissions (per second)
+        uint total_emissions; 			// total pair emissions (per second)
         address emissions_token; 		// pair emissions token address
         uint emissions_token_decimals; 	// pair emissions token decimals
 
@@ -113,7 +115,7 @@ contract BlackholePairAPIV2 is Initializable {
         uint amountOut;
     }
 
-    struct TempData {
+    struct SwapRouteHelperData {
         address _pair1;
         address _pair2;
         address _pairMid;
@@ -290,6 +292,7 @@ contract BlackholePairAPIV2 is Initializable {
                 }
                 gaugeTotalSupply = _gauge.totalSupply();
                 emissions = _gauge.rewardRate();
+                _pairInfo.total_emissions = _gauge.rewardForDuration();
             }
         }
         
@@ -419,75 +422,78 @@ contract BlackholePairAPIV2 is Initializable {
         emit Voter(_oldVoter, _voter);
     }
 
-    function getAmountOut1(uint amountIn, address tokenIn, address tokenOut) external view returns (swapRoute memory swapRoutes){
+    function getAmountOut(uint amountIn, address tokenIn, address tokenOut) external view returns (swapRoute memory swapRoutes){
         
-        TempData memory temp;
+        SwapRouteHelperData memory swapRouteHelperData;
         bool stable;
-        temp.minAmount = 0;
+        swapRouteHelperData.minAmount = 0;
 
-        (temp.minAmount, stable) = routerV2.getAmountOut(amountIn, tokenIn, tokenOut);
+        (swapRouteHelperData.minAmount, stable) = routerV2.getAmountOut(amountIn, tokenIn, tokenOut);
 
-        if (temp.minAmount > 0) {
-            temp._pair1 = pairFactory.getPair(tokenIn, tokenOut, stable);
+        if (swapRouteHelperData.minAmount > 0) {
+            swapRouteHelperData._pair1 = pairFactory.getPair(tokenIn, tokenOut, stable);
 
-            if(pairFactory.isPair(temp._pair1) && !pairFactory.isGenesis(temp._pair1)){
+            if(pairFactory.isPair(swapRouteHelperData._pair1) && !pairFactory.isGenesis(swapRouteHelperData._pair1)){
                 swapRoutes.routes = new route[](1);
-                swapRoutes.routes[0] = _createRoute(temp._pair1, tokenIn, tokenOut, stable, temp.minAmount);
-                swapRoutes.amountOut = temp.minAmount;
+                swapRoutes.routes[0] = _createRoute(swapRouteHelperData._pair1, tokenIn, tokenOut, stable, swapRouteHelperData.minAmount);
+                swapRoutes.amountOut = swapRouteHelperData.minAmount;
                 swapRoutes.hops = 1;
+            }
+            else{
+                swapRouteHelperData.minAmount = 0;
             }
         }
 
         uint totPairs = pairFactory.allPairsLength();
         uint i;
         uint j;
-        temp.foundPath = false;
-        swapRoute memory swapRoute1;
+        swapRouteHelperData.foundPath = false;
+        swapRoute memory swapRouteFromHopping;
 
 
         for(i = 0; i < totPairs; i++){
-            temp._pair1 = pairFactory.allPairs(i);
-            temp.ipair1 = IPair(temp._pair1);
+            swapRouteHelperData._pair1 = pairFactory.allPairs(i);
+            swapRouteHelperData.ipair1 = IPair(swapRouteHelperData._pair1);
 
-            if(pairFactory.isGenesis(temp._pair1)) continue;
-            if(tokenIn != temp.ipair1.token0() && tokenIn != temp.ipair1.token1()) continue;
+            if(pairFactory.isGenesis(swapRouteHelperData._pair1)) continue;
+            if(tokenIn != swapRouteHelperData.ipair1.token0() && tokenIn != swapRouteHelperData.ipair1.token1()) continue;
 
-            temp.otherToken1 = tokenIn == temp.ipair1.token0() ? temp.ipair1.token1() : temp.ipair1.token0();
+            swapRouteHelperData.otherToken1 = tokenIn == swapRouteHelperData.ipair1.token0() ? swapRouteHelperData.ipair1.token1() : swapRouteHelperData.ipair1.token0();
 
             for(j = 0; j < totPairs; j++){
                 if(j == i )continue;
-                temp._pair2 = pairFactory.allPairs(j);
-                temp.ipair2 = IPair(temp._pair2);
+                swapRouteHelperData._pair2 = pairFactory.allPairs(j);
+                swapRouteHelperData.ipair2 = IPair(swapRouteHelperData._pair2);
 
-                if(pairFactory.isGenesis(temp._pair2)) continue;
-                if(tokenOut != temp.ipair2.token0() && tokenOut != temp.ipair2.token1()) continue;
+                if(pairFactory.isGenesis(swapRouteHelperData._pair2)) continue;
+                if(tokenOut != swapRouteHelperData.ipair2.token0() && tokenOut != swapRouteHelperData.ipair2.token1()) continue;
 
-                temp.otherToken2 = tokenOut == temp.ipair2.token0() ? temp.ipair2.token1() : temp.ipair2.token0();
+                swapRouteHelperData.otherToken2 = tokenOut == swapRouteHelperData.ipair2.token0() ? swapRouteHelperData.ipair2.token1() : swapRouteHelperData.ipair2.token0();
 
-                if(temp.otherToken1 == temp.otherToken2){
-                    temp.foundPath = false;
-                    swapRoute1 = _getSwapRoutesFromTwoHop(temp, amountIn, tokenIn, tokenOut);
-                    if(temp.foundPath){
-                        swapRoutes = swapRoute1;
+                if(swapRouteHelperData.otherToken1 == swapRouteHelperData.otherToken2){
+                    swapRouteHelperData.foundPath = false;
+                    swapRouteFromHopping = _getSwapRoutesFromTwoHop(swapRouteHelperData, amountIn, tokenIn, tokenOut);
+                    if(swapRouteHelperData.foundPath){
+                        swapRoutes = swapRouteFromHopping;
                     }
                     continue;
                 }
 
-                temp._pairMid = pairFactory.getPair(temp.otherToken1, temp.otherToken2, true);
-                if(temp._pairMid != temp._pair1 && temp._pairMid != temp._pair2){
-                    temp.foundPath = false;
-                    swapRoute1 = _getSwapRoutesFromThreeHop(temp, amountIn, tokenIn, tokenOut);
-                    if(temp.foundPath){
-                        swapRoutes = swapRoute1;
+                swapRouteHelperData._pairMid = pairFactory.getPair(swapRouteHelperData.otherToken1, swapRouteHelperData.otherToken2, true);
+                if(swapRouteHelperData._pairMid != swapRouteHelperData._pair1 && swapRouteHelperData._pairMid != swapRouteHelperData._pair2){
+                    swapRouteHelperData.foundPath = false;
+                    swapRouteFromHopping = _getSwapRoutesFromThreeHop(swapRouteHelperData, amountIn, tokenIn, tokenOut);
+                    if(swapRouteHelperData.foundPath){
+                        swapRoutes = swapRouteFromHopping;
                     }
                 }
             
-                temp._pairMid = pairFactory.getPair(temp.otherToken1, temp.otherToken2, false);
-                if(temp._pairMid != temp._pair1 && temp._pairMid != temp._pair2){
-                    temp.foundPath = false;
-                    swapRoute1 =  _getSwapRoutesFromThreeHop(temp, amountIn, tokenIn, tokenOut);
-                    if(temp.foundPath){
-                        swapRoutes = swapRoute1;
+                swapRouteHelperData._pairMid = pairFactory.getPair(swapRouteHelperData.otherToken1, swapRouteHelperData.otherToken2, false);
+                if(swapRouteHelperData._pairMid != swapRouteHelperData._pair1 && swapRouteHelperData._pairMid != swapRouteHelperData._pair2){
+                    swapRouteHelperData.foundPath = false;
+                    swapRouteFromHopping =  _getSwapRoutesFromThreeHop(swapRouteHelperData, amountIn, tokenIn, tokenOut);
+                    if(swapRouteHelperData.foundPath){
+                        swapRoutes = swapRouteFromHopping;
                     }
                 }
 
@@ -495,36 +501,36 @@ contract BlackholePairAPIV2 is Initializable {
         }
     }
 
-    function _getSwapRoutesFromThreeHop(TempData memory temp, uint amountIn, address tokenIn, address tokenOut) internal view returns (swapRoute memory swapRoutes){
+    function _getSwapRoutesFromThreeHop(SwapRouteHelperData memory swapRouteFromHopping, uint amountIn, address tokenIn, address tokenOut) internal view returns (swapRoute memory swapRoutes){
         uint256[] memory amounts;
 
-        if(!pairFactory.isPair(temp._pairMid)) return swapRoutes;
-        if(pairFactory.isGenesis(temp._pairMid)) return swapRoutes;
+        if(!pairFactory.isPair(swapRouteFromHopping._pairMid)) return swapRoutes;
+        if(pairFactory.isGenesis(swapRouteFromHopping._pairMid)) return swapRoutes;
 
-        temp.ipairMid = IPair(temp._pairMid);
+        swapRouteFromHopping.ipairMid = IPair(swapRouteFromHopping._pairMid);
 
-        amounts = _getAmountViaHopping(amountIn, tokenIn, temp.otherToken1, temp.otherToken2, temp);
-        if(amounts[0] > 0 && amounts[1] > 0 && amounts[2] > 0 && amounts[2] > temp.minAmount){
-            temp.minAmount = amounts[2];
-            temp.foundPath = true;
+        amounts = _getAmountViaHopping(amountIn, tokenIn, swapRouteFromHopping.otherToken1, swapRouteFromHopping.otherToken2, swapRouteFromHopping);
+        if(amounts[0] > 0 && amounts[1] > 0 && amounts[2] > 0 && amounts[2] > swapRouteFromHopping.minAmount){
+            swapRouteFromHopping.minAmount = amounts[2];
+            swapRouteFromHopping.foundPath = true;
             swapRoutes.routes = new route[](3);
-            swapRoutes.routes[0] = _createRoute(temp._pair1, tokenIn, temp.otherToken1, temp.ipair1.isStable(), amounts[0]);
-            swapRoutes.routes[1] = _createRoute(temp._pairMid, temp.otherToken1, temp.otherToken2, temp.ipairMid.isStable(), amounts[1]);
-            swapRoutes.routes[2] = _createRoute(temp._pair2, temp.otherToken2, tokenOut, temp.ipair2.isStable(), amounts[2]);
+            swapRoutes.routes[0] = _createRoute(swapRouteFromHopping._pair1, tokenIn, swapRouteFromHopping.otherToken1, swapRouteFromHopping.ipair1.isStable(), amounts[0]);
+            swapRoutes.routes[1] = _createRoute(swapRouteFromHopping._pairMid, swapRouteFromHopping.otherToken1, swapRouteFromHopping.otherToken2, swapRouteFromHopping.ipairMid.isStable(), amounts[1]);
+            swapRoutes.routes[2] = _createRoute(swapRouteFromHopping._pair2, swapRouteFromHopping.otherToken2, tokenOut, swapRouteFromHopping.ipair2.isStable(), amounts[2]);
             swapRoutes.amountOut = amounts[2];
             swapRoutes.hops = 3;
         }
         return swapRoutes;
     }
 
-    function _getSwapRoutesFromTwoHop(TempData memory temp, uint amountIn, address tokenIn, address tokenOut) internal view returns (swapRoute memory swapRoutes){
-        uint256[] memory amounts = _getAmountViaHopping(amountIn, tokenIn, temp.otherToken1, temp);
-        if(amounts[0] > 0 && amounts[1] > 0 && amounts[1] > temp.minAmount){
-            temp.minAmount = amounts[1];
-            temp.foundPath = true;
+    function _getSwapRoutesFromTwoHop(SwapRouteHelperData memory swapRouteFromHopping, uint amountIn, address tokenIn, address tokenOut) internal view returns (swapRoute memory swapRoutes){
+        uint256[] memory amounts = _getAmountViaHopping(amountIn, tokenIn, swapRouteFromHopping.otherToken1, swapRouteFromHopping);
+        if(amounts[0] > 0 && amounts[1] > 0 && amounts[1] > swapRouteFromHopping.minAmount){
+            swapRouteFromHopping.minAmount = amounts[1];
+            swapRouteFromHopping.foundPath = true;
             swapRoutes.routes = new route[](2);
-            swapRoutes.routes[0] = _createRoute(temp._pair1, tokenIn, temp.otherToken1, temp.ipair1.isStable(), amounts[0]);
-            swapRoutes.routes[1] = _createRoute(temp._pair2, temp.otherToken1, tokenOut, temp.ipair2.isStable(), amounts[1]);
+            swapRoutes.routes[0] = _createRoute(swapRouteFromHopping._pair1, tokenIn, swapRouteFromHopping.otherToken1, swapRouteFromHopping.ipair1.isStable(), amounts[0]);
+            swapRoutes.routes[1] = _createRoute(swapRouteFromHopping._pair2, swapRouteFromHopping.otherToken1, tokenOut, swapRouteFromHopping.ipair2.isStable(), amounts[1]);
             swapRoutes.amountOut = amounts[1];
             swapRoutes.hops = 2;
         }
@@ -532,21 +538,21 @@ contract BlackholePairAPIV2 is Initializable {
     }
 
 
-    function _getAmountViaHopping(uint amountIn, address tokenIn, address tokenMid, TempData memory tempData) internal view returns (uint256[] memory amounts){
+    function _getAmountViaHopping(uint amountIn, address tokenIn, address tokenMid, SwapRouteHelperData memory swapRouteHelperData) internal view returns (uint256[] memory amounts){
         amounts = new uint256[](2);
 
-        amounts[0] = routerV2.getPoolAmountOut(amountIn, tokenIn, tempData._pair1);
-        amounts[1] = routerV2.getPoolAmountOut(amounts[0], tokenMid, tempData._pair2);
+        amounts[0] = routerV2.getPoolAmountOut(amountIn, tokenIn, swapRouteHelperData._pair1);
+        amounts[1] = routerV2.getPoolAmountOut(amounts[0], tokenMid, swapRouteHelperData._pair2);
 
         return amounts;
     }
 
-    function _getAmountViaHopping(uint amountIn, address tokenIn, address tokenMid1, address tokenMid2, TempData memory tempData) internal view returns (uint256[] memory amounts){
+    function _getAmountViaHopping(uint amountIn, address tokenIn, address tokenMid1, address tokenMid2, SwapRouteHelperData memory swapRouteHelperData) internal view returns (uint256[] memory amounts){
         amounts = new uint256[](3);
 
-        amounts[0] = routerV2.getPoolAmountOut(amountIn, tokenIn, tempData._pair1);
-        amounts[1] = routerV2.getPoolAmountOut(amounts[0], tokenMid1, tempData._pairMid);
-        amounts[2] = routerV2.getPoolAmountOut(amounts[1], tokenMid2, tempData._pair2);
+        amounts[0] = routerV2.getPoolAmountOut(amountIn, tokenIn, swapRouteHelperData._pair1);
+        amounts[1] = routerV2.getPoolAmountOut(amounts[0], tokenMid1, swapRouteHelperData._pairMid);
+        amounts[2] = routerV2.getPoolAmountOut(amounts[1], tokenMid2, swapRouteHelperData._pair2);
 
         return amounts;
     }
