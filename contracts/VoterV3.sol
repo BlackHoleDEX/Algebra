@@ -43,7 +43,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
     uint256 internal index;                                        // gauge index
     uint256 public maxVotingNum;
-    uint public constant EPOCH_DURATION = 3600;
+    uint public EPOCH_DURATION;
     uint256 internal constant MIN_OF_MAX_VOTING_NUM = 10;
     uint256 internal constant MIN_VOTING_NUM = 10;
 
@@ -110,7 +110,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         tokenHandler = _tokenHandler;
         genesisManager = address(0);
         maxVotingNum = 30;
-
+        EPOCH_DURATION = BlackTimeLibrary.WEEK;
         initflag = false;
     }
 

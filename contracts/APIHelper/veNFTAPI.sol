@@ -14,6 +14,7 @@ import '../interfaces/IRewardsDistributor.sol';
 import '../interfaces/IGaugeFactory.sol';
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import {BlackTimeLibrary} from "../libraries/BlackTimeLibrary.sol";
 
 import "hardhat/console.sol";
 
@@ -106,7 +107,7 @@ contract veNFTAPI is Initializable {
    
     uint256 constant public MAX_RESULTS = 1000;
     uint256 constant public MAX_PAIRS = 30;
-    uint256 public constant WEEK = 3600; 
+    uint256 public WEEK; 
 
     IVoter public voter;
     IGaugeFactory public gaugeFactory;
@@ -140,6 +141,7 @@ contract veNFTAPI is Initializable {
         underlyingToken = IVotingEscrow(ve).token();
 
         pairFactory = IPairFactory(voter.factories()[0]);
+        WEEK = BlackTimeLibrary.WEEK;
     }
 
     function getAllNFT(uint256 _amounts, uint256 _offset) external view returns(veNFT[] memory _veNFT){

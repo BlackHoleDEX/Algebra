@@ -5,6 +5,7 @@ import './libraries/Math.sol';
 import './interfaces/IERC20.sol';
 import './interfaces/IRewardsDistributor.sol';
 import './interfaces/IVotingEscrow.sol';
+import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
 
 /*
 
@@ -28,7 +29,7 @@ contract RewardsDistributor is IRewardsDistributor {
         uint max_epoch
     );
 
-    uint constant WEEK = 3600;
+    uint256 public WEEK;
 
     uint public start_time;
     uint public time_cursor;
@@ -46,6 +47,7 @@ contract RewardsDistributor is IRewardsDistributor {
     address public depositor;
 
     constructor(address _voting_escrow) {
+        WEEK = BlackTimeLibrary.WEEK;
         uint _t = block.timestamp / WEEK * WEEK;
         start_time = _t;
         last_token_time = _t;

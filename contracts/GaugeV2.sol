@@ -10,6 +10,7 @@ import './interfaces/IPair.sol';
 import './interfaces/IBribe.sol';
 import "./libraries/Math.sol";
 import './interfaces/IGenesisPool.sol';
+import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
 
 interface IRewarder {
     function onReward(
@@ -93,7 +94,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
         VE = _ve;                               // vested
         TOKEN = IERC20(_token);                 // underlying (LP)
         DISTRIBUTION = _distribution;           // distro address (voter)
-        DURATION = 3600;                      
+        DURATION = BlackTimeLibrary.WEEK;                   
 
         internal_bribe = _internal_bribe;       // lp fees goes here
         external_bribe = _external_bribe;       // bribe fees goes here

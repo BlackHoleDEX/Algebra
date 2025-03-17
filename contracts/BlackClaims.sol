@@ -6,6 +6,7 @@ pragma solidity 0.8.13;
 import {IERC20} from "./interfaces/IERC20.sol";
 import {IBlackClaims} from "./interfaces/IBlackClaims.sol";
 import {IVotingEscrow} from "./interfaces/IVotingEscrow.sol";
+import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
 
 /// @title Manager for the seasonal player rewards program.
 /// @author Chance Santana-Wees (Coelacanth/Coel.eth)
@@ -14,7 +15,7 @@ import {IVotingEscrow} from "./interfaces/IVotingEscrow.sol";
 /// @notice Allows System Admins to set up and report scores for Seasons.
 contract BlackClaims is IBlackClaims {
 
-    uint256 public constant MAX_PERIOD = 86400 * 365 * 4;
+    uint256 public MAX_PERIOD;
 
     ///@notice The address of the rewards token. (The BLACK token)
     IERC20 immutable token;
@@ -54,6 +55,7 @@ contract BlackClaims is IBlackClaims {
         treasury = treasury_;
         _ve = IVotingEscrow(__ve);
         token = IERC20(_ve.token());
+        MAX_PERIOD = BlackTimeLibrary.MAX_LOCK_DURATION;
     }
 
     ///@notice Updates the address of the account/contract that the Seasons reward system pulls reward tokens from.
