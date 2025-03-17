@@ -280,8 +280,10 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     function replaceFactory(address _pairFactory, address _gaugeFactory, uint256 _pos) external VoterAdmin {
         require(_pairFactory != address(0), 'addr0');
         require(_gaugeFactory != address(0), 'addr0');
-        require(isFactory[_pairFactory], '!fact');
-        require(isGaugeFactory[_gaugeFactory], '!gFact');
+        require(!isFactory[_pairFactory], 'fact');
+        require(!isGaugeFactory[_gaugeFactory], 'gFact');
+        require(_pairFactory.code.length > 0, "!contract");
+        require(_gaugeFactory.code.length > 0, "!contract");
         address oldPF = _factories[_pos];
         address oldGF = _gaugeFactories[_pos];
         isFactory[oldPF] = false;
@@ -335,7 +337,9 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         }
         claimable[_gauge] = 0;
 
-        // Do we need to decrease totalWeight also. For now It's being commented out. 
+        // We shouldn't update totalWeight because if we decrease it other pools will get more emission while in current scenario 
+        // emissionAmount of killed gauge will get transferred back to Minter
+        // We're decreasing totalWeight in case of Reset functionality while resetting vote from killed gauge.
         //totalWeight = totalWeight - weights[poolForGauge[_gauge]];
         emit GaugeKilled(_gauge);
     }
@@ -386,8 +390,8 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
                 IBribe(internal_bribes[gauges[_pool]]).withdraw(uint256(_votes), _tokenId);
                 IBribe(external_bribes[gauges[_pool]]).withdraw(uint256(_votes), _tokenId);
 
-                // if is alive remove _votes, else don't because we already done it in killGauge()
-                if(isAlive[gauges[_pool]]) _totalWeight += _votes;
+                // decrease totalWeight irrespective of gauge is killed/alive for this current pool
+                _totalWeight += _votes;
                 
                 emit Abstained(_tokenId, _votes);
             }
@@ -771,12 +775,15 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         if (_supplied > 0) {
             uint256 _supplyIndex = supplyIndex[_gauge];
             uint256 _index = index; // get global index0 for accumulated distro
+            // SupplyIndex will be updated for Killed Gauges as well so we don't need to udpate index while reviving gauge.
             supplyIndex[_gauge] = _index; // update _gauge current position to global position
             uint256 _delta = _index - _supplyIndex; // see if there is any difference that need to be accrued
             if (_delta > 0) {
                 uint256 _share = _supplied * _delta / 1e18; // add accrued difference for each supplied token
                 if (isAlive[_gauge]) {
                     claimable[_gauge] += _share;
+                } else {
+                    IERC20Upgradeable(base).safeTransfer(minter, _share); // send rewards back to Minter so they're not stuck in Voter
                 }
             }
         } else {

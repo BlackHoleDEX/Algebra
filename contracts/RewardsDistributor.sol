@@ -241,10 +241,9 @@ contract RewardsDistributor is IRewardsDistributor {
 
         for (uint i = 0; i < 50; i++) {
             if (week_cursor >= _last_token_time) break;
-
             int128 dt = int128(int256(week_cursor + WEEK - 1 - user_point.ts));
             uint balance_of = Math.max(uint(int256(user_point.bias - dt * user_point.slope + int256(user_point.permanent + user_point.smNFT + user_point.smNFTBonus))), 0);
-            supply = ve_supply[week_cursor];
+            supply = ve_supply[week_cursor + WEEK -1];
             supply = supply == 0 ? 1 : supply;
             to_distribute += balance_of * tokens_per_week[week_cursor] / supply;
             week_cursor += WEEK;

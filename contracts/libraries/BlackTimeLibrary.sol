@@ -21,14 +21,14 @@ library BlackTimeLibrary {
     /// @dev Returns start of voting window
     function epochVoteStart(uint256 timestamp) internal pure returns (uint256) {
         unchecked {
-            return timestamp - (timestamp % WEEK) + 300;
+            return timestamp - (timestamp % WEEK) + 3600;
         }
     }
 
     /// @dev Returns end of voting window / beginning of unrestricted voting window
     function epochVoteEnd(uint256 timestamp) internal pure returns (uint256) {
         unchecked {
-            return timestamp - (timestamp % WEEK) + WEEK - 300;
+            return timestamp - (timestamp % WEEK) + WEEK - 3600;
         }
     }
 
@@ -49,7 +49,7 @@ library BlackTimeLibrary {
     /// @dev Returns duration in multiples of epoch
     function isLastEpoch(uint256 timestamp, uint256 endTime) internal pure returns (bool) {
         unchecked {
-            return  endTime - WEEK < timestamp && timestamp < endTime;
+            return  endTime - WEEK <= timestamp && timestamp < endTime;
         }
     }
 }

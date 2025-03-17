@@ -117,6 +117,7 @@ contract TokenHandler is  ITokenHandler {
 
     function _whitelistConnector(address _token) internal {
         require(isWhitelisted[_token], "out");
+        require(!isConnector[_token], "connector");
         require(_token.code.length > 0, "!contract");
         isConnector[_token] = true;
         connectors.push(_token);
@@ -125,6 +126,7 @@ contract TokenHandler is  ITokenHandler {
 
     function blacklistConnector(address _token) external Governance() {
         require(isWhitelisted[_token], "out");
+        require(isConnector[_token], "not connector");
         require(_token.code.length > 0, "!contract");
         isConnector[_token] = false;
 
