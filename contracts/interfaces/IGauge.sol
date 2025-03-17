@@ -14,6 +14,4 @@ interface IGauge {
     function earned(address token, address account) external view returns (uint);
     function setGenesisPool(address genesisPool) external;
     function depositsForGenesis(address tokenOwner, uint256 timestamp, uint256 liquidity) external;
-    function setCurrentEmissions(uint amount) external;
-    function getCurrentEmissions() external view returns (uint);
 }

@@ -5,7 +5,6 @@ pragma solidity 0.8.13;
 import '../libraries/Math.sol';
 import '../interfaces/IBribeAPI.sol';
 import '../interfaces/IGaugeAPI.sol';
-import '../interfaces/IGauge.sol';
 
 import '../interfaces/IGaugeFactory.sol';
 import '../interfaces/IERC20.sol';
@@ -293,7 +292,7 @@ contract BlackholePairAPIV2 is Initializable {
                 }
                 gaugeTotalSupply = _gauge.totalSupply();
                 emissions = _gauge.rewardRate();
-                _pairInfo.total_emissions = IGauge(voter.gauges(_pair)).getCurrentEmissions();
+                _pairInfo.total_emissions = _gauge.rewardForDuration();
             }
         }
         

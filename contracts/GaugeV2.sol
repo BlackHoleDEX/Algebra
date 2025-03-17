@@ -195,7 +195,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     }
 
     ///@notice get total reward for the duration
-    function rewardForDuration() external view returns (uint256) {
+function rewardForDuration() external view returns (uint256) {
         return rewardRate * DURATION;
     }
 
@@ -433,13 +433,5 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
             } 
             emit ClaimFees(msg.sender, claimed0, claimed1);
         }
-    }
-
-    function setCurrentEmissions (uint amount) external {
-        _emissions = amount;
-    }
-
-    function getCurrentEmissions() external view returns (uint) {
-        return _emissions;
     }
 }

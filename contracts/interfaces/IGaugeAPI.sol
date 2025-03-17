@@ -13,5 +13,5 @@ interface IGaugeAPI {
     function earned(address account) external view returns (uint);
     function setGenesisPool(address genesisPool) external;
     function depositsForGenesis(address tokenOwner, uint256 timestamp, uint256 liquidity) external;
-
+    function rewardForDuration() external view returns (uint256);
 }
