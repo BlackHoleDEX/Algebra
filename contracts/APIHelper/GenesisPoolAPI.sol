@@ -163,7 +163,7 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
             tokenAllocation = IGenesisPool(genesisPool).getAllocationInfo();
             incentiveInfo = IGenesisPool(genesisPool).getIncentivesInfo();
 
-            if(userDeposit > 0 || _hasClaimbaleForOwner(_user, poolStatus, tokenAllocation, incentiveInfo)){
+            if(_hasClaimbaleForOwner(_user, userDeposit, poolStatus, tokenAllocation, incentiveInfo)){
                 count++;
             }
         }
@@ -186,7 +186,7 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
             tokenAllocation = IGenesisPool(genesisPool).getAllocationInfo();
             incentiveInfo = IGenesisPool(genesisPool).getIncentivesInfo();
 
-            if(userDeposit > 0 || _hasClaimbaleForOwner(_user, poolStatus, tokenAllocation, incentiveInfo)){
+            if(_hasClaimbaleForOwner(_user, userDeposit, poolStatus, tokenAllocation, incentiveInfo)){
                 genesisInfo = IGenesisPool(genesisPool).getGenesisInfo();
                 genesisPools[index].genesisPool = genesisPool;
                 genesisPools[index].nativeToken = nativeToken;
@@ -209,13 +209,13 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
         totalTokens = count;
     }
 
-    function _hasClaimbaleForOwner(address _user, PoolStatus poolStatus, TokenAllocation memory tokenAllocation, TokenIncentiveInfo memory incentiveInfo) internal pure returns (bool) {
+    function _hasClaimbaleForOwner(address _user, uint256 userDeposit, PoolStatus poolStatus, TokenAllocation memory tokenAllocation, TokenIncentiveInfo memory incentiveInfo) internal pure returns (bool) {
         if(_user == tokenAllocation.tokenOwner){
             if(poolStatus == PoolStatus.NOT_QUALIFIED){
                 return (tokenAllocation.refundableNativeAmount > 0 || incentiveInfo.incentivesToken.length > 0);
             }
             else if(poolStatus == PoolStatus.NATIVE_TOKEN_DEPOSITED){
-                return tokenAllocation.proposedNativeAmount > 0;
+                return (tokenAllocation.proposedNativeAmount > 0 || incentiveInfo.incentivesToken.length > 0);
             }
             else if(poolStatus == PoolStatus.PRE_LISTING || poolStatus == PoolStatus.PRE_LAUNCH || poolStatus == PoolStatus.PRE_LAUNCH_DEPOSIT_DISABLED){
                 return true;
@@ -224,6 +224,8 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
                 return tokenAllocation.refundableNativeAmount > 0;
             }
             return false;
+        }else if(poolStatus == PoolStatus.NOT_QUALIFIED && userDeposit > 0){
+            return true;
         }
         return false;
     }
