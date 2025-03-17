@@ -1,3 +1,0 @@
-PRIVATEKEY_DEPLOYMENT = ""
-
-module.exports = {PRIVATEKEY_DEPLOYMENT}
