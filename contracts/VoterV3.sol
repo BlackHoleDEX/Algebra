@@ -603,7 +603,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         // gov can create for any pool, even non-Black pairs
         if (!IPermissionsRegistry(permissionRegistry).hasRole("GOVERNANCE",msg.sender)) { 
             require(isPair, "!_pool");
-            require(!ITokenHandler(tokenHandler).isWhitelisted(tokenA) && !ITokenHandler(tokenHandler).isWhitelisted(tokenB), "!whitelisted");
+            require(ITokenHandler(tokenHandler).isWhitelisted(tokenA) && ITokenHandler(tokenHandler).isWhitelisted(tokenB), "!whitelisted");
             require(tokenA != address(0) && tokenB != address(0), "!pair.tokens");
         }
 
