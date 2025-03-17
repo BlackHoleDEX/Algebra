@@ -81,7 +81,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         MIN_THRESHOLD = 50 * 10 ** 2; 
         MATURITY_TIME = 900;
 
-        active_period = ((block.timestamp / WEEK) * WEEK) + (5 * 60);
+        active_period = ((block.timestamp / WEEK) * WEEK) + (25 * 60);
     }
 
     function check() external view returns (bool) {

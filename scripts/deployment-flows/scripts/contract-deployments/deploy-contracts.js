@@ -699,8 +699,8 @@ async function main () {
     // TODO: separate out the setting of chalink address 
     await setChainLinkAddress(epochControllerAddress, "0xBD3152De270D307d0720b434F75F80af6EE5a380", "0xa92967bB3C05dbB31FDcD779C81c86d623544A95");
 
-    //add black to user Address
-    await addBlackToUserAddress(minterUpgradableAddress);
+    // //add black to user Address
+    // await addBlackToUserAddress(minterUpgradableAddress);
 
     //set voterV3 in voting escrow
     await setVoterV3InVotingEscrow(voterV3Address, votingEscrowAddress);

@@ -1,4 +1,4 @@
-const genesisPoolFactoryAddress = "0x7b847f992C8f602F27bA064E13724f3b064c7de3";
+const genesisPoolFactoryAddress = "0x988bB7d4Fb4e9522db1Ed76e909175Dce5126714";
 
 const genesisPoolFactoryAbi = [
   {

@@ -167,21 +167,20 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
 
     function _eligbleForPreLaunchPool() internal view returns (bool){
         uint _endTime = genesisInfo.startTime + genesisInfo.duration;
-        uint256 targetFundingAmount = (allocationInfo.proposedFundingAmount * genesisInfo.threshold) / 10000; // threshold is 100 * of original to support 2 deciamls
+        uint256 targetNativeAmount = (allocationInfo.proposedNativeAmount * genesisInfo.threshold) / 10000; // threshold is 100 * of original to support 2 deciamls
 
-        return (BlackTimeLibrary.isLastEpoch(block.timestamp, _endTime) && allocationInfo.allocatedFundingAmount >= targetFundingAmount);
+        return (BlackTimeLibrary.isLastEpoch(block.timestamp, _endTime) && allocationInfo.allocatedNativeAmount >= targetNativeAmount);
     }
 
     function _eligbleForCompleteLaunch() internal view returns (bool){
-        uint256 targetFundingAmount = (allocationInfo.proposedFundingAmount * genesisInfo.threshold) / 10000; // threshold is 100 * of original to support 2 deciamls
-        return allocationInfo.allocatedFundingAmount >= targetFundingAmount;
+        return allocationInfo.allocatedNativeAmount >= allocationInfo.proposedNativeAmount;
     }
 
     function eligbleForDisqualify() external view returns (bool){
         uint256 _endTime = genesisInfo.startTime + genesisInfo.duration;    
-        uint256 targetFundingAmount = (allocationInfo.proposedFundingAmount * genesisInfo.threshold) / 10000; // threshold is 100 * of original to support 2 deciamls
+        uint256 targetNativeAmount = (allocationInfo.proposedNativeAmount * genesisInfo.threshold) / 10000; // threshold is 100 * of original to support 2 deciamls
 
-        return (BlackTimeLibrary.isLastEpoch(block.timestamp, _endTime) && targetFundingAmount < allocationInfo.allocatedFundingAmount);
+        return (BlackTimeLibrary.isLastEpoch(block.timestamp, _endTime) && allocationInfo.allocatedNativeAmount < targetNativeAmount);
     }
 
     function transferIncentives(address gauge, address external_bribe, address internal_bribe) external onlyManager {

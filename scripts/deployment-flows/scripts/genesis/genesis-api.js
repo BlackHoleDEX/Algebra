@@ -3,22 +3,24 @@ const { ethers } = require("hardhat");
 const fs = require('fs');
 const path = require('path');
 const { genesisPoolManagerAbi, genesisPoolManagerAddress } = require('../../../../generated/genesis-pool-manager');
+const { genesisPoolFactoryAbi } = require('../../../../generated/genesis-pool-factory');
 
 async function main () {
 
   accounts = await ethers.getSigners();
   owner = accounts[0];
   const ownerAddress = owner.address;
-  console.log("ownerAddress : ", ownerAddress)
+  console.log("ownerAddress : ", accounts[1].address)
 
     try{
-        const GenesisPoolApi = await ethers.getContractAt(genesisPoolAPIAbi, genesisPoolAPIAddress);
-        const genesisPoolsData = await GenesisPoolApi.getAllGenesisPools(ownerAddress, "2", "0");
+        const GenesisPoolApi = await ethers.getContractAt(genesisPoolAPIAbi, "0x6E49D82979e4a23184d16Afa96876c9852F0AD09");
+        const signers = GenesisPoolApi.connect(accounts[1]); 
+        const genesisPoolsData = await signers.getAllUserRelatedGenesisPools(accounts[1].address);
 
         console.log("genesisPool : ", genesisPoolsData);
 
-        const GenesisPoolManager = await ethers.getContractAt(genesisPoolManagerAbi, genesisPoolManagerAddress);
-        const nativeTokens = await GenesisPoolManager.getLiveNaitveTokens();
+        const GenesisPoolManager = await ethers.getContractAt(genesisPoolManagerAbi, '0xF6c64e5cBe8fafb44eAb82353245e890EBcE943c');
+        const nativeTokens = await GenesisPoolManager.getAllNaitveTokens();
 
         console.log("nativeTokens : ", nativeTokens);
         // const genesisPools = genesisPoolsData[0];
