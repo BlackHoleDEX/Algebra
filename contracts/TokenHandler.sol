@@ -45,14 +45,14 @@ contract TokenHandler is  ITokenHandler {
     }
 
     /// @notice Whitelist a token for gauge creation
-    function whitelistTokens(address[] memory _tokens) external {
+    function whitelistTokens(address[] memory _tokens) external GovernanceOrGenesisManager {
         uint256 i = 0;
         for(i = 0; i < _tokens.length; i++){
             _whitelist(_tokens[i]);
         }
     }
 
-    function whitelistToken(address _token) external {
+    function whitelistToken(address _token) external GovernanceOrGenesisManager {
         _whitelist(_token);
     }
        
@@ -117,6 +117,7 @@ contract TokenHandler is  ITokenHandler {
 
     function _whitelistConnector(address _token) internal {
         require(isWhitelisted[_token], "out");
+        require(!isConnector[_token], "connector");
         require(_token.code.length > 0, "!contract");
         isConnector[_token] = true;
         connectors.push(_token);
@@ -125,6 +126,7 @@ contract TokenHandler is  ITokenHandler {
 
     function blacklistConnector(address _token) external Governance() {
         require(isWhitelisted[_token], "out");
+        require(isConnector[_token], "not connector");
         require(_token.code.length > 0, "!contract");
         isConnector[_token] = false;
 
@@ -139,5 +141,13 @@ contract TokenHandler is  ITokenHandler {
         }
 
         emit BlacklistConnector(msg.sender, _token);
+    }
+
+    function whiteListedTokensLength() external view returns(uint256) {
+        return whiteListed.length;
+    }
+
+    function connectorTokensLength() external view returns(uint256) {
+        return connectors.length;
     }
 }
