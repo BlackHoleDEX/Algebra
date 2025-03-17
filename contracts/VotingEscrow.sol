@@ -1049,7 +1049,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         if (_epoch == 0) {
             return 0;
         } else {
-            Point memory last_point = user_point_history[_tokenId][_epoch];
+            uint userEpoch = getPastUserPointIndex(_epoch, _tokenId, _t);
+            Point memory last_point = user_point_history[_tokenId][userEpoch];
             if (last_point.smNFT != 0){
                 return last_point.smNFT + last_point.smNFTBonus;
             }
@@ -1064,6 +1065,23 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                 return uint(int256(last_point.bias));
             }
         }
+    }
+
+    function getPastUserPointIndex(uint _epoch, uint _tokenId,uint _t) internal view returns (uint256){
+        uint lower = 0;
+        uint upper = _epoch;
+        while (upper > lower) {
+            uint center = upper - (upper - lower) / 2; // ceil, avoiding overflow
+            Point memory userPoint = user_point_history[_tokenId][center];
+            if (userPoint.ts == _t) {
+                return center;
+            } else if (userPoint.ts < _t) {
+                lower = center;
+            } else {
+                upper = center - 1;
+            }
+        }
+        return lower;
     }
 
     function balanceOfNFT(uint _tokenId) external view returns (uint) {
