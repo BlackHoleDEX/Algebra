@@ -16,7 +16,7 @@ import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 contract Bribe is ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    uint256 public WEEK = 1800; 
+    uint256 public WEEK; 
 
     /* ========== STATE VARIABLES ========== */
 
@@ -60,6 +60,7 @@ contract Bribe is ReentrancyGuard {
 
     constructor(address _owner,address _voter,address _bribeFactory, address _tokenHandler, address _token0, address _token1, string memory _type)  {
         require(_bribeFactory != address(0) && _voter != address(0) && _owner != address(0));
+        WEEK = BlackTimeLibrary.WEEK;
         voter = _voter;
         bribeFactory = _bribeFactory;
         tokenHandler = ITokenHandler(_tokenHandler);

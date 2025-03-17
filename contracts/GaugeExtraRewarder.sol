@@ -4,6 +4,7 @@ pragma solidity 0.8.13;
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
 
 
 interface IRewarder {
@@ -58,7 +59,7 @@ contract GaugeExtraRewarder is Ownable {
             accRewardPerShare: 0
         });
         GAUGE = gauge;
-        distributePeriod = 7 days;
+        distributePeriod = BlackTimeLibrary.WEEK;
     }
 
     /// @notice Call onReward from gauge, it saves the new user balance and get any available reward

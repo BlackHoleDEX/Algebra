@@ -50,6 +50,7 @@ interface IVotingEscrow {
     function balanceOfNFT(uint _id) external view returns (uint);
     function balanceOf(address _owner) external view returns (uint);
     function totalSupply() external view returns (uint);
+    function totalSupplyAtT(uint256 _t) external view returns (uint);
     function supply() external view returns (uint);
 
     function avm() external view returns (address);

@@ -11,6 +11,7 @@ import "./interfaces/IVotingEscrow.sol";
 import { IBlackGovernor } from "./interfaces/IBlackGovernor.sol";
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
 
 // codifies the minting rules as per ve(3,3), abstracted from the token to support any token that allows minting
 // 14 increment epochs followed by 52 decrement epochs after which we wil have vote based epochs
@@ -32,10 +33,10 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     uint256 public constant PROPOSAL_INCREASE = 10_100; // 1% increment after the 67th epoch based on proposal
     uint256 public constant PROPOSAL_DECREASE = 9_900; // 1% increment after the 67th epoch based on proposal
 
-    uint public constant WEEK = 1800; // allows minting once per week (reset every Thursday 00:00 UTC)
+    uint public WEEK; // allows minting once per week (reset every Thursday 00:00 UTC)
     uint public weekly; // represents a starting weekly emission of 2.6M BLACK (BLACK has 18 decimals)
     uint public active_period;
-    uint public constant LOCK = 86400 * 7 * 52 * 4;
+    uint public LOCK;
     uint256 public epochCount;
 
     address internal _initializer;
@@ -66,7 +67,8 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
         tailEmissionRate = MAX_BPS;
         burnTokenAddress=0x000000000000000000000000000000000000dEaD;
         teamRate = 500; // 500 bps = 5%
-
+        WEEK = BlackTimeLibrary.WEEK;
+        LOCK = BlackTimeLibrary.MAX_LOCK_DURATION;
         _black = IBlack(IVotingEscrow(__ve).token());
         _voter = IVoter(__voter);
         _ve = IVotingEscrow(__ve);
@@ -195,7 +197,6 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
             
             require(_black.transfer(address(_rewards_distributor), _rebase));
             _rewards_distributor.checkpoint_token(); // checkpoint token balance that was just minted in rewards distributor
-            _rewards_distributor.checkpoint_total_supply(); // checkpoint supply
 
             _black.approve(address(_voter), _gauge);
             _voter.notifyRewardAmount(_gauge);

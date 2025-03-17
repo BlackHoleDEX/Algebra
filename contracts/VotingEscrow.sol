@@ -9,6 +9,7 @@ import {IVeArtProxy} from "./interfaces/IVeArtProxy.sol";
 import {IVotingEscrow} from "./interfaces/IVotingEscrow.sol";
 import {IVoter} from "./interfaces/IVoter.sol";
 import {IAutomatedVotingManager} from "./interfaces/IAutomatedVotingManager.sol";
+import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
 
 /// @title Voting Escrow
 /// @notice veNFT implementation that escrows ERC-20 tokens in the form of an ERC-721 NFT
@@ -114,6 +115,11 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
     /// @dev Current count of token
     uint internal tokenId;
 
+    uint internal WEEK;
+
+    uint internal MAXTIME;
+    int128 internal iMAXTIME;
+
     /// @notice Contract constructor
     /// @param token_addr `BLACK` token address
     constructor(address token_addr, address art_proxy, address _avm) {
@@ -122,6 +128,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         team = msg.sender;
         artProxy = art_proxy;
         avm = _avm;
+        WEEK = BlackTimeLibrary.WEEK;
+        MAXTIME = BlackTimeLibrary.MAX_LOCK_DURATION;
+        iMAXTIME = int128(int256(BlackTimeLibrary.MAX_LOCK_DURATION));
 
         point_history[0].blk = block.number;
         point_history[0].ts = block.timestamp;
@@ -559,9 +568,6 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
     mapping(uint => int128) public slope_changes; // time -> signed slope change
     uint public supply;
 
-    uint internal constant WEEK = 1800;
-    uint internal constant MAXTIME = 4 * 365 * 86400;
-    int128 internal constant iMAXTIME = 4 * 365 * 86400;
     uint internal constant MULTIPLIER = 1 ether;
 
     /*//////////////////////////////////////////////////////////////
