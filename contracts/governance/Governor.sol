@@ -13,8 +13,6 @@ import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Timers.sol";
 import "@openzeppelin/contracts/governance/IGovernor.sol";
 import {IBlackHoleVotes} from "../interfaces/IBlackHoleVotes.sol";
-import {IMinter} from "../interfaces/IMinter.sol";
-
 import {BlackTimeLibrary} from "../libraries/BlackTimeLibrary.sol";
 
 
@@ -51,7 +49,6 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
     }
 
     string private _name;
-    address public minter;
     uint256 public proposalIdMain; //TODO:: Abhijeet remove this and make it local as used for testing
     
     ProposalState public status;
@@ -88,8 +85,8 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
     /**
      * @dev Sets the value for {name} and {version}
      */
-    constructor(string memory name_, address minter_) EIP712(name_, version()) {
-        minter = minter_;
+    constructor(string memory name_) EIP712(name_, version()) {
+        
         _name = name_;
     }
 
@@ -264,21 +261,15 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
     /**
      * @dev See {IGovernor-propose}.
      */
-    function propose(
+    function createProposal(
         address[] memory targets,
         uint256[] memory values,
-        bytes[] memory calldatas,
-        string memory description
-    ) public virtual override returns (uint256) {
+        bytes[] memory calldatas
+    ) public returns (uint256) {
         require(
             getVotes(_msgSender(), block.number - 1) >= proposalThreshold(),
             "Governor: proposer votes below proposal threshold"
         );
-
-        require(targets.length == 1, "GovernorSimple: only one target allowed");
-        require(address(targets[0]) == minter, "GovernorSimple: only minter allowed");
-        require(calldatas.length == 1, "GovernorSimple: only one calldata allowed");
-        require(bytes4(calldatas[0]) == IMinter.nudge.selector, "GovernorSimple: only nudge allowed");
 
         epochStart = bytes32(BlackTimeLibrary.epochNext(block.timestamp));
 

@@ -4,6 +4,7 @@ pragma solidity 0.8.13;
 import {IGovernor} from "@openzeppelin/contracts/governance/IGovernor.sol";
 import {IBlackHoleVotes} from "./interfaces/IBlackHoleVotes.sol";
 import {L2Governor, L2GovernorCountingSimple, L2GovernorVotes, L2GovernorVotesQuorumFraction} from "./governance/Governor.sol";
+import {IMinter} from "./interfaces/IMinter.sol";
 
 contract BlackGovernor is
     L2Governor,
@@ -15,15 +16,17 @@ contract BlackGovernor is
     uint256 public constant MAX_PROPOSAL_NUMERATOR = 100; // max 10%
     uint256 public constant PROPOSAL_DENOMINATOR = 1000;
     uint256 public proposalNumerator = 2; // start at 0.02%
+    address public minter;
 
     constructor(
         IBlackHoleVotes _ve,
         address _minter
     )
-        L2Governor("Black Governor", _minter)
+        L2Governor("Black Governor")
         L2GovernorVotes(_ve)
         L2GovernorVotesQuorumFraction(4) // 4%
     {
+        minter = _minter;
         team = msg.sender;
     }
 
@@ -98,4 +101,22 @@ contract BlackGovernor is
     function quorum(uint256 blockTimestamp) public view override (L2GovernorVotesQuorumFraction, IGovernor) returns (uint256) {
         return (token.getsmNFTPastTotalSupply() * quorumNumerator()) / quorumDenominator();
     }
+
+    function propose(
+        address[] memory targets,
+        uint256[] memory values,
+        bytes[] memory calldatas,
+        string memory description
+    ) public virtual override returns (uint256) {
+
+        require(targets.length == 1, "GovernorSimple: only one target allowed");
+        require(address(targets[0]) == minter, "GovernorSimple: only minter allowed");
+        require(calldatas.length == 1, "GovernorSimple: only one calldata allowed");
+        require(bytes4(calldatas[0]) == IMinter.nudge.selector, "GovernorSimple: only nudge allowed");
+
+        uint256 proposalId;
+        proposalId = createProposal(targets, values, calldatas);
+        return proposalId;
+    }
+
 }
