@@ -149,6 +149,11 @@ contract RouterV2 {
         return amountStable > amountVolatile ? (amountStable, true) : (amountVolatile, false);
     }
 
+    function getPoolAmountOut(uint amountIn, address tokenIn, address pair) public view returns (uint amount) {
+        uint amountOut = IBaseV1Pair(pair).getAmountOut(amountIn, tokenIn);
+        return amountOut;
+    }
+
     // performs chained getAmountOut calculations on any number of pairs
     function getAmountsOut(uint amountIn, route[] memory routes) public view returns (uint[] memory amounts) {
         require(routes.length >= 1, 'BaseV1Router: INVALID_PATH');

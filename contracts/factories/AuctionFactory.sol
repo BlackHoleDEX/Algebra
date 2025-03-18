@@ -39,7 +39,8 @@ contract AuctionFactory is IAuctionFactory, OwnableUpgradeable {
 
     function replaceAuction(address _auction, uint256 _pos) external onlyManager {
         require(_auction != address(0), 'addr0');
-        require(isAuction[_auction], '!fact');
+        require(!isAuction[_auction], '!fact');
+        require(_auction.code.length > 0, "!contract");
         address oldPF = auctions[_pos];
         isAuction[oldPF] = false;
 

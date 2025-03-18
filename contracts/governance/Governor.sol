@@ -13,8 +13,6 @@ import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Timers.sol";
 import "@openzeppelin/contracts/governance/IGovernor.sol";
 import {IBlackHoleVotes} from "../interfaces/IBlackHoleVotes.sol";
-import {IMinter} from "../interfaces/IMinter.sol";
-
 import {BlackTimeLibrary} from "../libraries/BlackTimeLibrary.sol";
 
 
@@ -51,11 +49,8 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
     }
 
     string private _name;
-    address public minter;
-    uint256 public proposalIdMain; //TODO:: Abhijeet remove this and make it local as used for testing
     
     ProposalState public status;
-    bytes32 public epochStart;  //TODO:: Abhijeet remove this and make it local as used for testing
 
     mapping(uint256 => ProposalCore) public _proposals;
 
@@ -88,8 +83,8 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
     /**
      * @dev Sets the value for {name} and {version}
      */
-    constructor(string memory name_, address minter_) EIP712(name_, version()) {
-        minter = minter_;
+    constructor(string memory name_) EIP712(name_, version()) {
+        
         _name = name_;
     }
 
@@ -264,29 +259,23 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
     /**
      * @dev See {IGovernor-propose}.
      */
-    function propose(
+    function _proposal(
         address[] memory targets,
         uint256[] memory values,
         bytes[] memory calldatas,
         string memory description
-    ) public virtual override returns (uint256) {
+    ) internal virtual returns (uint256) {
         require(
             getVotes(_msgSender(), block.number - 1) >= proposalThreshold(),
             "Governor: proposer votes below proposal threshold"
         );
+        bytes32 epochStart = bytes32(BlackTimeLibrary.epochNext(block.timestamp));
 
-        require(targets.length == 1, "GovernorSimple: only one target allowed");
-        require(address(targets[0]) == minter, "GovernorSimple: only minter allowed");
-        require(calldatas.length == 1, "GovernorSimple: only one calldata allowed");
-        require(bytes4(calldatas[0]) == IMinter.nudge.selector, "GovernorSimple: only nudge allowed");
-
-        epochStart = bytes32(BlackTimeLibrary.epochNext(block.timestamp));
-
-        proposalIdMain = hashProposal(targets, values, calldatas, epochStart);
+        uint256 proposalId = hashProposal(targets, values, calldatas, epochStart);
 
         require(targets.length > 0, "Governor: empty proposal");
 
-        ProposalCore storage proposal = _proposals[proposalIdMain];
+        ProposalCore storage proposal = _proposals[proposalId];
         require(proposal.voteStart.isUnset(), "Governor: proposal already exists");
 
         uint64 start = block.timestamp.toUint64() + votingDelay().toUint64();
@@ -296,10 +285,10 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
         proposal.voteEnd.setDeadline(deadline);
         proposal.proposer = _msgSender();
 
-        _proposals[proposalIdMain] = proposal;
+        _proposals[proposalId] = proposal;
 
         emit ProposalCreated(
-            proposalIdMain,
+            proposalId,
             _msgSender(),
             targets,
             values,
@@ -310,7 +299,7 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
             ""
         );
 
-        return proposalIdMain;
+        return proposalId;
     }
 
     /**
@@ -324,7 +313,7 @@ abstract contract L2Governor is Context, ERC165, EIP712, IGovernor, IERC721Recei
     ) public payable virtual override returns (uint256) {
         uint256 proposalId = hashProposal(targets, values, calldatas, epochTimeHash);
 
-        status = state(proposalId);
+        ProposalState status = state(proposalId);
         require(
             status == ProposalState.Succeeded || status == ProposalState.Defeated || status == ProposalState.Expired,
             "Governor: proposal not successful or defeated"
