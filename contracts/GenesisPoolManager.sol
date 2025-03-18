@@ -91,7 +91,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         return block.timestamp >= _period + WEEK;
     }
 
-    function whiteListUserAndToken(address tokenOwner, address proposedToken) external Governance nonReentrant{
+    function whiteListUserAndToken(address tokenOwner, address proposedToken) external Governance {
         whiteListedTokensToUser[proposedToken][tokenOwner] = true;
         emit WhiteListedTokenToUser(proposedToken, tokenOwner);
     }
@@ -127,7 +127,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         IGenesisPool(genesisPool).setGenesisPoolInfo(genesisPoolInfo, allocationInfo, auction);
     }
 
-    function rejectGenesisPool(address nativeToken) external Governance nonReentrant {
+    function rejectGenesisPool(address nativeToken) external Governance {
         require(nativeToken != address(0), "0x native");
         address genesisPool = genesisFactory.getGenesisPool(nativeToken);
         require(genesisPool != address(0), '0x pool');
@@ -143,7 +143,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         }
     }
 
-    function approveGenesisPool(address nativeToken) external Governance nonReentrant {
+    function approveGenesisPool(address nativeToken) external Governance {
         require(nativeToken != address(0), "0x native");
         address genesisPool = genesisFactory.getGenesisPool(nativeToken);
         require(genesisPool != address(0), '0x pool');
@@ -175,7 +175,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
 
 
     // at epoch flip, PRE_LISTING -> PRE_LAUNCH (condition met) , PRE_LAUNCH_DDEPOSIT_DISBALED -> LAUNCH or PARTIALLY_LAUNCH
-    function checkAtEpochFlip() external nonReentrant{
+    function checkAtEpochFlip() external {
         require(epochController == msg.sender, "invalid access");
 
         uint256 _proposedTokensCnt = nativeTokens.length;
@@ -218,7 +218,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
     }
     
     // before 3 hrs
-    function checkBeforeEpochFlip() external nonReentrant{
+    function checkBeforeEpochFlip() external {
         require(epochController == msg.sender, "invalid access");
 
         uint _period = active_period;
