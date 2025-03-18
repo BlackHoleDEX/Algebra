@@ -44,7 +44,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
     IAuctionFactory public auctionFactory;
 
     uint public constant WEEK = 1800;
-    uint public active_period; // 2 : 30 of every thursday
+    uint public pre_epoch_period; // 2 : 30 of every thursday
 
     using SafeERC20 for IERC20;
 
@@ -81,13 +81,13 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
 
         MIN_DURATION = 2 * BlackTimeLibrary.WEEK;
         MIN_THRESHOLD = 50 * 10 ** 2; 
-        MATURITY_TIME = 900;
+        MATURITY_TIME = BlackTimeLibrary.GENESIS_STAKING_MATURITY_TIME;
 
-        active_period = ((block.timestamp / WEEK) * WEEK) + (25 * 60);
+        pre_epoch_period = BlackTimeLibrary.prevPreEpoch(block.timestamp);
     }
 
     function check() external view returns (bool) {
-        uint _period = active_period;
+        uint _period = pre_epoch_period;
         return block.timestamp >= _period + WEEK;
     }
 
@@ -221,7 +221,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
     function checkBeforeEpochFlip() external {
         require(epochController == msg.sender, "invalid access");
 
-        uint _period = active_period;
+        uint _period = pre_epoch_period;
         if (block.timestamp >= _period + WEEK) { 
             
             uint256 _proposedTokensCnt = nativeTokens.length;
@@ -240,9 +240,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
                     IGenesisPool(_genesisPool).setPoolStatus(PoolStatus.PRE_LAUNCH_DEPOSIT_DISABLED);
                 }
             }
-
-            _period = (block.timestamp / WEEK) * WEEK;
-            active_period = _period;
+            pre_epoch_period = BlackTimeLibrary.currPreEpoch(block.timestamp);
         }
     }
 
