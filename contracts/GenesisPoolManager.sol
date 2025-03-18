@@ -100,7 +100,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         address _sender = msg.sender;
         require(whiteListedTokensToUser[nativeToken][_sender] || _checkGovernance(), "!listed");
         require(nativeToken == genesisPoolInfo.nativeToken, "!= native");
-        require(_sender == allocationInfo.tokenOwner, "!= owner");
+        require(_sender == genesisPoolInfo.tokenOwner, "!= owner");
         require(allocationInfo.proposedNativeAmount > 0, "0 native");
         require(allocationInfo.proposedFundingAmount > 0, "0 funding");
 

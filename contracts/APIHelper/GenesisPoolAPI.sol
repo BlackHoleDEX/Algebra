@@ -134,6 +134,7 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
         address nativeToken;
         TokenAllocation memory tokenAllocation;
         TokenIncentiveInfo memory incentiveInfo;
+        GenesisInfo memory genesisInfo;
         PoolStatus poolStatus;
         uint256 userDeposit;
 
@@ -149,14 +150,14 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
             userDeposit = _user != address(0) ? IGenesisPool(genesisPool).userDeposits(_user) : 0;
             tokenAllocation = IGenesisPool(genesisPool).getAllocationInfo();
             incentiveInfo = IGenesisPool(genesisPool).getIncentivesInfo();
+            genesisInfo = IGenesisPool(genesisPool).getGenesisInfo();
 
-            if(_hasClaimbaleForOwner(_user, userDeposit, poolStatus, tokenAllocation, incentiveInfo)){
+            if(_hasClaimbaleForOwner(_user, userDeposit, poolStatus, genesisInfo.tokenOwner, tokenAllocation, incentiveInfo)){
                 count++;
             }
         }
 
         genesisPools = new GenesisData[](count);
-        GenesisInfo memory genesisInfo;
         uint index = 0;
         i = 0;
 
@@ -172,9 +173,10 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
             userDeposit = _user != address(0) ? IGenesisPool(genesisPool).userDeposits(_user) : 0;
             tokenAllocation = IGenesisPool(genesisPool).getAllocationInfo();
             incentiveInfo = IGenesisPool(genesisPool).getIncentivesInfo();
+            genesisInfo = IGenesisPool(genesisPool).getGenesisInfo();
 
-            if(_hasClaimbaleForOwner(_user, userDeposit, poolStatus, tokenAllocation, incentiveInfo)){
-                genesisInfo = IGenesisPool(genesisPool).getGenesisInfo();
+            if(_hasClaimbaleForOwner(_user, userDeposit, poolStatus, genesisInfo.tokenOwner, tokenAllocation, incentiveInfo)){
+            
                 genesisPools[index].genesisPool = genesisPool;
                 genesisPools[index].nativeToken = nativeToken;
 
@@ -196,8 +198,8 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
         totalTokens = count;
     }
 
-    function _hasClaimbaleForOwner(address _user, uint256 userDeposit, PoolStatus poolStatus, TokenAllocation memory tokenAllocation, TokenIncentiveInfo memory incentiveInfo) internal pure returns (bool) {
-        if(_user == tokenAllocation.tokenOwner){
+    function _hasClaimbaleForOwner(address _user, uint256 userDeposit, PoolStatus poolStatus, address tokenOwner, TokenAllocation memory tokenAllocation, TokenIncentiveInfo memory incentiveInfo) internal pure returns (bool) {
+        if(_user == tokenOwner){
             if(poolStatus == PoolStatus.NOT_QUALIFIED){
                 return (tokenAllocation.refundableNativeAmount > 0 || incentiveInfo.incentivesToken.length > 0);
             }
