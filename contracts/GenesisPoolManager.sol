@@ -138,8 +138,10 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         uint length = liveNativeTokens.length;
         if(length > 0 && index >= 1 && index <= length)
         {
-            liveNativeTokens[index-1] = liveNativeTokens[length - 1];
+            address replacingAddress = liveNativeTokens[length - 1];
+            liveNativeTokens[index - 1] = replacingAddress;
             liveNativeTokens.pop();
+            liveNativeTokensIndex[replacingAddress] = index;
         }
     }
 
@@ -178,18 +180,18 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
     function checkAtEpochFlip() external {
         require(epochController == msg.sender, "invalid access");
 
-        uint256 _proposedTokensCnt = nativeTokens.length;
+        uint256 _proposedTokensCnt = liveNativeTokens.length;
         uint256 i;
         address _genesisPool;
         PoolStatus _poolStatus;
-        for(i = 0; i < _proposedTokensCnt; i++){
-            _genesisPool = genesisFactory.getGenesisPool(nativeTokens[i]);
+        for(i = _proposedTokensCnt - 1; i >= 0; i--){
+            _genesisPool = genesisFactory.getGenesisPool(liveNativeTokens[i]);
             _poolStatus = IGenesisPool(_genesisPool).poolStatus();
 
             if(_poolStatus == PoolStatus.PRE_LISTING && IGenesisPool(_genesisPool).eligbleForPreLaunchPool()){
                 _preLaunchPool(_genesisPool);
             }else if(_poolStatus == PoolStatus.PRE_LAUNCH_DEPOSIT_DISABLED){
-                _launchPool(nativeTokens[i], _genesisPool);
+                _launchPool(liveNativeTokens[i], _genesisPool);
             }
         }
     }
@@ -212,8 +214,10 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         uint length = liveNativeTokens.length;
         if(length > 0 && index >= 1 && index <= length)
         {
-            liveNativeTokens[index - 1] = liveNativeTokens[length - 1];
+            address replacingAddress = liveNativeTokens[length - 1];
+            liveNativeTokens[index - 1] = replacingAddress;
             liveNativeTokens.pop();
+            liveNativeTokensIndex[replacingAddress] = index;
         }
     }
     
