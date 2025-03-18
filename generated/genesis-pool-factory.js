@@ -1,4 +1,4 @@
-const genesisPoolFactoryAddress = "0x054923954A2Ac9BE1Ae00832A8833446356063c3";
+const genesisPoolFactoryAddress = "0x0EF0e6e540dCB48269406d50880ff36E582db375";
 
 const genesisPoolFactoryAbi = [
   {
@@ -175,11 +175,6 @@ const genesisPoolFactoryAbi = [
         "internalType": "address",
         "name": "_tokenHandler",
         "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_voter",
-        "type": "address"
       }
     ],
     "name": "initialize",
@@ -257,19 +252,6 @@ const genesisPoolFactoryAbi = [
     "name": "transferOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "voter",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   }
 ];

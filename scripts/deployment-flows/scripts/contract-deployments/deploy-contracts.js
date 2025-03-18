@@ -63,8 +63,8 @@ const setPermissionRegistryRoles = async (permissionRegistryAddress, ownerAddres
 };
 
 const deployTokenHanlder = async (permissionRegistryAddress) => {
-    const tokens = [...addresses, blackAddress];
-    const connectorTokens = [...addresses, blackAddress];
+    const tokens = [blackAddress, ...addresses];
+    const connectorTokens = [blackAddress, ...addresses];
     
     try {
         const tokenHandlerContract = await ethers.getContractFactory("TokenHandler");
