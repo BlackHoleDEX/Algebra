@@ -185,6 +185,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
     function tokenURI(uint _tokenId) external view returns (string memory) {
         require(idToOwner[_tokenId] != address(0), "!exist token");
         LockedBalance memory _locked = locked[_tokenId];
+        
         return IVeArtProxy(artProxy)._tokenURI(_tokenId,_balanceOfNFT(_tokenId, block.timestamp),_locked.end,uint(int256(_locked.amount)), _locked.isSMNFT);
     }
 
@@ -1418,6 +1419,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
             // Use the provided input timestamp here to get the right decay
             votes = votes + _balanceOfNFT(tId, timestamp);
         }
+
         return votes;
     }
 

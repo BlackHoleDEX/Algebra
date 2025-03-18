@@ -1,4 +1,4 @@
-const tokenAPIAddress = "0xa94B3C723dFc65b01134625B1363aA2cC8C95C0e";
+const tokenAPIAddress = "0x506955864F77C820D03bE6F011e5B0C5D7CB7e22";
 
 const tokenAPIAbi = [
   {
@@ -29,6 +29,11 @@ const tokenAPIAbi = [
             "internalType": "address",
             "name": "tokenAddress",
             "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "ticker",
+            "type": "string"
           },
           {
             "internalType": "uint256",
@@ -78,6 +83,11 @@ const tokenAPIAbi = [
             "internalType": "address",
             "name": "tokenAddress",
             "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "ticker",
+            "type": "string"
           },
           {
             "internalType": "uint256",

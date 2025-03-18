@@ -13,7 +13,7 @@ module.exports = {
         settings: {
           optimizer: {
             enabled: true,
-            runs: 50,
+            runs: 30,
           },
           metadata: {
               useLiteralContent: true
