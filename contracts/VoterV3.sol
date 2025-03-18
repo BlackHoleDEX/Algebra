@@ -573,6 +573,8 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         require(_gaugeType < _factories.length, "gaugetype");
         require(gauges[_pool] == address(0x0), "!exists");
         require(_pool.code.length > 0, "!contract");
+        require(ITokenHandler(tokenHandler).isWhitelisted(tokenA) && ITokenHandler(tokenHandler).isWhitelisted(tokenB), "!whitelisted");
+        require(ITokenHandler(tokenHandler).isConnector(tokenA) || ITokenHandler(tokenHandler).isConnector(tokenB), "!connector");
 
         bool isPair;
         address _factory = _factories[_gaugeType];
@@ -599,12 +601,8 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
             //isPair = false;
         }
 
-        // gov can create for any pool, even non-Black pairs
-        if (!IPermissionsRegistry(permissionRegistry).hasRole("GOVERNANCE",msg.sender)) { 
-            require(isPair, "!_pool");
-            require(ITokenHandler(tokenHandler).isWhitelisted(tokenA) && ITokenHandler(tokenHandler).isWhitelisted(tokenB), "!whitelisted");
-            require(tokenA != address(0) && tokenB != address(0), "!pair.tokens");
-        }
+        require(isPair, "!_pool");
+        require(tokenA != address(0) && tokenB != address(0), "!pair.tokens");
 
         // create internal and external bribe
         address _owner = IPermissionsRegistry(permissionRegistry).blackTeamMultisig();
