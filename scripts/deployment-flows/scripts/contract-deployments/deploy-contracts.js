@@ -177,7 +177,7 @@ const deployVotingEscrow = async(blackAddress) =>{
         generateConstantFile("VotingEscrow", veBlack.address);
         return veBlack.address;
     } catch (error) {
-        console.log("error in deploying veArtProxy: ", error);
+        console.log("error in deploying deployVotingEscrow: ", error);
         process.exit(1);
     }
     

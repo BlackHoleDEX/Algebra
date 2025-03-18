@@ -185,6 +185,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
     function tokenURI(uint _tokenId) external view returns (string memory) {
         require(idToOwner[_tokenId] != address(0), "!exist token");
         LockedBalance memory _locked = locked[_tokenId];
+        
         return IVeArtProxy(artProxy)._tokenURI(_tokenId,_balanceOfNFT(_tokenId, block.timestamp),_locked.end,uint(int256(_locked.amount)), _locked.isSMNFT);
     }
 
@@ -1207,8 +1208,30 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
     /// @return Total voting power
     function totalSupplyAtT(uint t) public view returns (uint) {
         uint _epoch = epoch;
-        Point memory last_point = point_history[_epoch];
-        return _supply_at(last_point, t);
+        if(_epoch == 0) {
+            return 0;
+        } else {
+            uint globalEpoch = getPastGlobalPointIndex(_epoch, t);
+            Point memory last_point = point_history[globalEpoch];
+            return _supply_at(last_point, t);
+        }
+    }
+
+    function getPastGlobalPointIndex(uint _epoch,uint _t) internal view returns (uint256){
+        uint lower = 0;
+        uint upper = _epoch;
+        while (upper > lower) {
+            uint center = upper - (upper - lower) / 2; // ceil, avoiding overflow
+            Point memory point = point_history[center];
+            if (point.ts == _t) {
+                return center;
+            } else if (point.ts < _t) {
+                lower = center;
+            } else {
+                upper = center - 1;
+            }
+        }
+        return lower;
     }
 
     /*///////////////////////////////////////////////////////////////
@@ -1396,6 +1419,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
             // Use the provided input timestamp here to get the right decay
             votes = votes + _balanceOfNFT(tId, timestamp);
         }
+
         return votes;
     }
 
