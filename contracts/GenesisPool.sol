@@ -18,11 +18,9 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
 
     using SafeERC20 for IERC20;
 
-    address immutable internal factory;
     address immutable internal genesisManager;
     ITokenHandler immutable internal tokenHandler;
     IAuction internal auction;
-    IVoter immutable internal voter;
 
     TokenAllocation public allocationInfo;
     GenesisInfo public genesisInfo;
@@ -59,15 +57,13 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
         _;
     }
 
-    constructor(address _factory, address _genesisManager, address _tokenHandler, address _voter, address _tokenOwner, address _nativeToken, address _fundingToken){
+    constructor(address _genesisManager, address _tokenHandler, address _tokenOwner, address _nativeToken, address _fundingToken){
         genesisInfo.tokenOwner = _tokenOwner;
         genesisInfo.nativeToken = _nativeToken;    
         genesisInfo.fundingToken = _fundingToken;
 
-        factory = _factory;
         genesisManager = _genesisManager;
         tokenHandler = ITokenHandler(_tokenHandler);
-        voter = IVoter(_voter);
 
         totalDeposits = 0;
         liquidity = 0;
