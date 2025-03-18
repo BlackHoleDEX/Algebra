@@ -14,7 +14,7 @@ import "./interfaces/IPermissionsRegistry.sol";
 import "./interfaces/IGenesisPoolFactory.sol";
 import './interfaces/IGenesisPool.sol';
 import './interfaces/IAuctionFactory.sol';
-import './interfaces/IGauge.sol';
+import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
 
 interface IBaseV1Factory {
     function isPair(address pair) external view returns (bool);
@@ -77,7 +77,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         auctionFactory = IAuctionFactory(_auctionFactory);
         tokenHandler = ITokenHandler(_tokenHandler);
 
-        MIN_DURATION = 2 * WEEK; 
+        MIN_DURATION = 2 * BlackTimeLibrary.WEEK;
         MIN_THRESHOLD = 50 * 10 ** 2; 
         MATURITY_TIME = 900;
 
