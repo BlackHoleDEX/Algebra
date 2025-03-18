@@ -1,4 +1,4 @@
-const gaugeFactoryAddress = "0x26F3fa5292b41711DeA17F0e9f4679d789BC0983";
+const gaugeFactoryAddress = "0x8ca62218462222DcE252fD024A6B1Afc975daCDC";
 
 const gaugeFactoryAbi = [
   {

@@ -1,4 +1,4 @@
-const blackholePairAPIV2Address = "0x04B5d526132a093EfcF01f783AF8422bAF47155B";
+const blackholePairAPIV2Address = "0x927093851E9ABCd6C8bCDbC2E5635a5D3a7927d6";
 
 const blackholePairAPIV2Abi = [
   {
@@ -105,19 +105,6 @@ const blackholePairAPIV2Abi = [
   {
     "inputs": [],
     "name": "MAX_REWARDS",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "WEEK",
     "outputs": [
       {
         "internalType": "uint256",
@@ -253,6 +240,11 @@ const blackholePairAPIV2Abi = [
           {
             "internalType": "uint256",
             "name": "emissions",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "total_emissions",
             "type": "uint256"
           },
           {
@@ -566,6 +558,11 @@ const blackholePairAPIV2Abi = [
           {
             "internalType": "uint256",
             "name": "emissions",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "total_emissions",
             "type": "uint256"
           },
           {

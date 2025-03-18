@@ -1,4 +1,4 @@
-const tokenHandlerAddress = "0x77CD3AB74Eb9E0B8D603bF7DE1F8e65d08a73245";
+const tokenHandlerAddress = "0x290c721EFcae43A2dB212f02cDB83245137F9E01";
 
 const tokenHandlerAbi = [
   {
@@ -199,6 +199,19 @@ const tokenHandlerAbi = [
   },
   {
     "inputs": [],
+    "name": "connectorTokens",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "tokens",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "connectorTokensLength",
     "outputs": [
       {
@@ -326,6 +339,19 @@ const tokenHandlerAbi = [
         "internalType": "address",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "whiteListedTokens",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "tokens",
+        "type": "address[]"
       }
     ],
     "stateMutability": "view",

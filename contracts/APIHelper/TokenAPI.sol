@@ -11,6 +11,7 @@ contract TokenAPI is Initializable {
 
     struct Token {
         address tokenAddress;
+        string ticker;
         uint decimal; 	
     }
 
@@ -31,6 +32,7 @@ contract TokenAPI is Initializable {
         for(i = 0; i < length; i++){
             tokens[i].tokenAddress = whitelistedTokens[i];
             tokens[i].decimal =  IERC20(whitelistedTokens[i]).decimals();
+            tokens[i].ticker = IERC20(whitelistedTokens[i]).symbol();
         }
 
         return tokens;
@@ -45,6 +47,7 @@ contract TokenAPI is Initializable {
         for(i = 0; i < length; i++){
             tokens[i].tokenAddress = connectorTokens[i];
             tokens[i].decimal =  IERC20(connectorTokens[i]).decimals();
+            tokens[i].ticker = IERC20(connectorTokens[i]).symbol();
         }
 
         return tokens;
