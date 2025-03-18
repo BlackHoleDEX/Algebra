@@ -2,11 +2,11 @@
 pragma solidity 0.8.13;
 
 library BlackTimeLibrary {
-    uint256 internal constant WEEK = 1800;
-    uint internal constant NO_VOTING_WINDOW = 300;
+    uint256 internal constant WEEK = 7 * 86400;
+    uint internal constant NO_VOTING_WINDOW = 3600;
     uint256 internal constant MAX_LOCK_DURATION = 86400 * 365 * 4;
-    uint256 internal constant GENESIS_STAKING_MATURITY_TIME = 900;
-    uint256 internal constant NO_GENESIS_DEPOSIT_WINDOW = 5 * 60;
+    uint256 internal constant GENESIS_STAKING_MATURITY_TIME = 90 * 86400;
+    uint256 internal constant NO_GENESIS_DEPOSIT_WINDOW = 3 * 3600;
 
     /// @dev Returns start of epoch based on current timestamp
     function epochStart(uint256 timestamp) internal pure returns (uint256) {

@@ -43,7 +43,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
     IGenesisPoolFactory public genesisFactory;
     IAuctionFactory public auctionFactory;
 
-    uint public constant WEEK = 1800;
+    uint public WEEK;
     uint public pre_epoch_period; // 2 : 30 of every thursday
 
     using SafeERC20 for IERC20;
@@ -79,7 +79,8 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         auctionFactory = IAuctionFactory(_auctionFactory);
         tokenHandler = ITokenHandler(_tokenHandler);
 
-        MIN_DURATION = 2 * BlackTimeLibrary.WEEK;
+        WEEK = BlackTimeLibrary.WEEK;
+        MIN_DURATION = 2 * WEEK;
         MIN_THRESHOLD = 50 * 10 ** 2; 
         MATURITY_TIME = BlackTimeLibrary.GENESIS_STAKING_MATURITY_TIME;
 
