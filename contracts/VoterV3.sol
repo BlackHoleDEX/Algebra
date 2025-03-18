@@ -542,9 +542,6 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         require(_gaugeType < _factories.length, "gaugetype");
         require(gauges[_pool] == address(0x0), "!exists");
         require(_pool.code.length > 0, "!contract");
-        require(ITokenHandler(tokenHandler).isWhitelisted(tokenA) && ITokenHandler(tokenHandler).isWhitelisted(tokenB), "!whitelisted");
-        require(ITokenHandler(tokenHandler).isConnector(tokenA) || ITokenHandler(tokenHandler).isConnector(tokenB), "!connector");
-
         bool isPair;
         address _factory = _factories[_gaugeType];
         address _gaugeFactory = _gaugeFactories[_gaugeType];
@@ -570,6 +567,8 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
             //isPair = false;
         }
 
+        require(ITokenHandler(tokenHandler).isWhitelisted(tokenA) && ITokenHandler(tokenHandler).isWhitelisted(tokenB), "!whitelisted");
+        require(ITokenHandler(tokenHandler).isConnector(tokenA) || ITokenHandler(tokenHandler).isConnector(tokenB), "!connector");
         require(isPair, "!_pool");
         require(tokenA != address(0) && tokenB != address(0), "!pair.tokens");
 

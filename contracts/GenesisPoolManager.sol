@@ -9,6 +9,8 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "./interfaces/IGenesisPoolManager.sol";
 import "./interfaces/IVoter.sol";
 import "./interfaces/IGenesisPoolBase.sol";
+import "./interfaces/IGauge.sol";
+
 import "./interfaces/ITokenHandler.sol";
 import "./interfaces/IPermissionsRegistry.sol";
 import "./interfaces/IGenesisPoolFactory.sol";
