@@ -1,10 +1,10 @@
 [
   {
     "name": "Blachole",
-    "ticker": "$BLACK",
+    "ticker": "BLACK",
     "logo": "need to be uploaded to github or ipfs",
     "decimal": 18,
-    "address": "0x2221B4102974DaC5c01950B8F9219cBccE6866d7"
+    "address": "0x2378d86a3630ec70fa26b4399e884Cb8fbfE71f6"
   },
   {
     "name": "USDC",

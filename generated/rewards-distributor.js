@@ -1,4 +1,4 @@
-const rewardsDistributorAddress = "0x447955dB0dc847243b24D39701CEB4ef0cA6C45A";
+const rewardsDistributorAddress = "0x60b4d0CA51Ed8142892BcCE893d4321447d15494";
 
 const rewardsDistributorAbi = [
   {
@@ -64,14 +64,20 @@ const rewardsDistributorAbi = [
   },
   {
     "inputs": [],
-    "name": "checkpoint_token",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "name": "WEEK",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
-    "name": "checkpoint_total_supply",
+    "name": "checkpoint_token",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
