@@ -1,4 +1,4 @@
-const minterUpgradeableAddress = "0xbcD68Eb1013fA1bd147eFe8646EaB9Ff27FDf272";
+const minterUpgradeableAddress = "0x1bb13172385040cC8F821fAE7251847a9f941ACe";
 
 const minterUpgradeableAbi = [
   {
@@ -588,24 +588,6 @@ const minterUpgradeableAbi = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_to",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "transfer",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

@@ -150,4 +150,12 @@ contract TokenHandler is  ITokenHandler {
     function connectorTokensLength() external view returns(uint256) {
         return connectors.length;
     }
+
+    function whiteListedTokens() external view returns(address[] memory tokens) {
+        return whiteListed;
+    }
+
+    function connectorTokens() external view returns(address[] memory tokens) {
+        return connectors;
+    }
 }

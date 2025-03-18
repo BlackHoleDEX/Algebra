@@ -1,4 +1,4 @@
-const bribeFactoryV3Address = "0x0D9CaC89EF1054A52F7baA94b031C39D1d03FAEA";
+const bribeFactoryV3Address = "0xDC98b95833d13B70dfd8f12698Ccb1F9f192e659";
 
 const bribeFactoryV3Abi = [
   {
@@ -173,6 +173,11 @@ const bribeFactoryV3Abi = [
       {
         "internalType": "address",
         "name": "_permissionsRegistry",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_tokenHandler",
         "type": "address"
       }
     ],
@@ -388,6 +393,19 @@ const bribeFactoryV3Abi = [
     "inputs": [
       {
         "internalType": "address",
+        "name": "_tokenHandler",
+        "type": "address"
+      }
+    ],
+    "name": "setTokenHandler",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "_Voter",
         "type": "address"
       }
@@ -395,6 +413,19 @@ const bribeFactoryV3Abi = [
     "name": "setVoter",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "tokenHandler",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {

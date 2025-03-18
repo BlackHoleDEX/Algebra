@@ -11,7 +11,6 @@ contract GenesisPoolFactory is IGenesisPoolFactory, OwnableUpgradeable {
 
     address public genesisManager;
     address public tokenHandler;
-    address public voter;
 
     mapping(address => address) public getGenesisPool;
     address[] public genesisPools;
@@ -26,12 +25,11 @@ contract GenesisPoolFactory is IGenesisPoolFactory, OwnableUpgradeable {
 
     constructor() {}
 
-    function initialize(address _tokenHandler, address _voter) public initializer {
+    function initialize(address _tokenHandler) public initializer {
         __Ownable_init();
 
         genesisManager = msg.sender;
         tokenHandler = _tokenHandler;
-        voter = _voter;
     }
 
     function setGenesisManager(address _genesisManager) external onlyManager {
@@ -51,9 +49,8 @@ contract GenesisPoolFactory is IGenesisPoolFactory, OwnableUpgradeable {
         require(nativeToken != address(0), "0x"); 
         require(getGenesisPool[nativeToken] == address(0), "exists");
 
-        address factory = address(this);
         bytes32 salt = keccak256(abi.encodePacked(nativeToken, fundingToken));
-        genesisPool = address(new GenesisPool{salt: salt}(factory, genesisManager, tokenHandler, voter, tokenOwner, nativeToken, fundingToken));
+        genesisPool = address(new GenesisPool{salt: salt}(genesisManager, tokenHandler, tokenOwner, nativeToken, fundingToken));
 
         getGenesisPool[nativeToken] = genesisPool;
         genesisPools.push(genesisPool);

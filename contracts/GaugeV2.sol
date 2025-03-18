@@ -44,8 +44,8 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     uint256 public lastUpdateTime;
     uint256 public rewardPerTokenStored;
 
-    address public genesisManager;
     address public genesisPool;
+    address public genesisManager;
 
     mapping(address => uint256) public userRewardPerTokenPaid;
     mapping(address => uint256) public rewards;
@@ -80,7 +80,12 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     }
 
     modifier onlyGenesisPool() {
-        require(msg.sender == genesisPool, "!= genesisManager");
+        require(msg.sender == genesisPool, "!= genesisPool");
+        _;
+    }
+
+    modifier onlyGenesisManager() {
+        require(msg.sender == genesisManager, "!= genesisManager");
         _;
     }
 
@@ -368,7 +373,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     --------------------------------------------------------------------------------
     ----------------------------------------------------------------------------- */
 
-    function setGenesisPool(address _genesisPool) external onlyGenesisPool{
+    function setGenesisPool(address _genesisPool) external onlyGenesisManager{
         genesisPool = _genesisPool;
     }
 

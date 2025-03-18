@@ -72,6 +72,8 @@ contract BlackholePairAPIV2 is Initializable {
         // bribes
         Bribes internal_bribes;
         Bribes external_bribes;
+
+        bool isGenesisRunning;
     }
 
     struct tokenBribe {
@@ -131,7 +133,6 @@ contract BlackholePairAPIV2 is Initializable {
     uint256 public constant MAX_PAIRS = 1000;
     uint256 public constant MAX_EPOCHS = 200;
     uint256 public constant MAX_REWARDS = 16;
-    uint256 public constant WEEK = 7 * 24 * 60 * 60;
 
 
     IPairFactory public pairFactory;
@@ -335,7 +336,10 @@ contract BlackholePairAPIV2 is Initializable {
         _pairInfo.account_gauge_earned = earned;
 
         // votes
-        _pairInfo.votes = voter.weights(_pair);     
+        _pairInfo.votes = voter.weights(_pair);   
+
+        // genesis
+        _pairInfo.isGenesisRunning = pairFactory.isGenesis(_pair);
     }
 
     // read all the bribe available for a pair

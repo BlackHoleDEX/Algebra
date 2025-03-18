@@ -4,6 +4,7 @@ pragma solidity 0.8.13;
 import "./interfaces/IMinter.sol";
 import "./interfaces/IVoter.sol";
 import "./interfaces/IVotingEscrow.sol";
+import "./interfaces/ITokenHandler.sol";
 import {IAutomatedVotingManager} from "./interfaces/IAutomatedVotingManager.sol";
 import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -30,14 +31,16 @@ contract Bribe is ReentrancyGuard {
     }
 
     mapping(address => mapping(uint256 => uint256)) public tokenRewardsPerEpoch; // token -> startTimestamp -> rewardBalance
-    mapping(address => bool) public isRewardToken;
-    address[] public rewardTokens;
     address public voter;
     address public immutable bribeFactory;
     address public minter;
     address public immutable ve;
     address public owner;
     address public avm; // does it need to be immutable?
+    ITokenHandler public tokenHandler;
+    
+    address public immutable token0;
+    address public immutable token1;
 
     string public TYPE;
 
@@ -55,17 +58,21 @@ contract Bribe is ReentrancyGuard {
 
     /* ========== CONSTRUCTOR ========== */
 
-    constructor(address _owner,address _voter,address _bribeFactory, string memory _type)  {
+    constructor(address _owner,address _voter,address _bribeFactory, address _tokenHandler, address _token0, address _token1, string memory _type)  {
         require(_bribeFactory != address(0) && _voter != address(0) && _owner != address(0));
         WEEK = BlackTimeLibrary.WEEK;
         voter = _voter;
         bribeFactory = _bribeFactory;
+        tokenHandler = ITokenHandler(_tokenHandler);
         ve = IVoter(_voter)._ve();
         minter = IVoter(_voter).minter();
         avm = IVotingEscrow(ve).avm();
         require(minter != address(0));
         owner = _owner;
         TYPE = _type;
+
+        token0 = _token0;
+        token1 = _token1;
     }
 
     function getEpochStart() public view returns(uint256){
@@ -80,8 +87,24 @@ contract Bribe is ReentrancyGuard {
     /* ========== VIEWS ========== */
 
     /// @notice get the length of the reward tokens
-    function rewardsListLength() external view returns(uint256) {
-        return rewardTokens.length;
+    function rewardsListLength() external returns(uint256) {
+        uint256 rewardTokensCnt = tokenHandler.connectorTokensLength();
+        if(!tokenHandler.isConnector(token0)) rewardTokensCnt++;
+        if(!tokenHandler.isConnector(token1)) rewardTokensCnt++;
+        return rewardTokensCnt;
+    }
+
+    function rewardTokens(uint256 index) external returns (address){
+        uint256 rewardTokensCnt = tokenHandler.connectorTokensLength();
+        if(index < rewardTokensCnt) return tokenHandler.connectors(index);
+
+        index -= (rewardTokensCnt - 1);
+        if(index > 2) return address(0);
+        else if(index == 2) return token1;
+        else{
+            if(!tokenHandler.isConnector(token0)) return token0;
+            return token1;
+        }
     }
 
 
@@ -183,6 +206,15 @@ contract Bribe is ReentrancyGuard {
         }
         return lower;
     }
+
+    function isRewardToken(address _rewardsToken) external view returns (bool) {
+        return _isRewardToken(_rewardsToken);
+    }
+
+    function _isRewardToken(address _rewardsToken) internal view returns (bool) {
+        bool verifiedToken = _rewardsToken == token0 || _rewardsToken == token1 || tokenHandler.isConnector(_rewardsToken);
+        return verifiedToken;
+    }
  
     /* ========== MUTATIVE FUNCTIONS ========== */
 
@@ -269,35 +301,14 @@ contract Bribe is ReentrancyGuard {
 
     /// @dev Rewards are saved into Current EPOCH mapping. 
     function notifyRewardAmount(address _rewardsToken, uint256 reward) external nonReentrant {
-        require(isRewardToken[_rewardsToken], "reward token not verified");
+        require(_isRewardToken((_rewardsToken)), "reward token not verified");
         IERC20(_rewardsToken).safeTransferFrom(msg.sender,address(this),reward);
         uint256 epochStart = BlackTimeLibrary.epochStart(block.timestamp);
         tokenRewardsPerEpoch[_rewardsToken][epochStart] += reward;
         emit RewardAdded(_rewardsToken, reward, epochStart);
     }
 
-
-
     /* ========== RESTRICTED FUNCTIONS ========== */
-
-    /// @notice add rewards tokens
-    function addRewardTokens(address[] memory _rewardsToken) public onlyAllowed {
-        uint256 i = 0;
-        for(i; i < _rewardsToken.length; i++){
-           _addRewardToken(_rewardsToken[i]);
-        }
-    }
-
-    /// @notice add a single reward token
-    function addRewardToken(address _rewardsToken) public onlyAllowed {
-        _addRewardToken(_rewardsToken);
-    }
-    function _addRewardToken(address _rewardsToken) internal {
-        if(!isRewardToken[_rewardsToken]){
-            isRewardToken[_rewardsToken] = true;
-            rewardTokens.push(_rewardsToken);
-        }
-    }
 
     /// @notice Recover some ERC20 from the contract and updated given bribe
     function recoverERC20AndUpdateData(address tokenAddress, uint256 tokenAmount) external onlyAllowed {

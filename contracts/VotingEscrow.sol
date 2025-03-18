@@ -183,8 +183,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
     /// @dev Returns current token URI metadata
     /// @param _tokenId Token ID to fetch URI for.
     function tokenURI(uint _tokenId) external view returns (string memory) {
-        require(idToOwner[_tokenId] != address(0), "Nonexistent token");
+        require(idToOwner[_tokenId] != address(0), "!exist token");
         LockedBalance memory _locked = locked[_tokenId];
+        
         return IVeArtProxy(artProxy)._tokenURI(_tokenId,_balanceOfNFT(_tokenId, block.timestamp),_locked.end,uint(int256(_locked.amount)), _locked.isSMNFT);
     }
 
@@ -321,9 +322,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         uint _tokenId,
         address _sender
     ) internal {
-        require(attachments[_tokenId] == 0 && !voted[_tokenId], "attached");
+        require(attachments[_tokenId] == 0 && !voted[_tokenId], "attach");
         // Check requirements
-        require(_isApprovedOrOwner(_sender, _tokenId), "caller is not owner nor approved");
+        require(_isApprovedOrOwner(_sender, _tokenId), "IA");
 
         // Clear approval. Throws if `_from` is not the current owner
         _clearApproval(_from, _tokenId);
@@ -540,7 +541,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
     }
 
     function _burn(uint _tokenId) internal {
-        require(_isApprovedOrOwner(msg.sender, _tokenId), "caller is ! owner||approved");
+        require(_isApprovedOrOwner(msg.sender, _tokenId), "IA");
 
         address owner = ownerOf(_tokenId);
 
@@ -611,7 +612,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
             u_new.smNFTBonus = 0;
 
             if(new_locked.isSMNFT){
-                u_new.smNFT = _calculate_original_sm_nft_amount(uint(int256(new_locked.amount)));
+                u_new.smNFT = calculate_original_sm_nft_amount(uint(int256(new_locked.amount)));
                 u_new.smNFTBonus = uint(int256(new_locked.amount)) - u_new.smNFT;
             }
             else if(new_locked.isPermanent){
@@ -710,7 +711,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
             }
             last_point.permanent = permanentLockBalance;
             last_point.smNFT = smNFTBalance;
-            last_point.smNFTBonus = _calculate_sm_nft_bonus(smNFTBalance);
+            last_point.smNFTBonus = calculate_sm_nft_bonus(smNFTBalance);
         }
 
         // Record the changed point into history
@@ -767,7 +768,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         (old_locked.amount, old_locked.end, old_locked.isPermanent, old_locked.isSMNFT) = (_locked.amount, _locked.end, _locked.isPermanent, _locked.isSMNFT);
         // Adding to existing lock, or if a lock is expired - creating a new one
         if(old_locked.isSMNFT) {
-            _locked.amount += int128(int256(_value + _calculate_sm_nft_bonus(_value)));
+            _locked.amount += int128(int256(_value + calculate_sm_nft_bonus(_value)));
         } else {
             _locked.amount += int128(int256(_value));
         }
@@ -810,8 +811,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         LockedBalance memory _locked = locked[_tokenId];
 
         require(_value > 0); // dev: need non-zero value
-        require(_locked.amount > 0, 'No existing lock found');
-        require(_locked.end > block.timestamp, 'Cannot add to expired lock. Withdraw');
+        require(_locked.amount > 0, '!exist');
+        require(_locked.end > block.timestamp, 'expired');
 
         if (_locked.isSMNFT) smNFTBalance += _value;
         else if (_locked.isPermanent) permanentLockBalance += _value;
@@ -831,8 +832,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         uint unlock_time = (block.timestamp + _lock_duration) / WEEK * WEEK; // Locktime is rounded down to weeks
 
         require(_value > 0); // dev: need non-zero value
-        require(unlock_time > block.timestamp, 'Can only lock in future');
-        require(unlock_time <= block.timestamp + MAXTIME, '4 years max');
+        require(unlock_time > block.timestamp && (unlock_time <= block.timestamp + MAXTIME), 'IUT');
 
         ++tokenId;
         uint _tokenId = tokenId;
@@ -874,8 +874,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         LockedBalance memory _locked = locked[_tokenId];
 
         assert(_value > 0); // dev: need non-zero value
-        require(_locked.amount > 0, 'No lock');
-        require(_locked.end > block.timestamp || _locked.isPermanent, 'Cannot add to expired lock. Withdraw');
+        require(_locked.amount > 0, '!lock');
+        require(_locked.end > block.timestamp || _locked.isPermanent, 'expired');
         
         if (_locked.isSMNFT) smNFTBalance += _value;
         else if (_locked.isPermanent) permanentLockBalance += _value;
@@ -894,12 +894,11 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         assert(_isApprovedOrOwner(msg.sender, _tokenId));
 
         LockedBalance memory _locked = locked[_tokenId];
-        require(!_locked.isSMNFT && !_locked.isPermanent, "smnft || permanent");
+        require(!_locked.isSMNFT && !_locked.isPermanent, "smnft || per");
         uint unlock_time = (block.timestamp + _lock_duration) / WEEK * WEEK; // Locktime is rounded down to weeks
 
-        require(_locked.end > block.timestamp && _locked.amount > 0, 'expired or ntg is locked');
-        require(isSMNFT || unlock_time > _locked.end, 'increase out of scope');
-        require(unlock_time <= block.timestamp + MAXTIME, '4 Years is max');
+        require(_locked.end > block.timestamp && _locked.amount > 0, 'exp/ntg = lck');
+        require((isSMNFT || unlock_time > _locked.end) && (unlock_time <= block.timestamp + MAXTIME), 'IUT'); // IUT -> invalid unlock time
 
         if(isSMNFT) {
             updateToSMNFT(_tokenId, _locked);
@@ -921,7 +920,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         smNFTBalance += _amount;
         _locked.end = 0;
         uint _value = uint256(uint128(_locked.amount));
-        _locked.amount = int128(int256(_value + _calculate_sm_nft_bonus(_value)));
+        _locked.amount = int128(int256(_value + calculate_sm_nft_bonus(_value)));
         _checkpoint(_tokenId, locked[_tokenId], _locked);
         locked[_tokenId] = _locked;
         assert(IERC20(token).transfer(burnTokenAddress, _value));
@@ -931,11 +930,11 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
     /// @dev Only possible if the lock has expired
     function withdraw(uint _tokenId) external nonreentrant {
         assert(_isApprovedOrOwner(msg.sender, _tokenId));
-        require(attachments[_tokenId] == 0 && !voted[_tokenId], "attached");
+        require(attachments[_tokenId] == 0 && !voted[_tokenId], "attach");
 
         LockedBalance memory _locked = locked[_tokenId];
-        require(!_locked.isSMNFT && !_locked.isPermanent, "smnft || permanent");
-        require(block.timestamp >= _locked.end, "The lock didn't expire");
+        require(!_locked.isSMNFT && !_locked.isPermanent, "smnft || per");
+        require(block.timestamp >= _locked.end, "lock != exp");
         uint value = uint(int256(_locked.amount));
 
         locked[_tokenId] = LockedBalance(0, 0, false, false);
@@ -958,13 +957,12 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
 
     function lockPermanent(uint _tokenId) external {
         address sender = msg.sender;
-        require(_isApprovedOrOwner(sender, _tokenId), "caller !approved && !owner");
+        require(_isApprovedOrOwner(sender, _tokenId), "IA");
         
         LockedBalance memory _newLocked = locked[_tokenId];
-        require(!_newLocked.isSMNFT, "cant change permanent lock for SM NFT");
-        require(!_newLocked.isPermanent, "already permanent locked");
-        require(_newLocked.end > block.timestamp, "lock expired");
-        require(_newLocked.amount > 0, "no lock found");
+        require(!_newLocked.isSMNFT && !_newLocked.isPermanent, "smNft / per");
+        require(_newLocked.end > block.timestamp, "exp");
+        require(_newLocked.amount > 0, "0 amt");
 
         uint _amount = uint(int256(_newLocked.amount));
         permanentLockBalance += _amount;
@@ -981,17 +979,16 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
 
     function unlockPermanent(uint _tokenId) external {
         address sender = msg.sender;
-        require(_isApprovedOrOwner(msg.sender, _tokenId), "caller !approved && !owner");
+        require(_isApprovedOrOwner(msg.sender, _tokenId), "IA");
 
-        require(attachments[_tokenId] == 0 && !voted[_tokenId], "attached");
+        require(attachments[_tokenId] == 0 && !voted[_tokenId], "attach");
         LockedBalance memory _newLocked = locked[_tokenId];
-        require(!_newLocked.isSMNFT, "cant change permanent lock for SM NFT");
-        require(_newLocked.isPermanent, "not permanent locked");
+        require(!_newLocked.isSMNFT && _newLocked.isPermanent, "smNft / per");
         uint _amount = uint(int256(_newLocked.amount));
         permanentLockBalance -= _amount;
         _newLocked.end = ((block.timestamp + MAXTIME) / WEEK) * WEEK;
         _newLocked.isPermanent = false;
-        //_delegate(_tokenId, 0);
+
         _checkpoint(_tokenId, locked[_tokenId], _newLocked);
         locked[_tokenId] = _newLocked;
 
@@ -1275,16 +1272,15 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
     }
 
     function merge(uint _from, uint _to) external nonreentrant {
-        require(attachments[_from] == 0 && !voted[_from], "attached");
+        require(attachments[_from] == 0 && !voted[_from], "attach");
         require(_from != _to, "same nft");
-        require(_isApprovedOrOwner(msg.sender, _from), "caller !approved && !owner");
-        require(_isApprovedOrOwner(msg.sender, _to), "caller !approved && !owner");
+        require(_isApprovedOrOwner(msg.sender, _from), "IA1");
+        require(_isApprovedOrOwner(msg.sender, _to), "IA2");
 
         LockedBalance memory _locked0 = locked[_from];
         LockedBalance memory _locked1 = locked[_to];
-        require(_locked1.end > block.timestamp ||  _locked1.isPermanent,"lock expired");
-        require(!_locked0.isSMNFT,"sm NFT");
-        require(!_locked0.isPermanent,"permanent locked");
+        require(_locked1.end > block.timestamp ||  _locked1.isPermanent,"lock exp");
+        require(!_locked0.isSMNFT && !_locked0.isPermanent,"smNFT / per");
         
         uint value0 = uint(int256(_locked0.amount));
         uint end = _locked0.end >= _locked1.end ? _locked0.end : _locked1.end;
@@ -1298,7 +1294,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         newLockedTo.isSMNFT = _locked1.isSMNFT;
 
         if(newLockedTo.isSMNFT){
-            newLockedTo.amount = _locked1.amount + _locked0.amount + int128(int256(_calculate_sm_nft_bonus(uint256(int256(_locked0.amount)))));
+            newLockedTo.amount = _locked1.amount + _locked0.amount + int128(int256(calculate_sm_nft_bonus(uint256(int256(_locked0.amount)))));
             smNFTBalance += value0;
             assert(IERC20(token).transfer(burnTokenAddress, value0));
         } else if (newLockedTo.isPermanent){
@@ -1423,6 +1419,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
             // Use the provided input timestamp here to get the right decay
             votes = votes + _balanceOfNFT(tId, timestamp);
         }
+
         return votes;
     }
 
@@ -1494,7 +1491,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                 // All the same plus _tokenId
                 require(
                     dstRepOld.length + 1 <= MAX_DELEGATES,
-                    "too many tokenIds"
+                    "tokens>1"
                 );
                 for (uint i = 0; i < dstRepOld.length; i++) {
                     uint tId = dstRepOld[i];
@@ -1564,7 +1561,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                 uint ownerTokenCount = ownerToNFTokenCount[owner];
                 require(
                     dstRepOld.length + ownerTokenCount <= MAX_DELEGATES,
-                    "too many tokenIds"
+                    "tokens>1"
                 );
                 // All the same
                 for (uint i = 0; i < dstRepOld.length; i++) {
@@ -1630,38 +1627,30 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         address signatory = ecrecover(digest, v, r, s);
         require(
             signatory != address(0),
-            "invalid signature"
+            "IA signature"
         );
         require(
             nonce == nonces[signatory]++,
-            "invalid nonce"
+            "IA nonce"
         );
         require(
             block.timestamp <= expiry,
-            "signature expired"
+            "signature exp"
         );
         return _delegate(signatory, delegatee);
     }
 
     function setSmNFTBonus(uint _bonus) external {
-        require(msg.sender == team, "unauthorized to set bonus");
-        require(_bonus <= PRECISISON, "rate too high");
+        require(msg.sender == team, "IA");
+        require(_bonus <= PRECISISON, "rate high");
         SMNFT_BONUS = _bonus;
     }
 
-    function calculate_sm_nft_bonus(uint amount) external view returns (uint){
-        return _calculate_sm_nft_bonus(amount);
-    }
-
-    function _calculate_sm_nft_bonus(uint amount) internal view returns (uint){
+    function calculate_sm_nft_bonus(uint amount) public view returns (uint){
         return (SMNFT_BONUS * amount) / PRECISISON;
     }
 
-    function calculate_original_sm_nft_amount(uint amount) external view returns (uint){
-        return _calculate_original_sm_nft_amount(amount);
-    }
-
-    function _calculate_original_sm_nft_amount(uint amount) view internal returns (uint){
+    function calculate_original_sm_nft_amount(uint amount) public view returns (uint){
         return (amount * PRECISISON) / (SMNFT_BONUS + PRECISISON);
     }
 }
