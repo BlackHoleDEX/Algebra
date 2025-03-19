@@ -180,18 +180,18 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
     function checkAtEpochFlip() external {
         require(epochController == msg.sender, "invalid access");
 
-        uint256 _proposedTokensCnt = liveNativeTokens.length;
-        uint256 i;
+        int256 _proposedTokensCnt = int256(liveNativeTokens.length);
+        int256 i;
         address _genesisPool;
         PoolStatus _poolStatus;
         for(i = _proposedTokensCnt - 1; i >= 0; i--){
-            _genesisPool = genesisFactory.getGenesisPool(liveNativeTokens[i]);
+            _genesisPool = genesisFactory.getGenesisPool(liveNativeTokens[uint256(i)]);
             _poolStatus = IGenesisPool(_genesisPool).poolStatus();
 
             if(_poolStatus == PoolStatus.PRE_LISTING && IGenesisPool(_genesisPool).eligbleForPreLaunchPool()){
                 _preLaunchPool(_genesisPool);
             }else if(_poolStatus == PoolStatus.PRE_LAUNCH_DEPOSIT_DISABLED){
-                _launchPool(liveNativeTokens[i], _genesisPool);
+                _launchPool(liveNativeTokens[uint256(i)], _genesisPool);
             }
         }
     }
