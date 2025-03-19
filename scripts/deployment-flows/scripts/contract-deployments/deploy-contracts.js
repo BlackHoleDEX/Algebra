@@ -63,8 +63,9 @@ const setPermissionRegistryRoles = async (permissionRegistryAddress, ownerAddres
 };
 
 const deployTokenHanlder = async (permissionRegistryAddress) => {
-    const tokens = [blackAddress, ...addresses];
-    const connectorTokens = [blackAddress, ...addresses];
+    const defaultTokens = deployedTokens.map(obj => obj.address);
+    const whitelistTokens = [...defaultTokens, ...addresses];
+    const connectorTokens = [...defaultTokens, addresses[0], addresses[1], addresses[5]];
     
     try {
         const tokenHandlerContract = await ethers.getContractFactory("TokenHandler");
@@ -74,7 +75,7 @@ const deployTokenHanlder = async (permissionRegistryAddress) => {
         console.log("\ntoken handler address : ", tokenHandler.address)
         generateConstantFile("TokenHandler", tokenHandler.address);
 
-        await tokenHandler.whitelistTokens(tokens);
+        await tokenHandler.whitelistTokens(whitelistTokens);
         console.log("set tokens in token handler");
         await tokenHandler.whitelistConnectors(connectorTokens);
         console.log("set connector tokens in token handler\n");
