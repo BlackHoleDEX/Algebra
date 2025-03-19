@@ -4,11 +4,10 @@ const { permissionsRegistryAbi } = require('../../../../generated/permissions-re
 const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants.js");
 const { blackholePairAPIV2Abi } = require('../../../../generated/blackhole-pair-apiv2');
 const { voterV3Abi } = require('../../../../generated/voter-v3');
-const { minterUpgradeableAbi, minterUpgradeableAddress } = require('../../../../generated/minter-upgradeable');
+const { minterUpgradeableAbi } = require('../../../../generated/minter-upgradeable');
 const { epochControllerAbi } = require('../../../../generated/epoch-controller')
 const { blackAbi } = require('../../../blackhole-scripts/gaugeConstants/black')
 const { votingEscrowAbi } = require('../../../../generated/voting-escrow');
-const { tokenHandlerAbi } = require('../../../../generated/token-handler');
 const { rewardsDistributorAbi } = require('../../../../generated/rewards-distributor');
 const { pairFactoryAbi } = require('../../../../generated/pair-factory');
 const { genesisPoolFactoryAbi } = require('../../../../generated/genesis-pool-factory');
@@ -717,7 +716,7 @@ async function main () {
     //set voterV3 in voting escrow
     await setVoterV3InVotingEscrow(voterV3Address, votingEscrowAddress);
 
-    await deployBlackGovernor(votingEscrowAddress,minterUpgradeableAddress);
+    await deployBlackGovernor(votingEscrowAddress, minterUpgradableAddress);
 
     await pushDefaultRewardToken(bribeV3Address, blackAddress);
 
