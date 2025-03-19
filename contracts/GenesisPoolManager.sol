@@ -133,16 +133,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         require(genesisPool != address(0), '0x pool');
 
         IGenesisPool(genesisPool).rejectPool();
-
-        uint index = liveNativeTokensIndex[nativeToken];
-        uint length = liveNativeTokens.length;
-        if(length > 0 && index >= 1 && index <= length)
-        {
-            address replacingAddress = liveNativeTokens[length - 1];
-            liveNativeTokens[index - 1] = replacingAddress;
-            liveNativeTokens.pop();
-            liveNativeTokensIndex[replacingAddress] = index;
-        }
+        _removeLiveToken(nativeToken);
     }
 
     function approveGenesisPool(address nativeToken) external Governance {
@@ -209,16 +200,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         pairFactory.setGenesisStatus(liquidityPool.pairAddress, false);
         IGauge(liquidityPool.gaugeAddress).setGenesisPool(_genesisPool);
         IGenesisPool(_genesisPool).launch(router, MATURITY_TIME);
-
-        uint index = liveNativeTokensIndex[_nativeToken];
-        uint length = liveNativeTokens.length;
-        if(length > 0 && index >= 1 && index <= length)
-        {
-            address replacingAddress = liveNativeTokens[length - 1];
-            liveNativeTokens[index - 1] = replacingAddress;
-            liveNativeTokens.pop();
-            liveNativeTokensIndex[replacingAddress] = index;
-        }
+        _removeLiveToken(_nativeToken);
     }
     
     // before 3 hrs
@@ -239,12 +221,26 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
                 if(_poolStatus == PoolStatus.PRE_LISTING && IGenesisPool(_genesisPool).eligbleForDisqualify()){
                     pairFactory.setGenesisStatus(IGenesisPool(_genesisPool).getLiquidityPoolInfo().pairAddress, false);
                     IGenesisPool(_genesisPool).setPoolStatus(PoolStatus.NOT_QUALIFIED);
+                    tokenHandler.blacklistToken(nativeTokens[i]);
+                    _removeLiveToken(nativeTokens[i]);
                 }
                 else if(_poolStatus == PoolStatus.PRE_LAUNCH){
                     IGenesisPool(_genesisPool).setPoolStatus(PoolStatus.PRE_LAUNCH_DEPOSIT_DISABLED);
                 }
             }
             pre_epoch_period = BlackTimeLibrary.currPreEpoch(block.timestamp);
+        }
+    }
+
+    function _removeLiveToken(address nativeToken) internal {
+        uint index = liveNativeTokensIndex[nativeToken];
+        uint length = liveNativeTokens.length;
+        if(length > 0 && index >= 1 && index <= length)
+        {
+            address replacingAddress = liveNativeTokens[length - 1];
+            liveNativeTokens[index - 1] = replacingAddress;
+            liveNativeTokens.pop();
+            liveNativeTokensIndex[replacingAddress] = index;
         }
     }
 
