@@ -1,4 +1,4 @@
-const blackGovernorAddress = "0xA51eF9f4A90607B7F769FC6E6382989E750D3857";
+const blackGovernorAddress = "0xAD3B65586A187a8b5D72bac61745bDf0e1F37241";
 
 const blackGovernorAbi = [
   {

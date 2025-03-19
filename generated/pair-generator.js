@@ -1,4 +1,4 @@
-const pairGeneratorAddress = "0x81b19DA83c075066C78AA2F116FcFc38917f68aa";
+const pairGeneratorAddress = "0x0B26fdD3305E2B5e7ee912312a456F7f89FFb37e";
 
 const pairGeneratorAbi = [
   {
