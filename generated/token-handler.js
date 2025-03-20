@@ -1,4 +1,4 @@
-const tokenHandlerAddress = "0x46B2a86B4503Cd01B782bfB1e70475544f193Fb9";
+const tokenHandlerAddress = "0x6aE6a80C20942A7edb0eacC70D30CDeBaDA4fc5c";
 
 const tokenHandlerAbi = [
   {

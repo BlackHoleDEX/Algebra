@@ -1,4 +1,4 @@
-const bribeFactoryV3Address = "0x4bf7867Ea63057187605d0C53C746616DeC3efdA";
+const bribeFactoryV3Address = "0x178c42342a5e1272C0C8cfE48bAdef9390A76Cae";
 
 const bribeFactoryV3Abi = [
   {
