@@ -141,8 +141,6 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         address genesisPool = genesisFactory.getGenesisPool(nativeToken);
         require(genesisPool != address(0), '0x pool');
 
-        tokenHandler.whitelistToken(nativeToken);
-
         GenesisInfo memory genesisInfo =  IGenesisPool(genesisPool).getGenesisInfo();
         address pairAddress = pairFactory.createPair(nativeToken, genesisInfo.fundingToken, genesisInfo.stable);
         pairFactory.setGenesisStatus(pairAddress, true);
@@ -171,18 +169,22 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
     function checkAtEpochFlip() external {
         require(epochController == msg.sender, "invalid access");
 
-        int256 _proposedTokensCnt = int256(liveNativeTokens.length);
-        int256 i;
+        uint256 _proposedTokensCnt = liveNativeTokens.length;
+        uint256 i;
         address _genesisPool;
         PoolStatus _poolStatus;
-        for(i = _proposedTokensCnt - 1; i >= 0; i--){
-            _genesisPool = genesisFactory.getGenesisPool(liveNativeTokens[uint256(i)]);
+        address nativeToken;
+
+        for(i = _proposedTokensCnt; i > 0; i--){
+            nativeToken = liveNativeTokens[i-1];
+            _genesisPool = genesisFactory.getGenesisPool(nativeToken);
             _poolStatus = IGenesisPool(_genesisPool).poolStatus();
 
             if(_poolStatus == PoolStatus.PRE_LISTING && IGenesisPool(_genesisPool).eligbleForPreLaunchPool()){
+                tokenHandler.whitelistToken(nativeToken);
                 _preLaunchPool(_genesisPool);
             }else if(_poolStatus == PoolStatus.PRE_LAUNCH_DEPOSIT_DISABLED){
-                _launchPool(liveNativeTokens[uint256(i)], _genesisPool);
+                _launchPool(nativeToken, _genesisPool);
             }
         }
     }
@@ -221,7 +223,6 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
                 if(_poolStatus == PoolStatus.PRE_LISTING && IGenesisPool(_genesisPool).eligbleForDisqualify()){
                     pairFactory.setGenesisStatus(IGenesisPool(_genesisPool).getLiquidityPoolInfo().pairAddress, false);
                     IGenesisPool(_genesisPool).setPoolStatus(PoolStatus.NOT_QUALIFIED);
-                    tokenHandler.blacklistToken(nativeTokens[i]);
                     _removeLiveToken(nativeTokens[i]);
                 }
                 else if(_poolStatus == PoolStatus.PRE_LAUNCH){
