@@ -708,7 +708,7 @@ async function main () {
 
     // set chainlink address
     // TODO: separate out the setting of chalink address 
-    await setChainLinkAddress(epochControllerAddress, "0x66A5A3888B7401fE941ae84A13cd3e84206BfBE7", "0x9e12f224D5077a78a84580c8Eb0D499260fC45d5");
+    await setChainLinkAddress(epochControllerAddress, "0x859e9da8b3FBEEd0Dff61a2262B6AEB66081413A", "0x9e12f224D5077a78a84580c8Eb0D499260fC45d5");
 
     // //add black to user Address
     // await addBlackToUserAddress(minterUpgradableAddress);
