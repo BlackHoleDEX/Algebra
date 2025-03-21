@@ -1,4 +1,4 @@
-const blackholePairAPIV2Address = "0x5A1CF2bBDF4086DC89eF0408D38EfAD853734daa";
+const blackholePairAPIV2Address = "0x31b722BdD0227AA00Fc4A8ef4e918f62ed734961";
 
 const blackholePairAPIV2Abi = [
   {
@@ -375,6 +375,11 @@ const blackholePairAPIV2Abi = [
         "internalType": "struct BlackholePairAPIV2.pairInfo[]",
         "name": "pairs",
         "type": "tuple[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "epochDuration",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",

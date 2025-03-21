@@ -1,4 +1,4 @@
-const genesisPoolAPIAddress = "0x878E2e5d771a470eC0c96147e46423217F8E1A73";
+const genesisPoolAPIAddress = "0xf7B5BaE250503410a8c87aF3758de15688FD1ca2";
 
 const genesisPoolAPIAbi = [
   {
