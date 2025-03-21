@@ -193,12 +193,13 @@ contract BlackholePairAPIV2 is Initializable {
 
 
     // valid only for sAMM and vAMM
-    function getAllPair(address _user, uint _amounts, uint _offset) external view returns(uint totPairs, bool hasNext, pairInfo[] memory pairs){
+    function getAllPair(address _user, uint _amounts, uint _offset) external view returns(uint totPairs, bool hasNext, pairInfo[] memory pairs, uint epochDuration){
 
         
         require(_amounts <= MAX_PAIRS, 'too many pair');
 
         pairs = new pairInfo[](_amounts);
+
         
         uint i = _offset;
         totPairs = pairFactory.allPairsLength();
@@ -209,6 +210,7 @@ contract BlackholePairAPIV2 is Initializable {
         uint stakedToken0Fees;     
         uint stakedToken1Fees; 
         Bribes[] memory bribes;
+        epochDuration = BlackTimeLibrary.WEEK;
 
         for(i; i < _offset + _amounts; i++){
             // if totalPairs is reached, break.
