@@ -1,4 +1,4 @@
-const blackholePairAPIV2Address = "0x927093851E9ABCd6C8bCDbC2E5635a5D3a7927d6";
+const blackholePairAPIV2Address = "0x5A1CF2bBDF4086DC89eF0408D38EfAD853734daa";
 
 const blackholePairAPIV2Abi = [
   {
@@ -280,6 +280,11 @@ const blackholePairAPIV2Abi = [
           {
             "internalType": "uint256",
             "name": "account_gauge_earned",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "account_staked_unlock",
             "type": "uint256"
           },
           {
@@ -598,6 +603,11 @@ const blackholePairAPIV2Abi = [
           {
             "internalType": "uint256",
             "name": "account_gauge_earned",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "account_staked_unlock",
             "type": "uint256"
           },
           {

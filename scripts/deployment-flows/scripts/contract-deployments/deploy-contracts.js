@@ -4,11 +4,10 @@ const { permissionsRegistryAbi } = require('../../../../generated/permissions-re
 const { ZERO_ADDRESS } = require("@openzeppelin/test-helpers/src/constants.js");
 const { blackholePairAPIV2Abi } = require('../../../../generated/blackhole-pair-apiv2');
 const { voterV3Abi } = require('../../../../generated/voter-v3');
-const { minterUpgradeableAbi, minterUpgradeableAddress } = require('../../../../generated/minter-upgradeable');
+const { minterUpgradeableAbi } = require('../../../../generated/minter-upgradeable');
 const { epochControllerAbi } = require('../../../../generated/epoch-controller')
 const { blackAbi } = require('../../../blackhole-scripts/gaugeConstants/black')
 const { votingEscrowAbi } = require('../../../../generated/voting-escrow');
-const { tokenHandlerAbi } = require('../../../../generated/token-handler');
 const { rewardsDistributorAbi } = require('../../../../generated/rewards-distributor');
 const { pairFactoryAbi } = require('../../../../generated/pair-factory');
 const { genesisPoolFactoryAbi } = require('../../../../generated/genesis-pool-factory');
@@ -63,8 +62,9 @@ const setPermissionRegistryRoles = async (permissionRegistryAddress, ownerAddres
 };
 
 const deployTokenHanlder = async (permissionRegistryAddress) => {
-    const tokens = [...addresses, blackAddress];
-    const connectorTokens = [...addresses, blackAddress];
+    const defaultTokens = deployedTokens.map(obj => obj.address);
+    const whitelistTokens = [...defaultTokens, ...addresses];
+    const connectorTokens = [...defaultTokens, addresses[0], addresses[1], addresses[5]];
     
     try {
         const tokenHandlerContract = await ethers.getContractFactory("TokenHandler");
@@ -74,7 +74,7 @@ const deployTokenHanlder = async (permissionRegistryAddress) => {
         console.log("\ntoken handler address : ", tokenHandler.address)
         generateConstantFile("TokenHandler", tokenHandler.address);
 
-        await tokenHandler.whitelistTokens(tokens);
+        await tokenHandler.whitelistTokens(whitelistTokens);
         console.log("set tokens in token handler");
         await tokenHandler.whitelistConnectors(connectorTokens);
         console.log("set connector tokens in token handler\n");
@@ -708,7 +708,7 @@ async function main () {
 
     // set chainlink address
     // TODO: separate out the setting of chalink address 
-    await setChainLinkAddress(epochControllerAddress, "0xBD3152De270D307d0720b434F75F80af6EE5a380", "0xa92967bB3C05dbB31FDcD779C81c86d623544A95");
+    await setChainLinkAddress(epochControllerAddress, "0x859e9da8b3FBEEd0Dff61a2262B6AEB66081413A", "0x9e12f224D5077a78a84580c8Eb0D499260fC45d5");
 
     // //add black to user Address
     // await addBlackToUserAddress(minterUpgradableAddress);
@@ -716,7 +716,7 @@ async function main () {
     //set voterV3 in voting escrow
     await setVoterV3InVotingEscrow(voterV3Address, votingEscrowAddress);
 
-    await deployBlackGovernor(votingEscrowAddress,minterUpgradeableAddress);
+    await deployBlackGovernor(votingEscrowAddress, minterUpgradableAddress);
 
     await pushDefaultRewardToken(bribeV3Address, blackAddress);
 

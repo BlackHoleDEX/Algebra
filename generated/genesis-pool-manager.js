@@ -1,4 +1,4 @@
-const genesisPoolManagerAddress = "0x7B7Af039ad5915a36b5c0363b7fe862B074911bE";
+const genesisPoolManagerAddress = "0x553Ba072f9691f76a5206305754280aB1051153e";
 
 const genesisPoolManagerAbi = [
   {
@@ -135,19 +135,6 @@ const genesisPoolManagerAbi = [
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "active_period",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "address",
@@ -216,6 +203,11 @@ const genesisPoolManagerAbi = [
         "components": [
           {
             "internalType": "address",
+            "name": "tokenOwner",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
             "name": "nativeToken",
             "type": "address"
           },
@@ -261,11 +253,6 @@ const genesisPoolManagerAbi = [
       },
       {
         "components": [
-          {
-            "internalType": "address",
-            "name": "tokenOwner",
-            "type": "address"
-          },
           {
             "internalType": "uint256",
             "name": "proposedNativeAmount",
@@ -498,6 +485,19 @@ const genesisPoolManagerAbi = [
         "internalType": "address",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "pre_epoch_period",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",

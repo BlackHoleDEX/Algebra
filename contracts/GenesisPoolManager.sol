@@ -133,22 +133,13 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         require(genesisPool != address(0), '0x pool');
 
         IGenesisPool(genesisPool).rejectPool();
-
-        uint index = liveNativeTokensIndex[nativeToken];
-        uint length = liveNativeTokens.length;
-        if(length > 0 && index >= 1 && index <= length)
-        {
-            liveNativeTokens[index-1] = liveNativeTokens[length - 1];
-            liveNativeTokens.pop();
-        }
+        _removeLiveToken(nativeToken);
     }
 
     function approveGenesisPool(address nativeToken) external Governance {
         require(nativeToken != address(0), "0x native");
         address genesisPool = genesisFactory.getGenesisPool(nativeToken);
         require(genesisPool != address(0), '0x pool');
-
-        tokenHandler.whitelistToken(nativeToken);
 
         GenesisInfo memory genesisInfo =  IGenesisPool(genesisPool).getGenesisInfo();
         address pairAddress = pairFactory.createPair(nativeToken, genesisInfo.fundingToken, genesisInfo.stable);
@@ -178,18 +169,22 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
     function checkAtEpochFlip() external {
         require(epochController == msg.sender, "invalid access");
 
-        uint256 _proposedTokensCnt = nativeTokens.length;
+        uint256 _proposedTokensCnt = liveNativeTokens.length;
         uint256 i;
         address _genesisPool;
         PoolStatus _poolStatus;
-        for(i = 0; i < _proposedTokensCnt; i++){
-            _genesisPool = genesisFactory.getGenesisPool(nativeTokens[i]);
+        address nativeToken;
+
+        for(i = _proposedTokensCnt; i > 0; i--){
+            nativeToken = liveNativeTokens[i-1];
+            _genesisPool = genesisFactory.getGenesisPool(nativeToken);
             _poolStatus = IGenesisPool(_genesisPool).poolStatus();
 
             if(_poolStatus == PoolStatus.PRE_LISTING && IGenesisPool(_genesisPool).eligbleForPreLaunchPool()){
+                tokenHandler.whitelistToken(nativeToken);
                 _preLaunchPool(_genesisPool);
             }else if(_poolStatus == PoolStatus.PRE_LAUNCH_DEPOSIT_DISABLED){
-                _launchPool(nativeTokens[i], _genesisPool);
+                _launchPool(nativeToken, _genesisPool);
             }
         }
     }
@@ -207,14 +202,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         pairFactory.setGenesisStatus(liquidityPool.pairAddress, false);
         IGauge(liquidityPool.gaugeAddress).setGenesisPool(_genesisPool);
         IGenesisPool(_genesisPool).launch(router, MATURITY_TIME);
-
-        uint index = liveNativeTokensIndex[_nativeToken];
-        uint length = liveNativeTokens.length;
-        if(length > 0 && index >= 1 && index <= length)
-        {
-            liveNativeTokens[index - 1] = liveNativeTokens[length - 1];
-            liveNativeTokens.pop();
-        }
+        _removeLiveToken(_nativeToken);
     }
     
     // before 3 hrs
@@ -235,12 +223,25 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
                 if(_poolStatus == PoolStatus.PRE_LISTING && IGenesisPool(_genesisPool).eligbleForDisqualify()){
                     pairFactory.setGenesisStatus(IGenesisPool(_genesisPool).getLiquidityPoolInfo().pairAddress, false);
                     IGenesisPool(_genesisPool).setPoolStatus(PoolStatus.NOT_QUALIFIED);
+                    _removeLiveToken(nativeTokens[i]);
                 }
                 else if(_poolStatus == PoolStatus.PRE_LAUNCH){
                     IGenesisPool(_genesisPool).setPoolStatus(PoolStatus.PRE_LAUNCH_DEPOSIT_DISABLED);
                 }
             }
             pre_epoch_period = BlackTimeLibrary.currPreEpoch(block.timestamp);
+        }
+    }
+
+    function _removeLiveToken(address nativeToken) internal {
+        uint index = liveNativeTokensIndex[nativeToken];
+        uint length = liveNativeTokens.length;
+        if(length > 0 && index >= 1 && index <= length)
+        {
+            address replacingAddress = liveNativeTokens[length - 1];
+            liveNativeTokens[index - 1] = replacingAddress;
+            liveNativeTokens.pop();
+            liveNativeTokensIndex[replacingAddress] = index;
         }
     }
 
