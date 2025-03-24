@@ -75,6 +75,10 @@ contract AlgebraEternalFarming is IAlgebraEternalFarming {
   /// @inheritdoc IAlgebraEternalFarming
   mapping(uint256 tokenId => mapping(bytes32 incentiveId => Farm farm)) public override farms;
 
+  /// @dev pool => IncentiveKey
+  /// @inheritdoc IAlgebraEternalFarming
+  mapping(address pool => IncentiveKey key) public override incentiveKeys;
+
   /// @inheritdoc IAlgebraEternalFarming
   uint256 public numOfIncentives;
 
@@ -131,6 +135,7 @@ contract AlgebraEternalFarming is IAlgebraEternalFarming {
     IFarmingCenter(farmingCenter).connectVirtualPoolToPlugin(virtualPool, IFarmingPlugin(connectedPlugin));
 
     key.nonce = numOfIncentives++;
+    incentiveKeys[address(key.pool)] = key;
     bytes32 incentiveId = IncentiveId.compute(key);
     Incentive storage newIncentive = incentives[incentiveId];
 
@@ -171,6 +176,7 @@ contract AlgebraEternalFarming is IAlgebraEternalFarming {
 
     incentive.deactivated = true;
     virtualPool.deactivate();
+    delete incentiveKeys[address(key.pool)];
 
     (uint128 rewardRate0, uint128 rewardRate1) = virtualPool.rewardRates();
     if (rewardRate0 | rewardRate1 != 0) _setRewardRates(virtualPool, 0, 0, incentiveId);
