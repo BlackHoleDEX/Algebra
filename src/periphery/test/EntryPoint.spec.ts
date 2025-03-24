@@ -97,13 +97,13 @@ describe('CustomPoolEntryPoint', () => {
 
       await customPoolDeployer.setTickSpacing(customPoolAddress, 10)
       await customPoolDeployer.setPlugin(customPoolAddress, entryPoint)
-      await customPoolDeployer.setPluginConfig(customPoolAddress, 193)
+      await customPoolDeployer.setPluginConfig(customPoolAddress, 65)
       await customPoolDeployer.setFee(customPoolAddress, 300)
 
       expect(await pool.tickSpacing()).to.be.eq(10)
       expect(await pool.plugin()).to.be.eq(entryPoint)
       expect((await pool.globalState()).lastFee).to.be.eq(300)
-      expect((await pool.globalState()).pluginConfig).to.be.eq(193)
+      expect((await pool.globalState()).pluginConfig).to.be.eq(65)
     });
 
 

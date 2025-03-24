@@ -9,7 +9,7 @@ describe('SlidingFee', () => {
 
   async function slidingFeeFixture() {
     const factory = await ethers.getContractFactory('SlidingFeeTest');
-    return (await factory.deploy()) as any as SlidingFeeTest;
+    return (await factory.deploy(100)) as any as SlidingFeeTest;
   }
 
   beforeEach('deploy SlidingFeeTest', async () => {

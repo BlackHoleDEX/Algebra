@@ -5,7 +5,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "1.2.0",
+  "version": "1.2.1",
   "keywords": [
     "algebra",
     "periphery"
@@ -27,7 +27,7 @@
   "dependencies": {
     "@openzeppelin/contracts": "4.9.3",
     "@uniswap/v2-core": "1.0.1",
-    "@cryptoalgebra/integral-core": "1.2.0"
+    "@cryptoalgebra/integral-core": "1.2.1"
   },
   "devDependencies": {
     "is-svg": "^4.3.1"
@@ -36,7 +36,7 @@
     "compile": "npm --prefix ../core run compile  && hardhat compile",
     "test": "hardhat test",
     "expand-abi": "hardhat expand-abi",
-    "precommit": "pretty-quick --staged --pattern **/*.sol",
+    "precommit": "pretty-quick --staged --pattern '**/*.sol'",
     "solhint": "solhint ./contracts/**/*.sol",
     "coverage": "npm --prefix ../core run compile && hardhat coverage",
     "prepublish": "hardhat clean && npm run compile && npm run expand-abi"

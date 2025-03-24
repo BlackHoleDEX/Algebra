@@ -21,7 +21,7 @@ import './interfaces/IAlgebraFactory.sol';
 
 /// @title Algebra concentrated liquidity pool
 /// @notice This contract is responsible for liquidity positions, swaps and flashloans
-/// @dev Version: Algebra Integral 1.2
+/// @dev Version: Algebra Integral 1.2.1
 contract AlgebraPool is AlgebraPoolBase, TickStructure, ReentrancyGuard, Positions, SwapCalculation, ReservesManager {
   using SafeCast for uint256;
   using SafeCast for uint128;
@@ -396,10 +396,12 @@ contract AlgebraPool is AlgebraPoolBase, TickStructure, ReentrancyGuard, Positio
     bool payInAdvance,
     bytes calldata data
   ) internal returns (uint24 overrideFee, uint24 pluginFee) {
-    if (globalState.pluginConfig.hasFlag(Plugins.BEFORE_SWAP_FLAG)) {
+    uint8 pluginConfig = globalState.pluginConfig;
+    if (pluginConfig.hasFlag(Plugins.BEFORE_SWAP_FLAG)) {
       if (_isPlugin()) return (0, 0);
       bytes4 selector;
       (selector, overrideFee, pluginFee) = IAlgebraPlugin(plugin).beforeSwap(msg.sender, recipient, zto, amount, limitPrice, payInAdvance, data);
+      if (!pluginConfig.hasFlag(Plugins.DYNAMIC_FEE) && (overrideFee > 0 || pluginFee > 0)) revert dynamicFeeDisabled();
       // we will check that fee is less than denominator inside the swap calculation
       selector.shouldReturn(IAlgebraPlugin.beforeSwap.selector);
     }
@@ -518,15 +520,10 @@ contract AlgebraPool is AlgebraPoolBase, TickStructure, ReentrancyGuard, Positio
 
   /// @inheritdoc IAlgebraPoolPermissionedActions
   function setFee(uint16 newFee) external override {
+    _checkIfAdministrator();
     bool isDynamicFeeEnabled = globalState.pluginConfig.hasFlag(Plugins.DYNAMIC_FEE);
     if (!globalState.unlocked) revert locked(); // cheaper to check lock here
-
-    if (msg.sender == plugin) {
-      if (!isDynamicFeeEnabled) revert dynamicFeeDisabled();
-    } else {
-      if (isDynamicFeeEnabled) revert dynamicFeeActive();
-      _checkIfAdministrator();
-    }
+    if (isDynamicFeeEnabled) revert dynamicFeeActive();
     _setFee(newFee);
   }
 

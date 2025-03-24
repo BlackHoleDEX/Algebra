@@ -9,11 +9,11 @@ import '../interfaces/IBasePluginV1Factory.sol';
 import '../interfaces/IAlgebraVirtualPool.sol';
 import '../interfaces/plugins/IFarmingPlugin.sol';
 
-import '../base/BasePlugin.sol';
+import '../base/AlgebraBasePlugin.sol';
 
-/// @title Algebra Integral 1.2 default plugin
+/// @title Algebra Integral 1.2.1 default plugin
 /// @notice This contract stores timepoints and calculates adaptive fee and statistical averages
-abstract contract FarmingProxyPlugin is BasePlugin, IFarmingPlugin {
+abstract contract FarmingProxyPlugin is AlgebraBasePlugin, IFarmingPlugin {
   using Plugins for uint8;
 
   uint8 private constant defaultPluginConfig = uint8(Plugins.AFTER_SWAP_FLAG);

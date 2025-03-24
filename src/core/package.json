@@ -5,7 +5,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "1.2.0",
+  "version": "1.2.1",
   "keywords": [
     "algebra"
   ],
@@ -25,7 +25,7 @@
     "!artifacts/contracts/interfaces/**/*.dbg.json"
   ],
   "scripts": {
-    "precommit": "pretty-quick --staged --pattern **/*.sol && hardhat compile && node ../../scripts/updatePoolHash.js",
+    "precommit": "pretty-quick --staged --pattern '**/*.sol' && hardhat compile && node ../../scripts/updatePoolHash.js",
     "solhint": "solhint ./contracts/**/*.sol",
     "compile": "hardhat compile",
     "test": "hardhat test --parallel",
