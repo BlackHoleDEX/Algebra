@@ -1465,18 +1465,20 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                     ? checkpoints[srcRep][srcRepNum - 1].tokenIds
                     : checkpoints[srcRep][0].tokenIds;
                 uint32 nextSrcRepNum = _findWhatCheckpointToWrite(srcRep);
-                Checkpoint storage cpSrcRep = checkpoints[srcRep][nextSrcRepNum];
-                uint[] storage srcRepNew = cpSrcRep.tokenIds;
-                cpSrcRep.timestamp = block.timestamp;
-                // All the same except _tokenId
-                for (uint i = 0; i < srcRepOld.length; i++) {
-                    uint tId = srcRepOld[i];
-                    if (tId != _tokenId) {
-                        srcRepNew.push(tId);
+                bool _isCheckpointInNewBlock = (nextSrcRepNum != srcRepNum - 1);
+                if(_isCheckpointInNewBlock) {
+                    Checkpoint storage cpSrcRep = checkpoints[srcRep][nextSrcRepNum];
+                    uint[] storage srcRepNew = cpSrcRep.tokenIds;
+                    cpSrcRep.timestamp = block.timestamp;
+                    // All the same except _tokenId
+                    for (uint i = 0; i < srcRepOld.length; i++) {
+                        uint tId = srcRepOld[i];
+                        if (tId != _tokenId) {
+                            srcRepNew.push(tId);
+                        }
                     }
+                    numCheckpoints[srcRep] = nextSrcRepNum + 1;   
                 }
-
-                numCheckpoints[srcRep] = nextSrcRepNum + 1;
             }
 
             if (dstRep != address(0)) {
@@ -1485,21 +1487,23 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                     ? checkpoints[dstRep][dstRepNum - 1].tokenIds
                     : checkpoints[dstRep][0].tokenIds;
                 uint32 nextDstRepNum = _findWhatCheckpointToWrite(dstRep);
-                Checkpoint storage cpDstRep = checkpoints[dstRep][nextDstRepNum];
-                uint[] storage dstRepNew = cpDstRep.tokenIds;
-                cpDstRep.timestamp = block.timestamp;
-                // All the same plus _tokenId
-                require(
-                    dstRepOld.length + 1 <= MAX_DELEGATES,
-                    "tokens>1"
-                );
-                for (uint i = 0; i < dstRepOld.length; i++) {
-                    uint tId = dstRepOld[i];
-                    dstRepNew.push(tId);
+                bool _isCheckpointInNewBlock = (nextDstRepNum != dstRepNum - 1);
+                if(_isCheckpointInNewBlock) {
+                    Checkpoint storage cpDstRep = checkpoints[dstRep][nextDstRepNum];
+                    uint[] storage dstRepNew = cpDstRep.tokenIds;
+                    cpDstRep.timestamp = block.timestamp;
+                    // All the same plus _tokenId
+                    require(
+                        dstRepOld.length + 1 <= MAX_DELEGATES,
+                        "tokens>1"
+                    );
+                    for (uint i = 0; i < dstRepOld.length; i++) {
+                        uint tId = dstRepOld[i];
+                        dstRepNew.push(tId);
+                    }
+                    dstRepNew.push(_tokenId);
+                    numCheckpoints[dstRep] = nextDstRepNum + 1;
                 }
-                dstRepNew.push(_tokenId);
-
-                numCheckpoints[dstRep] = nextDstRepNum + 1;
             }
         }
     }
@@ -1535,18 +1539,20 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                     ? checkpoints[srcRep][srcRepNum - 1].tokenIds
                     : checkpoints[srcRep][0].tokenIds;
                 uint32 nextSrcRepNum = _findWhatCheckpointToWrite(srcRep);
-                Checkpoint storage cpSrcRep = checkpoints[srcRep][nextSrcRepNum];
-                uint[] storage srcRepNew = cpSrcRep.tokenIds;
-                cpSrcRep.timestamp = block.timestamp;
-                // All the same except what owner owns
-                for (uint i = 0; i < srcRepOld.length; i++) {
-                    uint tId = srcRepOld[i];
-                    if (idToOwner[tId] != owner) {
-                        srcRepNew.push(tId);
+                bool _isCheckpointInNewBlock = (nextSrcRepNum != srcRepNum - 1);
+                if(_isCheckpointInNewBlock) {
+                    Checkpoint storage cpSrcRep = checkpoints[srcRep][nextSrcRepNum];
+                    uint[] storage srcRepNew = cpSrcRep.tokenIds;
+                    cpSrcRep.timestamp = block.timestamp;
+                    // All the same except what owner owns
+                    for (uint i = 0; i < srcRepOld.length; i++) {
+                        uint tId = srcRepOld[i];
+                        if (idToOwner[tId] != owner) {
+                            srcRepNew.push(tId);
+                        }
                     }
+                    numCheckpoints[srcRep] = nextSrcRepNum + 1;
                 }
-
-                numCheckpoints[srcRep] = nextSrcRepNum + 1;
             }
 
             if (dstRep != address(0)) {
@@ -1555,26 +1561,27 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                     ? checkpoints[dstRep][dstRepNum - 1].tokenIds
                     : checkpoints[dstRep][0].tokenIds;
                 uint32 nextDstRepNum = _findWhatCheckpointToWrite(dstRep);
-                Checkpoint storage cpDstRep = checkpoints[dstRep][nextDstRepNum];
-                uint[] storage dstRepNew = cpDstRep.tokenIds;
-                cpDstRep.timestamp = block.timestamp;
-                uint ownerTokenCount = ownerToNFTokenCount[owner];
-                require(
-                    dstRepOld.length + ownerTokenCount <= MAX_DELEGATES,
-                    "tokens>1"
-                );
-                // All the same
-                for (uint i = 0; i < dstRepOld.length; i++) {
-                    uint tId = dstRepOld[i];
-                    dstRepNew.push(tId);
+                bool _isCheckpointInNewBlock = (nextDstRepNum != dstRepNum - 1);
+                if(_isCheckpointInNewBlock) {
+                    Checkpoint storage cpDstRep = checkpoints[dstRep][nextDstRepNum];
+                    uint[] storage dstRepNew = cpDstRep.tokenIds;
+                    cpDstRep.timestamp = block.timestamp;
+                    uint ownerTokenCount = ownerToNFTokenCount[owner];
+                    require(
+                        dstRepOld.length + ownerTokenCount <= MAX_DELEGATES,
+                        "tokens>1"
+                    );
+                    for (uint i = 0; i < dstRepOld.length; i++) {
+                        uint tId = dstRepOld[i];
+                        dstRepNew.push(tId);
+                    }
+                    // Plus all that's owned
+                    for (uint i = 0; i < ownerTokenCount; i++) {
+                        uint tId = ownerToNFTokenIdList[owner][i];
+                        dstRepNew.push(tId);
+                    }
+                    numCheckpoints[dstRep] = nextDstRepNum + 1;   
                 }
-                // Plus all that's owned
-                for (uint i = 0; i < ownerTokenCount; i++) {
-                    uint tId = ownerToNFTokenIdList[owner][i];
-                    dstRepNew.push(tId);
-                }
-
-                numCheckpoints[dstRep] = nextDstRepNum + 1;
             }
         }
     }
