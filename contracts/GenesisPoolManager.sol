@@ -158,6 +158,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         bool preLaunchPool = IGenesisPool(genesisPool).depositToken(msg.sender, amount);
 
         if(preLaunchPool){
+            tokenHandler.whitelistToken(IGenesisPool(genesisPool).getGenesisInfo().nativeToken);
             _preLaunchPool(genesisPool);
         }
 

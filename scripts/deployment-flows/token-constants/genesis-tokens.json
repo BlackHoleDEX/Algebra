@@ -44,7 +44,7 @@
   {
     "name": "ANON",
     "ticker": "ANON",
-    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x79bbf4508b1391af3a0f4b30bb5fc4aa9ab0e07c/logo.sv",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x79bbf4508b1391af3a0f4b30bb5fc4aa9ab0e07c/logo.svg",
     "decimal": 18,
     "address": "0xFF94f43F0d6aE54F48E557399bF9CDbd1330C708"
   },
