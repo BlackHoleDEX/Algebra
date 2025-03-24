@@ -10,7 +10,7 @@ import './plugins/FarmingProxyPlugin.sol';
 import './plugins/SlidingFeePlugin.sol';
 import './plugins/VolatilityOraclePlugin.sol';
 
-/// @title Algebra Integral 1.2 adaptive fee plugin
+/// @title Algebra Integral 1.2.1 adaptive fee plugin
 contract AlgebraBasePluginV1 is DynamicFeePlugin, FarmingProxyPlugin, VolatilityOraclePlugin {
   using Plugins for uint8;
 
@@ -18,7 +18,12 @@ contract AlgebraBasePluginV1 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
   uint8 public constant override defaultPluginConfig =
     uint8(Plugins.AFTER_INIT_FLAG | Plugins.BEFORE_SWAP_FLAG | Plugins.AFTER_SWAP_FLAG | Plugins.DYNAMIC_FEE);
 
-  constructor(address _pool, address _factory, address _pluginFactory) BasePlugin(_pool, _factory, _pluginFactory) {}
+  constructor(
+    address _pool,
+    address _factory,
+    address _pluginFactory,
+    AlgebraFeeConfiguration memory _config
+  ) AlgebraBasePlugin(_pool, _factory, _pluginFactory) DynamicFeePlugin(_config) {}
 
   // ###### HOOKS ######
 
@@ -29,8 +34,6 @@ contract AlgebraBasePluginV1 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
 
   function afterInitialize(address, uint160, int24 tick) external override onlyPool returns (bytes4) {
     _initialize_TWAP(tick);
-
-    IAlgebraPool(pool).setFee(_feeConfig.baseFee());
     return IAlgebraPlugin.afterInitialize.selector;
   }
 
@@ -49,8 +52,8 @@ contract AlgebraBasePluginV1 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
   function beforeSwap(address, address, bool, int256, uint160, bool, bytes calldata) external override onlyPool returns (bytes4, uint24, uint24) {
     _writeTimepoint();
     uint88 volatilityAverage = _getAverageVolatilityLast();
-    _updateFee(volatilityAverage);
-    return (IAlgebraPlugin.beforeSwap.selector, 0, 0);
+    uint24 fee = _getCurrentFee(volatilityAverage);
+    return (IAlgebraPlugin.beforeSwap.selector, fee, 0);
   }
 
   function afterSwap(address, address, bool zeroToOne, int256, uint160, int256, int256, bytes calldata) external override onlyPool returns (bytes4) {

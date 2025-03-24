@@ -51,8 +51,7 @@ contract MockTimeDSFactoryV2 is IBasePluginV2Factory {
   }
 
   function _createPlugin(address pool) internal returns (address) {
-    MockTimeAlgebraBasePluginV2 plugin = new MockTimeAlgebraBasePluginV2(pool, algebraFactory, address(this));
-    plugin.setBaseFee(defaultBaseFee);
+    MockTimeAlgebraBasePluginV2 plugin = new MockTimeAlgebraBasePluginV2(pool, algebraFactory, address(this), defaultBaseFee);
     pluginByPool[pool] = address(plugin);
     return address(plugin);
   }
