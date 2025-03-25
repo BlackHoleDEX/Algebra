@@ -11,7 +11,7 @@ import './plugins/SlidingFeePlugin.sol';
 import './plugins/VolatilityOraclePlugin.sol';
 
 /// @title Algebra Integral 1.2.1 adaptive fee plugin
-contract AlgebraBasePluginALM is DynamicFeePlugin, VolatilityOraclePlugin, AlmPlugin {
+contract AlgebraBasePluginALM is AlmPlugin, DynamicFeePlugin, VolatilityOraclePlugin {
   using Plugins for uint8;
 
   /// @inheritdoc IAlgebraPlugin
@@ -71,8 +71,7 @@ contract AlgebraBasePluginALM is DynamicFeePlugin, VolatilityOraclePlugin, AlmPl
       failedToObtainTWAP = true;
     }
 
-    TwapResult memory twapResult = _obtainTWAPs(currentTick, slowTwapTick, fastTwapTick, lastBlockTimestamp, failedToObtainTWAP);
-    _rebalance(twapResult);
+	_obtainTWAPAndRebalance(currentTick, slowTwapTick, fastTwapTick, lastBlockTimestamp, failedToObtainTWAP);
 
     return IAlgebraPlugin.afterSwap.selector;
   }
