@@ -72,7 +72,7 @@ export default {
     outDir: 'typechain',
   },
   solidity: {
-    compilers: [HIGHEST_OPTIMIZER_COMPILER_SETTINGS],
+    compilers: [LOWEST_COMPILER_SETTINGS],
   },
   docgen: {
     outputDir: '../../docs/Contracts/Plugin',
