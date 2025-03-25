@@ -214,7 +214,7 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
             }
             return false;
         }else if(userDeposit > 0){
-            return true;
+            return (poolStatus == PoolStatus.PRE_LISTING || poolStatus == PoolStatus.PRE_LAUNCH || poolStatus == PoolStatus.PRE_LAUNCH_DEPOSIT_DISABLED || poolStatus == PoolStatus.NOT_QUALIFIED); 
         }
         return false;
     }
