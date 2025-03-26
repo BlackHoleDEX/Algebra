@@ -242,6 +242,9 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
     }
 
     function launch(address router, uint256 maturityTime) external onlyManager {
+        if(genesisInfo.maturityTime > 0) {
+            maturityTime = genesisInfo.maturityTime;
+        }
         if(_eligbleForCompleteLaunch()){
             _launchCompletely(router, maturityTime);
         }else{
@@ -412,4 +415,9 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
         require(poolStatus == PoolStatus.NATIVE_TOKEN_DEPOSITED, "!= status");
         auction = IAuction(_auction);
     }
+
+    function setGenesisPoolMaturityTime(uint256 _maturityTime) external onlyManager{
+        genesisInfo.maturityTime = _maturityTime;
+    }
+
 }
