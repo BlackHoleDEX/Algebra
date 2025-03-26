@@ -112,7 +112,11 @@ contract AlmPluginTest is BaseRebalanceManager {
   }
 
   function setDecimals(uint8 _depositDecimals, uint8 _pairedDecimals) public {
-    (depositDecimals, pairedDecimals) = (_depositDecimals, _pairedDecimals);
+    (depositTokenDecimals, pairedTokenDecimals) = (_depositDecimals, _pairedDecimals);
+
+    decimalsSum = _depositDecimals + _pairedDecimals;
+    // console.log('decimals sum: ', decimalsSum);
+    tokenDecimals = allowToken1 ? _pairedDecimals : _depositDecimals;
   }
 
   function _getDepositTokenVaultBalance() internal view override returns (uint256) {

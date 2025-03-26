@@ -25,10 +25,14 @@ describe('#AlmPlugin', () => {
 			baseHighPct: string | number,
 			limitReservePct: string | number,
 		},
-		tickSpacing: number
+		tickSpacing: number,
+		allowToken0: boolean,
+		allowToken1: boolean
 	) {
 		const mockVaultFactory = await ethers.getContractFactory('MockVault');
 		const mockVault = await mockVaultFactory.deploy(ZERO_ADDRESS, true, false) as any as MockVault;
+
+		await mockVault.setAllowTokens(allowToken0, allowToken1);
 
 		const almPluginFactory = await ethers.getContractFactory('AlmPluginTest');
 		const almPlugin = (await almPluginFactory.deploy(
@@ -58,11 +62,11 @@ describe('#AlmPlugin', () => {
 				baseLowPct: 3000, // было 2000
 				baseHighPct: 1500, // было 3000
 				limitReservePct: 500,
-			}, 228);
+			}, 228, true, false);
 		});
 	});
 
-	describe('#rebalance', () => {
+	describe('#rebalance1', () => {
 		for (const rebalance of rebalances) {
 			it(`rebalance for tx ${rebalance.transactionHash}`, async () => {
 				const { almPlugin, mockVault } = await almPluginFixture({
@@ -79,7 +83,7 @@ describe('#AlmPlugin', () => {
 					baseLowPct: rebalance.state.baseLowPct,
 					baseHighPct: rebalance.state.baseHighPct,
 					limitReservePct: rebalance.state.limitReservePct,
-				}, 60);
+				}, 60, true, false);
 
 				const state = rebalance.state;
 				const currentTick = BigInt(state.currentTick);
@@ -128,7 +132,7 @@ describe('#AlmPlugin', () => {
 					baseLowPct: rebalance.state.baseLowPct,
 					baseHighPct: rebalance.state.baseHighPct,
 					limitReservePct: rebalance.state.limitReservePct,
-				}, 60);
+				}, 60, true, false);
 
 				const state = rebalance.state;
 				const currentTick = BigInt(state.currentTick);
@@ -177,7 +181,7 @@ describe('#AlmPlugin', () => {
 					baseLowPct: rebalance.state.baseLowPct,
 					baseHighPct: rebalance.state.baseHighPct,
 					limitReservePct: rebalance.state.limitReservePct,
-				}, 200);
+				}, 200, false, true);
 
 				const state = rebalance.state;
 				const currentTick = BigInt(state.currentTick);

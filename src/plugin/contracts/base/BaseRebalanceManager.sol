@@ -300,6 +300,7 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
     twapResult.currentTick = currentTick;
     twapResult.sameBlock = _blockTimestamp() == lastBlockTimestamp;
     bool _allowToken1 = allowToken1;
+    // console.log("allowToken1: ", allowToken1);
     if (_allowToken1) {
       // почему они эту строку наверх не вынесли?
       (uint256 amount0, uint256 amount1) = IAlgebraVault(vault).getTotalAmounts();
@@ -337,6 +338,9 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
 
     // uint256 currentPriceAccountingDecimals = _getPriceAccountingDecimals(_depositToken, _pairedToken, uint128(10 ** _pairedTokenDecimals), twapResult.currentTick);
     // console.log('2.5');
+    // console.log("currentPriceAccountingDecimals: ", currentPriceAccountingDecimals);
+    // console.log("twapResult.totalPairedToken: ", twapResult.totalPairedToken);
+    // console.log("_pairedTokenDecimals: ", _pairedTokenDecimals);
     twapResult.currentPriceAccountingDecimals = currentPriceAccountingDecimals;
     uint256 totalPairedInDepositWithDecimals = currentPriceAccountingDecimals * twapResult.totalPairedToken;
     uint256 totalPairedInDeposit = totalPairedInDepositWithDecimals / (10 ** _pairedTokenDecimals);
@@ -944,6 +948,7 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
 
   function getTickAtPrice(uint8 _tokenDecimals, uint256 _price) private pure returns (int24) {
     uint160 sqrtPriceX96 = getSqrtPriceX96(_tokenDecimals, _price);
+    // console.log("_tokenDecimals: ", _tokenDecimals);
     return TickMath.getTickAtSqrtRatio(sqrtPriceX96);
   }
 
