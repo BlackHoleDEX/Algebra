@@ -1,0 +1,2204 @@
+{
+	"rebalances2": [
+		{
+			"transactionHash": "0x8bf188bb6b7dccc6e6a259bf0a842001cc6b4d3729a93d28b919acee0d6a19ba",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52118373,
+				"lastRebalancePrice": "51878",
+				"state": "1",
+				"currentTick": "305819",
+				"currentPrice": "52373",
+				"twapSlow": "51738",
+				"twapFast": "51588",
+				"depositTokenBalance": "0",
+				"pairedTokenBalance": "3396736",
+				"usedToken0": "26633752",
+				"usedToken1": "85802082546924596827",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "80",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "2000",
+				"baseHighPct": "1000",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "305760",
+					"topTick": "312720"
+				},
+				"limitPosition": {
+					"bottomTick": "298860",
+					"topTick": "305760"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x48de1ac6aa72d6533e1df60538009c81923a85b19aca1e52579518005c8992a3",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52120078,
+				"lastRebalancePrice": "52373",
+				"state": "3",
+				"currentTick": "305776",
+				"currentPrice": "52599",
+				"twapSlow": "52531",
+				"twapFast": "52599",
+				"depositTokenBalance": "0",
+				"pairedTokenBalance": "1154662",
+				"usedToken0": "26842809",
+				"usedToken1": "82197437312526019392",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "80",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "2000",
+				"baseHighPct": "1000",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "305520",
+					"topTick": "307980"
+				},
+				"limitPosition": {
+					"bottomTick": "-887220",
+					"topTick": "305520"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x95e842455ecfc8e96f4967840d1f2969535be4b261c6ae63bee88b8db0b5dfbf",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52122528,
+				"lastRebalancePrice": "52599",
+				"state": "1",
+				"currentTick": "305941",
+				"currentPrice": "51738",
+				"twapSlow": "52431",
+				"twapFast": "52232",
+				"depositTokenBalance": "0",
+				"pairedTokenBalance": "2738031",
+				"usedToken0": "24724519",
+				"usedToken1": "122852795821242097918",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "80",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "2000",
+				"baseHighPct": "1000",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "305940",
+					"topTick": "312840"
+				},
+				"limitPosition": {
+					"bottomTick": "298980",
+					"topTick": "305940"
+				}
+			}
+		},
+		{
+			"transactionHash": "0xf4d477726be2d26365711ccca3589c5a4235102c7690a496658b155c342c1fce",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52145294,
+				"lastRebalancePrice": "52384",
+				"state": "3",
+				"currentTick": "305837",
+				"currentPrice": "52279",
+				"twapSlow": "52300",
+				"twapFast": "52279",
+				"depositTokenBalance": "0",
+				"pairedTokenBalance": "541812",
+				"usedToken0": "24334136",
+				"usedToken1": "131589505378911613863",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "80",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "2000",
+				"baseHighPct": "1000",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "305400",
+					"topTick": "308040"
+				},
+				"limitPosition": {
+					"bottomTick": "-887220",
+					"topTick": "305400"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x4b864ba4ddf8afd16d7bb2ec8d711186d3913d56b53dd21675c07b7014e66f26",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52148572,
+				"lastRebalancePrice": "52279",
+				"state": "1",
+				"currentTick": "305637",
+				"currentPrice": "53335",
+				"twapSlow": "52426",
+				"twapFast": "52594",
+				"depositTokenBalance": "0",
+				"pairedTokenBalance": "3310751",
+				"usedToken0": "26672600",
+				"usedToken1": "87406360311992835312",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "80",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "2000",
+				"baseHighPct": "1000",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "305580",
+					"topTick": "312540"
+				},
+				"limitPosition": {
+					"bottomTick": "298680",
+					"topTick": "305580"
+				}
+			}
+		},
+		{
+			"transactionHash": "0xea8caa37f7d0f10aaee664ee063d13a6389e5a167176134837aba58fa1bc58a4",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52151867,
+				"lastRebalancePrice": "53335",
+				"state": "3",
+				"currentTick": "305586",
+				"currentPrice": "53608",
+				"twapSlow": "53651",
+				"twapFast": "53640",
+				"depositTokenBalance": "0",
+				"pairedTokenBalance": "870449",
+				"usedToken0": "26917686",
+				"usedToken1": "83047650462793719300",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "80",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "2000",
+				"baseHighPct": "1000",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "305340",
+					"topTick": "307800"
+				},
+				"limitPosition": {
+					"bottomTick": "-887220",
+					"topTick": "305340"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x7f9056e572fdc28047d238fcd85173381979c60b1546bf6c819e649ef59a3fce",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52155075,
+				"lastRebalancePrice": "53608",
+				"state": "1",
+				"currentTick": "305526",
+				"currentPrice": "53930",
+				"twapSlow": "53479",
+				"twapFast": "53914",
+				"depositTokenBalance": "0",
+				"pairedTokenBalance": "1786362",
+				"usedToken0": "27694467",
+				"usedToken1": "68642907954387482607",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "80",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "2000",
+				"baseHighPct": "1000",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "305520",
+					"topTick": "312420"
+				},
+				"limitPosition": {
+					"bottomTick": "298560",
+					"topTick": "305520"
+				}
+			}
+		},
+		{
+			"transactionHash": "0xd7bdf9f01dc29c5e045ba50dcdff9188cb8a2ac74ce94c43064e844cf436f16b",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52158469,
+				"lastRebalancePrice": "53930",
+				"state": "3",
+				"currentTick": "305601",
+				"currentPrice": "53527",
+				"twapSlow": "53635",
+				"twapFast": "53527",
+				"depositTokenBalance": "0",
+				"pairedTokenBalance": "557802",
+				"usedToken0": "27344900",
+				"usedToken1": "75320546611139607771",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "80",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "2000",
+				"baseHighPct": "1000",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "305400",
+					"topTick": "307800"
+				},
+				"limitPosition": {
+					"bottomTick": "-887220",
+					"topTick": "305400"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x03276d66936eb15092dca4e950fab3d8b6b4d58d7c7e9efb2d4a767ba17c997b",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52175965,
+				"lastRebalancePrice": "52815",
+				"state": "3",
+				"currentTick": "305304",
+				"currentPrice": "55141",
+				"twapSlow": "54702",
+				"twapFast": "55141",
+				"depositTokenBalance": "183028369",
+				"pairedTokenBalance": "1096595",
+				"usedToken0": "837163844",
+				"usedToken1": "202078850152129009402",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "80",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "2000",
+				"baseHighPct": "1000",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "-887220",
+					"topTick": "305340"
+				},
+				"limitPosition": {
+					"bottomTick": "305340",
+					"topTick": "307560"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x57577c81802dcc538e2579856b23e687d577415f4503f95f22637c2959f9ded2",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52184327,
+				"lastRebalancePrice": "55191",
+				"state": "0",
+				"currentTick": "305351",
+				"currentPrice": "54882",
+				"twapSlow": "55351",
+				"twapFast": "54904",
+				"depositTokenBalance": "0",
+				"pairedTokenBalance": "623377",
+				"usedToken0": "4214810357",
+				"usedToken1": "741769483915778226292",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "80",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "2000",
+				"baseHighPct": "1000",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "305340",
+					"topTick": "312240"
+				},
+				"limitPosition": {
+					"bottomTick": "298380",
+					"topTick": "305340"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x80b7b0f6bc88f6003bf6c5a891d5fa9431b4759436c395eba0ab8fb2731092d2",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52192001,
+				"lastRebalancePrice": "55268",
+				"state": "3",
+				"currentTick": "305250",
+				"currentPrice": "55440",
+				"twapSlow": "55318",
+				"twapFast": "55440",
+				"depositTokenBalance": "0",
+				"pairedTokenBalance": "1024393",
+				"usedToken0": "4141471019",
+				"usedToken1": "2127521829907067277518",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "80",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "2000",
+				"baseHighPct": "1000",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "-887220",
+					"topTick": "305280"
+				},
+				"limitPosition": {
+					"bottomTick": "305280",
+					"topTick": "307500"
+				}
+			}
+		},
+		{
+			"transactionHash": "0xdb4acf10c61efbdbb51f4afc273dbc7dcf64717a0120daba6a3a59cbfe5ddb60",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52205100,
+				"lastRebalancePrice": "56137",
+				"state": "3",
+				"currentTick": "305349",
+				"currentPrice": "54893",
+				"twapSlow": "55213",
+				"twapFast": "54893",
+				"depositTokenBalance": "0",
+				"pairedTokenBalance": "628488",
+				"usedToken0": "3781079039",
+				"usedToken1": "8655888168412370725806",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "80",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "2000",
+				"baseHighPct": "1000",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "305160",
+					"topTick": "307560"
+				},
+				"limitPosition": {
+					"bottomTick": "-887220",
+					"topTick": "305160"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x0b00e0672d17c01eca4a7ab5e8ab3f7d496e65b0a640bb3bc74ffed3b9dcd721",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52229731,
+				"lastRebalancePrice": "55562",
+				"state": "0",
+				"currentTick": "305261",
+				"currentPrice": "55379",
+				"twapSlow": "55517",
+				"twapFast": "55379",
+				"depositTokenBalance": "0",
+				"pairedTokenBalance": "3616263",
+				"usedToken0": "3945332883",
+				"usedToken1": "5722540941972001044523",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "80",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "2000",
+				"baseHighPct": "1000",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "-887220",
+					"topTick": "305280"
+				},
+				"limitPosition": {
+					"bottomTick": "305280",
+					"topTick": "307500"
+				}
+			}
+		},
+		{
+			"transactionHash": "0xa6ab9b3b8db20a64f47f1aee0832a6c66821d224e541717949eb161aaca3a19a",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52235227,
+				"lastRebalancePrice": "55712",
+				"state": "3",
+				"currentTick": "304936",
+				"currentPrice": "57208",
+				"twapSlow": "56894",
+				"twapFast": "57208",
+				"depositTokenBalance": "0",
+				"pairedTokenBalance": "352195",
+				"usedToken0": "4088793746",
+				"usedToken1": "3166108676571027099999",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "80",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "2000",
+				"baseHighPct": "1000",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "-887220",
+					"topTick": "304980"
+				},
+				"limitPosition": {
+					"bottomTick": "304980",
+					"topTick": "307200"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x53805c575a3d32fb0fd9a4df1a885aebcb986146df7ec8a8bb339f9859289a79",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52244701,
+				"lastRebalancePrice": "54680",
+				"state": "3",
+				"currentTick": "305352",
+				"currentPrice": "54877",
+				"twapSlow": "54926",
+				"twapFast": "54828",
+				"depositTokenBalance": "541991",
+				"pairedTokenBalance": "908351",
+				"usedToken0": "3579130140",
+				"usedToken1": "12398301337603776326511",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "80",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "2000",
+				"baseHighPct": "1000",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "305040",
+					"topTick": "307560"
+				},
+				"limitPosition": {
+					"bottomTick": "-887220",
+					"topTick": "305040"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x8ef0969c5f3f2c5a0955dbe7c574f61d3a756d152ac92cb4ad9e8f73966cf456",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52251047,
+				"lastRebalancePrice": "54877",
+				"state": "1",
+				"currentTick": "305510",
+				"currentPrice": "54017",
+				"twapSlow": "54620",
+				"twapFast": "54174",
+				"depositTokenBalance": "1962899848",
+				"pairedTokenBalance": "72559",
+				"usedToken0": "5272380838",
+				"usedToken1": "17387273699179332512967",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "3000",
+				"baseHighPct": "1500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "305100",
+					"topTick": "309060"
+				},
+				"limitPosition": {
+					"bottomTick": "-887220",
+					"topTick": "305100"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x377a553bacfa7ffe9c8e3e70541b7ddf22b00c41532fc2159eda55152d142891",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52255916,
+				"lastRebalancePrice": "53186",
+				"state": "3",
+				"currentTick": "305895",
+				"currentPrice": "51977",
+				"twapSlow": "52567",
+				"twapFast": "51977",
+				"depositTokenBalance": "0",
+				"pairedTokenBalance": "1214",
+				"usedToken0": "4824792674",
+				"usedToken1": "25833928427342171156197",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "3000",
+				"baseHighPct": "1500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "305220",
+					"topTick": "309420"
+				},
+				"limitPosition": {
+					"bottomTick": "-887220",
+					"topTick": "305220"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x26699e55a937fc04123f66beaed5b4b26183faa9559cd1db85d13b38cecbca45",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52291589,
+				"lastRebalancePrice": "52510",
+				"state": "1",
+				"currentTick": "305469",
+				"currentPrice": "54239",
+				"twapSlow": "54342",
+				"twapFast": "54239",
+				"depositTokenBalance": "379000000",
+				"pairedTokenBalance": "1390901",
+				"usedToken0": "5971640526",
+				"usedToken1": "13393828837977646867893",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "3000",
+				"baseHighPct": "1500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "305220",
+					"topTick": "309000"
+				},
+				"limitPosition": {
+					"bottomTick": "-887220",
+					"topTick": "305220"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x6a30de26e17c203139db8f39a05ad080cbae81dbdd9be378b34a60c55ffd4a28",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52296371,
+				"lastRebalancePrice": "54239",
+				"state": "1",
+				"currentTick": "305564",
+				"currentPrice": "53726",
+				"twapSlow": "53726",
+				"twapFast": "53726",
+				"depositTokenBalance": "1269773269",
+				"pairedTokenBalance": "220526",
+				"usedToken0": "7066180171",
+				"usedToken1": "16621850614887507710528",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "3000",
+				"baseHighPct": "1500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "305340",
+					"topTick": "309120"
+				},
+				"limitPosition": {
+					"bottomTick": "-887220",
+					"topTick": "305340"
+				}
+			}
+		},
+		{
+			"transactionHash": "0xe1106781190be09a7aa81128d1bb54e7cda1473adddfd69429cd17354191d77c",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52312810,
+				"lastRebalancePrice": "53726",
+				"state": "1",
+				"currentTick": "305663",
+				"currentPrice": "53197",
+				"twapSlow": "53372",
+				"twapFast": "53197",
+				"depositTokenBalance": "1140608343",
+				"pairedTokenBalance": "1989602",
+				"usedToken0": "7009206239",
+				"usedToken1": "17715806037462838295271",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "3000",
+				"baseHighPct": "1500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "305400",
+					"topTick": "309180"
+				},
+				"limitPosition": {
+					"bottomTick": "-887220",
+					"topTick": "305400"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x647bfc3b23d0ad26e858a3090fe4e4a40abe76bea0392e24269466368e3045c3",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52319712,
+				"lastRebalancePrice": "53197",
+				"state": "1",
+				"currentTick": "305966",
+				"currentPrice": "51609",
+				"twapSlow": "53737",
+				"twapFast": "53538",
+				"depositTokenBalance": "0",
+				"pairedTokenBalance": "2498945",
+				"usedToken0": "6356025201",
+				"usedToken1": "30177131998379951939293",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "3000",
+				"baseHighPct": "1500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "305940",
+					"topTick": "312840"
+				},
+				"limitPosition": {
+					"bottomTick": "298980",
+					"topTick": "305940"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x42d103517d0e0f909cd2f95d343cf0fd24ce7b3c624baa0145b2e4cadfdee612",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52324931,
+				"lastRebalancePrice": "51609",
+				"state": "3",
+				"currentTick": "305850",
+				"currentPrice": "52211",
+				"twapSlow": "52065",
+				"twapFast": "52008",
+				"depositTokenBalance": "38360895",
+				"pairedTokenBalance": "566757",
+				"usedToken0": "6450376341",
+				"usedToken1": "29263409127481530892645",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "3000",
+				"baseHighPct": "1500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "305280",
+					"topTick": "309360"
+				},
+				"limitPosition": {
+					"bottomTick": "-887220",
+					"topTick": "305280"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x4d5d92fa3d8ddc7a369e6d38e61bd2826b94b1f12f7463e5388aecdec666f3ca",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52357872,
+				"lastRebalancePrice": "52295",
+				"state": "1",
+				"currentTick": "305971",
+				"currentPrice": "51583",
+				"twapSlow": "51909",
+				"twapFast": "51594",
+				"depositTokenBalance": "459953920",
+				"pairedTokenBalance": "4157113",
+				"usedToken0": "6800168315",
+				"usedToken1": "34122257478041390060580",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "3000",
+				"baseHighPct": "1500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "305400",
+					"topTick": "309480"
+				},
+				"limitPosition": {
+					"bottomTick": "-887220",
+					"topTick": "305400"
+				}
+			}
+		},
+		{
+			"transactionHash": "0xd5e8d4ab05aaf9f8be0393dbdfa9420b80260a5f3cffaf3181b6dcefe3905975",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52363072,
+				"lastRebalancePrice": "51583",
+				"state": "1",
+				"currentTick": "305801",
+				"currentPrice": "52468",
+				"twapSlow": "52347",
+				"twapFast": "52468",
+				"depositTokenBalance": "5000000003",
+				"pairedTokenBalance": "2315938",
+				"usedToken0": "12162011586",
+				"usedToken1": "27181637665303955459738",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "3000",
+				"baseHighPct": "1500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "305580",
+					"topTick": "309360"
+				},
+				"limitPosition": {
+					"bottomTick": "-887220",
+					"topTick": "305580"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x2489f148474aaf4983543639c0d3e6640e3718c247f460872d9566b0db97c95d",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52375311,
+				"lastRebalancePrice": "52468",
+				"state": "1",
+				"currentTick": "305608",
+				"currentPrice": "53490",
+				"twapSlow": "52863",
+				"twapFast": "53490",
+				"depositTokenBalance": "0",
+				"pairedTokenBalance": "2707595",
+				"usedToken0": "12482949117",
+				"usedToken1": "13069874255451379270413",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "3000",
+				"baseHighPct": "1500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "-887220",
+					"topTick": "305640"
+				},
+				"limitPosition": {
+					"bottomTick": "305640",
+					"topTick": "309180"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x55dd8d5a2de3577b07ccefe8f5d7e8e5581e3551f08869e353928c949701267e",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52394217,
+				"lastRebalancePrice": "53635",
+				"state": "0",
+				"currentTick": "305656",
+				"currentPrice": "53234",
+				"twapSlow": "53511",
+				"twapFast": "53346",
+				"depositTokenBalance": "0",
+				"pairedTokenBalance": "2221024",
+				"usedToken0": "11986830429",
+				"usedToken1": "13787984341636322582855",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "3000",
+				"baseHighPct": "1500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "-887220",
+					"topTick": "305700"
+				},
+				"limitPosition": {
+					"bottomTick": "305700",
+					"topTick": "309240"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x354cc327bc5a333e1baea560732af0f4e291a195b75d718429072bf7a3398439",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52494665,
+				"lastRebalancePrice": "49432",
+				"state": "2",
+				"currentTick": "306704",
+				"currentPrice": "47938",
+				"twapSlow": "47938",
+				"twapFast": "47938",
+				"depositTokenBalance": "0",
+				"pairedTokenBalance": "91719",
+				"usedToken0": "5545823783",
+				"usedToken1": "41564842349498368665349",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "3000",
+				"baseHighPct": "1500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "306660",
+					"topTick": "887220"
+				},
+				"limitPosition": {
+					"bottomTick": "305280",
+					"topTick": "306660"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x7f49f295f6bc5b2e32b14a1fdac2413469a52c92647f3462aae4b2688e27a917",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52910328,
+				"lastRebalancePrice": "48638",
+				"state": "1",
+				"currentTick": "306202",
+				"currentPrice": "50405",
+				"twapSlow": "50446",
+				"twapFast": "50405",
+				"depositTokenBalance": "0",
+				"pairedTokenBalance": "1281863",
+				"usedToken0": "51920818714",
+				"usedToken1": "60104532807922050649715",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "3000",
+				"baseHighPct": "1500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "-887220",
+					"topTick": "306240"
+				},
+				"limitPosition": {
+					"bottomTick": "306240",
+					"topTick": "309780"
+				}
+			}
+		},
+		{
+			"transactionHash": "0xbdcefece118153758a170f016e875f1fdd25af8628a44e1b69226b8d47488d6d",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 52929893,
+				"lastRebalancePrice": "50405",
+				"state": "0",
+				"currentTick": "306364",
+				"currentPrice": "49595",
+				"twapSlow": "49481",
+				"twapFast": "49595",
+				"depositTokenBalance": "0",
+				"pairedTokenBalance": "2847416",
+				"usedToken0": "49945859414",
+				"usedToken1": "99945159702788799912236",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "3000",
+				"baseHighPct": "1500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "306180",
+					"topTick": "309900"
+				},
+				"limitPosition": {
+					"bottomTick": "-887220",
+					"topTick": "306180"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x496f498e2494fab334fd5d8a3d8a3810766de6f6418f6f77889936255bc9982b",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 53001010,
+				"lastRebalancePrice": "46647",
+				"state": "2",
+				"currentTick": "306920",
+				"currentPrice": "46913",
+				"twapSlow": "46913",
+				"twapFast": "46913",
+				"depositTokenBalance": "152993873",
+				"pairedTokenBalance": "73542",
+				"usedToken0": "29092211844",
+				"usedToken1": "186347567699054640648894",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "1000",
+				"baseHighPct": "500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "306900",
+					"topTick": "887220"
+				},
+				"limitPosition": {
+					"bottomTick": "306420",
+					"topTick": "306900"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x7284baaa953b82e6f4e88ee1fa32501cad207333472ffbc9ab6e86c3a3855236",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 53168157,
+				"lastRebalancePrice": "45581",
+				"state": "2",
+				"currentTick": "307384",
+				"currentPrice": "44786",
+				"twapSlow": "45128",
+				"twapFast": "44885",
+				"depositTokenBalance": "285609895",
+				"pairedTokenBalance": "57815",
+				"usedToken0": "33147272623",
+				"usedToken1": "281299803196902979524378",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "1000",
+				"baseHighPct": "500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "307380",
+					"topTick": "887220"
+				},
+				"limitPosition": {
+					"bottomTick": "306840",
+					"topTick": "307380"
+				}
+			}
+		},
+		{
+			"transactionHash": "0xbf2798a2548d0996720447749b3fb12ee82862fc6a3d1dc9d73c8f3b756a4f0d",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 53208372,
+				"lastRebalancePrice": "45810",
+				"state": "1",
+				"currentTick": "306930",
+				"currentPrice": "46866",
+				"twapSlow": "46866",
+				"twapFast": "46866",
+				"depositTokenBalance": "1102666280",
+				"pairedTokenBalance": "2982997",
+				"usedToken0": "45099132284",
+				"usedToken1": "46553054160901135303587",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "1000",
+				"baseHighPct": "500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "-887220",
+					"topTick": "306960"
+				},
+				"limitPosition": {
+					"bottomTick": "306960",
+					"topTick": "308040"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x63b6027981899ce41dd9ea4741b851450252b970e5b0433514a843d56a4aa200",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 53228192,
+				"lastRebalancePrice": "46866",
+				"state": "0",
+				"currentTick": "306872",
+				"currentPrice": "47139",
+				"twapSlow": "46838",
+				"twapFast": "47148",
+				"depositTokenBalance": "1035634886",
+				"pairedTokenBalance": "62526",
+				"usedToken0": "45969651695",
+				"usedToken1": "46383992480626488537275",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "1000",
+				"baseHighPct": "500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "-887220",
+					"topTick": "306900"
+				},
+				"limitPosition": {
+					"bottomTick": "306900",
+					"topTick": "307980"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x7330f777fb9cf0a5c661534de6ce3e77de8333c3475aca31f9482133b954e29c",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 53288720,
+				"lastRebalancePrice": "48696",
+				"state": "0",
+				"currentTick": "306404",
+				"currentPrice": "49397",
+				"twapSlow": "49397",
+				"twapFast": "49397",
+				"depositTokenBalance": "0",
+				"pairedTokenBalance": "2993903",
+				"usedToken0": "45702486604",
+				"usedToken1": "18868686817785061036899",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "1000",
+				"baseHighPct": "500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "-887220",
+					"topTick": "306420"
+				},
+				"limitPosition": {
+					"bottomTick": "306420",
+					"topTick": "307500"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x901bd51e285bcb6fe2d88c9322e69ab3651aa843eb17a443e3d6526c5b8985c8",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 53296955,
+				"lastRebalancePrice": "49397",
+				"state": "0",
+				"currentTick": "306044",
+				"currentPrice": "51208",
+				"twapSlow": "50134",
+				"twapFast": "51172",
+				"depositTokenBalance": "0",
+				"pairedTokenBalance": "350592",
+				"usedToken0": "45719457280",
+				"usedToken1": "18532247691715796729261",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "1000",
+				"baseHighPct": "500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "306000",
+					"topTick": "312960"
+				},
+				"limitPosition": {
+					"bottomTick": "299100",
+					"topTick": "306000"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x566773b18dae517c7947f7dfc47458a3e41929191954a71866b6cffc0069174f",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 53339066,
+				"lastRebalancePrice": "51868",
+				"state": "0",
+				"currentTick": "305963",
+				"currentPrice": "51625",
+				"twapSlow": "51888",
+				"twapFast": "51625",
+				"depositTokenBalance": "0",
+				"pairedTokenBalance": "3814386",
+				"usedToken0": "22118658656",
+				"usedToken1": "15709140655475407132230",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "1000",
+				"baseHighPct": "500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "-887220",
+					"topTick": "306000"
+				},
+				"limitPosition": {
+					"bottomTick": "306000",
+					"topTick": "307020"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x560f8264d536cbcde0de0041edbe007e5622a0e8256fe9ab8c408ba2bf318f86",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 53497646,
+				"lastRebalancePrice": "59751",
+				"state": "2",
+				"currentTick": "304705",
+				"currentPrice": "58545",
+				"twapSlow": "58586",
+				"twapFast": "58545",
+				"depositTokenBalance": "2011640662",
+				"pairedTokenBalance": "48163",
+				"usedToken0": "20001213414",
+				"usedToken1": "118081131363835443839732",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "1000",
+				"baseHighPct": "500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "304680",
+					"topTick": "887220"
+				},
+				"limitPosition": {
+					"bottomTick": "304200",
+					"topTick": "304680"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x2a387d172df03e83450d603bcd2d4191a58e3214fb88525f48e0b354b7aafb47",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 53507043,
+				"lastRebalancePrice": "58545",
+				"state": "2",
+				"currentTick": "304326",
+				"currentPrice": "60806",
+				"twapSlow": "59507",
+				"twapFast": "60739",
+				"depositTokenBalance": "32499096",
+				"pairedTokenBalance": "2631",
+				"usedToken0": "25268417340",
+				"usedToken1": "30938211583463709266052",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "1000",
+				"baseHighPct": "500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "304320",
+					"topTick": "311220"
+				},
+				"limitPosition": {
+					"bottomTick": "297360",
+					"topTick": "304320"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x3425ff3c1d251c386ea259425bd76d08b365885c0560e9950d09898a7def0211",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 53637850,
+				"lastRebalancePrice": "57328",
+				"state": "0",
+				"currentTick": "305079",
+				"currentPrice": "56396",
+				"twapSlow": "56317",
+				"twapFast": "56396",
+				"depositTokenBalance": "10761706446",
+				"pairedTokenBalance": "3407563",
+				"usedToken0": "54536449059",
+				"usedToken1": "199668242511296620543280",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "1000",
+				"baseHighPct": "500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "304920",
+					"topTick": "306120"
+				},
+				"limitPosition": {
+					"bottomTick": "-887220",
+					"topTick": "304920"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x15ecff25ba1072e5a5f451e67459daf15516d823c847469b59b7209f3e5142be",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 53656869,
+				"lastRebalancePrice": "56396",
+				"state": "1",
+				"currentTick": "304924",
+				"currentPrice": "57277",
+				"twapSlow": "57019",
+				"twapFast": "57277",
+				"depositTokenBalance": "17755989867",
+				"pairedTokenBalance": "3042705",
+				"usedToken0": "80739567880",
+				"usedToken1": "52150261718886275170961",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "1000",
+				"baseHighPct": "500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "-887220",
+					"topTick": "304980"
+				},
+				"limitPosition": {
+					"bottomTick": "304980",
+					"topTick": "306000"
+				}
+			}
+		},
+		{
+			"transactionHash": "0xc32c1cccee5e4b74b5cd42824051dd86051dcb47572e65c6d0c17c719fe11999",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 53750958,
+				"lastRebalancePrice": "57082",
+				"state": "3",
+				"currentTick": "305136",
+				"currentPrice": "56075",
+				"twapSlow": "56441",
+				"twapFast": "56075",
+				"depositTokenBalance": "158479950",
+				"pairedTokenBalance": "558883",
+				"usedToken0": "47423982039",
+				"usedToken1": "488664903550421737649778",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "1000",
+				"baseHighPct": "500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "305100",
+					"topTick": "887220"
+				},
+				"limitPosition": {
+					"bottomTick": "304620",
+					"topTick": "305100"
+				}
+			}
+		},
+		{
+			"transactionHash": "0xb909267996439e0975a625a60a3cc58983edd6fb1169c3244a17c1e66e080ef8",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 53866630,
+				"lastRebalancePrice": "56548",
+				"state": "0",
+				"currentTick": "304630",
+				"currentPrice": "58985",
+				"twapSlow": "57328",
+				"twapFast": "58527",
+				"depositTokenBalance": "1238929384",
+				"pairedTokenBalance": "3727241",
+				"usedToken0": "71425614830",
+				"usedToken1": "64713852817662524386564",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "1000",
+				"baseHighPct": "500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "304620",
+					"topTick": "311520"
+				},
+				"limitPosition": {
+					"bottomTick": "297660",
+					"topTick": "304620"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x850f13b8579f8639eebfb22c6b5e725fae8f159b6d4fb9cd51b9f4096274b902",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 53912841,
+				"lastRebalancePrice": "63218",
+				"state": "3",
+				"currentTick": "304188",
+				"currentPrice": "61651",
+				"twapSlow": "61700",
+				"twapFast": "61651",
+				"depositTokenBalance": "492119442",
+				"pairedTokenBalance": "236649",
+				"usedToken0": "69228194735",
+				"usedToken1": "109850680083620936173657",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "1000",
+				"baseHighPct": "500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "304140",
+					"topTick": "305220"
+				},
+				"limitPosition": {
+					"bottomTick": "-887220",
+					"topTick": "304140"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x77eb622162ef0483dbdebafc2a89294035906c3819712051e5c22864016dea9d",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 53933313,
+				"lastRebalancePrice": "61651",
+				"state": "1",
+				"currentTick": "304376",
+				"currentPrice": "60503",
+				"twapSlow": "60569",
+				"twapFast": "60503",
+				"depositTokenBalance": "60760677",
+				"pairedTokenBalance": "335179",
+				"usedToken0": "56082644322",
+				"usedToken1": "319558878933819970682064",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "1000",
+				"baseHighPct": "500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "304320",
+					"topTick": "887220"
+				},
+				"limitPosition": {
+					"bottomTick": "303840",
+					"topTick": "304320"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x884873d62d97e051d9ca65a8e387954169b036c870f9f7af39738d8e02268d95",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 53953460,
+				"lastRebalancePrice": "60503",
+				"state": "2",
+				"currentTick": "304295",
+				"currentPrice": "60995",
+				"twapSlow": "60666",
+				"twapFast": "60995",
+				"depositTokenBalance": "253594783",
+				"pairedTokenBalance": "77526",
+				"usedToken0": "57425751447",
+				"usedToken1": "300112402951949788783723",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "1000",
+				"baseHighPct": "500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "304260",
+					"topTick": "887220"
+				},
+				"limitPosition": {
+					"bottomTick": "303780",
+					"topTick": "304260"
+				}
+			}
+		},
+		{
+			"transactionHash": "0xe0878917d337a26066f5d908f0719d0b0fb75db41c67fd5275d139f740717c63",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 53973387,
+				"lastRebalancePrice": "60995",
+				"state": "2",
+				"currentTick": "304408",
+				"currentPrice": "60310",
+				"twapSlow": "60539",
+				"twapFast": "60310",
+				"depositTokenBalance": "2854846",
+				"pairedTokenBalance": "31515",
+				"usedToken0": "57107327686",
+				"usedToken1": "305482580252812203464662",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "1000",
+				"baseHighPct": "500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "304380",
+					"topTick": "887220"
+				},
+				"limitPosition": {
+					"bottomTick": "303900",
+					"topTick": "304380"
+				}
+			}
+		},
+		{
+			"transactionHash": "0xf5f5f24e3a7ae7dd4dc97bcb645d2cf2ff74fd55b99464db43b7f6d45c43e317",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 54187887,
+				"lastRebalancePrice": "66679",
+				"state": "0",
+				"currentTick": "303176",
+				"currentPrice": "68216",
+				"twapSlow": "67971",
+				"twapFast": "68155",
+				"depositTokenBalance": "2519558490",
+				"pairedTokenBalance": "213371",
+				"usedToken0": "76612178512",
+				"usedToken1": "1869849452847666523778",
+				"priceChangeTrigger": "30",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "200",
+				"someVolatility": "40",
+				"dtrDelta": "300",
+				"baseLowPct": "1000",
+				"baseHighPct": "500",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "-887220",
+					"topTick": "303180"
+				},
+				"limitPosition": {
+					"bottomTick": "303180",
+					"topTick": "304260"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x13ef3c342a1f899db083ae2af2e66f478e330e463aa1a0b9c9c3ff392fef51c3",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 54233034,
+				"lastRebalancePrice": "92035",
+				"state": "0",
+				"currentTick": "300353",
+				"currentPrice": "90466",
+				"twapSlow": "90258",
+				"twapFast": "90466",
+				"depositTokenBalance": "1119597262",
+				"pairedTokenBalance": "1174889",
+				"usedToken0": "75025075555",
+				"usedToken1": "61597351301907434394494",
+				"priceChangeTrigger": "100",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "600",
+				"someVolatility": "100",
+				"dtrDelta": "300",
+				"baseLowPct": "6000",
+				"baseHighPct": "3000",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "-887220",
+					"topTick": "300360"
+				},
+				"limitPosition": {
+					"bottomTick": "300360",
+					"topTick": "309540"
+				}
+			}
+		},
+		{
+			"transactionHash": "0xce867ab0c3556163152aab2436cef19d26569d43ad25404943f1816a94ca32a2",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 54314568,
+				"lastRebalancePrice": "75783",
+				"state": "1",
+				"currentTick": "301950",
+				"currentPrice": "77114",
+				"twapSlow": "77144",
+				"twapFast": "77114",
+				"depositTokenBalance": "3401821280",
+				"pairedTokenBalance": "451859",
+				"usedToken0": "82614151909",
+				"usedToken1": "267991667492686461151072",
+				"priceChangeTrigger": "100",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "600",
+				"someVolatility": "100",
+				"dtrDelta": "300",
+				"baseLowPct": "6000",
+				"baseHighPct": "3000",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "300840",
+					"topTick": "311100"
+				},
+				"limitPosition": {
+					"bottomTick": "-887220",
+					"topTick": "300840"
+				}
+			}
+		},
+		{
+			"transactionHash": "0xbebe6f9ebe0ba0728eca68bd9eace083e35edab473214998748a6f6f89ad5a04",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 54466135,
+				"lastRebalancePrice": "89530",
+				"state": "0",
+				"currentTick": "300226",
+				"currentPrice": "91622",
+				"twapSlow": "89664",
+				"twapFast": "91604",
+				"depositTokenBalance": "0",
+				"pairedTokenBalance": "2709850",
+				"usedToken0": "105326526857",
+				"usedToken1": "66260246286421327979026",
+				"priceChangeTrigger": "100",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "600",
+				"someVolatility": "100",
+				"dtrDelta": "300",
+				"baseLowPct": "6000",
+				"baseHighPct": "3000",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "-887220",
+					"topTick": "300240"
+				},
+				"limitPosition": {
+					"bottomTick": "300240",
+					"topTick": "309420"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x93cba7a528226a899a7548d6f3431b6c82151b9f5cee9b2ce61063cc13e92f75",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 54471661,
+				"lastRebalancePrice": "91622",
+				"state": "0",
+				"currentTick": "300427",
+				"currentPrice": "89799",
+				"twapSlow": "90974",
+				"twapFast": "89880",
+				"depositTokenBalance": "0",
+				"pairedTokenBalance": "2701454",
+				"usedToken0": "102652685268",
+				"usedToken1": "95724173885994544440903",
+				"priceChangeTrigger": "100",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "600",
+				"someVolatility": "100",
+				"dtrDelta": "300",
+				"baseLowPct": "6000",
+				"baseHighPct": "3000",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "-887220",
+					"topTick": "300480"
+				},
+				"limitPosition": {
+					"bottomTick": "300480",
+					"topTick": "309600"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x57e443e73e6709f7286eabb5291e5365a9aee6676391c00fae0448e4123776b5",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 54480383,
+				"lastRebalancePrice": "89799",
+				"state": "0",
+				"currentTick": "300480",
+				"currentPrice": "89324",
+				"twapSlow": "89476",
+				"twapFast": "89324",
+				"depositTokenBalance": "1952013388",
+				"pairedTokenBalance": "2205725",
+				"usedToken0": "104575860575",
+				"usedToken1": "96311745193017595905733",
+				"priceChangeTrigger": "100",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "600",
+				"someVolatility": "100",
+				"dtrDelta": "300",
+				"baseLowPct": "6000",
+				"baseHighPct": "3000",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "-887220",
+					"topTick": "300480"
+				},
+				"limitPosition": {
+					"bottomTick": "300540",
+					"topTick": "309660"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x3d86f536a5e2d022e0e032c31f53700aa26ba01c1191a7d0163f4ac3c5c263e3",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 54509361,
+				"lastRebalancePrice": "87197",
+				"state": "1",
+				"currentTick": "300920",
+				"currentPrice": "85479",
+				"twapSlow": "85087",
+				"twapFast": "85411",
+				"depositTokenBalance": "7500704901",
+				"pairedTokenBalance": "2384494",
+				"usedToken0": "106890637567",
+				"usedToken1": "157691200002589602566938",
+				"priceChangeTrigger": "100",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "600",
+				"someVolatility": "100",
+				"dtrDelta": "300",
+				"baseLowPct": "6000",
+				"baseHighPct": "3000",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "300480",
+					"topTick": "310080"
+				},
+				"limitPosition": {
+					"bottomTick": "-887220",
+					"topTick": "300480"
+				}
+			}
+		},
+		{
+			"transactionHash": "0x74c43cd5288dbe8d734839e02b7e7c39bc6fe87af4cce24e7decc8a4488f58fc",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 54534891,
+				"lastRebalancePrice": "85479",
+				"state": "1",
+				"currentTick": "300511",
+				"currentPrice": "89048",
+				"twapSlow": "88444",
+				"twapFast": "88968",
+				"depositTokenBalance": "351996270",
+				"pairedTokenBalance": "521349",
+				"usedToken0": "113288774305",
+				"usedToken1": "88710011432890673735403",
+				"priceChangeTrigger": "100",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "600",
+				"someVolatility": "100",
+				"dtrDelta": "300",
+				"baseLowPct": "6000",
+				"baseHighPct": "3000",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "-887220",
+					"topTick": "300540"
+				},
+				"limitPosition": {
+					"bottomTick": "300540",
+					"topTick": "309720"
+				}
+			}
+		},
+		{
+			"transactionHash": "0xd82b4d4e5bb542356879b0cf25c020fec18bc8c214c55bcbaaa9740212487244",
+			"state": {
+				"depositToken": 0,
+				"blockNumber": 54563764,
+				"lastRebalancePrice": "90901",
+				"state": "0",
+				"currentTick": "300485",
+				"currentPrice": "89280",
+				"twapSlow": "89835",
+				"twapFast": "89280",
+				"depositTokenBalance": "1785684",
+				"pairedTokenBalance": "1195863",
+				"usedToken0": "113236487780",
+				"usedToken1": "126910015690890056813748",
+				"priceChangeTrigger": "100",
+				"simulateTrigger": "9300",
+				"normalTrigger": "7700",
+				"underTrigger": "7500",
+				"overTrigger": "9100",
+				"depositTokenUnusedThreshold": "100",
+				"extremeVolatility": "2500",
+				"highVolatility": "600",
+				"someVolatility": "100",
+				"dtrDelta": "300",
+				"baseLowPct": "6000",
+				"baseHighPct": "3000",
+				"limitReservePct": "10000"
+			},
+			"rebalance": {
+				"basePosition": {
+					"bottomTick": "300180",
+					"topTick": "309600"
+				},
+				"limitPosition": {
+					"bottomTick": "-887220",
+					"topTick": "300180"
+				}
+			}
+		}
+	]
+}
