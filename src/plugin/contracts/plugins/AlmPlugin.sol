@@ -8,9 +8,9 @@ import '../interfaces/IRebalanceManager.sol';
 // import 'hardhat/console.sol';
 
 abstract contract AlmPlugin is AlgebraBasePlugin, IAlmPlugin {
-    address public rebalanceManager;
-    uint32 public slowTwapPeriod;
-    uint32 public fastTwapPeriod;
+  address public rebalanceManager;
+  uint32 public slowTwapPeriod;
+  uint32 public fastTwapPeriod;
 
   function initializeALM(address _rebalanceManager, uint32 _slowTwapPeriod, uint32 _fastTwapPeriod) external {
     _authorize();
@@ -21,13 +21,31 @@ abstract contract AlmPlugin is AlgebraBasePlugin, IAlmPlugin {
     fastTwapPeriod = _fastTwapPeriod;
   }
 
-    function _obtainTWAPAndRebalance(
-        int24 currentTick,
-        int24 slowTwapTick,
-        int24 fastTwapTick,
-        uint32 lastBlockTimestamp,
-        bool failedToObtainTWAP
-    ) internal {
-        IRebalanceManager(rebalanceManager).obtainTWAPAndRebalance(currentTick, slowTwapTick, fastTwapTick, lastBlockTimestamp, failedToObtainTWAP);
-    }
+  function setSlowTwapPeriod(uint32 _slowTwapPeriod) external {
+    _authorize();
+    require(_slowTwapPeriod >= fastTwapPeriod, '_slowTwapPeriod must be >= fastTwapPeriod');
+    slowTwapPeriod = _slowTwapPeriod;
+  }
+
+  function setFastTwapPeriod(uint32 _fastTwapPeriod) external {
+    _authorize();
+    require(_fastTwapPeriod <= slowTwapPeriod, '_fastTwapPeriod must be <= slowTwapPeriod');
+    fastTwapPeriod = _fastTwapPeriod;
+  }
+
+  function setRebalanceManager(address _rebalanceManager) external {
+    _authorize();
+    require(_rebalanceManager != address(0), '_rebalanceManager must be non zero address');
+    rebalanceManager = _rebalanceManager;
+  }
+
+  function _obtainTWAPAndRebalance(
+    int24 currentTick,
+    int24 slowTwapTick,
+    int24 fastTwapTick,
+    uint32 lastBlockTimestamp,
+    bool failedToObtainTWAP
+  ) internal {
+    IRebalanceManager(rebalanceManager).obtainTWAPAndRebalance(currentTick, slowTwapTick, fastTwapTick, lastBlockTimestamp, failedToObtainTWAP);
+  }
 }
