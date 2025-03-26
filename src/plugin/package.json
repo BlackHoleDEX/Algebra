@@ -10,12 +10,17 @@
     "algebra"
   ],
   "files": [
+    "artifacts/contracts/AlgebraBasePluginV1.sol/**/*.json",
+    "artifacts/contracts/AlgebraBasePluginV2.sol/**/*.json",
+    "artifacts/contracts/BasePluginV1Factory.sol/**/*.json",
+    "artifacts/contracts/BasePluginV2Factory.sol/**/*.json",
+    "!artifacts/contracts/**/*.dbg.json",
     "contracts/libraries/integration/OracleLibrary.sol",
     "contracts/interfaces/plugins/*",
     "contracts/base/BasePlugin.sol",
     "contracts/base/BasePluginFactory.sol",
-    "contracts/interfaces/IBasePlugin.sol",
-    "contracts/interfaces/IBasePluginFactory.sol"
+    "contracts/interfaces/**/*.sol",
+    "contracts/base/AlgebraFeeConfiguration.sol"
   ],
   "repository": {
     "type": "git",
