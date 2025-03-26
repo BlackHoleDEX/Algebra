@@ -3,7 +3,7 @@ pragma solidity =0.8.20;
 
 import './interfaces/IBasePluginV1Factory.sol';
 import './libraries/AdaptiveFee.sol';
-import './AlgebraBasePluginV1.sol';
+import './AlgebraBasePluginALM.sol';
 
 /// @title Algebra Integral 1.2.1 default plugin factory
 /// @notice This contract creates Algebra adaptive fee plugins for Algebra liquidity pools
@@ -59,7 +59,7 @@ contract AlgebraBasePluginALMFactory is IBasePluginV1Factory {
 
   function _createPlugin(address pool) internal returns (address) {
     require(pluginByPool[pool] == address(0), 'Already created');
-    IDynamicFeeManager volatilityOracle = new AlgebraBasePluginV1(pool, algebraFactory, address(this), defaultFeeConfiguration);
+    IDynamicFeeManager volatilityOracle = new AlgebraBasePluginALM(pool, algebraFactory, address(this), defaultFeeConfiguration);
     pluginByPool[pool] = address(volatilityOracle);
     return address(volatilityOracle);
   }
