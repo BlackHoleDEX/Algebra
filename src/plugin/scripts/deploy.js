@@ -7,7 +7,7 @@ async function main() {
     const deployDataPath = path.resolve(__dirname, '../../../deploys.json')
     const deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'))
 
-    const BasePluginV1Factory = await hre.ethers.getContractFactory("BasePluginV1Factory");
+    const BasePluginV1Factory = await hre.ethers.getContractFactory("AlgebraBasePluginALMFactory");
     const dsFactory = await BasePluginV1Factory.deploy(deploysData.factory);
 
     await dsFactory.waitForDeployment()
