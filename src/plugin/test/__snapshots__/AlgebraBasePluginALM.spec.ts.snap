@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AlgebraBasePluginALM AlgebraBasePluginV1 external methods #changeFeeConfiguration feeConfig getter gas cost [ @skip-on-coverage ] 1`] = `21065`;

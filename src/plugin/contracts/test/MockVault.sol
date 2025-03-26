@@ -66,7 +66,7 @@ contract MockVault is IAlgebraVault, ERC20 {
     // pool = _pool;
     // token0 = IAlgebraPool(_pool).token0();
     // token1 = IAlgebraPool(_pool).token1();
-    pool = address(0);
+    pool = _pool;
     token0 = address(0);
     token1 = address(0);
     allowToken0 = _allowToken0;

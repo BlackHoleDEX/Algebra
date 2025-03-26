@@ -1,5 +1,5 @@
 import { ethers } from 'hardhat';
-import { MockFactory, MockPool, MockTimeAlgebraBasePluginV1, MockTimeAlgebraBasePluginV2, MockTimeDSFactoryV2, MockTimeDSFactory, BasePluginV1Factory, BasePluginV2Factory } from '../../typechain';
+import { MockFactory, MockPool, MockTimeAlgebraBasePluginV1, MockTimeAlgebraBasePluginV2, MockTimeDSFactoryV2, MockTimeDSFactory, BasePluginV1Factory, BasePluginV2Factory, MockAlgebraBasePluginALMFactory, MockVault, RebalanceManager, MockAlgebraBasePluginALM, MockRebalanceManager } from '../../typechain';
 
 type Fixture<T> = () => Promise<T>;
 interface MockFactoryFixture {
@@ -94,6 +94,69 @@ export const pluginFixtureV2: Fixture<PluginFixture> = async function (): Promis
   const plugin = mockDSOperatorFactory.attach(pluginAddress) as any as MockTimeAlgebraBasePluginV2;
 
   return {
+    plugin,
+    mockPluginFactory,
+    mockPool,
+    mockFactory,
+  };
+};
+
+interface ALMPluginFixture extends MockFactoryFixture {
+  mockVault: MockVault;
+  rebalanceManager: MockRebalanceManager;
+  plugin: MockAlgebraBasePluginALM;
+  mockPluginFactory: MockAlgebraBasePluginALMFactory;
+  mockPool: MockPool;
+}
+
+export const pluginFixtureALM: Fixture<ALMPluginFixture> = async function (): Promise<ALMPluginFixture> {
+  const { mockFactory } = await mockFactoryFixture();
+  //const { token0, token1, token2 } = await tokensFixture()
+
+  const mockPoolFactory = await ethers.getContractFactory('MockPool');
+  const mockPool = (await mockPoolFactory.deploy()) as any as MockPool;
+
+  const mockPluginFactoryFactory = await ethers.getContractFactory('MockAlgebraBasePluginALMFactory');
+  const mockPluginFactory = (await mockPluginFactoryFactory.deploy(mockFactory)) as any as MockAlgebraBasePluginALMFactory;
+
+  const mockVaultFactory = await ethers.getContractFactory('MockVault');
+  const mockVault = await mockVaultFactory.deploy(await mockPool.getAddress(), true, false) as any as MockVault;
+
+  await mockVault.setAllowTokens(true, false);
+
+  const thresholds = {
+    depositTokenUnusedThreshold: 100,
+    simulate: 9400, // было 9300
+    normalThreshold: 8100, // было 8000
+    underInventoryThreshold: 7800, // было 7700
+    overInventoryThreshold: 9100,
+    priceChangeThreshold: 100,
+    extremeVolatility: 2500,
+    highVolatility: 900, // было 500
+    someVolatility: 200, // было 100
+    dtrDelta: 300,
+    baseLowPct: 3000, // было 2000
+    baseHighPct: 1500, // было 3000
+    limitReservePct: 500,
+  }
+
+  const rebalanceManagerFactory = await ethers.getContractFactory('MockRebalanceManager');
+  const rebalanceManager = (await rebalanceManagerFactory.deploy(
+    await mockVault.getAddress(),
+    thresholds
+  )) as any as MockRebalanceManager;
+
+  await mockPluginFactory.beforeCreatePoolHook(mockPool, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, '0x');
+  const pluginAddress = await mockPluginFactory.pluginByPool(mockPool);
+
+  const mockAlgebraBasePluginALMFactory = await ethers.getContractFactory('MockAlgebraBasePluginALM');
+  const plugin = mockAlgebraBasePluginALMFactory.attach(pluginAddress) as any as MockAlgebraBasePluginALM;
+
+  await plugin.setRebalanceManager(await rebalanceManager.getAddress());
+
+  return {
+    mockVault,
+    rebalanceManager,
     plugin,
     mockPluginFactory,
     mockPool,

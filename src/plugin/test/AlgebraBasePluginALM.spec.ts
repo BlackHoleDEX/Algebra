@@ -3,19 +3,21 @@ import { ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import checkTimepointEquals from './shared/checkTimepointEquals';
 import { expect } from './shared/expect';
-import { TEST_POOL_START_TIME, pluginFixture } from './shared/fixtures';
+import { TEST_POOL_START_TIME, pluginFixtureALM } from './shared/fixtures';
 import { PLUGIN_FLAGS, encodePriceSqrt, expandTo18Decimals, getMaxTick, getMinTick } from './shared/utilities';
 
-import { MockPool, MockTimeAlgebraBasePluginV1, MockTimeDSFactory, MockTimeVirtualPool } from '../typechain';
+import { MockPool, MockAlgebraBasePluginALM, MockAlgebraBasePluginALMFactory, MockTimeVirtualPool, MockVault, RebalanceManager } from '../typechain';
 
 import snapshotGasCost from './shared/snapshotGasCost';
 
-describe('AlgebraBasePluginV1', () => {
+describe('AlgebraBasePluginALM', () => {
   let wallet: Wallet, other: Wallet;
 
-  let plugin: MockTimeAlgebraBasePluginV1; // modified plugin
+  let mockVault: MockVault;
+  let rebalanceManager: RebalanceManager;
+  let plugin: MockAlgebraBasePluginALM; // modified plugin
+  let mockPluginFactory: MockAlgebraBasePluginALMFactory; // modified plugin factory
   let mockPool: MockPool; // mock of AlgebraPool
-  let mockPluginFactory: MockTimeDSFactory; // modified plugin factory
 
   let minTick = getMinTick(60);
   let maxTick = getMaxTick(60);
@@ -29,7 +31,7 @@ describe('AlgebraBasePluginV1', () => {
   });
 
   beforeEach('deploy test AlgebraBasePluginV1', async () => {
-    ({ plugin, mockPool, mockPluginFactory } = await loadFixture(pluginFixture));
+    ({ mockVault, rebalanceManager, plugin, mockPluginFactory, mockPool } = await loadFixture(pluginFixtureALM));
   });
 
   describe('#Initialize', async () => {
@@ -498,225 +500,225 @@ describe('AlgebraBasePluginV1', () => {
     });
   });
 
-  describe('#FarmingPlugin', () => {
-    describe('virtual pool tests', () => {
-      let virtualPoolMock: MockTimeVirtualPool;
+  // describe('#FarmingPlugin', () => {
+  //   describe('virtual pool tests', () => {
+  //     let virtualPoolMock: MockTimeVirtualPool;
 
-      beforeEach('deploy virtualPoolMock', async () => {
-        await mockPluginFactory.setFarmingAddress(wallet);
-        const virtualPoolMockFactory = await ethers.getContractFactory('MockTimeVirtualPool');
-        virtualPoolMock = (await virtualPoolMockFactory.deploy()) as any as MockTimeVirtualPool;
-      });
+  //     beforeEach('deploy virtualPoolMock', async () => {
+  //       await mockPluginFactory.setFarmingAddress(wallet);
+  //       const virtualPoolMockFactory = await ethers.getContractFactory('MockTimeVirtualPool');
+  //       virtualPoolMock = (await virtualPoolMockFactory.deploy()) as any as MockTimeVirtualPool;
+  //     });
 
-      it('set incentive works', async () => {
-        await mockPool.setPlugin(plugin);
-        await plugin.setIncentive(virtualPoolMock);
-        expect(await plugin.incentive()).to.be.eq(await virtualPoolMock.getAddress());
-      });
+  //     it('set incentive works', async () => {
+  //       await mockPool.setPlugin(plugin);
+  //       await plugin.setIncentive(virtualPoolMock);
+  //       expect(await plugin.incentive()).to.be.eq(await virtualPoolMock.getAddress());
+  //     });
 
-      it('can detach incentive', async () => {
-        await mockPool.setPlugin(plugin);
-        await plugin.setIncentive(virtualPoolMock);
-        await plugin.setIncentive(ZeroAddress);
-        expect(await plugin.incentive()).to.be.eq(ZeroAddress);
-      });
+  //     it('can detach incentive', async () => {
+  //       await mockPool.setPlugin(plugin);
+  //       await plugin.setIncentive(virtualPoolMock);
+  //       await plugin.setIncentive(ZeroAddress);
+  //       expect(await plugin.incentive()).to.be.eq(ZeroAddress);
+  //     });
 
-      it('can detach incentive even if no more has rights to connect plugins', async () => {
-        await mockPool.setPlugin(plugin);
-        await plugin.setIncentive(virtualPoolMock);
-        await mockPluginFactory.setFarmingAddress(other);
-        await plugin.setIncentive(ZeroAddress);
-        expect(await plugin.incentive()).to.be.eq(ZeroAddress);
-      });
+  //     it('can detach incentive even if no more has rights to connect plugins', async () => {
+  //       await mockPool.setPlugin(plugin);
+  //       await plugin.setIncentive(virtualPoolMock);
+  //       await mockPluginFactory.setFarmingAddress(other);
+  //       await plugin.setIncentive(ZeroAddress);
+  //       expect(await plugin.incentive()).to.be.eq(ZeroAddress);
+  //     });
 
-      it('cannot attach incentive even if no more has rights to connect plugins', async () => {
-        await mockPool.setPlugin(plugin);
-        await plugin.setIncentive(virtualPoolMock);
-        await mockPluginFactory.setFarmingAddress(other);
-        await expect(plugin.setIncentive(other)).to.be.revertedWith('Not allowed to set incentive');
-      });
+  //     it('cannot attach incentive even if no more has rights to connect plugins', async () => {
+  //       await mockPool.setPlugin(plugin);
+  //       await plugin.setIncentive(virtualPoolMock);
+  //       await mockPluginFactory.setFarmingAddress(other);
+  //       await expect(plugin.setIncentive(other)).to.be.revertedWith('Not allowed to set incentive');
+  //     });
 
-      it('new farming can detach old incentive', async () => {
-        await mockPool.setPlugin(plugin);
-        await plugin.setIncentive(virtualPoolMock);
-        await mockPluginFactory.setFarmingAddress(other);
-        await plugin.connect(other).setIncentive(ZeroAddress);
-        expect(await plugin.incentive()).to.be.eq(ZeroAddress);
-      });
+  //     it('new farming can detach old incentive', async () => {
+  //       await mockPool.setPlugin(plugin);
+  //       await plugin.setIncentive(virtualPoolMock);
+  //       await mockPluginFactory.setFarmingAddress(other);
+  //       await plugin.connect(other).setIncentive(ZeroAddress);
+  //       expect(await plugin.incentive()).to.be.eq(ZeroAddress);
+  //     });
 
-      it('cannot detach incentive if nothing connected', async () => {
-        await mockPool.setPlugin(plugin);
-        await expect(plugin.setIncentive(ZeroAddress)).to.be.revertedWith('Already active');
-        expect(await plugin.incentive()).to.be.eq(ZeroAddress);
-      });
+  //     it('cannot detach incentive if nothing connected', async () => {
+  //       await mockPool.setPlugin(plugin);
+  //       await expect(plugin.setIncentive(ZeroAddress)).to.be.revertedWith('Already active');
+  //       expect(await plugin.incentive()).to.be.eq(ZeroAddress);
+  //     });
 
-      it('cannot set same incentive twice', async () => {
-        await mockPool.setPlugin(plugin);
-        await plugin.setIncentive(virtualPoolMock);
-        await expect(plugin.setIncentive(virtualPoolMock)).to.be.revertedWith('Already active');
-      });
+  //     it('cannot set same incentive twice', async () => {
+  //       await mockPool.setPlugin(plugin);
+  //       await plugin.setIncentive(virtualPoolMock);
+  //       await expect(plugin.setIncentive(virtualPoolMock)).to.be.revertedWith('Already active');
+  //     });
 
-      it('cannot set incentive if has active', async () => {
-        await mockPool.setPlugin(plugin);
-        await plugin.setIncentive(virtualPoolMock);
-        await expect(plugin.setIncentive(wallet.address)).to.be.revertedWith('Has active incentive');
-      });
+  //     it('cannot set incentive if has active', async () => {
+  //       await mockPool.setPlugin(plugin);
+  //       await plugin.setIncentive(virtualPoolMock);
+  //       await expect(plugin.setIncentive(wallet.address)).to.be.revertedWith('Has active incentive');
+  //     });
 
-      it('can detach incentive if not connected to pool', async () => {
-        const defaultConfig = await plugin.defaultPluginConfig();
-        await mockPool.setPlugin(plugin);
-        await mockPool.setPluginConfig(BigInt(PLUGIN_FLAGS.AFTER_SWAP_FLAG) | defaultConfig);
-        await plugin.setIncentive(virtualPoolMock);
-        expect(await plugin.incentive()).to.be.eq(await virtualPoolMock.getAddress());
-        await mockPool.setPlugin(ZeroAddress);
-        await plugin.setIncentive(ZeroAddress);
-        expect(await plugin.incentive()).to.be.eq(ZeroAddress);
-      });
+  //     it('can detach incentive if not connected to pool', async () => {
+  //       const defaultConfig = await plugin.defaultPluginConfig();
+  //       await mockPool.setPlugin(plugin);
+  //       await mockPool.setPluginConfig(BigInt(PLUGIN_FLAGS.AFTER_SWAP_FLAG) | defaultConfig);
+  //       await plugin.setIncentive(virtualPoolMock);
+  //       expect(await plugin.incentive()).to.be.eq(await virtualPoolMock.getAddress());
+  //       await mockPool.setPlugin(ZeroAddress);
+  //       await plugin.setIncentive(ZeroAddress);
+  //       expect(await plugin.incentive()).to.be.eq(ZeroAddress);
+  //     });
 
-      it('can set incentive if afterSwap hook is active', async () => {
-        const defaultConfig = await plugin.defaultPluginConfig();
-        await mockPool.setPlugin(plugin);
-        await mockPool.setPluginConfig(BigInt(PLUGIN_FLAGS.AFTER_SWAP_FLAG) | defaultConfig);
-        await plugin.setIncentive(virtualPoolMock);
-        expect(await plugin.incentive()).to.be.eq(await virtualPoolMock.getAddress());
-        expect((await mockPool.globalState()).pluginConfig).to.be.eq(BigInt(PLUGIN_FLAGS.AFTER_SWAP_FLAG) | defaultConfig);
-      });
+  //     it('can set incentive if afterSwap hook is active', async () => {
+  //       const defaultConfig = await plugin.defaultPluginConfig();
+  //       await mockPool.setPlugin(plugin);
+  //       await mockPool.setPluginConfig(BigInt(PLUGIN_FLAGS.AFTER_SWAP_FLAG) | defaultConfig);
+  //       await plugin.setIncentive(virtualPoolMock);
+  //       expect(await plugin.incentive()).to.be.eq(await virtualPoolMock.getAddress());
+  //       expect((await mockPool.globalState()).pluginConfig).to.be.eq(BigInt(PLUGIN_FLAGS.AFTER_SWAP_FLAG) | defaultConfig);
+  //     });
 
-      it('set incentive works only for PluginFactory.farmingAddress', async () => {
-        await mockPluginFactory.setFarmingAddress(ZeroAddress);
-        await expect(plugin.setIncentive(virtualPoolMock)).to.be.revertedWith('Not allowed to set incentive');
-      });
+  //     it('set incentive works only for PluginFactory.farmingAddress', async () => {
+  //       await mockPluginFactory.setFarmingAddress(ZeroAddress);
+  //       await expect(plugin.setIncentive(virtualPoolMock)).to.be.revertedWith('Not allowed to set incentive');
+  //     });
 
-      it('incentive can not be attached if plugin is not attached', async () => {
-        await expect(plugin.setIncentive(virtualPoolMock)).to.be.revertedWith('Plugin not attached');
-      });
+  //     it('incentive can not be attached if plugin is not attached', async () => {
+  //       await expect(plugin.setIncentive(virtualPoolMock)).to.be.revertedWith('Plugin not attached');
+  //     });
 
-      it('incentive attached before initialization', async () => {
-        await mockPool.setPlugin(plugin);
+  //     it('incentive attached before initialization', async () => {
+  //       await mockPool.setPlugin(plugin);
 
-        await plugin.setIncentive(virtualPoolMock);
-        await mockPool.initialize(encodePriceSqrt(1, 1));
-        await mockPool.mint(wallet.address, wallet.address, -120, 120, 1, '0x');
-        await mockPool.mint(wallet.address, wallet.address, minTick, maxTick, 1, '0x');
+  //       await plugin.setIncentive(virtualPoolMock);
+  //       await mockPool.initialize(encodePriceSqrt(1, 1));
+  //       await mockPool.mint(wallet.address, wallet.address, -120, 120, 1, '0x');
+  //       await mockPool.mint(wallet.address, wallet.address, minTick, maxTick, 1, '0x');
 
-        await mockPool.swapToTick(-130);
+  //       await mockPool.swapToTick(-130);
 
-        expect(await plugin.incentive()).to.be.eq(await virtualPoolMock.getAddress());
-        expect(await plugin.isIncentiveConnected(virtualPoolMock)).to.be.true;
+  //       expect(await plugin.incentive()).to.be.eq(await virtualPoolMock.getAddress());
+  //       expect(await plugin.isIncentiveConnected(virtualPoolMock)).to.be.true;
 
-        const tick = (await mockPool.globalState()).tick;
-        expect(await virtualPoolMock.currentTick()).to.be.eq(tick);
-        expect(await virtualPoolMock.timestamp()).to.be.gt(0);
-      });
+  //       const tick = (await mockPool.globalState()).tick;
+  //       expect(await virtualPoolMock.currentTick()).to.be.eq(tick);
+  //       expect(await virtualPoolMock.timestamp()).to.be.gt(0);
+  //     });
 
-      it('incentive attached after initialization', async () => {
-        await mockPool.setPlugin(plugin);
-        await mockPool.initialize(encodePriceSqrt(1, 1));
-        await plugin.setIncentive(virtualPoolMock);
+  //     it('incentive attached after initialization', async () => {
+  //       await mockPool.setPlugin(plugin);
+  //       await mockPool.initialize(encodePriceSqrt(1, 1));
+  //       await plugin.setIncentive(virtualPoolMock);
 
-        await mockPool.mint(wallet.address, wallet.address, -120, 120, 1, '0x');
-        await mockPool.mint(wallet.address, wallet.address, minTick, maxTick, 1, '0x');
+  //       await mockPool.mint(wallet.address, wallet.address, -120, 120, 1, '0x');
+  //       await mockPool.mint(wallet.address, wallet.address, minTick, maxTick, 1, '0x');
 
-        await mockPool.swapToTick(-130);
+  //       await mockPool.swapToTick(-130);
 
-        expect(await plugin.incentive()).to.be.eq(await virtualPoolMock.getAddress());
-        expect(await plugin.isIncentiveConnected(virtualPoolMock)).to.be.true;
+  //       expect(await plugin.incentive()).to.be.eq(await virtualPoolMock.getAddress());
+  //       expect(await plugin.isIncentiveConnected(virtualPoolMock)).to.be.true;
 
-        const tick = (await mockPool.globalState()).tick;
-        expect(await virtualPoolMock.currentTick()).to.be.eq(tick);
-        expect(await virtualPoolMock.timestamp()).to.be.gt(0);
-      });
+  //       const tick = (await mockPool.globalState()).tick;
+  //       expect(await virtualPoolMock.currentTick()).to.be.eq(tick);
+  //       expect(await virtualPoolMock.timestamp()).to.be.gt(0);
+  //     });
 
-      it.skip('swap with finished incentive', async () => {
-        /*await virtualPoolMock.setIsExist(false);
-         await mockPool.setIncentive(virtualPoolMock.address);
-         await mockPool.initialize(encodePriceSqrt(1, 1));
-         await mint(wallet.address, -120, 120, 1);
-         await mint(wallet.address, minTick, maxTick, 1);
-         expect(await mockPool.activeIncentive()).to.be.eq(virtualPoolMock.address);    
+  //     it.skip('swap with finished incentive', async () => {
+  //       /*await virtualPoolMock.setIsExist(false);
+  //        await mockPool.setIncentive(virtualPoolMock.address);
+  //        await mockPool.initialize(encodePriceSqrt(1, 1));
+  //        await mint(wallet.address, -120, 120, 1);
+  //        await mint(wallet.address, minTick, maxTick, 1);
+  //        expect(await mockPool.activeIncentive()).to.be.eq(virtualPoolMock.address);    
    
-         await swapToLowerPrice(encodePriceSqrt(1, 2), wallet.address);
+  //        await swapToLowerPrice(encodePriceSqrt(1, 2), wallet.address);
    
-         expect(await mockPool.activeIncentive()).to.be.eq(ethers.constants.AddressZero);
-         expect(await virtualPoolMock.currentTick()).to.be.eq(0);
-         expect(await virtualPoolMock.timestamp()).to.be.eq(0);
-         */
-      });
+  //        expect(await mockPool.activeIncentive()).to.be.eq(ethers.constants.AddressZero);
+  //        expect(await virtualPoolMock.currentTick()).to.be.eq(0);
+  //        expect(await virtualPoolMock.timestamp()).to.be.eq(0);
+  //        */
+  //     });
 
-      it.skip('swap with not started yet incentive', async () => {
-        /*
-         await virtualPoolMock.setIsStarted(false);
-         await mockPool.setIncentive(virtualPoolMock.address);
-         await mockPool.initialize(encodePriceSqrt(1, 1));
-         await mint(wallet.address, -120, 120, 1);
-         await mint(wallet.address, minTick, maxTick, 1);
-         expect(await mockPool.activeIncentive()).to.be.eq(virtualPoolMock.address);    
+  //     it.skip('swap with not started yet incentive', async () => {
+  //       /*
+  //        await virtualPoolMock.setIsStarted(false);
+  //        await mockPool.setIncentive(virtualPoolMock.address);
+  //        await mockPool.initialize(encodePriceSqrt(1, 1));
+  //        await mint(wallet.address, -120, 120, 1);
+  //        await mint(wallet.address, minTick, maxTick, 1);
+  //        expect(await mockPool.activeIncentive()).to.be.eq(virtualPoolMock.address);    
    
-         await swapToLowerPrice(encodePriceSqrt(1, 2), wallet.address);
+  //        await swapToLowerPrice(encodePriceSqrt(1, 2), wallet.address);
    
-         const tick = (await mockPool.globalState()).tick;
-         expect(await mockPool.activeIncentive()).to.be.eq(virtualPoolMock.address);
-         expect(await virtualPoolMock.currentTick()).to.be.eq(tick);
-         expect(await virtualPoolMock.timestamp()).to.be.eq(0); 
-         */
-      });
-    });
+  //        const tick = (await mockPool.globalState()).tick;
+  //        expect(await mockPool.activeIncentive()).to.be.eq(virtualPoolMock.address);
+  //        expect(await virtualPoolMock.currentTick()).to.be.eq(tick);
+  //        expect(await virtualPoolMock.timestamp()).to.be.eq(0); 
+  //        */
+  //     });
+  //   });
 
-    describe('#isIncentiveConnected', () => {
-      let virtualPoolMock: MockTimeVirtualPool;
+  //   describe('#isIncentiveConnected', () => {
+  //     let virtualPoolMock: MockTimeVirtualPool;
 
-      beforeEach('deploy virtualPoolMock', async () => {
-        await mockPluginFactory.setFarmingAddress(wallet);
-        const virtualPoolMockFactory = await ethers.getContractFactory('MockTimeVirtualPool');
-        virtualPoolMock = (await virtualPoolMockFactory.deploy()) as any as MockTimeVirtualPool;
-      });
+  //     beforeEach('deploy virtualPoolMock', async () => {
+  //       await mockPluginFactory.setFarmingAddress(wallet);
+  //       const virtualPoolMockFactory = await ethers.getContractFactory('MockTimeVirtualPool');
+  //       virtualPoolMock = (await virtualPoolMockFactory.deploy()) as any as MockTimeVirtualPool;
+  //     });
 
-      it('true with active incentive', async () => {
-        await mockPool.setPlugin(plugin);
-        await plugin.setIncentive(virtualPoolMock);
-        expect(await plugin.isIncentiveConnected(virtualPoolMock)).to.be.true;
-      });
+  //     it('true with active incentive', async () => {
+  //       await mockPool.setPlugin(plugin);
+  //       await plugin.setIncentive(virtualPoolMock);
+  //       expect(await plugin.isIncentiveConnected(virtualPoolMock)).to.be.true;
+  //     });
 
-      it('false with invalid address', async () => {
-        await mockPool.setPlugin(plugin);
-        await plugin.setIncentive(virtualPoolMock);
-        expect(await plugin.isIncentiveConnected(wallet.address)).to.be.false;
-      });
+  //     it('false with invalid address', async () => {
+  //       await mockPool.setPlugin(plugin);
+  //       await plugin.setIncentive(virtualPoolMock);
+  //       expect(await plugin.isIncentiveConnected(wallet.address)).to.be.false;
+  //     });
 
-      it('false if plugin detached', async () => {
-        await mockPool.setPlugin(plugin);
-        await plugin.setIncentive(virtualPoolMock);
-        await mockPool.setPlugin(ZeroAddress);
-        expect(await plugin.isIncentiveConnected(virtualPoolMock)).to.be.false;
-      });
+  //     it('false if plugin detached', async () => {
+  //       await mockPool.setPlugin(plugin);
+  //       await plugin.setIncentive(virtualPoolMock);
+  //       await mockPool.setPlugin(ZeroAddress);
+  //       expect(await plugin.isIncentiveConnected(virtualPoolMock)).to.be.false;
+  //     });
 
-      it('false if hook deactivated', async () => {
-        await mockPool.setPlugin(plugin);
-        await plugin.setIncentive(virtualPoolMock);
-        await mockPool.setPluginConfig(0);
-        expect(await plugin.isIncentiveConnected(virtualPoolMock)).to.be.false;
-      });
-    });
+  //     it('false if hook deactivated', async () => {
+  //       await mockPool.setPlugin(plugin);
+  //       await plugin.setIncentive(virtualPoolMock);
+  //       await mockPool.setPluginConfig(0);
+  //       expect(await plugin.isIncentiveConnected(virtualPoolMock)).to.be.false;
+  //     });
+  //   });
 
-    describe('#Incentive', () => {
-      it('incentive is not detached after swap', async () => {
-        await mockPool.setPlugin(plugin);
-        await initializeAtZeroTick(mockPool);
-        await mockPluginFactory.setFarmingAddress(wallet.address);
+  //   describe('#Incentive', () => {
+  //     it('incentive is not detached after swap', async () => {
+  //       await mockPool.setPlugin(plugin);
+  //       await initializeAtZeroTick(mockPool);
+  //       await mockPluginFactory.setFarmingAddress(wallet.address);
 
-        const vpStubFactory = await ethers.getContractFactory('MockTimeVirtualPool');
-        let vpStub = (await vpStubFactory.deploy()) as any as MockTimeVirtualPool;
+  //       const vpStubFactory = await ethers.getContractFactory('MockTimeVirtualPool');
+  //       let vpStub = (await vpStubFactory.deploy()) as any as MockTimeVirtualPool;
 
-        await plugin.setIncentive(vpStub);
-        const initLiquidityAmount = 10000000000n;
-        await mockPool.mint(wallet.address, wallet.address, -120, 120, initLiquidityAmount, '0x');
-        await mockPool.mint(wallet.address, wallet.address, -1200, 1200, initLiquidityAmount, '0x');
-        await mockPool.swapToTick(-200);
+  //       await plugin.setIncentive(vpStub);
+  //       const initLiquidityAmount = 10000000000n;
+  //       await mockPool.mint(wallet.address, wallet.address, -120, 120, initLiquidityAmount, '0x');
+  //       await mockPool.mint(wallet.address, wallet.address, -1200, 1200, initLiquidityAmount, '0x');
+  //       await mockPool.swapToTick(-200);
 
-        expect(await plugin.incentive()).to.be.eq(await vpStub.getAddress());
-      });
-    });
-  });
+  //       expect(await plugin.incentive()).to.be.eq(await vpStub.getAddress());
+  //     });
+  //   });
+  // });
 
   describe('AlgebraBasePluginV1 external methods', () => {
     describe('#changeFeeConfiguration', () => {
