@@ -364,6 +364,79 @@ describe('unit/EternalFarms', () => {
     });
   });
 
+  describe('#incentiveKeys', async () => {
+    let localNonce = 0n;
+    let incentiveArgs;
+    let incentiveId: string;
+    let incentiveKey;
+
+    beforeEach(async () => {
+      context = await loadFixture(algebraFixture);
+      helpers = HelperCommands.fromTestContext(context, actors, provider);
+
+      localNonce = await context.eternalFarming.numOfIncentives();
+
+      await erc20Helper.ensureBalancesAndApprovals(lpUser0, [context.token0, context.token1], amountDesired, await context.nft.getAddress());
+
+      tokenId = await mintPosition(context.nft.connect(lpUser0), {
+        token0: await context.token0.getAddress(),
+        token1: await context.token1.getAddress(),
+        fee: FeeAmount.MEDIUM,
+        tickLower: getMinTick(TICK_SPACINGS[FeeAmount.MEDIUM]),
+        tickUpper: getMaxTick(TICK_SPACINGS[FeeAmount.MEDIUM]),
+        recipient: lpUser0.address,
+        amount0Desired: amountDesired,
+        amount1Desired: amountDesired,
+        amount0Min: 0,
+        amount1Min: 0,
+        deadline: (await blockTimestamp()) + 1000,
+      });
+
+      incentiveArgs = {
+        rewardToken: context.rewardToken,
+        bonusRewardToken: context.bonusRewardToken,
+        totalReward,
+        bonusReward,
+        poolAddress: await context.poolObj.getAddress(),
+        nonce: localNonce,
+        rewardRate: 10n,
+        bonusRewardRate: 50n,
+      };
+
+      incentiveKey = {
+        rewardToken: context.rewardToken,
+        bonusRewardToken: context.bonusRewardToken,
+        pool: await context.poolObj.getAddress(),
+        nonce: localNonce,
+      }
+
+      incentiveId = await helpers.getIncentiveId(await helpers.createIncentiveFlow(incentiveArgs));
+    });
+
+    it('returns incentive key after farming creation', async () => {
+      let {rewardToken, bonusRewardToken, pool, nonce} = await context.eternalFarming.incentiveKeys(await context.poolObj.getAddress())
+      expect(rewardToken, bonusRewardToken, pool, nonce).to.be.eq(incentiveKey.rewardToken, incentiveKey.bonusRewardToken, incentiveKey.pool, incentiveKey.nonce);
+    });
+
+    it('returns zero key after farming deactivation', async () => {
+      await context.eternalFarming.connect(incentiveCreator).deactivateIncentive({
+        pool: context.pool01,
+        rewardToken: context.rewardToken,
+        bonusRewardToken: context.bonusRewardToken,
+        nonce: localNonce,
+      });
+
+      let {rewardToken, bonusRewardToken, pool, nonce} = await context.eternalFarming.incentiveKeys(await context.poolObj.getAddress())
+      expect(rewardToken, bonusRewardToken, pool, nonce).to.be.eq(ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, 0);
+    });
+
+    it('true if incentive deactivated indirectly', async () => {
+      await detachIncentiveIndirectly(localNonce);
+
+      expect(await context.eternalFarming.isIncentiveDeactivated(incentiveId)).to.be.true;
+    });
+  });
+
   describe('#createEternalFarming', () => {
     let localNonce = 0n;
 

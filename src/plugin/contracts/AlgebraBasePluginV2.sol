@@ -9,7 +9,7 @@ import './plugins/FarmingProxyPlugin.sol';
 import './plugins/SlidingFeePlugin.sol';
 import './plugins/VolatilityOraclePlugin.sol';
 
-/// @title Algebra Integral 1.2 sliding fee plugin
+/// @title Algebra Integral 1.2.1 sliding fee plugin
 contract AlgebraBasePluginV2 is SlidingFeePlugin, FarmingProxyPlugin, VolatilityOraclePlugin {
   using Plugins for uint8;
 
@@ -17,7 +17,12 @@ contract AlgebraBasePluginV2 is SlidingFeePlugin, FarmingProxyPlugin, Volatility
   uint8 public constant override defaultPluginConfig =
     uint8(Plugins.AFTER_INIT_FLAG | Plugins.BEFORE_SWAP_FLAG | Plugins.AFTER_SWAP_FLAG | Plugins.DYNAMIC_FEE);
 
-  constructor(address _pool, address _factory, address _pluginFactory) BasePlugin(_pool, _factory, _pluginFactory) {}
+  constructor(
+    address _pool,
+    address _factory,
+    address _pluginFactory,
+    uint16 _baseFee
+  ) AlgebraBasePlugin(_pool, _factory, _pluginFactory) SlidingFeePlugin(_baseFee) {}
 
   // ###### HOOKS ######
 

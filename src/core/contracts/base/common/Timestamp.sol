@@ -1,5 +1,5 @@
-// SPDX-License-Identifier: BUSL-1.1
-pragma solidity =0.8.20;
+// SPDX-License-Identifier: GPL-2.0-or-later
+pragma solidity >=0.8.0 <0.9.0;
 
 /// @title Abstract contract with modified blockTimestamp functionality
 /// @notice Allows the pool and other contracts to get a timestamp truncated to 32 bits

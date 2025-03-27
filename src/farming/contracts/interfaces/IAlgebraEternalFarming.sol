@@ -163,6 +163,11 @@ interface IAlgebraEternalFarming {
     bytes32 incentiveId
   ) external view returns (uint128 liquidity, int24 tickLower, int24 tickUpper, uint256 innerRewardGrowth0, uint256 innerRewardGrowth1);
 
+  /// @notice Returns connected to pool incentive key
+  function incentiveKeys(
+    address poolAddress
+  ) external view returns (IERC20Minimal rewardToken, IERC20Minimal bonusRewardToken, IAlgebraPool pool, uint256 nonce);
+
   /// @notice Creates a new liquidity farming incentive program
   /// @param key Details of the incentive to create
   /// @param params Params of incentive

@@ -3,12 +3,10 @@ name: Checks
 on:
   push:
     branches:
-      - master
-      - staged
+      - integral-v1.2.1
   pull_request:
     branches:
-      - master
-      - dev
+      - integral-v1.2.1
 
 jobs:
   Codespell:

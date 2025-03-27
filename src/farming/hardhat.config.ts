@@ -15,6 +15,20 @@ const DEFAULT_COMPILER_SETTINGS: SolcUserConfig = {
     evmVersion: 'paris',
     optimizer: {
       enabled: true,
+      runs: 10000,
+    },
+    metadata: {
+      bytecodeHash: 'none',
+    },
+  },
+};
+
+const HIGHEST_OPTIMIZER_COMPILER_SETTINGS: SolcUserConfig = {
+  version: '0.8.20',
+  settings: {
+    evmVersion: 'paris',
+    optimizer: {
+      enabled: true,
       runs: 99999999,
     },
     metadata: {
@@ -23,11 +37,16 @@ const DEFAULT_COMPILER_SETTINGS: SolcUserConfig = {
   },
 };
 
+
 const config: HardhatUserConfig = {
   networks: baseConfig.networks,
   etherscan: baseConfig.etherscan,
   solidity: {
-    compilers: [DEFAULT_COMPILER_SETTINGS],
+    compilers: [HIGHEST_OPTIMIZER_COMPILER_SETTINGS],
+    overrides: {
+      'contracts/farmings/AlgebraEternalFarming.sol': DEFAULT_COMPILER_SETTINGS,
+      'contracts/farmings/EternalVirtualPool.sol': DEFAULT_COMPILER_SETTINGS,
+    },
   },
   typechain: {
     outDir: 'typechain',

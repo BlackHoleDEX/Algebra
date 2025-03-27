@@ -5,7 +5,7 @@ import './interfaces/IBasePluginV2Factory.sol';
 import './AlgebraBasePluginV2.sol';
 import './interfaces/plugins/ISlidingFeePlugin.sol';
 
-/// @title Algebra Integral 1.2 default plugin factory
+/// @title Algebra Integral 1.2.1 default plugin factory
 /// @notice This contract creates Algebra sliding fee plugins for Algebra liquidity pools
 /// @dev This plugin factory can only be used for Algebra base pools
 contract BasePluginV2Factory is IBasePluginV2Factory {
@@ -57,8 +57,7 @@ contract BasePluginV2Factory is IBasePluginV2Factory {
 
   function _createPlugin(address pool) internal returns (address) {
     require(pluginByPool[pool] == address(0), 'Already created');
-    ISlidingFeePlugin plugin = new AlgebraBasePluginV2(pool, algebraFactory, address(this));
-    plugin.setBaseFee(defaultBaseFee);
+    ISlidingFeePlugin plugin = new AlgebraBasePluginV2(pool, algebraFactory, address(this), defaultBaseFee);
     pluginByPool[pool] = address(plugin);
     return address(plugin);
   }

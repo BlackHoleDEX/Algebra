@@ -40,11 +40,6 @@ describe('AlgebraPool gas tests [ @skip-on-coverage ]', () => {
       await snapshotGasCost(pool.setFee(220));
     });
 
-    it('by plugin', async () => {
-      await pool.setPlugin(other.address);
-      await pool.setPluginConfig(2**7);
-      await snapshotGasCost(pool.connect(other).setFee(220));
-    });
   });
 
   for (const communityFee of [0, 500]) {

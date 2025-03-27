@@ -8,9 +8,9 @@ import {TickMath} from '@cryptoalgebra/integral-core/contracts/libraries/TickMat
 import {FullMath} from '@cryptoalgebra/integral-core/contracts/libraries/FullMath.sol';
 
 import {ISlidingFeePlugin} from '../interfaces/plugins/ISlidingFeePlugin.sol';
-import {BasePlugin} from '../base/BasePlugin.sol';
+import {AlgebraBasePlugin} from '../base/AlgebraBasePlugin.sol';
 
-abstract contract SlidingFeePlugin is BasePlugin, ISlidingFeePlugin {
+abstract contract SlidingFeePlugin is AlgebraBasePlugin, ISlidingFeePlugin {
   struct FeeFactors {
     uint128 zeroToOneFeeFactor;
     uint128 oneToZeroFeeFactor;
@@ -25,10 +25,11 @@ abstract contract SlidingFeePlugin is BasePlugin, ISlidingFeePlugin {
   uint16 public s_baseFee = 3000;
   bool public slidingFeeEnabled;
 
-  constructor() {
+  constructor(uint16 _baseFee) {
     FeeFactors memory feeFactors = FeeFactors(uint128(1 << FEE_FACTOR_SHIFT), uint128(1 << FEE_FACTOR_SHIFT));
 
     s_feeFactors = feeFactors;
+    s_baseFee = _baseFee;
   }
 
   function _getFeeAndUpdateFactors(bool zeroToOne, int24 currenTick, int24 lastTick, bool overrideFee, uint16 fee) internal returns (uint16) {
@@ -58,7 +59,7 @@ abstract contract SlidingFeePlugin is BasePlugin, ISlidingFeePlugin {
   }
 
   function setPriceChangeFactor(uint16 newPriceChangeFactor) external override {
-    require(IAlgebraFactory(factory).hasRoleOrOwner(ALGEBRA_BASE_PLUGIN_MANAGER, msg.sender));
+    _authorize();
 
     s_priceChangeFactor = newPriceChangeFactor;
 
@@ -66,7 +67,7 @@ abstract contract SlidingFeePlugin is BasePlugin, ISlidingFeePlugin {
   }
 
   function setBaseFee(uint16 newBaseFee) external override {
-    require(msg.sender == pluginFactory || IAlgebraFactory(factory).hasRoleOrOwner(ALGEBRA_BASE_PLUGIN_MANAGER, msg.sender));
+    _authorize();
 
     s_baseFee = newBaseFee;
     emit BaseFee(newBaseFee);
