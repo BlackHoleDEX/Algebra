@@ -5,22 +5,12 @@ const genesisPoolAbi = [
     "inputs": [
       {
         "internalType": "address",
-        "name": "_factory",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
         "name": "_genesisManager",
         "type": "address"
       },
       {
         "internalType": "address",
         "name": "_tokenHandler",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_voter",
         "type": "address"
       },
       {
@@ -152,11 +142,6 @@ const genesisPoolAbi = [
     "inputs": [],
     "name": "allocationInfo",
     "outputs": [
-      {
-        "internalType": "address",
-        "name": "tokenOwner",
-        "type": "address"
-      },
       {
         "internalType": "uint256",
         "name": "proposedNativeAmount",
@@ -379,6 +364,11 @@ const genesisPoolAbi = [
     "outputs": [
       {
         "internalType": "address",
+        "name": "tokenOwner",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
         "name": "nativeToken",
         "type": "address"
       },
@@ -427,11 +417,6 @@ const genesisPoolAbi = [
     "outputs": [
       {
         "components": [
-          {
-            "internalType": "address",
-            "name": "tokenOwner",
-            "type": "address"
-          },
           {
             "internalType": "uint256",
             "name": "proposedNativeAmount",
@@ -491,6 +476,11 @@ const genesisPoolAbi = [
     "outputs": [
       {
         "components": [
+          {
+            "internalType": "address",
+            "name": "tokenOwner",
+            "type": "address"
+          },
           {
             "internalType": "address",
             "name": "nativeToken",
@@ -742,6 +732,11 @@ const genesisPoolAbi = [
         "components": [
           {
             "internalType": "address",
+            "name": "tokenOwner",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
             "name": "nativeToken",
             "type": "address"
           },
@@ -787,11 +782,6 @@ const genesisPoolAbi = [
       },
       {
         "components": [
-          {
-            "internalType": "address",
-            "name": "tokenOwner",
-            "type": "address"
-          },
           {
             "internalType": "uint256",
             "name": "proposedNativeAmount",

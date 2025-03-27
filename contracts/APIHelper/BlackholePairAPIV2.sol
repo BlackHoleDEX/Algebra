@@ -62,6 +62,8 @@ contract BlackholePairAPIV2 is Initializable {
         uint account_gauge_balance;     // account pair staked in gauge balance
         uint account_gauge_earned; 		// account earned emissions for this pair
 
+        uint account_staked_unlock;     // account pair staked in gauge balance
+
         // votes
         uint votes;
 
@@ -193,12 +195,13 @@ contract BlackholePairAPIV2 is Initializable {
 
 
     // valid only for sAMM and vAMM
-    function getAllPair(address _user, uint _amounts, uint _offset) external view returns(uint totPairs, bool hasNext, pairInfo[] memory pairs){
+    function getAllPair(address _user, uint _amounts, uint _offset) external view returns(uint totPairs, bool hasNext, pairInfo[] memory pairs, uint epochDuration){
 
         
         require(_amounts <= MAX_PAIRS, 'too many pair');
 
         pairs = new pairInfo[](_amounts);
+
         
         uint i = _offset;
         totPairs = pairFactory.allPairsLength();
@@ -209,6 +212,7 @@ contract BlackholePairAPIV2 is Initializable {
         uint stakedToken0Fees;     
         uint stakedToken1Fees; 
         Bribes[] memory bribes;
+        epochDuration = BlackTimeLibrary.WEEK;
 
         for(i; i < _offset + _amounts; i++){
             // if totalPairs is reached, break.
@@ -334,6 +338,7 @@ contract BlackholePairAPIV2 is Initializable {
         _pairInfo.account_token1_balance = _account == address(0) ? 0 : IERC20(token_1).balanceOf(_account);
         _pairInfo.account_gauge_balance = accountGaugeLPAmount;
         _pairInfo.account_gauge_earned = earned;
+        _pairInfo.account_staked_unlock = _account != address(0) && address(_gauge) != address(0) ? _gauge.maturityTime(_account) : 0;
 
         // votes
         _pairInfo.votes = voter.weights(_pair);   

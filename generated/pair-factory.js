@@ -1,4 +1,4 @@
-const pairFactoryAddress = "0x1Ec9fa0e80A28F2C038E8BCC813DD1a167970a42";
+const pairFactoryAddress = "0x066C270c9A351c79f5079194FD2Abc63ab9b91dB";
 
 const pairFactoryAbi = [
   {
