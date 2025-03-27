@@ -416,7 +416,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
         auction = IAuction(_auction);
     }
 
-    function setGenesisPoolMaturityTime(uint256 _maturityTime) external onlyManager{
+    function setMaturityTime(uint256 _maturityTime) external onlyManager{
         genesisInfo.maturityTime = _maturityTime;
     }
 

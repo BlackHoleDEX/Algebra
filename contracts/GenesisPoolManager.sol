@@ -276,8 +276,8 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         MATURITY_TIME = _maturityTime;
     }
 
-    function setGenesisPoolMaturityTime(address _genesisPool, uint256 _maturityTime) external Governance {
-        IGenesisPool(_genesisPool).setGenesisPoolMaturityTime(_maturityTime);
+    function setMaturityTime(address _genesisPool, uint256 _maturityTime) external Governance {
+        IGenesisPool(_genesisPool).setMaturityTime(_maturityTime);
     }
 
 }
