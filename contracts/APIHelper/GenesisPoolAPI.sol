@@ -82,46 +82,63 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
     function getAllGenesisPools(address _user, uint _amounts, uint _offset) external view returns(uint totalPools, bool hasNext, GenesisData[] memory genesisPools){
         require(_amounts <= MAX_POOLS, 'too many pools');
 
-        genesisPools = new GenesisData[](_amounts);
-
         address[] memory proposedTokens = genesisManager.getLiveNaitveTokens();
-        totalPools = proposedTokens.length;
-
-        uint i = _offset;
-        hasNext = true;
-        address genesisPool;
-        address nativeToken;
-        GenesisInfo memory genesisInfo;
-        uint256 userDeposit;
-
-        for(i; i < _offset + _amounts; i++){
-            if(i >= totalPools) {
-                hasNext = false;
-                break;
-            }
-
-            nativeToken = proposedTokens[i];
-
-            genesisPool = genesisPoolFactory.getGenesisPool(nativeToken);
-            genesisInfo = IGenesisPool(genesisPool).getGenesisInfo();
-
-            genesisPools[i - _offset].genesisPool = genesisPool;
-            genesisPools[i - _offset].nativeToken = nativeToken;
-
-            genesisPools[i - _offset].nativeTokensDecimal = IERC20(nativeToken).decimals();
-            genesisPools[i - _offset].fundingTokensDecimal = IERC20(genesisInfo.fundingToken).decimals();
-
-            userDeposit = _user != address(0) ? IGenesisPool(genesisPool).userDeposits(_user) : 0;
-            genesisPools[i - _offset].userDeposit = userDeposit;
-            genesisPools[i - _offset].estimatedNativeAmount = userDeposit > 0 ? IGenesisPool(genesisPool).getNativeTokenAmount(userDeposit) : 0;
-
-            genesisPools[i - _offset].tokenAllocation = IGenesisPool(genesisPool).getAllocationInfo();
-            genesisPools[i - _offset].incentiveInfo = IGenesisPool(genesisPool).getIncentivesInfo();
-            genesisPools[i - _offset].genesisInfo = genesisInfo;
-            genesisPools[i - _offset].liquidityPool = IGenesisPool(genesisPool).getLiquidityPoolInfo();
-            genesisPools[i - _offset].poolStatus = IGenesisPool(genesisPool).poolStatus();
+        
+        // Precompute pool index mapping to quickly skip to the correct offset
+        uint[] memory poolIndexes = new uint[](proposedTokens.length);
+        totalPools = 0;
+        for(uint i = 0; i < proposedTokens.length; i++) {
+            poolIndexes[i] = totalPools;
+            totalPools += genesisPoolFactory.getGenesisPools(proposedTokens[i]).length;
         }
 
+        // Find the correct token and local offset
+        uint tokenIndex = 0;
+        uint localOffset = _offset;
+        while(tokenIndex < proposedTokens.length - 1 && localOffset >= poolIndexes[tokenIndex + 1]) {
+            tokenIndex++;
+            localOffset -= poolIndexes[tokenIndex];
+        }
+
+        genesisPools = new GenesisData[](_amounts);
+        uint currentIndex = 0;
+        hasNext = true;
+
+        // Start from the identified token and local offset
+        for(uint i = tokenIndex; i < proposedTokens.length; i++) {
+            address nativeToken = proposedTokens[i];
+            address[] memory genesisPoolsPerToken = genesisPoolFactory.getGenesisPools(nativeToken);
+
+            for(uint j = (i == tokenIndex ? localOffset : 0); j < genesisPoolsPerToken.length; j++) {
+                if (currentIndex >= _amounts) {
+                    return (totalPools, true, genesisPools);
+                }
+
+                address genesisPool = genesisPoolsPerToken[j];
+                GenesisInfo memory genesisInfo = IGenesisPool(genesisPool).getGenesisInfo();
+
+                genesisPools[currentIndex].genesisPool = genesisPool;
+                genesisPools[currentIndex].nativeToken = nativeToken;
+
+                genesisPools[currentIndex].nativeTokensDecimal = IERC20(nativeToken).decimals();
+                genesisPools[currentIndex].fundingTokensDecimal = IERC20(genesisInfo.fundingToken).decimals();
+
+                uint256 userDeposit = _user != address(0) ? IGenesisPool(genesisPool).userDeposits(_user) : 0;
+                genesisPools[currentIndex].userDeposit = userDeposit;
+                genesisPools[currentIndex].estimatedNativeAmount = userDeposit > 0 ? IGenesisPool(genesisPool).getNativeTokenAmount(userDeposit) : 0;
+
+                genesisPools[currentIndex].tokenAllocation = IGenesisPool(genesisPool).getAllocationInfo();
+                genesisPools[currentIndex].incentiveInfo = IGenesisPool(genesisPool).getIncentivesInfo();
+                genesisPools[currentIndex].genesisInfo = genesisInfo;
+                genesisPools[currentIndex].liquidityPool = IGenesisPool(genesisPool).getLiquidityPoolInfo();
+                genesisPools[currentIndex].poolStatus = IGenesisPool(genesisPool).poolStatus();
+
+                currentIndex++;
+            }
+        }
+
+        hasNext = (poolIndexes[proposedTokens.length - 1] + genesisPoolFactory.getGenesisPools(proposedTokens[proposedTokens.length - 1]).length) > (_offset + currentIndex);
+        return (totalPools, hasNext, genesisPools);
     }
    
     function getAllUserRelatedGenesisPools(address _user) external view returns(uint totalTokens, GenesisData[] memory genesisPools){
@@ -141,19 +158,22 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
         for(i; i < totalTokens; i++){
             nativeToken = proposedTokens[i];
 
-            genesisPool = genesisPoolFactory.getGenesisPool(nativeToken);
-            poolStatus = IGenesisPool(genesisPool).poolStatus();
+            address[] memory genesisPoolsPerToken = genesisPoolFactory.getGenesisPools(nativeToken);
+            for(uint j =0; j < genesisPoolsPerToken.length; j++){
+                genesisPool = genesisPoolsPerToken[j];
+                poolStatus = IGenesisPool(genesisPool).poolStatus();
 
-            if(poolStatus == PoolStatus.DEFAULT || poolStatus == PoolStatus.LAUNCH)
-                continue;
-            
-            userDeposit = _user != address(0) ? IGenesisPool(genesisPool).userDeposits(_user) : 0;
-            tokenAllocation = IGenesisPool(genesisPool).getAllocationInfo();
-            incentiveInfo = IGenesisPool(genesisPool).getIncentivesInfo();
-            genesisInfo = IGenesisPool(genesisPool).getGenesisInfo();
+                if(poolStatus == PoolStatus.DEFAULT || poolStatus == PoolStatus.LAUNCH)
+                    continue;
+                
+                userDeposit = _user != address(0) ? IGenesisPool(genesisPool).userDeposits(_user) : 0;
+                tokenAllocation = IGenesisPool(genesisPool).getAllocationInfo();
+                incentiveInfo = IGenesisPool(genesisPool).getIncentivesInfo();
+                genesisInfo = IGenesisPool(genesisPool).getGenesisInfo();
 
-            if(_hasClaimbaleForOwner(_user, userDeposit, poolStatus, genesisInfo.tokenOwner, tokenAllocation, incentiveInfo)){
-                count++;
+                if(_hasClaimbaleForOwner(_user, userDeposit, poolStatus, genesisInfo.tokenOwner, tokenAllocation, incentiveInfo)){
+                    count++;
+                }
             }
         }
 
@@ -164,34 +184,37 @@ contract GenesisPoolAPI is IGenesisPoolBase, Initializable {
         for(i; i < totalTokens; i++){
             nativeToken = proposedTokens[i];
 
-            genesisPool = genesisPoolFactory.getGenesisPool(nativeToken);
-            poolStatus = IGenesisPool(genesisPool).poolStatus();
+            address[] memory genesisPoolsPerToken = genesisPoolFactory.getGenesisPools(nativeToken);
+            for(uint j =0; j < genesisPoolsPerToken.length; j++){
+                genesisPool = genesisPoolsPerToken[j];
+                poolStatus = IGenesisPool(genesisPool).poolStatus();
 
-            if(poolStatus == PoolStatus.DEFAULT || poolStatus == PoolStatus.LAUNCH)
-                continue;
-            
-            userDeposit = _user != address(0) ? IGenesisPool(genesisPool).userDeposits(_user) : 0;
-            tokenAllocation = IGenesisPool(genesisPool).getAllocationInfo();
-            incentiveInfo = IGenesisPool(genesisPool).getIncentivesInfo();
-            genesisInfo = IGenesisPool(genesisPool).getGenesisInfo();
+                if(poolStatus == PoolStatus.DEFAULT || poolStatus == PoolStatus.LAUNCH)
+                    continue;
+                
+                userDeposit = _user != address(0) ? IGenesisPool(genesisPool).userDeposits(_user) : 0;
+                tokenAllocation = IGenesisPool(genesisPool).getAllocationInfo();
+                incentiveInfo = IGenesisPool(genesisPool).getIncentivesInfo();
+                genesisInfo = IGenesisPool(genesisPool).getGenesisInfo();
 
-            if(_hasClaimbaleForOwner(_user, userDeposit, poolStatus, genesisInfo.tokenOwner, tokenAllocation, incentiveInfo)){
-            
-                genesisPools[index].genesisPool = genesisPool;
-                genesisPools[index].nativeToken = nativeToken;
+                if(_hasClaimbaleForOwner(_user, userDeposit, poolStatus, genesisInfo.tokenOwner, tokenAllocation, incentiveInfo)){
+                
+                    genesisPools[index].genesisPool = genesisPool;
+                    genesisPools[index].nativeToken = nativeToken;
 
-                genesisPools[index].nativeTokensDecimal = IERC20(nativeToken).decimals();
-                genesisPools[index].fundingTokensDecimal = IERC20(genesisInfo.fundingToken).decimals();
+                    genesisPools[index].nativeTokensDecimal = IERC20(nativeToken).decimals();
+                    genesisPools[index].fundingTokensDecimal = IERC20(genesisInfo.fundingToken).decimals();
 
-                genesisPools[index].userDeposit = userDeposit;
-                genesisPools[index].estimatedNativeAmount = userDeposit > 0 ? IGenesisPool(genesisPool).getNativeTokenAmount(userDeposit) : 0;
+                    genesisPools[index].userDeposit = userDeposit;
+                    genesisPools[index].estimatedNativeAmount = userDeposit > 0 ? IGenesisPool(genesisPool).getNativeTokenAmount(userDeposit) : 0;
 
-                genesisPools[index].tokenAllocation = tokenAllocation;
-                genesisPools[index].incentiveInfo = IGenesisPool(genesisPool).getIncentivesInfo();
-                genesisPools[index].genesisInfo = genesisInfo;
-                genesisPools[index].liquidityPool = IGenesisPool(genesisPool).getLiquidityPoolInfo();
-                genesisPools[index].poolStatus = IGenesisPool(genesisPool).poolStatus();
-                index++;
+                    genesisPools[index].tokenAllocation = tokenAllocation;
+                    genesisPools[index].incentiveInfo = IGenesisPool(genesisPool).getIncentivesInfo();
+                    genesisPools[index].genesisInfo = genesisInfo;
+                    genesisPools[index].liquidityPool = IGenesisPool(genesisPool).getLiquidityPoolInfo();
+                    genesisPools[index].poolStatus = IGenesisPool(genesisPool).poolStatus();
+                    index++;
+                }
             }
         }
 

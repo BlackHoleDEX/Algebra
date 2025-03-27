@@ -12,7 +12,7 @@ contract GenesisPoolFactory is IGenesisPoolFactory, OwnableUpgradeable {
     address public genesisManager;
     address public tokenHandler;
 
-    mapping(address => address) public getGenesisPool;
+    mapping(address => address[]) public getGenesisPools;
     address[] public genesisPools;
 
     event GenesisCreated(address indexed nativeToken, address indexed fundingToken);
@@ -42,19 +42,32 @@ contract GenesisPoolFactory is IGenesisPoolFactory, OwnableUpgradeable {
     }
 
     function removeGenesisPool(address nativeToken) external onlyManager {
-        getGenesisPool[nativeToken] = address(0);
+        for (uint256 i = 0; i < getGenesisPools[nativeToken].length; i++) {
+            getGenesisPools[nativeToken][i] = address(0);
+        }
     }
 
     function createGenesisPool(address tokenOwner, address nativeToken, address fundingToken) external onlyManager returns (address genesisPool) {
         require(nativeToken != address(0), "0x"); 
-        require(getGenesisPool[nativeToken] == address(0), "exists");
+        require(getGenesisPool(nativeToken) == address(0), "exists");
 
-        bytes32 salt = keccak256(abi.encodePacked(nativeToken, fundingToken));
+        bytes32 salt = keccak256(abi.encodePacked(nativeToken, fundingToken, genesisPools.length));
         genesisPool = address(new GenesisPool{salt: salt}(genesisManager, tokenHandler, tokenOwner, nativeToken, fundingToken));
 
-        getGenesisPool[nativeToken] = genesisPool;
+        getGenesisPools[nativeToken].push(genesisPool);
         genesisPools.push(genesisPool);
 
         emit GenesisCreated(nativeToken, fundingToken);
     }
+
+    function getGenesisPool(address nativeToken) public view returns (address) {
+        address[] memory pools = getGenesisPools[nativeToken];
+        if (pools.length == 0) {
+            return address(0);
+        }
+        if(IGenesisPool(pools[pools.length - 1]).poolStatus() != IGenesisPoolBase.PoolStatus.NOT_QUALIFIED)
+            return pools[pools.length - 1];
+        return address(0);
+    }
+
 }
