@@ -498,9 +498,10 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
               // 80% <= twapResult.percentageOfDepositToken <= 93%
               // типа из андеринветори или спешл ребалансим в НОРМАЛ
               return (true, State.Normal);
-            } else {
-              return (true, State.UnderInventory);
             }
+            // else {
+            //   return (true, State.UnderInventory);
+            // }
           } else {
             // sqrtStatus = 1;
             // state == UnderInventory || state == Special
@@ -518,9 +519,9 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
             return (true, State.Normal);
           }
           // WHAT IF GREATER THAN 91%? (STAYING OVER-INVENTORY)
-          else {
-            return (true, State.OverInventory);
-          }
+          // else {
+          //   return (true, State.OverInventory);
+          // }
         } else {
           // state == OverInventory
           // twapResult.percentageOfDepositToken <= 77%
@@ -531,6 +532,8 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
         // TODO: unreachable код, подумать чо с ним делать (тесты все проходят)
         uint256 priceChange = _calcPercentageDiff(lastRebalanceCurrentPrice, twapResult.currentPriceAccountingDecimals); // percentage diff between lastRebalanceCurrentPrice and currentPriceAccountingDecimals
         // console.log('priceChange: ', priceChange);
+        // console.log('priceChange: ', priceChange);
+        // console.log('threshold: ', thresholds.priceChangeThreshold);
         if (priceChange > thresholds.priceChangeThreshold) {
           // CASES:
           // 1. we are still under-inventory and price changed by more than (1/0.5)%

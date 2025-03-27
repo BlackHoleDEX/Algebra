@@ -10,7 +10,7 @@ import './plugins/AlmPlugin.sol';
 import './plugins/SlidingFeePlugin.sol';
 import './plugins/VolatilityOraclePlugin.sol';
 
-import 'hardhat/console.sol';
+// import 'hardhat/console.sol';
 
 /// @title Algebra Integral 1.2.1 ALM plugin
 contract AlgebraBasePluginALM is AlmPlugin, DynamicFeePlugin, VolatilityOraclePlugin {
@@ -59,22 +59,24 @@ contract AlgebraBasePluginALM is AlmPlugin, DynamicFeePlugin, VolatilityOraclePl
   }
 
   function afterSwap(address, address, bool, int256, uint160, int256, int256, bytes calldata) external override onlyPool returns (bytes4) {
-	console.log('entered after swap');
-    ( , int24 currentTick, , ) = _getPoolState();
-    uint32 lastBlockTimestamp = _getLastBlockTimestamp();
+	// console.log('entered after swap');
+	if (rebalanceManager != address(0)) {
+		( , int24 currentTick, , ) = _getPoolState();
+		uint32 lastBlockTimestamp = _getLastBlockTimestamp();
 
-    bool failedToObtainTWAP;
-    int24 slowTwapTick;
-    int24 fastTwapTick;
+		bool failedToObtainTWAP;
+		int24 slowTwapTick;
+		int24 fastTwapTick;
 
-    if (_ableToGetTimepoints(slowTwapPeriod)) {
-      slowTwapTick = _getTwapTick(slowTwapPeriod);
-      fastTwapTick = _getTwapTick(fastTwapPeriod);
-    } else {
-      failedToObtainTWAP = true;
-    }
+		if (_ableToGetTimepoints(slowTwapPeriod)) {
+		slowTwapTick = _getTwapTick(slowTwapPeriod);
+		fastTwapTick = _getTwapTick(fastTwapPeriod);
+		} else {
+		failedToObtainTWAP = true;
+		}
 
-	_obtainTWAPAndRebalance(currentTick, slowTwapTick, fastTwapTick, lastBlockTimestamp, failedToObtainTWAP);
+		_obtainTWAPAndRebalance(currentTick, slowTwapTick, fastTwapTick, lastBlockTimestamp, failedToObtainTWAP);
+	}
 
     return IAlgebraPlugin.afterSwap.selector;
   }
