@@ -188,11 +188,10 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
     int24 currentTick,
     int24 slowTwapTick,
     int24 fastTwapTick,
-    uint32 lastBlockTimestamp,
-    bool failedToObtainTWAP
+    uint32 lastBlockTimestamp
   ) external {
     // console.log('entered obtainTWAPAndRebalance');
-    TwapResult memory twapResult = _obtainTWAPs(currentTick, slowTwapTick, fastTwapTick, lastBlockTimestamp, failedToObtainTWAP);
+    TwapResult memory twapResult = _obtainTWAPs(currentTick, slowTwapTick, fastTwapTick, lastBlockTimestamp);
     // console.log("TWAP RESULT START");
 		// console.log(twapResult.currentPriceAccountingDecimals);
 		// console.log(twapResult.slowAvgPriceAccountingDecimals);
@@ -284,8 +283,7 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
     int24 currentTick,
     int24 slowTwapTick,
     int24 fastTwapTick,
-    uint32 lastBlockTimestamp,
-    bool failedToObtainTWAP
+    uint32 lastBlockTimestamp
   ) internal view returns (TwapResult memory twapResult) {
     // достать проценты, хуенты
     // достать резервы токенычей
@@ -306,10 +304,7 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
     // }
 
     // console.log('entered obtain twaps');
-    twapResult.failedToObtainTWAP = failedToObtainTWAP;
-    if (failedToObtainTWAP) {
-      return twapResult;
-    }
+    twapResult.failedToObtainTWAP = false;
 
     twapResult.currentTick = currentTick;
     twapResult.sameBlock = _blockTimestamp() == lastBlockTimestamp;
@@ -839,7 +834,7 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
   //         return IERC20Metadata(depositToken).decimals();
   // }
 
-  function _authorize() internal view virtual {
+  function _authorize() internal view {
     require(IAlgebraFactory(factory).hasRoleOrOwner(ALGEBRA_BASE_PLUGIN_MANAGER, msg.sender));
   }
 

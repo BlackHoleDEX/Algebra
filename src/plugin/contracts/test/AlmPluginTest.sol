@@ -52,7 +52,7 @@ contract AlmPluginTest is BaseRebalanceManager {
   }
 
   function rebalance(int24 currentTick, int24 slowTwapTick, int24 fastTwapTick, uint32 lastBlockTimestamp) public {
-    TwapResult memory twapResult = _obtainTWAPs(currentTick, slowTwapTick, fastTwapTick, lastBlockTimestamp, false);
+    TwapResult memory twapResult = _obtainTWAPs(currentTick, slowTwapTick, fastTwapTick, lastBlockTimestamp);
 
     // struct TwapResult {
     // 	uint256 currentPriceAccountingDecimals;

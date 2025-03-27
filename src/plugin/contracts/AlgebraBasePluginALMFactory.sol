@@ -5,7 +5,7 @@ import './interfaces/IBasePluginV1Factory.sol';
 import './libraries/AdaptiveFee.sol';
 import './AlgebraBasePluginALM.sol';
 
-/// @title Algebra Integral 1.2.1 default plugin factory
+/// @title Algebra Integral 1.2.1 ALM plugin factory
 /// @notice This contract creates Algebra adaptive fee plugins for Algebra liquidity pools
 /// @dev This plugin factory can only be used for Algebra base pools
 contract AlgebraBasePluginALMFactory is IBasePluginV1Factory {

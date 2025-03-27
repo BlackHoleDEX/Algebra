@@ -6,7 +6,6 @@ interface IRebalanceManager {
 		int24 currentTick,
         int24 slowTwapTick,
         int24 fastTwapTick,
-        uint32 lastBlockTimestamp,
-        bool failedToObtainTWAP
+        uint32 lastBlockTimestamp
 	) external;
 }
