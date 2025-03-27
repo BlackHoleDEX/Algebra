@@ -1503,7 +1503,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                 cpDstRep.timestamp = block.timestamp;
                 require(
                     dstRepOld.length + 1 <= MAX_DELEGATES,
-                    "tokens>1"
+                    "tok>1"
                 );
                 if(_isCheckpointInNewBlock) {
                     for (uint i = 0; i < dstRepOld.length; i++) {
@@ -1589,7 +1589,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                 uint ownerTokenCount = ownerToNFTokenCount[owner];
                 require(
                     dstRepOld.length + ownerTokenCount <= MAX_DELEGATES,
-                    "tokens>1"
+                    "tok>1"
                 );
                 if(_isCheckpointInNewBlock) {
                     for (uint i = 0; i < dstRepOld.length; i++) {
@@ -1655,7 +1655,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         address signatory = ecrecover(digest, v, r, s);
         require(
             signatory != address(0),
-            "IA signature"
+            "IA sig"
         );
         require(
             nonce == nonces[signatory]++,
@@ -1663,7 +1663,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         );
         require(
             block.timestamp <= expiry,
-            "signature exp"
+            "exp sig"
         );
         return _delegate(signatory, delegatee);
     }

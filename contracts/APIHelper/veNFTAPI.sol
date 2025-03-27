@@ -362,7 +362,7 @@ contract veNFTAPI is Initializable {
     function _addExternalBribeRewards(Reward[] memory _reward, ExternalBribeInputs memory external_bribes_input) internal view returns (bool) {
         bool hasReward = false;
         for (uint256 k = 0; k < external_bribes_input.tokens; k++) {
-            address _token = IBribeAPI(external_bribes_input.bribe_address).rewardTokens(k);
+            address _token = IBribeAPI(external_bribes_input.bribe_address).bribeTokens(k);
             uint256 bribeAmount = IBribeAPI(external_bribes_input.bribe_address).earned(external_bribes_input.id, _token);
             if(bribeAmount > 0){
                 hasReward = true;

@@ -92,7 +92,7 @@ contract RewardAPI is Initializable {
     //     IBribeAPI.Reward memory _reward;
 
     //     for(i; i < totTokens; i++){
-    //         _token = IBribeAPI(_bribe).rewardTokens(i);
+    //         _token = IBribeAPI(_bribe).bribeTokens(i);
     //         _tokens[i] = _token;
     //         if(_balance == 0){
     //             _amounts[i] = 0;
@@ -145,7 +145,7 @@ contract RewardAPI is Initializable {
         address _token;
 
         for(i; i < totTokens; i++){
-            _token = IBribeAPI(_bribe).rewardTokens(i);
+            _token = IBribeAPI(_bribe).bribeTokens(i);
             _tokens[i] = _token;
             _symbol[i] = IERC20(_token).symbol();
             _decimals[i] = IERC20(_token).decimals();

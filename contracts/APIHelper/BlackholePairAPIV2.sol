@@ -385,7 +385,7 @@ contract BlackholePairAPIV2 is Initializable {
         address _token;
 
         for(i; i < totTokens; i++){
-            _token = IBribeAPI(_bribeAddress).rewardTokens(i);
+            _token = IBribeAPI(_bribeAddress).bribeTokens(i);
             _tokens[i] = _token;
             _symbol[i] = IERC20(_token).symbol();
             _decimals[i] = IERC20(_token).decimals();
