@@ -6,7 +6,7 @@ import { expect } from './shared/expect';
 import { TEST_POOL_START_TIME, pluginFixtureALM } from './shared/fixtures';
 import { PLUGIN_FLAGS, encodePriceSqrt, expandTo18Decimals, getMaxTick, getMinTick } from './shared/utilities';
 
-import { MockPool, MockAlgebraBasePluginALM, MockAlgebraBasePluginALMFactory, MockTimeVirtualPool, MockVault, RebalanceManager } from '../typechain';
+import { MockPool, MockAlgebraBasePluginALM, MockAlgebraBasePluginALMFactory, MockTimeVirtualPool, MockVault, RebalanceManager, MockRebalanceManager } from '../typechain';
 
 import snapshotGasCost from './shared/snapshotGasCost';
 
@@ -14,7 +14,7 @@ describe('AlgebraBasePluginALM', () => {
   let wallet: Wallet, other: Wallet;
 
   let mockVault: MockVault;
-  let rebalanceManager: RebalanceManager;
+  let rebalanceManager: MockRebalanceManager;
   let plugin: MockAlgebraBasePluginALM; // modified plugin
   let mockPluginFactory: MockAlgebraBasePluginALMFactory; // modified plugin factory
   let mockPool: MockPool; // mock of AlgebraPool
@@ -26,17 +26,45 @@ describe('AlgebraBasePluginALM', () => {
     await pool.initialize(encodePriceSqrt(1, 1));
   }
 
+  // сделал отдельной фикстурой, потому что сначала пул должен проинициализироваться
+  // потом уже должен деплоиться rebalanceManager, потому что он в конструкторе достает из пула tickSpacing
+  async function deployAndSetRebalanceManager() {
+      const thresholds = {
+        depositTokenUnusedThreshold: 100,
+        simulate: 9400, // было 9300
+        normalThreshold: 8100, // было 8000
+        underInventoryThreshold: 7800, // было 7700
+        overInventoryThreshold: 9100,
+        priceChangeThreshold: 100,
+        extremeVolatility: 2500,
+        highVolatility: 900, // было 500
+        someVolatility: 200, // было 100
+        dtrDelta: 300,
+        baseLowPct: 3000, // было 2000
+        baseHighPct: 1500, // было 3000
+        limitReservePct: 500,
+      }
+
+      const rebalanceManagerFactory = await ethers.getContractFactory('MockRebalanceManager');
+      rebalanceManager = (await rebalanceManagerFactory.deploy(
+        await mockVault.getAddress(),
+        thresholds
+      )) as any as MockRebalanceManager;
+
+      await plugin.setRebalanceManager(rebalanceManager);
+  }
+
   before('prepare signers', async () => {
     [wallet, other] = await (ethers as any).getSigners();
   });
 
-  beforeEach('deploy test AlgebraBasePluginV1', async () => {
-    ({ mockVault, rebalanceManager, plugin, mockPluginFactory, mockPool } = await loadFixture(pluginFixtureALM));
+  beforeEach('deploy test AlgebraBasePlugin', async () => {
+    ({ mockVault, plugin, mockPluginFactory, mockPool } = await loadFixture(pluginFixtureALM));
   });
 
   describe('#Initialize', async () => {
     it('cannot initialize twice', async () => {
-      await mockPool.setPlugin(plugin);
+      await mockPool.setPlugin(await plugin.getAddress());
       await initializeAtZeroTick(mockPool);
 
       await expect(plugin.initialize()).to.be.revertedWith('Already initialized');
@@ -54,7 +82,7 @@ describe('AlgebraBasePluginALM', () => {
 
     it('can initialize for existing pool', async () => {
       await initializeAtZeroTick(mockPool);
-      await mockPool.setPlugin(plugin);
+      await mockPool.setPlugin(await plugin.getAddress());
       await plugin.initialize();
 
       const timepoint = await plugin.timepoints(0);
@@ -127,6 +155,8 @@ describe('AlgebraBasePluginALM', () => {
   describe('#VolatilityVolatilityOracle', () => {
     beforeEach('connect plugin to pool', async () => {
       await mockPool.setPlugin(plugin);
+      await deployAndSetRebalanceManager();
+      await plugin.initializeALM(rebalanceManager, 3600, 300);
     });
 
     it('initializes timepoints slot', async () => {
@@ -322,6 +352,9 @@ describe('AlgebraBasePluginALM', () => {
       beforeEach('initialize pool', async () => {
         await mockPool.setPlugin(plugin);
         await initializeAtZeroTick(mockPool);
+        await deployAndSetRebalanceManager();
+        await plugin.initializeALM(rebalanceManager, 3600, 300);
+  
         mint = async (recipient: string, tickLower: number, tickUpper: number, liquidityDesired: number) => {
           await mockPool.mint(recipient, recipient, tickLower, tickUpper, liquidityDesired, '0x');
         };
@@ -497,6 +530,23 @@ describe('AlgebraBasePluginALM', () => {
           expect(currentFeeAfterSwap).to.be.not.eq(currentFee2);
         });
       });
+    });
+  });
+
+  describe('#AlmPlugin', () => {
+    it('first rebalance', async () => {
+      const defaultConfig = await plugin.defaultPluginConfig();
+      await mockPool.setPlugin(plugin);
+      await mockPool.setPluginConfig(BigInt(PLUGIN_FLAGS.AFTER_SWAP_FLAG) | defaultConfig);
+
+      await initializeAtZeroTick(mockPool);
+      await deployAndSetRebalanceManager();
+      await plugin.initializeALM(rebalanceManager, 3600, 300);
+
+      await rebalanceManager.setDepositTokenBalance(10000n);
+      await mockVault.setTotalAmounts(10000, 0);
+      await plugin.advanceTime(5000);
+      await mockPool.swapToTick(10);
     });
   });
 

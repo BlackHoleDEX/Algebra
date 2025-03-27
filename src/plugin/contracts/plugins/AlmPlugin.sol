@@ -5,7 +5,7 @@ import '../base/AlgebraBasePlugin.sol';
 import '../interfaces/plugins/IAlmPlugin.sol';
 import '../interfaces/IRebalanceManager.sol';
 
-// import 'hardhat/console.sol';
+import 'hardhat/console.sol';
 
 abstract contract AlmPlugin is AlgebraBasePlugin, IAlmPlugin {
   address public rebalanceManager;
@@ -34,6 +34,7 @@ abstract contract AlmPlugin is AlgebraBasePlugin, IAlmPlugin {
   }
 
   function setRebalanceManager(address _rebalanceManager) external {
+    console.log('setRebalanceManager called');
     _authorize();
     require(_rebalanceManager != address(0), '_rebalanceManager must be non zero address');
     rebalanceManager = _rebalanceManager;

@@ -4,12 +4,23 @@ pragma solidity =0.8.20;
 import '../RebalanceManager.sol';
 
 contract MockRebalanceManager is RebalanceManager {
-	constructor(address _vault, Thresholds memory _thresholds) RebalanceManager(_vault, _thresholds) {}
-	function _getDepositTokenDecimals() internal view override returns (uint8) {
-		return 18;
-	}
+  uint256 depositTokenVaultBalance;
 
-	function _getPairedTokenDecimals() internal view override returns (uint8) {
-		return 18;
-	}
+  constructor(address _vault, Thresholds memory _thresholds) RebalanceManager(_vault, _thresholds) {}
+
+  function setDepositTokenBalance(uint256 _depositTokenVaultBalance) external {
+	depositTokenVaultBalance = _depositTokenVaultBalance;
+  }
+
+  function _getDepositTokenDecimals() internal view override returns (uint8) {
+    return 18;
+  }
+
+  function _getPairedTokenDecimals() internal view override returns (uint8) {
+    return 18;
+  }
+
+  function _getDepositTokenVaultBalance() internal view override returns (uint256) {
+    return depositTokenVaultBalance;
+  }
 }

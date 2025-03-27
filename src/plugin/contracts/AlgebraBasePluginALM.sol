@@ -10,6 +10,8 @@ import './plugins/AlmPlugin.sol';
 import './plugins/SlidingFeePlugin.sol';
 import './plugins/VolatilityOraclePlugin.sol';
 
+import 'hardhat/console.sol';
+
 /// @title Algebra Integral 1.2.1 adaptive fee plugin
 contract AlgebraBasePluginALM is AlmPlugin, DynamicFeePlugin, VolatilityOraclePlugin {
   using Plugins for uint8;
@@ -57,6 +59,7 @@ contract AlgebraBasePluginALM is AlmPlugin, DynamicFeePlugin, VolatilityOraclePl
   }
 
   function afterSwap(address, address, bool, int256, uint160, int256, int256, bytes calldata) external override onlyPool returns (bytes4) {
+	console.log('entered after swap');
     ( , int24 currentTick, , ) = _getPoolState();
     uint32 lastBlockTimestamp = _getLastBlockTimestamp();
 

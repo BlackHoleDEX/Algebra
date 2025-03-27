@@ -21,6 +21,7 @@ contract MockAlgebraBasePluginALMFactory is IAlgebraBasePluginALMFactory {
 
   constructor(address _algebraFactory) {
     algebraFactory = _algebraFactory;
+    defaultFeeConfiguration = AdaptiveFee.initialFeeConfiguration();
   }
 
   /// @inheritdoc IAlgebraPluginFactory
@@ -48,9 +49,9 @@ contract MockAlgebraBasePluginALMFactory is IAlgebraBasePluginALMFactory {
   }
 
   function _createPlugin(address pool) internal returns (address) {
-    // MockAlgebraBasePluginALM plugin = new MockAlgebraBasePluginALM(pool, algebraFactory, address(this), defaultFeeConfiguration);
-    // pluginByPool[pool] = address(plugin);
-    // return address(plugin);
+    MockAlgebraBasePluginALM plugin = new MockAlgebraBasePluginALM(pool, algebraFactory, address(this), defaultFeeConfiguration);
+    pluginByPool[pool] = address(plugin);
+    return address(plugin);
   }
 
   function setDefaultFeeConfiguration(AlgebraFeeConfiguration calldata newConfig) external override {

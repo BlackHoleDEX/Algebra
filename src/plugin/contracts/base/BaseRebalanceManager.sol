@@ -14,7 +14,7 @@ import '../interfaces/IRebalanceManager.sol';
 
 import './AlgebraBasePlugin.sol';
 
-// import 'hardhat/console.sol';
+import 'hardhat/console.sol';
 
 abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
   bytes32 public constant ALGEBRA_BASE_PLUGIN_MANAGER = keccak256('ALGEBRA_BASE_PLUGIN_MANAGER');
@@ -191,7 +191,21 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
     uint32 lastBlockTimestamp,
     bool failedToObtainTWAP
   ) external {
+    console.log('entered obtainTWAPAndRebalance');
     TwapResult memory twapResult = _obtainTWAPs(currentTick, slowTwapTick, fastTwapTick, lastBlockTimestamp, failedToObtainTWAP);
+    console.log("TWAP RESULT START");
+		console.log(twapResult.currentPriceAccountingDecimals);
+		console.log(twapResult.slowAvgPriceAccountingDecimals);
+		console.log(twapResult.fastAvgPriceAccountingDecimals);
+		console.log(twapResult.totalPairedInDeposit);
+		console.log(twapResult.totalDepositToken);
+		console.log(twapResult.totalPairedToken);
+		console.logInt(twapResult.currentTick);
+		console.log(twapResult.percentageOfDepositTokenUnused);
+		console.log(twapResult.percentageOfDepositToken);
+		console.log(twapResult.failedToObtainTWAP);
+		console.log(twapResult.sameBlock);
+		console.log("TWAP RESULT END");
     _rebalance(twapResult);
   }
 
@@ -291,7 +305,7 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
     //         bool sameBlock; done
     // }
 
-    // console.log('entered obtain twaps');
+    console.log('entered obtain twaps');
     twapResult.failedToObtainTWAP = failedToObtainTWAP;
     if (failedToObtainTWAP) {
       return twapResult;
@@ -334,13 +348,13 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
     // uint256 fastPrice = _getPriceAccountingDecimals(_depositToken, _pairedToken, uint128(10 ** _pairedTokenDecimals), fastTwapTick);
     // twapResult.fastAvgPriceAccountingDecimals = fastPrice;
 
-    // console.log('2');
+    console.log('2');
 
     // uint256 currentPriceAccountingDecimals = _getPriceAccountingDecimals(_depositToken, _pairedToken, uint128(10 ** _pairedTokenDecimals), twapResult.currentTick);
-    // console.log('2.5');
-    // console.log("currentPriceAccountingDecimals: ", currentPriceAccountingDecimals);
-    // console.log("twapResult.totalPairedToken: ", twapResult.totalPairedToken);
-    // console.log("_pairedTokenDecimals: ", _pairedTokenDecimals);
+    console.log('2.5');
+    console.log("currentPriceAccountingDecimals: ", currentPriceAccountingDecimals);
+    console.log("twapResult.totalPairedToken: ", twapResult.totalPairedToken);
+    console.log("_pairedTokenDecimals: ", _pairedTokenDecimals);
     twapResult.currentPriceAccountingDecimals = currentPriceAccountingDecimals;
     uint256 totalPairedInDepositWithDecimals = currentPriceAccountingDecimals * twapResult.totalPairedToken;
     uint256 totalPairedInDeposit = totalPairedInDepositWithDecimals / (10 ** _pairedTokenDecimals);
@@ -348,6 +362,7 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
 
     // console.log('3');
 
+    console.log('totalPairedInDeposit: ', totalPairedInDeposit);
     if (totalPairedInDeposit == 0) {
       twapResult.percentageOfDepositToken = 10000;
     } else {
@@ -369,6 +384,7 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
 
     if (depositTokenBalance > 0) {
       uint256 totalTokensAmount = twapResult.totalDepositToken + twapResult.totalPairedInDeposit;
+      console.log('totalTokensAmount: ', totalTokensAmount);
       // uint256 totalDepositTokenMultipliedByFactor = depositTokenBalance * 10000;
       // че за v42 и v43, надо чекнуть первоначальный декомпайл
       // V42 = v41 / v40 = (10000 * depositTokenBalance) / (result.totalDepositToken + result.totalPairedInDeposit)
@@ -582,6 +598,8 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
       // console.log('targetPrice: ', targetPrice);
       // console.log('lowerPriceBound: ', lowerPriceBound);
 
+      console.log('tickSpacing');
+      console.logInt(_tickSpacing);
       int24 roundedTick = roundTickToTickSpacing(_tickSpacing, twapResult.currentTick);
       bool currentTickIsRound = roundedTick == twapResult.currentTick;
 
