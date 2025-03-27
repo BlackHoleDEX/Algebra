@@ -142,6 +142,8 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         require(genesisPool != address(0), '0x pool');
 
         GenesisInfo memory genesisInfo =  IGenesisPool(genesisPool).getGenesisInfo();
+        require(genesisInfo.startTime + genesisInfo.duration - BlackTimeLibrary.NO_GENESIS_DEPOSIT_WINDOW > block.timestamp, "time");
+
         address pairAddress = pairFactory.createPair(nativeToken, genesisInfo.fundingToken, genesisInfo.stable);
         pairFactory.setGenesisStatus(pairAddress, true);
 

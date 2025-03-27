@@ -252,61 +252,44 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
         }
     }
 
-    function claimableUnallocatedAmount() public view returns(PoolStatus, address[] memory addresses, uint256[] memory amounts){
-        uint claimableCnt = 1;
-        if(poolStatus == PoolStatus.NOT_QUALIFIED && msg.sender == genesisInfo.tokenOwner){
-            claimableCnt++;
-        }
-
-        addresses = new address[](claimableCnt);
-        amounts = new uint256[](claimableCnt);
-
-        if(poolStatus == PoolStatus.PARTIALLY_LAUNCHED){
-            if(msg.sender == genesisInfo.tokenOwner){
-                addresses[0] = genesisInfo.nativeToken;
-                amounts[0] = allocationInfo.refundableNativeAmount;
-            } 
-        }else if(poolStatus == PoolStatus.NOT_QUALIFIED){
-            addresses[0] = genesisInfo.fundingToken;
-            amounts[0] = userDeposits[msg.sender];
-            if(msg.sender == genesisInfo.tokenOwner){
-                addresses[1] = genesisInfo.nativeToken;
-                amounts[1] = allocationInfo.refundableNativeAmount;
+    function claimableNative() public view returns(PoolStatus, address token, uint256 amount){
+        if(msg.sender == genesisInfo.tokenOwner){
+            if(poolStatus == PoolStatus.PARTIALLY_LAUNCHED || poolStatus == PoolStatus.NOT_QUALIFIED){
+                token = genesisInfo.nativeToken;
+                amount = allocationInfo.refundableNativeAmount;
             }
         }
-        
-        return (PoolStatus.DEFAULT, addresses, amounts);
+        return (poolStatus, token, amount);
     }
 
-    function claimUnallocatedAmount() external {
+    function claimableDeposits() public view returns(PoolStatus, address token, uint256 amount){
+        if(poolStatus == PoolStatus.NOT_QUALIFIED){
+            token = genesisInfo.fundingToken;
+            amount = userDeposits[msg.sender];
+        }
+        return (poolStatus, token, amount);
+    }
+
+    function claimaNative() external {
         require(poolStatus == PoolStatus.NOT_QUALIFIED || poolStatus == PoolStatus.PARTIALLY_LAUNCHED, "!= status");
+        require(msg.sender == genesisInfo.tokenOwner, "!= owner");
 
-        uint256 _amount;
-        if(poolStatus == PoolStatus.PARTIALLY_LAUNCHED){
-            if(msg.sender == genesisInfo.tokenOwner){
-                _amount = allocationInfo.refundableNativeAmount;
-                allocationInfo.refundableNativeAmount = 0;
+        uint256 _amount = allocationInfo.refundableNativeAmount;
+        allocationInfo.refundableNativeAmount = 0;
 
-                if(_amount > 0){
-                    assert(IERC20(genesisInfo.nativeToken).transfer(msg.sender, _amount));
-                }
-            } 
-        }else if(poolStatus == PoolStatus.NOT_QUALIFIED){
-            if(msg.sender == genesisInfo.tokenOwner){
-                _amount = allocationInfo.refundableNativeAmount;
-                allocationInfo.refundableNativeAmount = 0;
+        if(_amount > 0){
+            assert(IERC20(genesisInfo.nativeToken).transfer(msg.sender, _amount));
+        }
+    }
 
-                if(_amount > 0){
-                    assert(IERC20(genesisInfo.nativeToken).transfer(msg.sender, _amount));
-                }
-            }
+    function claimDeposits() external {
+        require(poolStatus == PoolStatus.NOT_QUALIFIED, "!= status");
 
-            _amount = userDeposits[msg.sender];
-            userDeposits[msg.sender] = 0;
+        uint256 _amount = userDeposits[msg.sender];
+        userDeposits[msg.sender] = 0;
 
-            if(_amount > 0){
-                assert(IERC20(genesisInfo.fundingToken).transfer(msg.sender, _amount));
-            }
+        if(_amount > 0){
+            assert(IERC20(genesisInfo.fundingToken).transfer(msg.sender, _amount));
         }
     }
 
