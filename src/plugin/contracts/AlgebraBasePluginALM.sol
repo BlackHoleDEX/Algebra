@@ -12,7 +12,7 @@ import './plugins/VolatilityOraclePlugin.sol';
 
 import 'hardhat/console.sol';
 
-/// @title Algebra Integral 1.2.1 adaptive fee plugin
+/// @title Algebra Integral 1.2.1 ALM plugin
 contract AlgebraBasePluginALM is AlmPlugin, DynamicFeePlugin, VolatilityOraclePlugin {
   using Plugins for uint8;
 
