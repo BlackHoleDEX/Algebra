@@ -47,11 +47,15 @@ contract GenesisPoolFactory is IGenesisPoolFactory, OwnableUpgradeable {
         }
     }
 
+    function removeGenesisPool(address nativeToken, uint256 i) external onlyManager {
+        getGenesisPools[nativeToken][i] = address(0);
+    }
+
     function createGenesisPool(address tokenOwner, address nativeToken, address fundingToken) external onlyManager returns (address genesisPool) {
         require(nativeToken != address(0), "0x"); 
         require(getGenesisPool(nativeToken) == address(0), "exists");
 
-        bytes32 salt = keccak256(abi.encodePacked(nativeToken, fundingToken, genesisPools.length));
+        bytes32 salt = keccak256(abi.encodePacked(nativeToken, fundingToken, getGenesisPools[nativeToken].length));
         genesisPool = address(new GenesisPool{salt: salt}(genesisManager, tokenHandler, tokenOwner, nativeToken, fundingToken));
 
         getGenesisPools[nativeToken].push(genesisPool);
