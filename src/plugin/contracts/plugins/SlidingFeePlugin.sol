@@ -22,7 +22,7 @@ abstract contract SlidingFeePlugin is AlgebraBasePlugin, ISlidingFeePlugin {
   FeeFactors public s_feeFactors;
 
   uint16 public s_priceChangeFactor = 1000;
-  uint16 public s_baseFee = 3000;
+  uint16 public s_baseFee;
   bool public slidingFeeEnabled;
 
   constructor(uint16 _baseFee) {
@@ -74,7 +74,8 @@ abstract contract SlidingFeePlugin is AlgebraBasePlugin, ISlidingFeePlugin {
   }
 
   function changeSlidingFeeStatus(bool _isEnabled) external override {
-    require(msg.sender == pluginFactory || IAlgebraFactory(factory).hasRoleOrOwner(ALGEBRA_BASE_PLUGIN_MANAGER, msg.sender));
+    _authorize();
+
     slidingFeeEnabled = _isEnabled;
     emit SlidingFeeStatus(_isEnabled);
   }

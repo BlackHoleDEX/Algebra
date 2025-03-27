@@ -90,6 +90,7 @@ export default {
     compilers: [HIGHEST_OPTIMIZER_COMPILER_SETTINGS],
     overrides: {
       'contracts/BasePluginV4Factory.sol': DEFAULT_COMPILER_SETTINGS,
+      'contracts/BasePluginV3Factory.sol': DEFAULT_COMPILER_SETTINGS,
       'contracts/tests/MockBasePluginV4Factory.sol': DEFAULT_COMPILER_SETTINGS,
       'contracts/tests/MockTimeDSCamelotFactory.sol': LOWEST_COMPILER_SETTINGS,
       'contracts/tests/MockTimeDSFactoryV4.sol': LOWEST_COMPILER_SETTINGS,

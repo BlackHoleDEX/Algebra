@@ -5,7 +5,7 @@ import './interfaces/ICamelotBasePluginFactory.sol';
 import './libraries/AdaptiveFee.sol';
 import './CamelotBasePlugin.sol';
 
-/// @title Algebra Integral 1.2 plugin factory
+/// @title Algebra Integral 1.2.1 plugin factory
 /// @notice This contract creates Camelot base plugins for Algebra liquidity pools
 /// @dev This plugin factory can only be used for Algebra base pools
 contract CamelotBasePluginFactory is ICamelotBasePluginFactory {
@@ -26,6 +26,9 @@ contract CamelotBasePluginFactory is ICamelotBasePluginFactory {
 
   /// @inheritdoc ICamelotBasePluginFactory
   address public override securityRegistry;
+
+  /// @inheritdoc ICamelotBasePluginFactory
+  uint16 public override defaultBaseFee = 3000;
 
   /// @inheritdoc ICamelotBasePluginFactory
   mapping(address poolAddress => address pluginAddress) public override pluginByPool;
@@ -65,8 +68,7 @@ contract CamelotBasePluginFactory is ICamelotBasePluginFactory {
 
   function _createPlugin(address pool) internal returns (address) {
     require(pluginByPool[pool] == address(0), 'Already created');
-    address plugin = address(new CamelotBasePlugin(pool, algebraFactory, address(this)));
-    IDynamicFeeManager(plugin).changeFeeConfiguration(defaultFeeConfiguration);
+    address plugin = address(new CamelotBasePlugin(pool, algebraFactory, address(this), defaultFeeConfiguration, defaultBaseFee));
     IDynamicFeeManager(plugin).changeDynamicFeeStatus(dynamicFeeStatus);
     ISecurityPlugin(plugin).setSecurityRegistry(securityRegistry);
     ISlidingFeePlugin(plugin).changeSlidingFeeStatus(slidingFeeStatus);
@@ -94,6 +96,13 @@ contract CamelotBasePluginFactory is ICamelotBasePluginFactory {
     slidingFeeStatus = status;
     emit SlidingFeeStatus(status);
   }
+
+  /// @inheritdoc ICamelotBasePluginFactory
+  function setDefaultBaseFee(uint16 newDefaultBaseFee) external override onlyAdministrator {
+    require(defaultBaseFee != newDefaultBaseFee);
+    defaultBaseFee = newDefaultBaseFee;
+    emit DefaultBaseFee(newDefaultBaseFee);
+  } 
 
   /// @inheritdoc ICamelotBasePluginFactory
   function setSecurityRegistry(address _securityRegistry) external override onlyAdministrator {

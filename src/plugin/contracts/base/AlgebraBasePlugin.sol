@@ -13,6 +13,6 @@ abstract contract AlgebraBasePlugin is BasePlugin {
   }
 
   function _authorize() internal view virtual override {
-    require(IAlgebraFactory(factory).hasRoleOrOwner(ALGEBRA_BASE_PLUGIN_MANAGER, msg.sender));
+    require(msg.sender == pluginFactory || IAlgebraFactory(factory).hasRoleOrOwner(ALGEBRA_BASE_PLUGIN_MANAGER, msg.sender));
   }
 }

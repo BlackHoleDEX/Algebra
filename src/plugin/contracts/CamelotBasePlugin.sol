@@ -9,7 +9,7 @@ import './plugins/VolatilityOraclePlugin.sol';
 import './plugins/SlidingFeePlugin.sol';
 import './plugins/SecurityPlugin.sol';
 
-/// @title Algebra Integral 1.2 plugin. Contains adaptive + sliding fee, safety switch and twap oracle
+/// @title Algebra Integral 1.2.1 plugin. Contains adaptive + sliding fee, safety switch and twap oracle
 contract CamelotBasePlugin is DynamicFeePlugin, VolatilityOraclePlugin, SlidingFeePlugin, SecurityPlugin {
   using Plugins for uint8;
 
@@ -24,7 +24,13 @@ contract CamelotBasePlugin is DynamicFeePlugin, VolatilityOraclePlugin, SlidingF
         Plugins.BEFORE_FLASH_FLAG
     );
 
-  constructor(address _pool, address _factory, address _pluginFactory) BasePlugin(_pool, _factory, _pluginFactory) {}
+  constructor(
+    address _pool,
+    address _factory,
+    address _pluginFactory,
+    AlgebraFeeConfiguration memory _config,
+    uint16 _baseFee
+  ) AlgebraBasePlugin(_pool, _factory, _pluginFactory) DynamicFeePlugin(_config) SlidingFeePlugin(_baseFee) {}
 
   // ###### HOOKS ######
 
@@ -35,8 +41,6 @@ contract CamelotBasePlugin is DynamicFeePlugin, VolatilityOraclePlugin, SlidingF
 
   function afterInitialize(address, uint160, int24 tick) external override onlyPool returns (bytes4) {
     _initialize_TWAP(tick);
-
-    IAlgebraPool(pool).setFee(_feeConfig.baseFee());
     return IAlgebraPlugin.afterInitialize.selector;
   }
 
@@ -77,7 +81,7 @@ contract CamelotBasePlugin is DynamicFeePlugin, VolatilityOraclePlugin, SlidingF
     /// security plugin check
     _checkStatus();
     /// get ticks for slidiing fee calculation
-    (, int24 currentTick, uint16 fee, ) = _getPoolState();
+    (, int24 currentTick, , ) = _getPoolState();
     int24 lastTick = _getLastTick();
     /// write timepoint to oracle
     _writeTimepoint();
@@ -90,11 +94,8 @@ contract CamelotBasePlugin is DynamicFeePlugin, VolatilityOraclePlugin, SlidingF
     if (slidingFeeEnabled) {
       newFee = _getFeeAndUpdateFactors(zeroToOne, currentTick, lastTick, _dynamicFeeEnabled, newFee);
     }
-    /// update pool state fee
-    if (newFee != fee) {
-      IAlgebraPool(pool).setFee(newFee);
-    }
-    return (IAlgebraPlugin.beforeSwap.selector, 0, 0);
+
+    return (IAlgebraPlugin.beforeSwap.selector, newFee, 0);
   }
 
   function afterSwap(address, address, bool, int256, uint160, int256, int256, bytes calldata) external override onlyPool returns (bytes4) {

@@ -14,6 +14,8 @@ interface ICamelotBasePluginFactory is IAlgebraPluginFactory {
   /// @dev See the AdaptiveFee library for more details
   event DefaultFeeConfiguration(AlgebraFeeConfiguration newConfig);
 
+  event DefaultBaseFee(uint16 newDefaultBaseFee);
+  
   /// @notice Emitted when the dynamic fee status is changed
   /// @param isEnabled Dynamic fee new status
   event DynamicFeeStatus(bool isEnabled);
@@ -33,6 +35,8 @@ interface ICamelotBasePluginFactory is IAlgebraPluginFactory {
   /// @notice Returns the address of AlgebraFactory
   /// @return The AlgebraFactory contract address
   function algebraFactory() external view returns (address);
+
+  function defaultBaseFee() external view returns (uint16);
 
   /// @notice Returns the status of the sliding fee
   /// @return The status of the sliding fee
@@ -82,4 +86,6 @@ interface ICamelotBasePluginFactory is IAlgebraPluginFactory {
   /// @dev updates securoty registry address on the factory
   /// @param newSecurityRegistry The new security registry contract address
   function setSecurityRegistry(address newSecurityRegistry) external;
+
+  function setDefaultBaseFee(uint16 newDefaultBaseFee) external;
 }

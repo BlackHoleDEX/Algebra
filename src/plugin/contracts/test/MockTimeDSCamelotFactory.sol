@@ -25,6 +25,8 @@ contract MockTimeDSCamelotFactory is ICamelotBasePluginFactory {
   /// @inheritdoc ICamelotBasePluginFactory
   bool public override slidingFeeStatus;
 
+  uint16 public override defaultBaseFee;
+
   /// @inheritdoc ICamelotBasePluginFactory
   address public override securityRegistry;
 
@@ -58,8 +60,7 @@ contract MockTimeDSCamelotFactory is ICamelotBasePluginFactory {
   }
 
   function _createPlugin(address pool) internal returns (address) {
-    MockTimeCamelotBasePlugin plugin = new MockTimeCamelotBasePlugin(pool, algebraFactory, address(this));
-    IDynamicFeeManager(plugin).changeFeeConfiguration(defaultFeeConfiguration);
+    MockTimeCamelotBasePlugin plugin = new MockTimeCamelotBasePlugin(pool, algebraFactory, address(this), defaultFeeConfiguration, defaultBaseFee);
     IDynamicFeeManager(plugin).changeDynamicFeeStatus(dynamicFeeStatus);
     ISlidingFeePlugin(plugin).changeSlidingFeeStatus(slidingFeeStatus);
     pluginByPool[pool] = address(plugin);
@@ -93,4 +94,11 @@ contract MockTimeDSCamelotFactory is ICamelotBasePluginFactory {
     securityRegistry = _securityRegistry;
     emit SecurityRegistry(_securityRegistry);
   }
+
+  /// @inheritdoc ICamelotBasePluginFactory
+  function setDefaultBaseFee(uint16 newDefaultBaseFee) external override {
+    require(defaultBaseFee != newDefaultBaseFee);
+    defaultBaseFee = newDefaultBaseFee;
+    emit DefaultBaseFee(newDefaultBaseFee);
+  } 
 }

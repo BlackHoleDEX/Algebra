@@ -5,7 +5,7 @@ import './interfaces/ISecurityPluginFactory.sol';
 import './interfaces/plugins/ISecurityPlugin.sol';
 import './AlgebraSecurityPlugin.sol';
 
-/// @title Algebra Integral 1.2 security plugin factory
+/// @title Algebra Integral 1.2.1 security plugin factory
 contract SecurityPluginFactory is ISecurityPluginFactory {
   /// @inheritdoc ISecurityPluginFactory
   bytes32 public constant override ALGEBRA_BASE_PLUGIN_FACTORY_ADMINISTRATOR = keccak256('ALGEBRA_BASE_PLUGIN_FACTORY_ADMINISTRATOR');

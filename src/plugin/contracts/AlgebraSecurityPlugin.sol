@@ -7,7 +7,7 @@ import '@cryptoalgebra/integral-core/contracts/interfaces/plugin/IAlgebraPlugin.
 
 import './plugins/SecurityPlugin.sol';
 
-/// @title Algebra Integral 1.2 security plugin
+/// @title Algebra Integral 1.2.1 security plugin
 contract AlgebraSecurityPlugin is SecurityPlugin {
   using Plugins for uint8;
 
@@ -15,7 +15,7 @@ contract AlgebraSecurityPlugin is SecurityPlugin {
   uint8 public constant override defaultPluginConfig =
     uint8(Plugins.BEFORE_POSITION_MODIFY_FLAG | Plugins.BEFORE_SWAP_FLAG | Plugins.BEFORE_FLASH_FLAG);
 
-  constructor(address _pool, address _factory, address _pluginFactory) BasePlugin(_pool, _factory, _pluginFactory) {}
+  constructor(address _pool, address _factory, address _pluginFactory) AlgebraBasePlugin(_pool, _factory, _pluginFactory) {}
 
   // ###### HOOKS ######
 

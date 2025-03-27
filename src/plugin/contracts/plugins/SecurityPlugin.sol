@@ -9,10 +9,10 @@ import '../interfaces/IBasePluginV1Factory.sol';
 import '../interfaces/plugins/ISecurityPlugin.sol';
 import '../interfaces/plugins/ISecurityRegistry.sol';
 
-import '../base/BasePlugin.sol';
+import '../base/AlgebraBasePlugin.sol';
 
 /// @title Algebra Integral 1.2 security plugin
-abstract contract SecurityPlugin is BasePlugin, ISecurityPlugin {
+abstract contract SecurityPlugin is AlgebraBasePlugin, ISecurityPlugin {
   using Plugins for uint8;
 
   uint8 private constant defaultPluginConfig = uint8(Plugins.BEFORE_SWAP_FLAG | Plugins.BEFORE_FLASH_FLAG | Plugins.BEFORE_POSITION_MODIFY_FLAG);
@@ -41,7 +41,7 @@ abstract contract SecurityPlugin is BasePlugin, ISecurityPlugin {
 
   function setSecurityRegistry(address _securityRegistry) external override {
     securityRegistry = _securityRegistry;
-    require(msg.sender == pluginFactory || IAlgebraFactory(factory).hasRoleOrOwner(ALGEBRA_BASE_PLUGIN_MANAGER, msg.sender));
+    _authorize();
     emit SecurityRegistry(_securityRegistry);
   }
 
