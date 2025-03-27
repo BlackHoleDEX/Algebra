@@ -10,7 +10,7 @@ import '../interfaces/plugins/IVolatilityOracle.sol';
 import '../libraries/VolatilityOracle.sol';
 import '../base/AlgebraBasePlugin.sol';
 
-import 'hardhat/console.sol';
+// import 'hardhat/console.sol';
 
 /// @title Algebra Integral 1.2.1 VolatilityOraclePlugin plugin
 /// @notice This contract stores timepoints and calculates adaptive fee and statistical averages
@@ -36,9 +36,9 @@ abstract contract VolatilityOraclePlugin is AlgebraBasePlugin, IVolatilityOracle
 
   /// @inheritdoc IVolatilityOracle
   function initialize() external override {
-    console.log('initialize called');
+    // console.log('initialize called');
     require(!isInitialized, 'Already initialized');
-    console.log("plugin address in solidity: ", address(this));
+    // console.log("plugin address in solidity: ", address(this));
     require(_getPluginInPool() == address(this), 'Plugin not attached');
     (uint160 price, int24 tick, , ) = _getPoolState();
     require(price != 0, 'Pool is not initialized');
