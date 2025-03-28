@@ -1,4 +1,4 @@
-const genesisPoolFactoryAddress = "0xEB213ad9E87b9e0E5FF28a8898862dE4283Ec424";
+const genesisPoolFactoryAddress = "0x334840F0E94F1B612Ca0ae57a0600E0eBC3D652d";
 
 const genesisPoolFactoryAbi = [
   {
@@ -79,6 +79,25 @@ const genesisPoolFactoryAbi = [
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "allGenesisPools",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "tokenOwner",
         "type": "address"
@@ -121,6 +140,11 @@ const genesisPoolFactoryAbi = [
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
@@ -154,7 +178,7 @@ const genesisPoolFactoryAbi = [
     "inputs": [
       {
         "internalType": "address",
-        "name": "",
+        "name": "nativeToken",
         "type": "address"
       }
     ],
@@ -164,6 +188,25 @@ const genesisPoolFactoryAbi = [
         "internalType": "address",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "nativeToken",
+        "type": "address"
+      }
+    ],
+    "name": "getGenesisPools",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
       }
     ],
     "stateMutability": "view",
@@ -201,6 +244,24 @@ const genesisPoolFactoryAbi = [
         "internalType": "address",
         "name": "nativeToken",
         "type": "address"
+      }
+    ],
+    "name": "removeGenesisPool",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "nativeToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
       }
     ],
     "name": "removeGenesisPool",

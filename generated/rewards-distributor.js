@@ -1,4 +1,4 @@
-const rewardsDistributorAddress = "0x0BBAaC513EB64ccC6270e87E3aA0982b5856dB79";
+const rewardsDistributorAddress = "0x8ADA6644d3fb28Bf52782d2E3aD50B3A0D87EBB0";
 
 const rewardsDistributorAbi = [
   {
@@ -297,25 +297,6 @@ const rewardsDistributorAbi = [
       }
     ],
     "name": "tokens_per_week",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "user_epoch_of",
     "outputs": [
       {
         "internalType": "uint256",

@@ -27,7 +27,21 @@ module.exports = {
     baseSepolia: {
       url: "https://base-sepolia.g.alchemy.com/v2/zY8fO9bbJbzywRt0xRheXQWpWjWiCqop",
       chainId: 84532, // Sepolia's Chain ID
-      accounts: [`0x${process.env.PRIVATEKEY}`, `0x${process.env.SECONDPRIVATEKEY}`, `0x${process.env.THIRDPRIVATEKEY}`],
+      accounts: [
+        `0x${process.env.PRIVATEKEY}`, 
+        `0x${process.env.SECONDPRIVATEKEY}`, 
+        `0x${process.env.THIRDPRIVATEKEY}`
+      ],
+      gas: 21000000,
+    },
+    ethSepolia: {
+      url: "https://eth-sepolia.g.alchemy.com/v2/vlFIIvUdyv4c6EdNQJ8Vw64sl6U1qhpnMf/V1K2P2IXeBVoM82ECzg",
+      chainId: 11155111, // Ethereum Sepolia's Chain ID
+      accounts: [
+        `0x${process.env.PRIVATEKEY}`,
+        `0x${process.env.SECONDPRIVATEKEY}`,
+        `0x${process.env.THIRDPRIVATEKEY}`
+      ],
       gas: 21000000,
     },
     // baseMainnet: {

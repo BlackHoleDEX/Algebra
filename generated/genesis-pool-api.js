@@ -1,4 +1,4 @@
-const genesisPoolAPIAddress = "0xd8aE9C25Efe435cAF8a869FAa5e603c812570f53";
+const genesisPoolAPIAddress = "0x8aa828b959eEfA8bFb93D42E17AD16f2EFC08066";
 
 const genesisPoolAPIAbi = [
   {
@@ -215,6 +215,11 @@ const genesisPoolAPIAbi = [
                 "internalType": "uint256",
                 "name": "startTime",
                 "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "maturityTime",
+                "type": "uint256"
               }
             ],
             "internalType": "struct IGenesisPoolBase.GenesisInfo",
@@ -403,6 +408,11 @@ const genesisPoolAPIAbi = [
               {
                 "internalType": "uint256",
                 "name": "startTime",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "maturityTime",
                 "type": "uint256"
               }
             ],
@@ -593,6 +603,11 @@ const genesisPoolAPIAbi = [
                 "internalType": "uint256",
                 "name": "startTime",
                 "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "maturityTime",
+                "type": "uint256"
               }
             ],
             "internalType": "struct IGenesisPoolBase.GenesisInfo",
@@ -781,6 +796,11 @@ const genesisPoolAPIAbi = [
               {
                 "internalType": "uint256",
                 "name": "startTime",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "maturityTime",
                 "type": "uint256"
               }
             ],

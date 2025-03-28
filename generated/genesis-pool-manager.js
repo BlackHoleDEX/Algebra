@@ -1,4 +1,4 @@
-const genesisPoolManagerAddress = "0x1f744f036A3898B42280D26cD9A198EBD7Fb77C8";
+const genesisPoolManagerAddress = "0xb88caB016fE3856dC7065FD88234bC9628201110";
 
 const genesisPoolManagerAbi = [
   {
@@ -244,6 +244,11 @@ const genesisPoolManagerAbi = [
           {
             "internalType": "uint256",
             "name": "startTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maturityTime",
             "type": "uint256"
           }
         ],
@@ -569,6 +574,24 @@ const genesisPoolManagerAbi = [
   },
   {
     "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_maturityTime",
+        "type": "uint256"
+      }
+    ],
+    "name": "setMaturityTime",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_genesisPool",
+        "type": "address"
+      },
       {
         "internalType": "uint256",
         "name": "_maturityTime",

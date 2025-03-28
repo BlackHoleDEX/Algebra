@@ -205,6 +205,13 @@ const genesisPoolAbi = [
   },
   {
     "inputs": [],
+    "name": "claimDeposits",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "claimIncentives",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -212,9 +219,32 @@ const genesisPoolAbi = [
   },
   {
     "inputs": [],
-    "name": "claimUnallocatedAmount",
+    "name": "claimaNative",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "claimableDeposits",
+    "outputs": [
+      {
+        "internalType": "enum IGenesisPoolBase.PoolStatus",
+        "name": "",
+        "type": "uint8"
+      },
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -237,7 +267,7 @@ const genesisPoolAbi = [
   },
   {
     "inputs": [],
-    "name": "claimableUnallocatedAmount",
+    "name": "claimableNative",
     "outputs": [
       {
         "internalType": "enum IGenesisPoolBase.PoolStatus",
@@ -245,14 +275,14 @@ const genesisPoolAbi = [
         "type": "uint8"
       },
       {
-        "internalType": "address[]",
-        "name": "addresses",
-        "type": "address[]"
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
       },
       {
-        "internalType": "uint256[]",
-        "name": "amounts",
-        "type": "uint256[]"
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -406,6 +436,11 @@ const genesisPoolAbi = [
         "internalType": "uint256",
         "name": "startTime",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "maturityTime",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -519,6 +554,11 @@ const genesisPoolAbi = [
           {
             "internalType": "uint256",
             "name": "startTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maturityTime",
             "type": "uint256"
           }
         ],
@@ -774,6 +814,11 @@ const genesisPoolAbi = [
             "internalType": "uint256",
             "name": "startTime",
             "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maturityTime",
+            "type": "uint256"
           }
         ],
         "internalType": "struct IGenesisPoolBase.GenesisInfo",
@@ -819,6 +864,19 @@ const genesisPoolAbi = [
       }
     ],
     "name": "setGenesisPoolInfo",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_maturityTime",
+        "type": "uint256"
+      }
+    ],
+    "name": "setMaturityTime",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
