@@ -215,18 +215,21 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         uint _period = pre_epoch_period;
         if (block.timestamp >= _period + WEEK) { 
             
-            uint256 _proposedTokensCnt = nativeTokens.length;
+            uint256 _proposedTokensCnt = liveNativeTokens.length;
             uint256 i;
             address _genesisPool;
             PoolStatus _poolStatus;
-            for(i = 0; i < _proposedTokensCnt; i++){
-                _genesisPool = genesisFactory.getGenesisPool(nativeTokens[i]);
+            address nativeToken;
+            
+            for(i = _proposedTokensCnt; i > 0; i--){
+                nativeToken = liveNativeTokens[i-1];
+                _genesisPool = genesisFactory.getGenesisPool(nativeToken);
                 _poolStatus = IGenesisPool(_genesisPool).poolStatus();
 
                 if(_poolStatus == PoolStatus.PRE_LISTING && IGenesisPool(_genesisPool).eligbleForDisqualify()){
                     pairFactory.setGenesisStatus(IGenesisPool(_genesisPool).getLiquidityPoolInfo().pairAddress, false);
                     IGenesisPool(_genesisPool).setPoolStatus(PoolStatus.NOT_QUALIFIED);
-                    _removeLiveToken(nativeTokens[i]);
+                    _removeLiveToken(nativeToken);
                 }
                 else if(_poolStatus == PoolStatus.PRE_LAUNCH){
                     IGenesisPool(_genesisPool).setPoolStatus(PoolStatus.PRE_LAUNCH_DEPOSIT_DISABLED);
@@ -278,8 +281,18 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         MATURITY_TIME = _maturityTime;
     }
 
-    function setMaturityTime(address _genesisPool, uint256 _maturityTime) external Governance {
-        IGenesisPool(_genesisPool).setMaturityTime(_maturityTime);
+    function setMaturityTime(address _nativeToken, uint256 _maturityTime) external Governance {
+        require(_nativeToken != address(0), "0x");
+        address genesisPool = genesisFactory.getGenesisPool(_nativeToken);
+        require(genesisPool != address(0), "0x gen");
+        IGenesisPool(genesisPool).setMaturityTime(_maturityTime);
+    }
+
+    function setGenesisStartTime(address _nativeToken, uint256 _startTime) external Governance {
+        require(_nativeToken != address(0), "0x");
+        address genesisPool = genesisFactory.getGenesisPool(_nativeToken);
+        require(genesisPool != address(0), "0x gen");
+        IGenesisPool(genesisPool).setStartTime(_startTime);
     }
 
 }

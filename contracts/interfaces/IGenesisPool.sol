@@ -27,4 +27,5 @@ interface IGenesisPool {
 
     function launch(address router, uint256 maturityTime) external;
     function setMaturityTime(uint256 _maturityTime) external;
+    function setStartTime(uint256 _startTime) external;
 }

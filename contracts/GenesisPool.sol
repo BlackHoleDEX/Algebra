@@ -403,4 +403,10 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
         genesisInfo.maturityTime = _maturityTime;
     }
 
+    function setStartTime(uint256 _startTime) external onlyManager{
+        _startTime = BlackTimeLibrary.epochStart(_startTime);
+        require(_startTime + genesisInfo.duration - BlackTimeLibrary.NO_GENESIS_DEPOSIT_WINDOW > block.timestamp, "time");
+        genesisInfo.startTime = _startTime;
+    }
+
 }
