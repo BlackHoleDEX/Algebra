@@ -10,6 +10,7 @@ import {IVotingEscrow} from "./interfaces/IVotingEscrow.sol";
 import {IVoter} from "./interfaces/IVoter.sol";
 import {IAutomatedVotingManager} from "./interfaces/IAutomatedVotingManager.sol";
 import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
+import {VotingDelegationLib} from "./libraries/VotingDelegationLib.sol";
 
 /// @title Voting Escrow
 /// @notice veNFT implementation that escrows ERC-20 tokens in the form of an ERC-721 NFT
@@ -41,15 +42,6 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         uint permanent;
         uint smNFT;
         uint smNFTBonus;
-    }
-    /* We cannot really do block numbers per se b/c slope is per time, not per block
-     * and per block could be fairly bad b/c Ethereum changes blocktimes.
-     * What we can do is to extrapolate ***At functions */
-
-    /// @notice A checkpoint for marking delegated tokenIds from a given timestamp
-    struct Checkpoint {
-        uint timestamp;
-        uint[] tokenIds;
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -119,6 +111,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
 
     uint internal MAXTIME;
     int128 internal iMAXTIME;
+
+    // Instance of the library's storage struct
+    VotingDelegationLib.Data private cpData;
 
     /// @notice Contract constructor
     /// @param token_addr `BLACK` token address
@@ -203,6 +198,10 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
     /// @param _tokenId The identifier for an NFT.
     function ownerOf(uint _tokenId) public view returns (address) {
         return idToOwner[_tokenId];
+    }
+
+    function ownerToNFTokenCountFn(address owner) public view returns (uint) {
+        return ownerToNFTokenCount[owner];
     }
 
     /// @dev Returns the number of NFTs owned by `_owner`.
@@ -331,7 +330,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         // Remove NFT. Throws if `_tokenId` is not a valid NFT
         _removeTokenFrom(_from, _tokenId);
         // auto re-delegate
-        _moveTokenDelegates(delegates(_from), delegates(_to), _tokenId);
+        VotingDelegationLib._moveTokenDelegates(cpData, delegates(_from), delegates(_to), _tokenId, ownerOf);
         // Add NFT
         _addTokenTo(_to, _tokenId);
         // Set the block of ownership transfer (for Flash NFT protection)
@@ -453,7 +452,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
     mapping(uint => uint) internal tokenToOwnerIndex;
 
     /// @dev  Get token by index
-    function tokenOfOwnerByIndex(address _owner, uint _tokenIndex) external view returns (uint) {
+    function tokenOfOwnerByIndex(address _owner, uint _tokenIndex) public view returns (uint) {
         return ownerToNFTokenIdList[_owner][_tokenIndex];
     }
 
@@ -490,7 +489,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         // Throws if `_to` is zero address
         assert(_to != address(0));
         // checkpoint for gov
-        _moveTokenDelegates(address(0), delegates(_to), _tokenId);
+        VotingDelegationLib._moveTokenDelegates(cpData, address(0), delegates(_to), _tokenId, ownerOf);
         // Add NFT. Throws if `_tokenId` is owned by someone
         _addTokenTo(_to, _tokenId);
         emit Transfer(address(0), _to, _tokenId);
@@ -548,7 +547,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         // Clear approval
         approve(address(0), _tokenId);
         // checkpoint for gov
-        _moveTokenDelegates(delegates(owner), address(0), _tokenId);
+        VotingDelegationLib._moveTokenDelegates(cpData, delegates(owner), address(0), _tokenId, ownerOf);
+        // _moveTokenDelegates(delegates(owner), address(0), _tokenId);
         // Remove token
         //_removeTokenFrom(msg.sender, _tokenId);
         _removeTokenFrom(owner, _tokenId);
@@ -1334,13 +1334,6 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
 
     /// @notice A record of each accounts delegate
     mapping(address => address) private _delegates;
-    uint public constant MAX_DELEGATES = 1024; // avoid too much gas
-
-    /// @notice A record of delegated token checkpoints for each account, by index
-    mapping(address => mapping(uint32 => Checkpoint)) public checkpoints;
-
-    /// @notice The number of checkpoints for each account
-    mapping(address => uint32) public numCheckpoints;
 
     /// @notice A record of states for signing / validating signatures
     mapping(address => uint) public nonces;
@@ -1361,11 +1354,11 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
      * @return The number of current votes for `account`
      */
     function getVotes(address account) external view returns (uint) {
-        uint32 nCheckpoints = numCheckpoints[account];
+        uint32 nCheckpoints = cpData.numCheckpoints[account];
         if (nCheckpoints == 0) {
             return 0;
         }
-        uint[] storage _tokenIds = checkpoints[account][nCheckpoints - 1].tokenIds;
+        uint[] storage _tokenIds = cpData.checkpoints[account][nCheckpoints - 1].tokenIds;
         uint votes = 0;
         for (uint i = 0; i < _tokenIds.length; i++) {
             uint tId = _tokenIds[i];
@@ -1374,45 +1367,14 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         return votes;
     }
 
-    function getPastVotesIndex(address account, uint timestamp) public view returns (uint32) {
-        uint32 nCheckpoints = numCheckpoints[account];
-        if (nCheckpoints == 0) {
-            return 0;
-        }
-        // First check most recent balance
-        if (checkpoints[account][nCheckpoints - 1].timestamp <= timestamp) {
-            return (nCheckpoints - 1);
-        }
-
-        // Next check implicit zero balance
-        if (checkpoints[account][0].timestamp > timestamp) {
-            return 0;
-        }
-
-        uint32 lower = 0;
-        uint32 upper = nCheckpoints - 1;
-        while (upper > lower) {
-            uint32 center = upper - (upper - lower) / 2; // ceil, avoiding overflow
-            Checkpoint storage cp = checkpoints[account][center];
-            if (cp.timestamp == timestamp) {
-                return center;
-            } else if (cp.timestamp < timestamp) {
-                lower = center;
-            } else {
-                upper = center - 1;
-            }
-        }
-        return lower;
-    }
-
     function getPastVotes(address account, uint timestamp)
         public
         view
         returns (uint)
     {
-        uint32 _checkIndex = getPastVotesIndex(account, timestamp);
+        uint32 _checkIndex = VotingDelegationLib.getPastVotesIndex(cpData, account, timestamp);
         // Sum votes
-        uint[] storage _tokenIds = checkpoints[account][_checkIndex].tokenIds;
+        uint[] storage _tokenIds = cpData.checkpoints[account][_checkIndex].tokenIds;
         uint votes = 0;
         for (uint i = 0; i < _tokenIds.length; i++) {
             uint tId = _tokenIds[i];
@@ -1428,9 +1390,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         view
         returns (uint)
     {
-        uint32 _checkIndex = getPastVotesIndex(account, timestamp);
+        uint32 _checkIndex = VotingDelegationLib.getPastVotesIndex(cpData, account, timestamp);
         // Sum votes
-        uint[] storage _tokenIds = checkpoints[account][_checkIndex].tokenIds;
+        uint[] storage _tokenIds = cpData.checkpoints[account][_checkIndex].tokenIds;
         uint votes = 0;
         for (uint i = 0; i < _tokenIds.length; i++) {
             uint tId = _tokenIds[i];
@@ -1453,160 +1415,6 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
                              DAO VOTING LOGIC
     //////////////////////////////////////////////////////////////*/
 
-    function _moveTokenDelegates(
-        address srcRep,
-        address dstRep,
-        uint _tokenId
-    ) internal {
-        if (srcRep != dstRep && _tokenId > 0) {
-            if (srcRep != address(0)) {
-                uint32 srcRepNum = numCheckpoints[srcRep];
-                uint[] storage srcRepOld = srcRepNum > 0
-                    ? checkpoints[srcRep][srcRepNum - 1].tokenIds
-                    : checkpoints[srcRep][0].tokenIds;
-                uint32 nextSrcRepNum = _findWhatCheckpointToWrite(srcRep);
-                bool _isCheckpointInNewBlock = (nextSrcRepNum != srcRepNum - 1);
-                Checkpoint storage cpSrcRep = checkpoints[srcRep][nextSrcRepNum];
-                uint[] storage srcRepNew = cpSrcRep.tokenIds;
-                cpSrcRep.timestamp = block.timestamp;
-                // All the same except _tokenId
-                uint256 length = srcRepOld.length;
-                for (uint i = 0; i < length;) {
-                    uint tId = srcRepOld[i];
-                    if(_isCheckpointInNewBlock) {
-                        if(idToOwner[tId] == srcRep) {
-                            srcRepNew.push(tId);
-                        }
-                        i++;
-                    } else {
-                        if(idToOwner[tId] != srcRep) {
-                            srcRepNew[i] = srcRepNew[length -1];
-                            srcRepNew.pop();
-                            length--;
-                        } else {
-                            i++;
-                        }
-                    }
-                }
-                numCheckpoints[srcRep] = nextSrcRepNum + 1;   
-            }
-
-            if (dstRep != address(0)) {
-                uint32 dstRepNum = numCheckpoints[dstRep];
-                uint[] storage dstRepOld = dstRepNum > 0
-                    ? checkpoints[dstRep][dstRepNum - 1].tokenIds
-                    : checkpoints[dstRep][0].tokenIds;
-                uint32 nextDstRepNum = _findWhatCheckpointToWrite(dstRep);
-                bool _isCheckpointInNewBlock = (nextDstRepNum != dstRepNum - 1);
-                Checkpoint storage cpDstRep = checkpoints[dstRep][nextDstRepNum];
-                uint[] storage dstRepNew = cpDstRep.tokenIds;
-                cpDstRep.timestamp = block.timestamp;
-                require(
-                    dstRepOld.length + 1 <= MAX_DELEGATES,
-                    "tokens>1"
-                );
-                if(_isCheckpointInNewBlock) {
-                    for (uint i = 0; i < dstRepOld.length; i++) {
-                        uint tId = dstRepOld[i];
-                        dstRepNew.push(tId);
-                    }
-                }
-                dstRepNew.push(_tokenId);
-                numCheckpoints[dstRep] = nextDstRepNum + 1;
-            }
-        }
-    }
-
-    function _findWhatCheckpointToWrite(address account)
-        internal
-        view
-        returns (uint32)
-    {
-        uint _timestamp = block.timestamp;
-        uint32 _nCheckPoints = numCheckpoints[account];
-
-        if (
-            _nCheckPoints > 0 &&
-            checkpoints[account][_nCheckPoints - 1].timestamp == _timestamp
-        ) {
-            return _nCheckPoints - 1;
-        } else {
-            return _nCheckPoints;
-        }
-    }
-
-    function _moveAllDelegates(
-        address owner,
-        address srcRep,
-        address dstRep
-    ) internal {
-        // You can only redelegate what you own
-        if (srcRep != dstRep) {
-            if (srcRep != address(0)) {
-                uint32 srcRepNum = numCheckpoints[srcRep];
-                uint[] storage srcRepOld = srcRepNum > 0
-                    ? checkpoints[srcRep][srcRepNum - 1].tokenIds
-                    : checkpoints[srcRep][0].tokenIds;
-                uint32 nextSrcRepNum = _findWhatCheckpointToWrite(srcRep);
-                bool _isCheckpointInNewBlock = (nextSrcRepNum != srcRepNum - 1);
-                // if(_isCheckpointInNewBlock) {
-                Checkpoint storage cpSrcRep = checkpoints[srcRep][nextSrcRepNum];
-                uint[] storage srcRepNew = cpSrcRep.tokenIds;
-                cpSrcRep.timestamp = block.timestamp;
-
-                uint256 length = srcRepOld.length;
-                for (uint i = 0; i < length;) {
-                    uint tId = srcRepOld[i];
-                    if(_isCheckpointInNewBlock) {
-                        if(idToOwner[tId] != owner) {
-                            srcRepNew.push(tId);
-                        }
-                        i++;
-                    } else {
-                        if(idToOwner[tId] == owner) {
-                            srcRepNew[i] = srcRepNew[length -1];
-                            srcRepNew.pop();
-                            length--;
-                        } else {
-                            i++;
-                        }
-                    }
-                }
-                numCheckpoints[srcRep] = nextSrcRepNum + 1;
-            }
-
-
-            if (dstRep != address(0)) {
-                uint32 dstRepNum = numCheckpoints[dstRep];
-                uint[] storage dstRepOld = dstRepNum > 0
-                    ? checkpoints[dstRep][dstRepNum - 1].tokenIds
-                    : checkpoints[dstRep][0].tokenIds;
-                uint32 nextDstRepNum = _findWhatCheckpointToWrite(dstRep);
-                bool _isCheckpointInNewBlock = (nextDstRepNum != dstRepNum - 1);
-                Checkpoint storage cpDstRep = checkpoints[dstRep][nextDstRepNum];
-                uint[] storage dstRepNew = cpDstRep.tokenIds;
-                cpDstRep.timestamp = block.timestamp;
-                uint ownerTokenCount = ownerToNFTokenCount[owner];
-                require(
-                    dstRepOld.length + ownerTokenCount <= MAX_DELEGATES,
-                    "tokens>1"
-                );
-                if(_isCheckpointInNewBlock) {
-                    for (uint i = 0; i < dstRepOld.length; i++) {
-                        uint tId = dstRepOld[i];
-                        dstRepNew.push(tId);
-                    }
-                }
-                // Plus all that's owned
-                for (uint i = 0; i < ownerTokenCount; i++) {
-                    uint tId = ownerToNFTokenIdList[owner][i];
-                    dstRepNew.push(tId);
-                }
-                numCheckpoints[dstRep] = nextDstRepNum + 1;   
-            }
-        }
-    }
-
     function _delegate(address delegator, address delegatee) internal {
         /// @notice differs from `_delegate()` in `Comp.sol` to use `delegates` override method to simulate auto-delegation
         address currentDelegate = delegates(delegator);
@@ -1614,7 +1422,12 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         _delegates[delegator] = delegatee;
 
         emit DelegateChanged(delegator, currentDelegate, delegatee);
-        _moveAllDelegates(delegator, currentDelegate, delegatee);
+        VotingDelegationLib.TokenHelpers memory tokenHelpers = VotingDelegationLib.TokenHelpers({
+            ownerOfFn: ownerOf,
+            ownerToNFTokenCountFn: ownerToNFTokenCountFn,
+            tokenOfOwnerByIndex:tokenOfOwnerByIndex
+        });
+        VotingDelegationLib._moveAllDelegates(cpData, delegator, currentDelegate, delegatee, tokenHelpers);
     }
 
     /**
