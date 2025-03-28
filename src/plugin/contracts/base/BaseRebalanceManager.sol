@@ -808,7 +808,7 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
       // }
       return
         token1 < token0
-          ? FullMath.mulDiv(uint256(sqrtPriceX96) * uint256(sqrtPriceX96), token1decimals, type(uint192).max + 1)
+          ? FullMath.mulDiv(uint256(sqrtPriceX96) * uint256(sqrtPriceX96), token1decimals, uint256(type(uint192).max) + 1)
           : FullMath.mulDiv(uint256(type(uint192).max) + 1, token1decimals, uint256(sqrtPriceX96) * uint256(sqrtPriceX96));
     }
   }
