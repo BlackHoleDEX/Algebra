@@ -5,7 +5,7 @@ import './base/BaseRebalanceManager.sol';
 
 contract RebalanceManager is BaseRebalanceManager {
   constructor(address _vault, Thresholds memory _thresholds) {
-    require(vault != address(0), 'Invalid vault address');
+    require(_vault != address(0), 'Invalid vault address');
     paused = false;
     // TODO: добавить require'ов
     vault = _vault;
