@@ -43,8 +43,7 @@ library VotingDelegationLib {
         }
     }
 
-
-    function _moveTokenDelegates(
+    function moveTokenDelegates(
         Data storage self,
         address srcRep,
         address dstRep,
