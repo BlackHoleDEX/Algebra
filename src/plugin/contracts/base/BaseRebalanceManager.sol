@@ -184,27 +184,22 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
 
   // TODO: написать obtainTWAPAndRebalance()
 
-  function obtainTWAPAndRebalance(
-    int24 currentTick,
-    int24 slowTwapTick,
-    int24 fastTwapTick,
-    uint32 lastBlockTimestamp
-  ) external {
+  function obtainTWAPAndRebalance(int24 currentTick, int24 slowTwapTick, int24 fastTwapTick, uint32 lastBlockTimestamp) external {
     // console.log('entered obtainTWAPAndRebalance');
     TwapResult memory twapResult = _obtainTWAPs(currentTick, slowTwapTick, fastTwapTick, lastBlockTimestamp);
     // console.log("TWAP RESULT START");
-		// console.log(twapResult.currentPriceAccountingDecimals);
-		// console.log(twapResult.slowAvgPriceAccountingDecimals);
-		// console.log(twapResult.fastAvgPriceAccountingDecimals);
-		// console.log(twapResult.totalPairedInDeposit);
-		// console.log(twapResult.totalDepositToken);
-		// console.log(twapResult.totalPairedToken);
-		// console.logInt(twapResult.currentTick);
-		// console.log(twapResult.percentageOfDepositTokenUnused);
-		// console.log(twapResult.percentageOfDepositToken);
-		// console.log(twapResult.failedToObtainTWAP);
-		// console.log(twapResult.sameBlock);
-		// console.log("TWAP RESULT END");
+    // console.log(twapResult.currentPriceAccountingDecimals);
+    // console.log(twapResult.slowAvgPriceAccountingDecimals);
+    // console.log(twapResult.fastAvgPriceAccountingDecimals);
+    // console.log(twapResult.totalPairedInDeposit);
+    // console.log(twapResult.totalDepositToken);
+    // console.log(twapResult.totalPairedToken);
+    // console.logInt(twapResult.currentTick);
+    // console.log(twapResult.percentageOfDepositTokenUnused);
+    // console.log(twapResult.percentageOfDepositToken);
+    // console.log(twapResult.failedToObtainTWAP);
+    // console.log(twapResult.sameBlock);
+    // console.log("TWAP RESULT END");
     _rebalance(twapResult);
   }
 
@@ -251,7 +246,7 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
           // v10, /* bool */ v11 = address(_gnosis >> 8).execTransactionFromModule(_vault, 0, 128, 0, 164, v12, v12, v12, v12, v12, v9).gas(msg.gas);
 
           // TODO: swapquantity ?
-          try IAlgebraVault(vault).rebalance(ranges.baseLower, ranges.baseUpper, ranges.limitLower, ranges.limitUpper, 1) {
+          try IAlgebraVault(vault).rebalance(ranges.baseLower, ranges.baseUpper, ranges.limitLower, ranges.limitUpper, 0) {
             lastRebalanceTimestamp = _blockTimestamp();
             lastRebalanceCurrentPrice = obtainTWAPsResult.currentPriceAccountingDecimals;
           } catch {
