@@ -61,7 +61,8 @@ contract AlgebraBasePluginALM is AlmPlugin, DynamicFeePlugin, VolatilityOraclePl
   function afterSwap(address, address, bool, int256, uint160, int256, int256, bytes calldata) external override onlyPool returns (bytes4) {
 	// console.log('entered after swap');
   //                                 to prevent pause rebalanceManager
-    if (rebalanceManager != address(0) && gasleft() >= 1600000) {
+    if (rebalanceManager != address(0)) {
+      require(gasleft() >= 1600000, 'Not enough gas left');
       if (!_ableToGetTimepoints(slowTwapPeriod)) {
         return IAlgebraPlugin.afterSwap.selector;
       }
