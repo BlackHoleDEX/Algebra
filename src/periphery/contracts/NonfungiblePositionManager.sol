@@ -165,7 +165,8 @@ contract NonfungiblePositionManager is
                 amount0Desired: params.amount0Desired,
                 amount1Desired: params.amount1Desired,
                 amount0Min: params.amount0Min,
-                amount1Min: params.amount1Min
+                amount1Min: params.amount1Min,
+                pluginData: params.pluginData
             })
         );
         unchecked {
@@ -278,7 +279,8 @@ contract NonfungiblePositionManager is
                 amount1Desired: params.amount1Desired,
                 amount0Min: params.amount0Min,
                 amount1Min: params.amount1Min,
-                recipient: address(this)
+                recipient: address(this),
+                pluginData: params.pluginData
             })
         );
 
@@ -328,7 +330,7 @@ contract NonfungiblePositionManager is
         require(positionLiquidity >= params.liquidity);
 
         IAlgebraPool pool = IAlgebraPool(_getPoolById(poolId));
-        (amount0, amount1) = pool._burnPositionInPool(tickLower, tickUpper, params.liquidity);
+        (amount0, amount1) = pool._burnPositionInPool(tickLower, tickUpper, params.liquidity, params.pluginData);
 
         require(amount0 >= params.amount0Min && amount1 >= params.amount1Min, 'Price slippage check');
 
@@ -376,7 +378,7 @@ contract NonfungiblePositionManager is
 
         (uint128 tokensOwed0, uint128 tokensOwed1) = (position.tokensOwed0, position.tokensOwed1);
         if (positionLiquidity > 0) {
-            pool._burnPositionInPool(tickLower, tickUpper, 0);
+            pool._burnPositionInPool(tickLower, tickUpper, 0, '0x0');
             (uint128 _tokensOwed0, uint128 _tokensOwed1) = _updateUncollectedFees(
                 position,
                 pool,

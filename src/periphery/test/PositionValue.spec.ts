@@ -90,6 +90,7 @@ describe('PositionValue', async () => {
         amount0Min: 0,
         amount1Min: 0,
         deadline: 10,
+        pluginData: "0x"
       });
 
       const swapAmount = expandTo18Decimals(1_000);
@@ -154,6 +155,7 @@ describe('PositionValue', async () => {
         amount0Min: 0,
         amount1Min: 0,
         deadline: 10,
+        pluginData: "0x"
       });
 
       const principal = await positionValue.principal(nft, 1, sqrtRatioX96);
@@ -174,6 +176,7 @@ describe('PositionValue', async () => {
         amount0Min: 0,
         amount1Min: 0,
         deadline: 10,
+        pluginData: "0x"
       });
 
       const principal = await positionValue.principal(nft, 1, sqrtRatioX96);
@@ -194,6 +197,7 @@ describe('PositionValue', async () => {
         amount0Min: 0,
         amount1Min: 0,
         deadline: 10,
+        pluginData: "0x"
       });
 
       const principal = await positionValue.principal(nft, 1, sqrtRatioX96);
@@ -214,6 +218,7 @@ describe('PositionValue', async () => {
         amount0Min: 0,
         amount1Min: 0,
         deadline: 10,
+        pluginData: "0x"
       });
 
       const principal = await positionValue.principal(nft, 1, sqrtRatioX96);
@@ -234,6 +239,7 @@ describe('PositionValue', async () => {
         amount0Min: 0,
         amount1Min: 0,
         deadline: 10,
+        pluginData: "0x"
       });
 
       const principal = await positionValue.principal(nft, 1, sqrtRatioX96);
@@ -254,6 +260,7 @@ describe('PositionValue', async () => {
         amount0Min: 0,
         amount1Min: 0,
         deadline: 10,
+        pluginData: "0x"
       });
 
       await snapshotGasCost(positionValue.principalGas(nft, 1, sqrtRatioX96));
@@ -279,6 +286,7 @@ describe('PositionValue', async () => {
         amount0Min: 0,
         amount1Min: 0,
         deadline: 10,
+        pluginData: "0x"
       });
     });
 
@@ -296,6 +304,7 @@ describe('PositionValue', async () => {
           amount0Min: 0,
           amount1Min: 0,
           deadline: 10,
+          pluginData: "0x"
         });
 
         const swapAmount = expandTo18Decimals(1_000);
@@ -329,6 +338,7 @@ describe('PositionValue', async () => {
           recipient: wallets[0].address,
           amount0Max: MaxUint128,
           amount1Max: MaxUint128,
+          pluginData: "0x"
         });
         const feeAmounts = await positionValue.fees(nft, tokenId);
 
@@ -344,6 +354,7 @@ describe('PositionValue', async () => {
           amount0Min: 0,
           amount1Min: 0,
           deadline: 1,
+          pluginData: "0x"
         });
 
         const swapAmount = expandTo18Decimals(1_000);
@@ -364,6 +375,7 @@ describe('PositionValue', async () => {
           recipient: wallets[0].address,
           amount0Max: MaxUint128,
           amount1Max: MaxUint128,
+          pluginData: "0x"
         });
         const feeAmounts = await positionValue.fees(nft, tokenId);
         expect(feeAmounts[0]).to.equal(feesFromCollect[0]);
@@ -389,6 +401,7 @@ describe('PositionValue', async () => {
           amount0Min: 0,
           amount1Min: 0,
           deadline: 10,
+          pluginData: "0x"
         });
 
         await tokens[0].approve(router, MaxUint256);
@@ -421,6 +434,7 @@ describe('PositionValue', async () => {
           recipient: wallets[0].address,
           amount0Max: MaxUint128,
           amount1Max: MaxUint128,
+          pluginData: "0x"
         });
 
         const feeAmounts = await positionValue.fees(nft, tokenId);
@@ -448,6 +462,7 @@ describe('PositionValue', async () => {
           amount0Min: 0,
           amount1Min: 0,
           deadline: 10,
+          pluginData: "0x"
         });
 
         await tokens[0].approve(router, MaxUint256);
@@ -480,6 +495,7 @@ describe('PositionValue', async () => {
           recipient: wallets[0].address,
           amount0Max: MaxUint128,
           amount1Max: MaxUint128,
+          pluginData: "0x"
         });
         const feeAmounts = await positionValue.fees(nft, tokenId);
         expect(feeAmounts[0]).to.equal(feesFromCollect[0]);

@@ -3,6 +3,7 @@ pragma solidity =0.8.20;
 
 import '@cryptoalgebra/integral-core/contracts/interfaces/plugin/IAlgebraPlugin.sol';
 import '@cryptoalgebra/integral-core/contracts/interfaces/IAlgebraPool.sol';
+import '../libraries/PoolAddress.sol';
 
 contract MockPlugin is IAlgebraPlugin {
 
@@ -13,6 +14,12 @@ contract MockPlugin is IAlgebraPlugin {
         bytes pluginData;
         bytes path;
         address payer;
+    }
+
+    struct MintCallbackData {
+        PoolAddress.PoolKey poolKey;
+        address payer;
+        bytes pluginData;
     }
 
     function defaultPluginConfig() external pure returns (uint8) {
@@ -35,7 +42,12 @@ contract MockPlugin is IAlgebraPlugin {
         int128 liquidity,
         bytes calldata data
     ) external returns (bytes4, uint24) {
-        if(data.length != 0 && liquidity > 0) mintCallData = abi.decode(data, (uint24));
+        if(liquidity > 0 ) {
+            MintCallbackData memory mintData = abi.decode(data, (MintCallbackData));
+            (, mintCallData) = mintData.pluginData.length > 0 ? abi.decode(mintData.pluginData, (uint24, uint128)) : (0, 0);
+        } else {
+            (, mintCallData) = data.length > 0 ? abi.decode(data, (uint24, uint128)) : (0, 0);
+        }
         return (IAlgebraPlugin.beforeModifyPosition.selector, 0);
     }
 

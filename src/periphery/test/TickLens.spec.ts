@@ -10,6 +10,7 @@ import { getMaxTick, getMinTick } from './shared/ticks';
 import { computePoolAddress } from './shared/computePoolAddress';
 import snapshotGasCost from './shared/snapshotGasCost';
 import { ZERO_ADDRESS } from './CallbackValidation.spec';
+import { plugin } from '../typechain/@cryptoalgebra/integral-core/contracts/interfaces';
 
 type TestERC20WithAddress = TestERC20 & { address: string };
 
@@ -63,6 +64,7 @@ describe('TickLens', () => {
       amount1Min: 0,
       recipient: wallets[0].address,
       deadline: 1,
+      pluginData: "0x"
     };
 
     const { liquidity } = await nft.mint.staticCall(mintParams);
@@ -93,6 +95,7 @@ describe('TickLens', () => {
       amount0Min: 0,
       amount1Min: 0,
       deadline: 1,
+      pluginData: "0x"
     };
 
     await _nft.mint(liquidityParams);

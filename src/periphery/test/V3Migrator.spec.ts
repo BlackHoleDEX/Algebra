@@ -137,6 +137,7 @@ describe('V3Migrator', () => {
           recipient: wallet.address,
           deadline: 1,
           refundAsNative: false,
+          pluginData: "0x"
         })
       ).to.be.reverted;
     });
@@ -160,6 +161,7 @@ describe('V3Migrator', () => {
         recipient: wallet.address,
         deadline: 1,
         refundAsNative: false,
+        pluginData: "0x"
       });
 
       const position = await nft.positions(1);
@@ -192,6 +194,7 @@ describe('V3Migrator', () => {
         recipient: wallet.address,
         deadline: 1,
         refundAsNative: false,
+        pluginData: "0x"   
       });
 
       const tokenBalanceAfter = await token.balanceOf(wallet.address);
@@ -230,6 +233,7 @@ describe('V3Migrator', () => {
         recipient: wallet.address,
         deadline: 1,
         refundAsNative: false,
+        pluginData: "0x"
       });
 
       const tokenBalanceAfter = await token.balanceOf(wallet.address);
@@ -274,6 +278,7 @@ describe('V3Migrator', () => {
         recipient: wallet.address,
         deadline: 1,
         refundAsNative: false,
+        pluginData: "0x"
       });
 
       const tokenBalanceAfter = await token.balanceOf(wallet.address);
@@ -318,6 +323,7 @@ describe('V3Migrator', () => {
           recipient: wallet.address,
           deadline: 1,
           refundAsNative: true,
+          pluginData: "0x"
         })
       )
         .to.emit(wnative, 'Withdrawal')
@@ -362,6 +368,7 @@ describe('V3Migrator', () => {
           recipient: wallet.address,
           deadline: 1,
           refundAsNative: true,
+          pluginData: "0x"
         })
       )
         .to.emit(wnative, 'Withdrawal')
@@ -404,6 +411,7 @@ describe('V3Migrator', () => {
           recipient: wallet.address,
           deadline: 1,
           refundAsNative: false,
+          pluginData: "0x"
         })
       );
     });

@@ -23,6 +23,7 @@ abstract contract LiquidityManagement is IAlgebraMintCallback, PeripheryImmutabl
     struct MintCallbackData {
         PoolAddress.PoolKey poolKey;
         address payer;
+        bytes pluginData;
     }
 
     /// @inheritdoc IAlgebraMintCallback
@@ -45,6 +46,7 @@ abstract contract LiquidityManagement is IAlgebraMintCallback, PeripheryImmutabl
         uint256 amount1Desired;
         uint256 amount0Min;
         uint256 amount1Min;
+        bytes pluginData;
     }
 
     /// @notice Add liquidity to an initialized pool
@@ -83,7 +85,7 @@ abstract contract LiquidityManagement is IAlgebraMintCallback, PeripheryImmutabl
             params.tickLower,
             params.tickUpper,
             liquidity,
-            abi.encode(MintCallbackData({poolKey: poolKey, payer: msg.sender}))
+            abi.encode(MintCallbackData({poolKey: poolKey, payer: msg.sender, pluginData: params.pluginData}))
         );
 
         require(amount0 >= params.amount0Min && amount1 >= params.amount1Min, 'Price slippage check');

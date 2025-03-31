@@ -130,6 +130,7 @@ describe('NonfungibleTokenPositionDescriptor', () => {
         amount0Min: 0,
         amount1Min: 0,
         deadline: 1,
+        pluginData: "0x"
       });
 
       const metadata = extractJSONFromURI(await nft.tokenURI(1));
@@ -155,6 +156,7 @@ describe('NonfungibleTokenPositionDescriptor', () => {
         amount0Min: 0,
         amount1Min: 0,
         deadline: 1,
+        pluginData: "0x"
       });
 
       const metadata = extractJSONFromURI(await nft.tokenURI(1));

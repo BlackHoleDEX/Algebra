@@ -34,8 +34,9 @@ library PoolInteraction {
         IAlgebraPool pool,
         int24 tickLower,
         int24 tickUpper,
-        uint128 liquidity
+        uint128 liquidity,
+        bytes memory data
     ) internal returns (uint256 amount0, uint256 amount1) {
-        return pool.burn(tickLower, tickUpper, liquidity, '0x0');
+        return pool.burn(tickLower, tickUpper, liquidity, data);
     }
 }

@@ -1,7 +1,7 @@
 import { MaxUint256, Contract, ContractTransactionResponse, Wallet, ZeroAddress, AbiCoder } from 'ethers';
 import { ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { IWNativeToken, MockTimeNonfungiblePositionManager, MockTimeSwapRouter, MockPlugin, TestERC20, CustomPoolDeployerTest } from '../typechain';
+import { IWNativeToken, MockTimeNonfungiblePositionManager, MockTimeSwapRouter, MockPlugin, TestERC20 } from '../typechain';
 import completeFixture from './shared/completeFixture';
 import { FeeAmount, TICK_SPACINGS } from './shared/constants';
 import { encodePriceSqrt } from './shared/encodePriceSqrt';
@@ -26,7 +26,6 @@ describe('SwapRouter', function () {
   let wnative: IWNativeToken;
   let router: MockTimeSwapRouter;
   let nft: MockTimeNonfungiblePositionManager;
-  let customPoolDeployer: CustomPoolDeployerTest;
   let tokens: [TestERC20WithAddress, TestERC20WithAddress, TestERC20WithAddress];
   let path: [string, string, string, string, string];
   let plugin0: MockPlugin;
@@ -66,6 +65,7 @@ describe('SwapRouter', function () {
       amount0Min: 0,
       amount1Min: 0,
       deadline: 1,
+      pluginData: "0x"
     };
 
     return _nft.mint(liquidityParams);
@@ -183,6 +183,7 @@ describe('SwapRouter', function () {
         amount1Min: 0,
         liquidity: _liquidity,
         deadline: 2,
+        pluginData: "0x"
       });
 
       await expect(
@@ -211,7 +212,6 @@ describe('SwapRouter', function () {
         const outputIsWNativeToken = _tokens[_tokens.length - 1] === (await wnative.getAddress());
 
         const value = inputIsWNativeToken ? amountIn : 0;
-        console.log(pluginDatas)
         const params = {
           pluginData: pluginDatas,
           path: encodePath(_tokens),
@@ -229,7 +229,6 @@ describe('SwapRouter', function () {
         params.amountOutMinimum += 1;
         await expect(router.connect(trader).exactInput(params, { value })).to.be.revertedWith('Too little received');
         params.amountOutMinimum -= 1;
-        console.log("afterRevert")
 
         if (setTime != 1) await router.setTime(setTime);
         // optimized for the gas test

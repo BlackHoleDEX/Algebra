@@ -25,6 +25,7 @@ interface IV3Migrator is IMulticall, ISelfPermit, IPoolInitializer {
         address recipient;
         uint256 deadline;
         bool refundAsNative;
+        bytes pluginData;
     }
 
     /// @notice Migrates liquidity to Algebra by burning v2 liquidity and minting a new position for Algebra
