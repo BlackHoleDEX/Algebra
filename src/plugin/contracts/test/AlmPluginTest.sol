@@ -13,7 +13,7 @@ contract AlmPluginTest is BaseRebalanceManager {
   uint8 public depositDecimals;
   uint8 public pairedDecimals;
 
-  constructor(address _vault, Thresholds memory _thresholds, int24 _tickSpacing) {
+  constructor(address _vault, uint32 _minTimeBetweenRebalances, Thresholds memory _thresholds, int24 _tickSpacing) {
     require(!isAlmInitialized, 'Already initialized');
     isAlmInitialized = true;
     paused = false;
@@ -24,6 +24,8 @@ contract AlmPluginTest is BaseRebalanceManager {
     tickSpacing = _tickSpacing;
 
     bool _allowToken1 = IAlgebraVault(vault).allowToken1();
+
+    minTimeBetweenRebalances = _minTimeBetweenRebalances;
 
     allowToken1 = _allowToken1;
     state = State.OverInventory; // поч overinventory?

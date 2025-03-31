@@ -6,7 +6,7 @@ import '../RebalanceManager.sol';
 contract MockRebalanceManager is RebalanceManager {
   uint256 depositTokenVaultBalance;
 
-  constructor(address _vault, Thresholds memory _thresholds) RebalanceManager(_vault, _thresholds) {}
+  constructor(address _vault, uint32 _minTimeBetweenRebalances, Thresholds memory _thresholds) RebalanceManager(_vault, _minTimeBetweenRebalances, _thresholds) {}
 
   function setDepositTokenBalance(uint256 _depositTokenVaultBalance) external {
 	depositTokenVaultBalance = _depositTokenVaultBalance;

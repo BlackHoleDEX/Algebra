@@ -50,31 +50,28 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
     bool failedToObtainTWAP;
     bool sameBlock;
   }
+
   struct Ranges {
     int24 baseLower;
     int24 baseUpper;
     int24 limitLower;
     int24 limitUpper;
   }
+
   enum State {
     OverInventory,
     Normal,
     UnderInventory,
     Special
   }
-  //                                                                     этот статус можно офнуть
+
   enum DecideStatus {
     Normal,
     Special,
-    PendingRebalanceNeeded,
     NoNeed,
-    ToSoon,
+    TooSoon,
     NoNeedWithPending,
-    FailedToObtainTWAPOrExtremeVolatility
-  }
-  enum UpdateStatus {
-    Status0,
-    Status1
+    ExtremeVolatility
   }
 
   struct Thresholds {
@@ -113,12 +110,13 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
   int24 public tickSpacing;
   address public factory;
   address public pool;
+  uint32 public minTimeBetweenRebalances;
 
   function setPriceChangeThreshold(uint16 _priceChangeThreshold) external {
     _authorize();
     require(_priceChangeThreshold < 10000, 'Invalid price change threshold');
     thresholds.priceChangeThreshold = _priceChangeThreshold;
-    // нужно эмитить ивент?
+    emit SetPriceChangeThreshold(_priceChangeThreshold);
   }
 
   function setPercentages(uint16 _baseLowPct, uint16 _baseHighPct, uint16 _limitReservePct) external {
@@ -129,6 +127,7 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
     thresholds.baseLowPct = _baseLowPct;
     thresholds.baseHighPct = _baseHighPct;
     thresholds.limitReservePct = _limitReservePct;
+    emit SetPercentages(_baseLowPct, _baseHighPct, _limitReservePct);
   }
 
   function setTriggers(uint16 _simulate, uint16 _normalThreshold, uint16 _underInventoryThreshold, uint16 _overInventoryThreshold) external {
@@ -142,30 +141,35 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
     thresholds.normalThreshold = _normalThreshold;
     thresholds.underInventoryThreshold = _underInventoryThreshold;
     thresholds.overInventoryThreshold = _overInventoryThreshold;
+    emit SetTriggers(_simulate, _normalThreshold, _underInventoryThreshold, _overInventoryThreshold);
   }
 
   function setDtrDelta(uint16 _dtrDelta) external {
     _authorize();
     require(_dtrDelta <= 10000, '_dtrDelta must be <= 10000');
     thresholds.dtrDelta = _dtrDelta;
+    emit SetDtrDelta(_dtrDelta);
   }
 
   function setHighVolatility(uint16 _highVolatility) external {
     _authorize();
     require(_highVolatility >= thresholds.someVolatility, '_highVolatility must be >= someVolatility');
     thresholds.highVolatility = _highVolatility;
+    emit SetHighVolatility(_highVolatility);
   }
 
   function setSomeVolatility(uint16 _someVolatility) external {
     _authorize();
     require(_someVolatility <= 300, '_someVolatility must be <= 300');
     thresholds.someVolatility = _someVolatility;
+    emit SetSomeVolatility(_someVolatility);
   }
 
   function setExtremeVolatility(uint16 _extremeVolatility) external {
     _authorize();
     require(_extremeVolatility >= thresholds.highVolatility, '_extremeVolatility must be >= highVolatility');
     thresholds.extremeVolatility = _extremeVolatility;
+    emit SetExtremeVolatility(_extremeVolatility);
   }
 
   function setDepositTokenUnusedThreshold(uint16 _depositTokenUnusedThreshold) external {
@@ -175,11 +179,26 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
       '_depositTokenUnusedThreshold must be 100 <= _depositTokenUnusedThreshold <= 10000'
     );
     thresholds.depositTokenUnusedThreshold = _depositTokenUnusedThreshold;
+    emit SetDepositTokenUnusedThreshold(_depositTokenUnusedThreshold);
+  }
+
+  function setMinTimeBetweenRebalances(uint32 _minTimeBetweenRebalances) external {
+    _authorize();
+    minTimeBetweenRebalances = _minTimeBetweenRebalances;
+    emit SetMinTimeBetweenRebalances(_minTimeBetweenRebalances);
   }
 
   function setVault(address _vault) external {
     _authorize();
     vault = _vault;
+    emit SetVault(_vault);
+  }
+
+  function unpause() external {
+    _authorize();
+    require(paused, 'Already unpaused');
+    paused = false;
+    emit Unpaused();
   }
 
   // TODO: написать obtainTWAPAndRebalance()
@@ -215,35 +234,47 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
 
     // TODO: сделать тут просто возвращаение результата, чтобы если ребаланс не нужен был, то вся транза не падала
     // require(decideStatus != DecideStatus.NoNeed, "no need");
-    // require(decideStatus != DecideStatus.ToSoon, "too soon");
-    if (decideStatus == DecideStatus.NoNeed || decideStatus == DecideStatus.ToSoon) return;
+    // require(decideStatus != DecideStatus.TooSoon, "too soon");
+    if (decideStatus == DecideStatus.NoNeed || decideStatus == DecideStatus.TooSoon) return;
 
-    if (decideStatus != DecideStatus.PendingRebalanceNeeded) {
-      if (decideStatus != DecideStatus.NoNeedWithPending) {
-        if (decideStatus != DecideStatus.FailedToObtainTWAPOrExtremeVolatility) {
-          Ranges memory ranges = decideStatus == DecideStatus.Normal
-            ? _getRangesWithState(newState, obtainTWAPsResult)
-            : _getRangesWithoutState(obtainTWAPsResult);
+    if (decideStatus != DecideStatus.NoNeedWithPending) {
+      if (decideStatus != DecideStatus.ExtremeVolatility) {
+        Ranges memory ranges;
+        if (decideStatus == DecideStatus.Normal) {
+          // require(twapResult.currentPriceAccountingDecimals != 0, 'middlePrice must be > 0');
+          // require(twapResult.totalDepositToken > 0, 'no deposit tokens in the vault. need manual rebalance');
+          if (
+            obtainTWAPsResult.currentPriceAccountingDecimals == 0 ||
+            obtainTWAPsResult.totalDepositToken == 0 ||
+            (newState == State.Normal &&
+              obtainTWAPsResult.totalPairedInDeposit <=
+              _calcPart(obtainTWAPsResult.totalDepositToken + obtainTWAPsResult.totalPairedInDeposit, thresholds.limitReservePct)
+            )
+          ) return;
+          ranges = _getRangesWithState(newState, obtainTWAPsResult);
+        } else {
+          ranges = _getRangesWithoutState(obtainTWAPsResult);
+        }
 
-          // struct Ranges {
-          //         int24 baseLower;
-          //         int24 baseUpper;
-          //         int24 limitLower;
-          //         int24 limitUpper;
-          // }
-          // console.log('RANGES START');
-          // console.logInt(ranges.baseLower);
-          // console.logInt(ranges.baseUpper);
-          // console.logInt(ranges.limitLower);
-          // console.logInt(ranges.limitUpper);
-          // console.log('RANGES END');
+        // struct Ranges {
+        //         int24 baseLower;
+        //         int24 baseUpper;
+        //         int24 limitLower;
+        //         int24 limitUpper;
+        // }
+        // console.log('RANGES START');
+        // console.logInt(ranges.baseLower);
+        // console.logInt(ranges.baseUpper);
+        // console.logInt(ranges.limitLower);
+        // console.logInt(ranges.limitUpper);
+        // console.log('RANGES END');
 
-          // require(ranges.baseUpper - ranges.baseLower > 300 &&
-          //                 ranges.limitUpper - ranges.limitLower > 300, 'positions are concentrated too much');
-          if (ranges.baseUpper - ranges.baseLower <= 300 || ranges.limitUpper - ranges.limitLower <= 300) return;
+        // require(ranges.baseUpper - ranges.baseLower > 300 &&
+        //                 ranges.limitUpper - ranges.limitLower > 300, 'positions are concentrated too much');
+        if (ranges.baseUpper - ranges.baseLower <= 300 || ranges.limitUpper - ranges.limitLower <= 300) return;
 
-          // что за v10 и v11? как их достать? (1 из них success call'a, а второй?)
-          // v10, /* bool */ v11 = address(_gnosis >> 8).execTransactionFromModule(_vault, 0, 128, 0, 164, v12, v12, v12, v12, v12, v9).gas(msg.gas);
+        // что за v10 и v11? как их достать? (1 из них success call'a, а второй?)
+        // v10, /* bool */ v11 = address(_gnosis >> 8).execTransactionFromModule(_vault, 0, 128, 0, 164, v12, v12, v12, v12, v12, v9).gas(msg.gas);
 
           // TODO: swapquantity ?
           try IAlgebraVault(vault).rebalance(ranges.baseLower, ranges.baseUpper, ranges.limitLower, ranges.limitUpper, 0) {
@@ -263,9 +294,6 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
         // pendingRebalanceTimestamp = 0;
         lastRebalanceTimestamp = _blockTimestamp();
         lastRebalanceCurrentPrice = obtainTWAPsResult.currentPriceAccountingDecimals;
-      }
-    } else {
-      // pendingRebalanceTimestamp = _blockTimestamp();
     }
 
     // чекируем decideStatus
@@ -391,8 +419,9 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
     // куча куча ифов, в итоге в одном из случаев вызываем
     // вычисления на основе twapResult И UpdateStatus, юзается вспомогательная функция _calcPercentageDiff
     // UpdateStatus updStatus = _updateStatus(twapResult);
-    if (twapResult.failedToObtainTWAP) {
-      return (DecideStatus.FailedToObtainTWAPOrExtremeVolatility, State.Special);
+
+    if (_blockTimestamp() < lastRebalanceTimestamp + minTimeBetweenRebalances) {
+      return (DecideStatus.TooSoon, State.Special);
     }
 
     uint256 fastSlowDiff = _calcPercentageDiff(twapResult.fastAvgPriceAccountingDecimals, twapResult.slowAvgPriceAccountingDecimals);
@@ -419,24 +448,11 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
               // console.log('fastCurrentDiff < thresholds.someVolatility');
               return (DecideStatus.Normal, newState); // normal rebalance
             } else {
-              return (DecideStatus.ToSoon, newState); // too soon
+              return (DecideStatus.TooSoon, newState); // too soon
             }
           } else {
             return (DecideStatus.NoNeedWithPending, newState); // pending rebalance but no rebalance needed??? (this is when twapResult.percentageOfToken1 is less than 1%)
           }
-        } else {
-          // State == NORMAL || OVER
-          // И Это не первый ребаланс
-          // И percentageOfDepositToken меньше чем _underInventoryPct - _dtrDelta (??) - значит очень мало депозит токенов, то:
-          // ----> переходим дальше в итоге выставляя status = SPECIAL
-          // тут как будто ничо не происходит
-          // типа тут сетятся v19, v21, v23, v25
-          // но дальше с ними ничо не происходит
-          // только в гносис записываем v23, который итак равен гносису
-          // v19 = v20 = 21;
-          // v21 = v22 = 3;
-          // v23 = v24 = bytes31(_gnosis);
-          // v25 = v26 = 1;
         }
       } else {
         // handle high volatility
@@ -447,14 +463,7 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
           if (fastCurrentDiff >= thresholds.someVolatility && twapResult.sameBlock) {
             // Если fastCurrentDiff >= _someVolatility (low? - 1%):
             // Проверяем, что последний timepoint был записан не в том же блоке, в котором мы исполняем транзакцию, иначе - ребаланс не делается
-            return (DecideStatus.ToSoon, State.Special);
-          } else {
-            // Иначе ------> переходим дальше в итоге выставляя status = SPECIAL
-            // то же самое, как будто нихуя не происходит
-            // v19 = v30 = 21;
-            // v21 = v31 = 3;
-            // v23 = v32 = bytes31(_gnosis);
-            // v25 = v33 = 1;
+            return (DecideStatus.TooSoon, State.Special);
           }
         } else {
           // special -> noneed
@@ -466,7 +475,7 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
       return (DecideStatus.Special, State.Special); // выяснить чо он означает
     } else {
       // Если fastSlowDiff >= _extremeVolatility ИЛИ fastCurrentDiff => _extremeVolatility (25%), то считаем, что сейчас экстремальная волатильность и ребаланс не делается
-      return (DecideStatus.FailedToObtainTWAPOrExtremeVolatility, State.Special);
+      return (DecideStatus.ExtremeVolatility, State.Special);
     }
   }
 
@@ -489,9 +498,6 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
               // типа из андеринветори или спешл ребалансим в НОРМАЛ
               return (true, State.Normal);
             }
-            // else {
-            //   return (true, State.UnderInventory);
-            // }
           } else {
             // sqrtStatus = 1;
             // state == UnderInventory || state == Special
@@ -509,9 +515,6 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
             return (true, State.Normal);
           }
           // WHAT IF GREATER THAN 91%? (STAYING OVER-INVENTORY)
-          // else {
-          //   return (true, State.OverInventory);
-          // }
         } else {
           // state == OverInventory
           // twapResult.percentageOfDepositToken <= 77%
@@ -880,10 +883,6 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
   //                                                                                                                                                                    upper             target    lower
   function _getPriceBounds(State _state, TwapResult memory twapResult, bool _allowToken1) private view returns (uint256, uint256, uint256) {
     uint256 targetPrice = twapResult.currentPriceAccountingDecimals;
-    // тут чтобы убрать require нужно тогда прокидывать, видимо
-    require(targetPrice != 0, 'middlePrice must be > 0');
-    require(twapResult.totalDepositToken > 0, 'no deposit tokens in the vault. need manual rebalance');
-    // if (targetPrice == 0 || twapResult.totalDepositToken == 0) return (0, 0, 0);
 
     uint256 lowerPriceBound = 0;
     if (_state != State.UnderInventory) {
@@ -910,8 +909,6 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
       uint256 partOfTotalTokens = _calcPart(totalTokens, thresholds.limitReservePct); // 5% of totalTokensInToken0
       // console.log('limitReservePct: ', thresholds.limitReservePct);
       // console.log('partOfTotalTokens: ', partOfTotalTokens);
-      // TODO: убрать этот require
-      require(twapResult.totalPairedInDeposit > partOfTotalTokens, 'not enough quote token');
       uint256 excess = twapResult.totalPairedInDeposit - partOfTotalTokens;
       uint256 partOfExcess = excess * thresholds.baseLowPct; // 20% of excess
       uint256 excessCoef = partOfExcess / twapResult.totalDepositToken;
@@ -951,10 +948,7 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
 
   function _pause() private {
     paused = true;
-  }
-
-  function unpause() public payable /* onlyowner */ {
-    paused = false;
+    emit Paused();
   }
 
   function getTickAtPrice(uint8 _tokenDecimals, uint256 _price) private pure returns (int24) {
@@ -980,5 +974,25 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
 
   function getSqrtPriceX96FromPriceWithoutDecimals(uint8 _tokenDecimals, uint256 _price) private pure returns (uint160) {
     return uint160(Math.sqrt((_price << 192) / 10 ** _tokenDecimals));
+  }
+
+  function _validateThresholds(Thresholds memory _thresholds) internal pure {
+    require(_thresholds.priceChangeThreshold < 10000, 'Invalid price change threshold');
+    require(_thresholds.underInventoryThreshold > 6000, '_underInventoryThreshold must be > 6000');
+    require(_thresholds.normalThreshold > _thresholds.underInventoryThreshold, '_normalThreshold must be > _underInventoryThreshold');
+    require(_thresholds.overInventoryThreshold > _thresholds.normalThreshold, '_overInventoryThreshold must be > _normalThreshold');
+    require(_thresholds.simulate > _thresholds.overInventoryThreshold, 'Simulate must be > _overInventoryThreshold');
+    require(_thresholds.simulate < 9500, 'Simulate must be < 9500');
+    require(_thresholds.baseLowPct >= 100 && _thresholds.baseLowPct <= 10000, 'Invalid base low percent');
+    require(_thresholds.baseHighPct >= 100 && _thresholds.baseHighPct <= 10000, 'Invalid base high percent');
+    require(_thresholds.limitReservePct >= 100 && _thresholds.baseLowPct <= 10000 - _thresholds.simulate, 'Invalid limit reserve percent');
+    require(_thresholds.dtrDelta <= 10000, '_dtrDelta must be <= 10000');
+    require(_thresholds.highVolatility >= _thresholds.someVolatility, '_highVolatility must be >= someVolatility');
+    require(_thresholds.someVolatility <= 300, '_someVolatility must be <= 300');
+    require(_thresholds.extremeVolatility >= _thresholds.highVolatility, '_extremeVolatility must be >= highVolatility');
+    require(
+      _thresholds.depositTokenUnusedThreshold >= 100 && _thresholds.depositTokenUnusedThreshold <= 10000,
+      '_depositTokenUnusedThreshold must be 100 <= _depositTokenUnusedThreshold <= 10000'
+    );
   }
 }

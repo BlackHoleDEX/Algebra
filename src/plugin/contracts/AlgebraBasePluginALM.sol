@@ -60,19 +60,20 @@ contract AlgebraBasePluginALM is AlmPlugin, DynamicFeePlugin, VolatilityOraclePl
 
   function afterSwap(address, address, bool, int256, uint160, int256, int256, bytes calldata) external override onlyPool returns (bytes4) {
 	// console.log('entered after swap');
-	if (rebalanceManager != address(0)) {
-		if (!_ableToGetTimepoints(slowTwapPeriod)) {
-			return IAlgebraPlugin.afterSwap.selector;
-		}
+  //                                 to prevent pause rebalanceManager
+    if (rebalanceManager != address(0) && gasleft() >= 1600000) {
+      if (!_ableToGetTimepoints(slowTwapPeriod)) {
+        return IAlgebraPlugin.afterSwap.selector;
+      }
 
-		( , int24 currentTick, , ) = _getPoolState();
-		uint32 lastBlockTimestamp = _getLastBlockTimestamp();
+      ( , int24 currentTick, , ) = _getPoolState();
+      uint32 lastBlockTimestamp = _getLastBlockTimestamp();
 
-		int24 slowTwapTick = _getTwapTick(slowTwapPeriod);
-		int24 fastTwapTick = _getTwapTick(fastTwapPeriod);
+      int24 slowTwapTick = _getTwapTick(slowTwapPeriod);
+      int24 fastTwapTick = _getTwapTick(fastTwapPeriod);
 
-		_obtainTWAPAndRebalance(currentTick, slowTwapTick, fastTwapTick, lastBlockTimestamp);
-	}
+      _obtainTWAPAndRebalance(currentTick, slowTwapTick, fastTwapTick, lastBlockTimestamp);
+    }
 
     return IAlgebraPlugin.afterSwap.selector;
   }

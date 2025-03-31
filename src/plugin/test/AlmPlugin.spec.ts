@@ -36,8 +36,7 @@ describe('#AlmPlugin', () => {
 
 		const almPluginFactory = await ethers.getContractFactory('AlmPluginTest');
 		const almPlugin = (await almPluginFactory.deploy(
-			await mockVault.getAddress(),
-			thresholds, tickSpacing
+			await mockVault.getAddress(), 7200, thresholds, tickSpacing
 		)) as any as AlmPluginTest;
 
 		return {
