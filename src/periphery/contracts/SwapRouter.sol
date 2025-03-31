@@ -37,6 +37,9 @@ contract SwapRouter is
     /// @dev Transient storage variable used for returning the computed amount in for an exact output swap.
     uint256 private amountInCached = DEFAULT_AMOUNT_IN_CACHED;
 
+    /// @dev Transient storage variable used for plugin data chunk size in for an exact output swap
+    uint256 private chunkSizeCached;
+
     constructor(
         address _factory,
         address _WNativeToken,
@@ -49,6 +52,7 @@ contract SwapRouter is
     }
 
     struct SwapCallbackData {
+        bytes pluginData;
         bytes path;
         address payer;
     }
@@ -69,6 +73,7 @@ contract SwapRouter is
             // either initiate the next swap or pay
             if (data.path.hasMultiplePools()) {
                 data.path = data.path.skipToken();
+                data.pluginData = data.pluginData.skipChunk(chunkSizeCached);
                 exactOutputInternal(amountToPay, msg.sender, 0, data);
             } else {
                 amountInCached = amountToPay;
@@ -90,7 +95,6 @@ contract SwapRouter is
         (address tokenIn, address deployer, address tokenOut) = data.path.decodeFirstPool();
 
         bool zeroToOne = tokenIn < tokenOut;
-
         (int256 amount0, int256 amount1) = getPool(deployer, tokenIn, tokenOut).swap(
             recipient,
             zeroToOne,
@@ -113,6 +117,7 @@ contract SwapRouter is
             params.recipient,
             params.limitSqrtPrice,
             SwapCallbackData({
+                pluginData: params.pluginData,
                 path: abi.encodePacked(params.tokenIn, params.deployer, params.tokenOut),
                 payer: msg.sender
             })
@@ -125,10 +130,9 @@ contract SwapRouter is
         ExactInputParams memory params
     ) external payable override checkDeadline(params.deadline) returns (uint256 amountOut) {
         address payer = msg.sender; // msg.sender pays for the first hop
-
+        uint i;
         while (true) {
             bool hasMultiplePools = params.path.hasMultiplePools();
-
             // the outputs of prior swaps become the inputs to subsequent ones
             params.amountIn = exactInputInternal(
                 params.amountIn,
@@ -136,7 +140,8 @@ contract SwapRouter is
                 0,
                 SwapCallbackData({
                     path: params.path.getFirstPool(), // only the first pool in the path is necessary
-                    payer: payer
+                    payer: payer,
+                    pluginData: params.pluginData[i]
                 })
             );
 
@@ -144,6 +149,7 @@ contract SwapRouter is
             if (hasMultiplePools) {
                 payer = address(this); // at this point, the caller has paid
                 params.path = params.path.skipToken();
+                i++;
             } else {
                 amountOut = params.amountIn;
                 break;
@@ -158,6 +164,7 @@ contract SwapRouter is
         ExactInputSingleParams calldata params
     ) external payable override checkDeadline(params.deadline) returns (uint256 amountOut) {
         SwapCallbackData memory data = SwapCallbackData({
+            pluginData: params.pluginData,
             path: abi.encodePacked(params.tokenIn, params.deployer, params.tokenOut),
             payer: msg.sender
         });
@@ -224,6 +231,7 @@ contract SwapRouter is
             params.recipient,
             params.limitSqrtPrice,
             SwapCallbackData({
+                pluginData: params.pluginData,
                 path: abi.encodePacked(params.tokenOut, params.deployer, params.tokenIn),
                 payer: msg.sender
             })
@@ -239,14 +247,16 @@ contract SwapRouter is
     ) external payable override checkDeadline(params.deadline) returns (uint256 amountIn) {
         // it's okay that the payer is fixed to msg.sender here, as they're only paying for the "final" exact output
         // swap, which happens first, and subsequent swaps are paid for within nested callback frames
+        chunkSizeCached = params.chunkSize;
 
         exactOutputInternal(
             params.amountOut,
             params.recipient,
             0,
-            SwapCallbackData({path: params.path, payer: msg.sender})
+            SwapCallbackData({pluginData: params.pluginData, path: params.path, payer: msg.sender})
         );
 
+        chunkSizeCached = 0;
         amountIn = amountInCached;
         require(amountIn <= params.amountInMaximum, 'Too much requested');
         amountInCached = DEFAULT_AMOUNT_IN_CACHED;

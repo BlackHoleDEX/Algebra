@@ -1291,6 +1291,7 @@ describe('NonfungiblePositionManager', () => {
         const swapAmount = 3_333_333;
         await tokens[0].approve(router.getAddress(), swapAmount);
         await router.exactInput({
+          pluginData: ["0x"],
           recipient: wallet.address,
           deadline: 1,
           path: encodePath([await tokens[0].getAddress(), ZERO_ADDRESS, await tokens[1].getAddress()]),

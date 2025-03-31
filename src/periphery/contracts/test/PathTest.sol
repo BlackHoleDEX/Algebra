@@ -20,6 +20,10 @@ contract PathTest {
         return Path.skipToken(path);
     }
 
+    function skipPluginChunk(bytes memory path, uint256 chunkSize) public pure returns (bytes memory) {
+        return Path.skipChunk(path, chunkSize);
+    }
+
     // gas funcs
     function getGasCostOfDecodeFirstPool(bytes memory path) public view returns (uint256) {
         uint256 gasBefore = gasleft();

@@ -2,8 +2,19 @@
 pragma solidity =0.8.20;
 
 import '@cryptoalgebra/integral-core/contracts/interfaces/plugin/IAlgebraPlugin.sol';
+import '@cryptoalgebra/integral-core/contracts/interfaces/IAlgebraPool.sol';
 
 contract MockPlugin is IAlgebraPlugin {
+
+    uint24 public swapCalldata;
+    uint128 public mintCallData;
+
+    struct SwapCallbackData {
+        bytes pluginData;
+        bytes path;
+        address payer;
+    }
+
     function defaultPluginConfig() external pure returns (uint8) {
         return 0;
     }
@@ -21,9 +32,10 @@ contract MockPlugin is IAlgebraPlugin {
         address,
         int24,
         int24,
-        int128,
-        bytes calldata
-    ) external pure returns (bytes4, uint24) {
+        int128 liquidity,
+        bytes calldata data
+    ) external returns (bytes4, uint24) {
+        if(data.length != 0 && liquidity > 0) mintCallData = abi.decode(data, (uint24));
         return (IAlgebraPlugin.beforeModifyPosition.selector, 0);
     }
 
@@ -44,7 +56,9 @@ contract MockPlugin is IAlgebraPlugin {
         return IAlgebraPlugin.afterModifyPosition.selector;
     }
 
-    function beforeSwap(address, address, bool, int256, uint160, bool, bytes calldata) external pure returns (bytes4, uint24, uint24) {
+    function beforeSwap(address, address, bool, int256, uint160, bool, bytes calldata data) external returns (bytes4, uint24, uint24) {
+        SwapCallbackData memory swapData = abi.decode(data, (SwapCallbackData));
+        swapCalldata = swapData.pluginData.length > 0 ? abi.decode(swapData.pluginData, (uint24)) : 0;
         return (IAlgebraPlugin.beforeSwap.selector, 0, 0);
     }
 

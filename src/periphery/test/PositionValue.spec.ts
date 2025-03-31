@@ -98,6 +98,7 @@ describe('PositionValue', async () => {
 
       // accumulate token0 fees
       await router.exactInput({
+        pluginData: ["0x"],
         recipient: wallets[0].address,
         deadline: 1,
         path: encodePath([await tokens[0].getAddress(), ZERO_ADDRESS, await tokens[1].getAddress()]),
@@ -107,6 +108,7 @@ describe('PositionValue', async () => {
 
       // accumulate token1 fees
       await router.exactInput({
+        pluginData: ["0x"],
         recipient: wallets[0].address,
         deadline: 1,
         path: encodePath([await tokens[1].getAddress(), ZERO_ADDRESS, await tokens[0].getAddress()]),
@@ -302,6 +304,7 @@ describe('PositionValue', async () => {
 
         // accumulate token0 fees
         await router.exactInput({
+          pluginData: ["0x"],
           recipient: wallets[0].address,
           deadline: 1,
           path: encodePath([await tokens[0].getAddress(), ZERO_ADDRESS, await tokens[1].getAddress()]),
@@ -311,6 +314,7 @@ describe('PositionValue', async () => {
 
         // accumulate token1 fees
         await router.exactInput({
+          pluginData: ["0x"],
           recipient: wallets[0].address,
           deadline: 1,
           path: encodePath([await tokens[1].getAddress(), ZERO_ADDRESS, await tokens[0].getAddress()]),
@@ -347,6 +351,7 @@ describe('PositionValue', async () => {
 
         // accumulate more token0 fees after clearing initial amount
         await router.exactInput({
+          pluginData: ["0x"],
           recipient: wallets[0].address,
           deadline: 1,
           path: encodePath([await tokens[0].getAddress(), ZERO_ADDRESS, await tokens[1].getAddress()]),
@@ -391,6 +396,7 @@ describe('PositionValue', async () => {
 
         // accumulate token1 fees
         await router.exactInput({
+          pluginData: ["0x"],
           recipient: wallets[0].address,
           deadline: 1,
           path: encodePath([await tokens[1].getAddress(), ZERO_ADDRESS, await tokens[0].getAddress()]),
@@ -400,6 +406,7 @@ describe('PositionValue', async () => {
 
         // accumulate token0 fees and push price below tickLower
         await router.exactInput({
+          pluginData: ["0x"],
           recipient: wallets[0].address,
           deadline: 1,
           path: encodePath([await tokens[0].getAddress(), ZERO_ADDRESS, await tokens[1].getAddress()]),
@@ -448,6 +455,7 @@ describe('PositionValue', async () => {
 
         // accumulate token0 fees
         await router.exactInput({
+          pluginData: ["0x"],
           recipient: wallets[0].address,
           deadline: 1,
           path: encodePath([await tokens[0].getAddress(), ZERO_ADDRESS, await tokens[1].getAddress()]),
@@ -457,6 +465,7 @@ describe('PositionValue', async () => {
 
         // accumulate token1 fees and push price above tickUpper
         await router.exactInput({
+          pluginData: ["0x"],
           recipient: wallets[0].address,
           deadline: 1,
           path: encodePath([await tokens[1].getAddress(), ZERO_ADDRESS, await tokens[0].getAddress()]),
