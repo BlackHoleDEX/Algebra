@@ -59,8 +59,7 @@ interface ISwapRouter is IAlgebraSwapCallback {
     function exactOutputSingle(ExactOutputSingleParams calldata params) external payable returns (uint256 amountIn);
 
     struct ExactOutputParams {
-        bytes pluginData;
-        uint256 chunkSize;
+        bytes[] pluginData;
         bytes path;
         address recipient;
         uint256 deadline;

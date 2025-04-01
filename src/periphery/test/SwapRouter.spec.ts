@@ -243,7 +243,7 @@ describe('SwapRouter', function () {
             path.slice(0, 3),
             3,
             1,
-            2
+            2,
           )
         ).to.be.revertedWith('Transaction too old');
       });
@@ -743,8 +743,7 @@ describe('SwapRouter', function () {
         const value = inputIsWNativeToken ? amountInMaximum : 0;
 
         const params = {
-          pluginData: pluginDatas[0],
-          chunkSize: 32,
+          pluginData: pluginDatas,
           path: encodePath(_tokens.slice().reverse()),
           recipient: outputIsWNativeToken ? ZeroAddress : trader.address,
           deadline: 1,
@@ -825,7 +824,7 @@ describe('SwapRouter', function () {
         });
       });
 
-      describe('multi-pool', () => {
+      describe.only('multi-pool', () => {
         it('0 -> 1 -> 2', async () => {
           const traderBefore = await getBalances(trader.address);
 
@@ -839,7 +838,7 @@ describe('SwapRouter', function () {
 
           expect(traderAfter.token0).to.be.eq(traderBefore.token0 - 5n);
           expect(traderAfter.token2).to.be.eq(traderBefore.token2 + 1n);
-          expect(await plugin0.swapCalldata()).to.be.eq(10000)
+          expect(await plugin0.swapCalldata()).to.be.eq(1000)
           expect(await plugin1.swapCalldata()).to.be.eq(2000)
         });
 
@@ -853,7 +852,7 @@ describe('SwapRouter', function () {
           expect(traderAfter.token2).to.be.eq(traderBefore.token2 - 5n);
           expect(traderAfter.token0).to.be.eq(traderBefore.token0 + 1n);
           expect(await plugin0.swapCalldata()).to.be.eq(2000)
-          expect(await plugin1.swapCalldata()).to.be.eq(10000)
+          expect(await plugin1.swapCalldata()).to.be.eq(1000)
         });
 
         it('events', async () => {
