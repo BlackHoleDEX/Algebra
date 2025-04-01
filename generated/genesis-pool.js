@@ -897,6 +897,19 @@ const genesisPoolAbi = [
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "_startTime",
+        "type": "uint256"
+      }
+    ],
+    "name": "setStartTime",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "gauge",
         "type": "address"

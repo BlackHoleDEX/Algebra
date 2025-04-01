@@ -52,6 +52,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
     address[] public nativeTokens;
     address[] public liveNativeTokens;
     mapping(address => uint256) internal liveNativeTokensIndex;
+    mapping(address => bool) internal isNativeToken;
     
     event WhiteListedTokenToUser(address proposedToken, address tokenOwner);
     event DespositedToken(address genesisPool, address sender, uint256 amount);
@@ -123,7 +124,10 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
 
         address auction = auctionFactory.auctions(auctionIndex);
         auction = auction == address(0) ? auctionFactory.auctions(0) : auction;
-        nativeTokens.push(nativeToken); 
+        if(!isNativeToken[nativeToken]){
+            nativeTokens.push(nativeToken); 
+            isNativeToken[nativeToken] = true;
+        }
         IGenesisPool(genesisPool).setGenesisPoolInfo(genesisPoolInfo, allocationInfo, auction);
     }
 
