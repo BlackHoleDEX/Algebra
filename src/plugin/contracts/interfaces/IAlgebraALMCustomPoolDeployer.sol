@@ -29,10 +29,6 @@ interface IAlgebraALMCustomPoolDeployer is IAlgebraPluginFactory {
   /// @return The entryPoint contract address
   function entryPoint() external view returns (address);
 
-  /// @notice Returns current farming address
-  /// @return The farming contract address
-  function farmingAddress() external view returns (address);
-
   /// @notice Current default dynamic fee configuration
   /// @dev See the AdaptiveFee struct for more details about params.
   /// This value is set by default in new plugins
@@ -54,9 +50,5 @@ interface IAlgebraALMCustomPoolDeployer is IAlgebraPluginFactory {
   /// alpha1 + alpha2 + baseFee (max possible fee) must be <= type(uint16).max and gammas must be > 0
   /// @param newConfig new default fee configuration. See the #AdaptiveFee.sol library for details
   function setDefaultFeeConfiguration(AlgebraFeeConfiguration calldata newConfig) external;
-
-  /// @dev updates farmings manager address on the factory
-  /// @param newFarmingAddress The new tokenomics contract address
-  function setFarmingAddress(address newFarmingAddress) external;
 
 }

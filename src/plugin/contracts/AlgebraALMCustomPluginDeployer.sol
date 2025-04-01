@@ -18,9 +18,6 @@ contract AlgebraALMCustomPoolDeployer is IAlgebraALMCustomPoolDeployer {
   address public immutable entryPoint;
 
   /// @inheritdoc IAlgebraALMCustomPoolDeployer
-  address public override farmingAddress;
-
-  /// @inheritdoc IAlgebraALMCustomPoolDeployer
   AlgebraFeeConfiguration public override defaultFeeConfiguration; // values of constants for sigmoids in fee calculation formula
 
   /// @inheritdoc IAlgebraALMCustomPoolDeployer
@@ -34,6 +31,7 @@ contract AlgebraALMCustomPoolDeployer is IAlgebraALMCustomPoolDeployer {
   constructor(address _algebraFactory, address _entryPoint) {
     entryPoint = _entryPoint;
     algebraFactory = _algebraFactory;
+    defaultFeeConfiguration = AdaptiveFee.initialFeeConfiguration();
   }
 
   /// @inheritdoc IAlgebraPluginFactory
@@ -64,13 +62,6 @@ contract AlgebraALMCustomPoolDeployer is IAlgebraALMCustomPoolDeployer {
     AdaptiveFee.validateFeeConfiguration(newConfig);
     defaultFeeConfiguration = newConfig;
     emit DefaultFeeConfiguration(newConfig);
-  }
-
-  /// @inheritdoc IAlgebraALMCustomPoolDeployer
-  function setFarmingAddress(address newFarmingAddress) external override onlyAdministrator {
-    require(farmingAddress != newFarmingAddress);
-    farmingAddress = newFarmingAddress;
-    emit FarmingAddress(newFarmingAddress);
   }
 
 }
