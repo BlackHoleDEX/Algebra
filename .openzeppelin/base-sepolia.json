@@ -7944,6 +7944,76 @@
       "address": "0x9D2b5a75dD8fA1e89122feb77af6E178B9769Ab9",
       "txHash": "0x36e81907a45d796236619d2498a38c9beb831bc60f13dedf714e511c802bcf6b",
       "kind": "transparent"
+    },
+    {
+      "address": "0xbe5A502935645e1C1E29380b16D283D3c6da017e",
+      "txHash": "0x03c538931b6b9293e44385245329eaa68148b4632eb1fc680b10eba6755e629d",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xC2E7D016AD116044A4B315bE020F416444839D89",
+      "txHash": "0x676379d34a8c23e7cb25d066ef1966cfec4f9b149586e05e4e47263c4fe52e98",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xe0a41141ce219a1677dC3052606ab780d45836c5",
+      "txHash": "0x2705076dc3af16e6f240ba55ab68141e43c81b23528b90cf953adeba5a07efc4",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xFade2f462f961B2373c6b5E01F1A082323D51741",
+      "txHash": "0xabdd41aa105df94d03888345733bb3f573c702dfe7bfbcb2d8d5d87b34e34806",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x789E41a7DCd2c9b33Edf8FD623Ec22ED4456a046",
+      "txHash": "0x96d902d16b66f975f151b5acfb574979b79a2062447d14a44607ee5a286b01fe",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x1E53EF7418cdB5127B6efB935aB2e1dc1cdec2Da",
+      "txHash": "0xc5eaf4fffd8614bfe4a89a5f0b3ee170ae09583ba29d804a5536ae5926baca91",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x7dBfb9C5C44a056047D7a3d288937b5FF3b9F26e",
+      "txHash": "0x360bb7f5e3a9c8b782aa456b9de3e0bc04e171010b3d803126f7e68730f235c3",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x310A9f577882932B9EeDB49e48bF81dBb9C039A2",
+      "txHash": "0x5ba37d3b59d5eee42304b911798641c6d94deed3ef208b88aaff042fc359eac9",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x9a991C215D13db648bc0b96F739C57d3456d31C3",
+      "txHash": "0x2fc84367d513389cf57d838662327e69c1cb7f82ab4fbfce99155b997ea1cada",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x1E8923920de789BDEaf7243359081C412b346cd4",
+      "txHash": "0x221f8704991aefe4f0d6ba09f6168a9deeb1548ffda957b50dcb3f6e66084167",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x5fC798241F41d67a0546BF922bC140f449731032",
+      "txHash": "0xf6580167fb6116312e3038a9c5dceaa43945d650ca692d316f6ce3ba1e296017",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x766Fe9E20162cc4b6ED32Fe8E437E3F054B4733a",
+      "txHash": "0xdfab594a3be7c411556ea39d6574c343d291092d271f05b773670a28371626a5",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x41Cf2FfB4A1dFe06089B62c2c8Bf49CAF6D0Bea9",
+      "txHash": "0x5680ca4aeec4b3c71a1ce5fec5fbcfb423cccb5651316a378d6057b11eee6f9f",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xe43DAe6731361a71830EFd7E4e1de34fc3e8232A",
+      "txHash": "0xf049aec94fb8357efa4fd96515eac10ba50213dabc46dd0a40b1ac5863e67134",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -65427,6 +65497,279 @@
             "numberOfBytes": "20"
           },
           "t_contract(IVoter)9423": {
+            "label": "contract IVoter",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_bool))": {
+            "label": "mapping(address => mapping(address => bool))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "7e9b0fbbc4c6869975ecc5677929686739ddc98bf922b2e45dfa711dd00f9c46": {
+      "address": "0xF29fF9d4455dAcEBaCa3dDD0Abe17163AD9C2629",
+      "txHash": "0x35959334018edf24bcb5c9014b4c1d6d4ebdcbfd018946ec2812c8d89fe87fb7",
+      "layout": {
+        "solcVersion": "0.8.13",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:40"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:88"
+          },
+          {
+            "label": "MIN_DURATION",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_uint256",
+            "contract": "GenesisPoolManager",
+            "src": "contracts/GenesisPoolManager.sol:31"
+          },
+          {
+            "label": "MIN_THRESHOLD",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_uint256",
+            "contract": "GenesisPoolManager",
+            "src": "contracts/GenesisPoolManager.sol:32"
+          },
+          {
+            "label": "MATURITY_TIME",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_uint256",
+            "contract": "GenesisPoolManager",
+            "src": "contracts/GenesisPoolManager.sol:33"
+          },
+          {
+            "label": "epochController",
+            "offset": 0,
+            "slot": "154",
+            "type": "t_address",
+            "contract": "GenesisPoolManager",
+            "src": "contracts/GenesisPoolManager.sol:35"
+          },
+          {
+            "label": "permissionRegistory",
+            "offset": 0,
+            "slot": "155",
+            "type": "t_address",
+            "contract": "GenesisPoolManager",
+            "src": "contracts/GenesisPoolManager.sol:36"
+          },
+          {
+            "label": "router",
+            "offset": 0,
+            "slot": "156",
+            "type": "t_address",
+            "contract": "GenesisPoolManager",
+            "src": "contracts/GenesisPoolManager.sol:37"
+          },
+          {
+            "label": "pairFactory",
+            "offset": 0,
+            "slot": "157",
+            "type": "t_contract(IBaseV1Factory)1789",
+            "contract": "GenesisPoolManager",
+            "src": "contracts/GenesisPoolManager.sol:38"
+          },
+          {
+            "label": "voter",
+            "offset": 0,
+            "slot": "158",
+            "type": "t_contract(IVoter)3749",
+            "contract": "GenesisPoolManager",
+            "src": "contracts/GenesisPoolManager.sol:40"
+          },
+          {
+            "label": "tokenHandler",
+            "offset": 0,
+            "slot": "159",
+            "type": "t_contract(ITokenHandler)3544",
+            "contract": "GenesisPoolManager",
+            "src": "contracts/GenesisPoolManager.sol:41"
+          },
+          {
+            "label": "genesisFactory",
+            "offset": 0,
+            "slot": "160",
+            "type": "t_contract(IGenesisPoolFactory)3412",
+            "contract": "GenesisPoolManager",
+            "src": "contracts/GenesisPoolManager.sol:43"
+          },
+          {
+            "label": "auctionFactory",
+            "offset": 0,
+            "slot": "161",
+            "type": "t_contract(IAuctionFactory)3073",
+            "contract": "GenesisPoolManager",
+            "src": "contracts/GenesisPoolManager.sol:44"
+          },
+          {
+            "label": "WEEK",
+            "offset": 0,
+            "slot": "162",
+            "type": "t_uint256",
+            "contract": "GenesisPoolManager",
+            "src": "contracts/GenesisPoolManager.sol:46"
+          },
+          {
+            "label": "pre_epoch_period",
+            "offset": 0,
+            "slot": "163",
+            "type": "t_uint256",
+            "contract": "GenesisPoolManager",
+            "src": "contracts/GenesisPoolManager.sol:47"
+          },
+          {
+            "label": "whiteListedTokensToUser",
+            "offset": 0,
+            "slot": "164",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
+            "contract": "GenesisPoolManager",
+            "src": "contracts/GenesisPoolManager.sol:51"
+          },
+          {
+            "label": "nativeTokens",
+            "offset": 0,
+            "slot": "165",
+            "type": "t_array(t_address)dyn_storage",
+            "contract": "GenesisPoolManager",
+            "src": "contracts/GenesisPoolManager.sol:52"
+          },
+          {
+            "label": "liveNativeTokens",
+            "offset": 0,
+            "slot": "166",
+            "type": "t_array(t_address)dyn_storage",
+            "contract": "GenesisPoolManager",
+            "src": "contracts/GenesisPoolManager.sol:53"
+          },
+          {
+            "label": "liveNativeTokensIndex",
+            "offset": 0,
+            "slot": "167",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "GenesisPoolManager",
+            "src": "contracts/GenesisPoolManager.sol:54"
+          },
+          {
+            "label": "isNativeToken",
+            "offset": 0,
+            "slot": "168",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "GenesisPoolManager",
+            "src": "contracts/GenesisPoolManager.sol:55"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IAuctionFactory)3073": {
+            "label": "contract IAuctionFactory",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IBaseV1Factory)1789": {
+            "label": "contract IBaseV1Factory",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IGenesisPoolFactory)3412": {
+            "label": "contract IGenesisPoolFactory",
+            "numberOfBytes": "20"
+          },
+          "t_contract(ITokenHandler)3544": {
+            "label": "contract ITokenHandler",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IVoter)3749": {
             "label": "contract IVoter",
             "numberOfBytes": "20"
           },
