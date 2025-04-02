@@ -209,6 +209,7 @@ describe('unit/FarmingCenter', () => {
     it('works if liquidity decreased', async () => {
       await expect(
         context.nft.connect(lpUser0).decreaseLiquidity({
+          pluginData: "0x",
           tokenId: tokenIdEternal,
           liquidity: 100,
           amount0Min: 0,
@@ -228,6 +229,7 @@ describe('unit/FarmingCenter', () => {
 
       await expect(
         context.nft.connect(lpUser0).decreaseLiquidity({
+          pluginData: "0x",
           tokenId: tokenIdEternal,
           liquidity: 5,
           amount0Min: 0,
@@ -244,6 +246,7 @@ describe('unit/FarmingCenter', () => {
 
       await expect(
         context.nft.connect(lpUser0).decreaseLiquidity({
+          pluginData: "0x",
           tokenId: tokenIdEternal,
           liquidity: 5,
           amount0Min: 0,
@@ -299,6 +302,7 @@ describe('unit/FarmingCenter', () => {
 
       await expect(
         context.nft.connect(lpUser0).decreaseLiquidity({
+          pluginData: "0x",
           tokenId: tokenIdEternal,
           liquidity: 5,
           amount0Min: 0,
@@ -350,6 +354,7 @@ describe('unit/FarmingCenter', () => {
 
       await expect(
         context.nft.connect(lpUser0).decreaseLiquidity({
+          pluginData: "0x",
           tokenId: tokenIdEternal,
           liquidity: 5,
           amount0Min: 0,
@@ -367,6 +372,7 @@ describe('unit/FarmingCenter', () => {
 
       await expect(
         context.nft.connect(lpUser0).increaseLiquidity({
+          pluginData: "0x",
           tokenId: tokenIdEternal,
           amount0Desired: 100,
           amount1Desired: 100,
@@ -381,6 +387,7 @@ describe('unit/FarmingCenter', () => {
       const liquidity = (await context.nft.positions(tokenIdEternal)).liquidity;
       await expect(
         context.nft.connect(lpUser0).decreaseLiquidity({
+          pluginData: "0x",
           tokenId: tokenIdEternal,
           liquidity: liquidity,
           amount0Min: 0,

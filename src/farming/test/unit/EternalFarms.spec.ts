@@ -618,6 +618,7 @@ describe('unit/EternalFarms', () => {
 
         let farmBefore = await context.eternalFarming.farms(tokenId, incentiveId);
         await context.nft.connect(lpUser0).increaseLiquidity({
+          pluginData: "0x",
           tokenId: tokenId,
           amount0Desired: amountDesired,
           amount1Desired: amountDesired,
@@ -714,6 +715,7 @@ describe('unit/EternalFarms', () => {
         await context.nft.connect(lpUser0).approveForFarming(tokenId2, true, context.farmingCenter);
 
         await context.nft.connect(lpUser0).decreaseLiquidity({
+          pluginData: "0x",
           tokenId: tokenId2,
           liquidity: (await context.nft.positions(tokenId2)).liquidity,
           amount0Min: 0,
@@ -2044,6 +2046,7 @@ describe('unit/EternalFarms', () => {
 
         await erc20Helper.ensureBalancesAndApprovals(lpUser0, [token0, token1], amountDesired, await context.router.getAddress());
         const swapData = {
+          pluginData: "0x",
           tokenIn: tokenReentrant,
           tokenOut: context.token1,
           deployer: ZERO_ADDRESS,

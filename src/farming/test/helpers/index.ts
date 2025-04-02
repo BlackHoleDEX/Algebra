@@ -236,6 +236,7 @@ export class HelperCommands {
 
     await this.nft.connect(params.lp).decreaseLiquidity(
       {
+        pluginData: "0x",
         tokenId: params.tokenId,
         liquidity,
         amount0Min: 0,
@@ -347,6 +348,7 @@ export class HelperCommands {
 
       await this.router.connect(actor).exactInput(
         {
+          pluginData: ["0x"],
           recipient: actor.address,
           deadline: MaxUint256,
           path,
@@ -406,6 +408,7 @@ export class HelperCommands {
 
     await this.router.connect(actor).exactInputSingle(
       {
+        pluginData: "0x",
         recipient: actor.address,
         deadline: MaxUint256,
         tokenIn: zto ? tok0Address : tok1Address,
@@ -465,6 +468,7 @@ export class HelperCommands {
 
       await this.router.connect(actor).exactInput(
         {
+          pluginData: ["0x"],
           recipient: actor.address,
           deadline: MaxUint256,
           path,
@@ -525,6 +529,7 @@ export class HelperCommands {
 
     return this.router.connect(actor).exactInput(
       {
+        pluginData: ["0x"],
         recipient: actor.address,
         deadline: MaxUint256,
         path,

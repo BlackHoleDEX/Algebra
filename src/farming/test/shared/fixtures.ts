@@ -180,6 +180,7 @@ export const mintPosition = async (
   const receipt = await (
     await nft.mint(
       {
+        pluginData: "0x",
         token0: mintParams.token0,
         token1: mintParams.token1,
         deployer: ZERO_ADDRESS,
