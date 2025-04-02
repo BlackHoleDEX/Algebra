@@ -14,7 +14,7 @@ import '../interfaces/IRebalanceManager.sol';
 
 import './AlgebraBasePlugin.sol';
 
-import 'hardhat/console.sol';
+// import 'hardhat/console.sol';
 
 abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
   bytes32 public constant ALGEBRA_BASE_PLUGIN_MANAGER = keccak256('ALGEBRA_BASE_PLUGIN_MANAGER');
@@ -206,9 +206,9 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
     if (vault == address(0)) return;
 
     (DecideStatus decideStatus, State newState) = _decideRebalance(obtainTWAPsResult);
-    console.log('rebalance entered');
-    console.log('decide status: ', uint256(decideStatus));
-    console.log('newState: ', uint256(newState));
+    // console.log('rebalance entered');
+    // console.log('decide status: ', uint256(decideStatus));
+    // console.log('newState: ', uint256(newState));
 
     if (decideStatus == DecideStatus.NoNeed || decideStatus == DecideStatus.TooSoon) return;
 
