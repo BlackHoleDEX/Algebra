@@ -49,13 +49,14 @@ contract SwapRouter is
     }
 
     function skipPluginDataElement(bytes[] memory pluginDataForward) private pure returns (bytes[] memory) {
-        bytes[] memory pluginDataForwardCut = new bytes[](pluginDataForward.length - 1);
         if (pluginDataForward.length > 0){
-            for(uint i; i < pluginDataForward.length - 1; i++){
+            bytes[] memory pluginDataForwardCut = new bytes[](pluginDataForward.length - 1);
+            for(uint i; i < pluginDataForwardCut.length; i++){
                 pluginDataForwardCut[i] = pluginDataForward[i + 1];
-            } 
+            }
+            return pluginDataForwardCut; 
         }
-        return pluginDataForwardCut;
+        return new bytes[](0);
     }
     struct SwapCallbackData {
         bytes pluginData;

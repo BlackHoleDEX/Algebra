@@ -824,7 +824,7 @@ describe('SwapRouter', function () {
         });
       });
 
-      describe.only('multi-pool', () => {
+      describe('multi-pool', () => {
         it('0 -> 1 -> 2', async () => {
           const traderBefore = await getBalances(trader.address);
 
