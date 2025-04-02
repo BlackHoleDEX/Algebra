@@ -9,4 +9,6 @@ interface IBlack {
     function transferFrom(address,address,uint) external returns (bool);
     function mint(address, uint) external returns (bool);
     function minter() external returns (address);
+    function burn(uint) external returns (bool);
+    function burnFrom(address, uint) external returns (bool);
 }

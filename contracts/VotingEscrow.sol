@@ -4,6 +4,7 @@ pragma solidity 0.8.13;
 import {IERC721, IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {IERC20} from "./interfaces/IERC20.sol";
+import "./interfaces/IBlack.sol";
 import {IBlackHoleVotes} from "./interfaces/IBlackHoleVotes.sol";
 import {IVeArtProxy} from "./interfaces/IVeArtProxy.sol";
 import {IVotingEscrow} from "./interfaces/IVotingEscrow.sol";
@@ -69,7 +70,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
     address public team;
     address public artProxy;
     address public avm;
-    address public burnTokenAddress=0x000000000000000000000000000000000000dEaD;
+    // address public burnTokenAddress=0x000000000000000000000000000000000000dEaD;
 
     uint public SMNFT_BONUS = 1000;
     uint public PRECISISON = 10000;
@@ -93,6 +94,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
 
     uint internal MAXTIME;
     int128 internal iMAXTIME;
+    IBlack public _black;
 
     // Instance of the library's storage struct
     VotingDelegationLib.Data private cpData;
@@ -117,6 +119,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         supportedInterfaces[ERC165_INTERFACE_ID] = true;
         supportedInterfaces[ERC721_INTERFACE_ID] = true;
         supportedInterfaces[ERC721_METADATA_INTERFACE_ID] = true;
+        _black = IBlack(token);
 
         // mint-ish
         emit Transfer(address(0), address(this), tokenId);
@@ -769,7 +772,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         address from = msg.sender;
         if (_value != 0) {
             if(old_locked.isSMNFT) {
-                assert(IERC20(token).transferFrom(from, burnTokenAddress, _value));
+                // assert(IERC20(token).transferFrom(from, burnTokenAddress, _value));
+                assert(_black.burnFrom(from,_value));
             } else {
                 assert(IERC20(token).transferFrom(from, address(this), _value));
             }
@@ -905,7 +909,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         _locked.amount = int128(int256(_value + calculate_sm_nft_bonus(_value)));
         _checkpoint(_tokenId, locked[_tokenId], _locked);
         locked[_tokenId] = _locked;
-        assert(IERC20(token).transfer(burnTokenAddress, _value));
+        // assert(IERC20(token).transfer(burnTokenAddress, _value));
+        assert(_black.burn(_value));
     }
 
     /// @notice Withdraw all tokens for `_tokenId`
@@ -1081,7 +1086,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         if(newLockedTo.isSMNFT){
             newLockedTo.amount = _locked1.amount + _locked0.amount + int128(int256(calculate_sm_nft_bonus(uint256(int256(_locked0.amount)))));
             smNFTBalance += value0;
-            assert(IERC20(token).transfer(burnTokenAddress, value0));
+            //assert(IERC20(token).transfer(burnTokenAddress, value0));
+            assert(_black.burn(value0));
         } else if (newLockedTo.isPermanent){
             newLockedTo.amount = _locked1.amount + _locked0.amount;
             permanentLockBalance += value0;
