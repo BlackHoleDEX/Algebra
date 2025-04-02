@@ -4,6 +4,7 @@ import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { IWNativeToken, MockTimeNonfungiblePositionManager, MockTimeSwapRouter, TestERC20 } from '../typechain';
 import completeFixture from './shared/completeFixture';
 import { FeeAmount, TICK_SPACINGS } from './shared/constants';
+import snapshotGasCost from './shared/snapshotGasCost';
 import { encodePriceSqrt } from './shared/encodePriceSqrt';
 import { expandTo18Decimals } from './shared/expandTo18Decimals';
 import { expect } from './shared/expect';
@@ -291,6 +292,10 @@ describe('SwapRouter', function () {
           expect(traderAfter.token0).to.be.eq(traderBefore.token0 + 1n);
         });
 
+        it('gas cost [ @skip-on-coverage ]', async () => {
+          await snapshotGasCost(exactInput(path.slice().reverse(), 5, 1))
+        });
+
         it('events', async () => {
           await expect(
             exactInput(
@@ -503,6 +508,10 @@ describe('SwapRouter', function () {
         expect(poolAfter.token1).to.be.eq(poolBefore.token1 + 3n);
       });
 
+      it('gas cost [ @skip-on-coverage ]', async () => {
+        await snapshotGasCost(exactInputSingle(tokens[1].address, tokens[0].address, ZERO_ADDRESS))
+      });
+
       describe('Native input', () => {
         describe('WNativeToken', () => {
           beforeEach(async () => {
@@ -660,6 +669,10 @@ describe('SwapRouter', function () {
         expect(poolAfter.token1).to.be.eq(poolBefore.token1 + 285000n);
       });
 
+      it('gas cost [ @skip-on-coverage ]', async () => {
+        await snapshotGasCost(exactInputSingleSupportingFeeOnTransferTokens(tokens[1].address, tokens[0].address, ZERO_ADDRESS))
+      });
+
       describe('Native output', () => {
         describe('WNativeToken', () => {
           beforeEach(async () => {
@@ -779,6 +792,18 @@ describe('SwapRouter', function () {
           expect(poolAfter.token0).to.be.eq(poolBefore.token0 - 1n);
           expect(poolAfter.token1).to.be.eq(poolBefore.token1 + 3n);
         });
+
+        it('gas cost [ @skip-on-coverage ]', async () => {
+          const pool = await factory.poolByPair(tokens[1].address, tokens[0].address);
+
+          await snapshotGasCost(  
+            exactOutput(
+              path
+                .slice(0, 3)
+                .reverse()
+            )
+          )
+        });
       });
 
       describe('multi-pool', () => {
@@ -806,6 +831,10 @@ describe('SwapRouter', function () {
 
           expect(traderAfter.token2).to.be.eq(traderBefore.token2 - 5n);
           expect(traderAfter.token0).to.be.eq(traderBefore.token0 + 1n);
+        });
+
+        it('gas cost [ @skip-on-coverage ]', async () => {
+          await snapshotGasCost(exactOutput(path.slice().reverse(), 1, 5))
         });
 
         it('events', async () => {
@@ -873,6 +902,10 @@ describe('SwapRouter', function () {
             const traderAfter = await getBalances(trader.address);
 
             expect(traderAfter.token1).to.be.eq(traderBefore.token1 + 1n);
+          });
+
+          it('gas cost [ @skip-on-coverage ]', async () => {
+            await snapshotGasCost(exactOutput([await wnative.getAddress(), ZERO_ADDRESS, tokens[0].address, ZERO_ADDRESS, tokens[1].address], 1, 5))
           });
         });
       });
@@ -1009,6 +1042,10 @@ describe('SwapRouter', function () {
         expect(traderAfter.token1).to.be.eq(traderBefore.token1 - 3n);
         expect(poolAfter.token0).to.be.eq(poolBefore.token0 - 1n);
         expect(poolAfter.token1).to.be.eq(poolBefore.token1 + 3n);
+      });
+
+      it('gas cost [ @skip-on-coverage ]', async () => {
+        await snapshotGasCost(exactOutputSingle(tokens[1].address, tokens[0].address))
       });
 
       describe('Native input', () => {
