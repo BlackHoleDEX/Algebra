@@ -82,6 +82,7 @@ contract SwapRouter is
             if (data.path.hasMultiplePools()) {
                 data.path = data.path.skipToken();
                 data.pluginData = data.pluginDataForward[0];
+                data.pluginDataForward = skipPluginDataElement(data.pluginDataForward);
                 exactOutputInternal(amountToPay, msg.sender, 0, data);
             } else {
                 amountInCached = amountToPay;
@@ -212,7 +213,6 @@ contract SwapRouter is
         (address tokenOut, address deployer, address tokenIn) = data.path.decodeFirstPool();
 
         bool zeroToOne = tokenIn < tokenOut;
-        data.pluginDataForward = skipPluginDataElement(data.pluginDataForward);
         (int256 amount0Delta, int256 amount1Delta) = getPool(deployer, tokenIn, tokenOut).swap(
             recipient,
             zeroToOne,
@@ -257,13 +257,14 @@ contract SwapRouter is
     function exactOutput(
         ExactOutputParams calldata params
     ) external payable override checkDeadline(params.deadline) returns (uint256 amountIn) {
+
         // it's okay that the payer is fixed to msg.sender here, as they're only paying for the "final" exact output
         // swap, which happens first, and subsequent swaps are paid for within nested callback frames
         exactOutputInternal(
             params.amountOut,
             params.recipient,
             0,
-            SwapCallbackData({pluginData: params.pluginData[0], path: params.path, payer: msg.sender, pluginDataForward: params.pluginData})
+            SwapCallbackData({pluginData: params.pluginData[0], path: params.path, payer: msg.sender, pluginDataForward: skipPluginDataElement(params.pluginData)})
         );
 
         amountIn = amountInCached;

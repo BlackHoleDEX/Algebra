@@ -1,17 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SwapRouter bytecode size [ @skip-on-coverage ] 1`] = `12653`;
+exports[`SwapRouter bytecode size [ @skip-on-coverage ] 1`] = `14173`;
 
-exports[`SwapRouter swaps #exactInput multi-pool gas cost [ @skip-on-coverage ] 1`] = `283639`;
+exports[`SwapRouter swaps #exactInput multi-pool gas cost [ @skip-on-coverage ] 1`] = `283651`;
 
 exports[`SwapRouter swaps #exactInputSingle gas cost [ @skip-on-coverage ] 1`] = `160156`;
 
 exports[`SwapRouter swaps #exactInputSingleSupportingFeeOnTransferTokens gas cost [ @skip-on-coverage ] 1`] = `213148`;
 
-exports[`SwapRouter swaps #exactOutput Native input WNativeToken gas cost [ @skip-on-coverage ] 1`] = `258719`;
+exports[`SwapRouter swaps #exactOutput Native input WNativeToken gas cost [ @skip-on-coverage ] 1`] = `258693`;
 
-exports[`SwapRouter swaps #exactOutput multi-pool gas cost [ @skip-on-coverage ] 1`] = `285585`;
+exports[`SwapRouter swaps #exactOutput multi-pool gas cost [ @skip-on-coverage ] 1`] = `285571`;
 
-exports[`SwapRouter swaps #exactOutput single-pool gas cost [ @skip-on-coverage ] 1`] = `170677`;
+exports[`SwapRouter swaps #exactOutput single-pool gas cost [ @skip-on-coverage ] 1`] = `170651`;
 
-exports[`SwapRouter swaps #exactOutputSingle gas cost [ @skip-on-coverage ] 1`] = `166437`;
+exports[`SwapRouter swaps #exactOutputSingle gas cost [ @skip-on-coverage ] 1`] = `166289`;
