@@ -48,7 +48,8 @@ describe('AlgebraBasePluginALM', () => {
       const rebalanceManagerFactory = await ethers.getContractFactory('MockRebalanceManager');
       rebalanceManager = (await rebalanceManagerFactory.deploy(
         await mockVault.getAddress(),
-        thresholds
+        7200,
+        thresholds,
       )) as any as MockRebalanceManager;
 
       await plugin.setRebalanceManager(rebalanceManager);
@@ -534,19 +535,52 @@ describe('AlgebraBasePluginALM', () => {
   });
 
   describe('#AlmPlugin', () => {
-    it('first rebalance', async () => {
+    it('first rebalance (over -> over)', async () => {
       const defaultConfig = await plugin.defaultPluginConfig();
       await mockPool.setPlugin(plugin);
       await mockPool.setPluginConfig(BigInt(PLUGIN_FLAGS.AFTER_SWAP_FLAG) | defaultConfig);
 
       await initializeAtZeroTick(mockPool);
       await deployAndSetRebalanceManager();
+      await rebalanceManager.setDecimals(18, 18);
       await plugin.initializeALM(rebalanceManager, 3600, 300);
 
       await rebalanceManager.setDepositTokenBalance(10000n);
       await mockVault.setTotalAmounts(10000, 0);
       await plugin.advanceTime(5000);
       await mockPool.swapToTick(10);
+    });
+
+    it('over -> normal', async () => {
+      const defaultConfig = await plugin.defaultPluginConfig();
+      await mockPool.setPlugin(plugin);
+      await mockPool.setPluginConfig(BigInt(PLUGIN_FLAGS.AFTER_SWAP_FLAG) | defaultConfig);
+
+      await initializeAtZeroTick(mockPool);
+      await deployAndSetRebalanceManager();
+      await rebalanceManager.setDecimals(18, 18);
+      await plugin.initializeALM(rebalanceManager, 3600, 300);
+
+      await rebalanceManager.setDepositTokenBalance(10000n);
+      await mockVault.setTotalAmounts(8000, 2000);
+      await plugin.advanceTime(3600);
+      await mockPool.swapToTick(10);
+    });
+
+    it('over -> special (extreme volatility)', async () => {
+      const defaultConfig = await plugin.defaultPluginConfig();
+      await mockPool.setPlugin(plugin);
+      await mockPool.setPluginConfig(BigInt(PLUGIN_FLAGS.AFTER_SWAP_FLAG) | defaultConfig);
+
+      await initializeAtZeroTick(mockPool);
+      await deployAndSetRebalanceManager();
+      await rebalanceManager.setDecimals(18, 18);
+      await plugin.initializeALM(rebalanceManager, 3600, 300);
+
+      await rebalanceManager.setDepositTokenBalance(10000n);
+      await mockVault.setTotalAmounts(8000, 2000);
+      await plugin.advanceTime(3600);
+      await mockPool.swapToTick(2000);
     });
   });
 
