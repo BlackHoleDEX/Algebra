@@ -13,20 +13,6 @@ contract MockRebalanceManager is RebalanceManager {
 
   constructor(address _vault, uint32 _minTimeBetweenRebalances, Thresholds memory _thresholds) RebalanceManager(_vault, _minTimeBetweenRebalances, _thresholds) {}
 
-  // function setDepositTokenBalance(uint256 _depositTokenVaultBalance) external {
-  //   depositTokenBalance = _depositTokenVaultBalance;
-  // }
-
-  // function _getDepositTokenDecimals() internal view override returns (uint8) {
-  //   return 18;
-  // }
-
-  // function _getPairedTokenDecimals() internal view override returns (uint8) {
-  //   return 18;
-  // }
-
-  ////////////////////////////////////////
-
   function setDepositTokenBalance(uint256 _depositTokenBalance) public {
     depositTokenBalance = _depositTokenBalance;
   }
@@ -34,12 +20,6 @@ contract MockRebalanceManager is RebalanceManager {
   function setState(State _state) public {
     state = _state;
   }
-
-  // function setPrices(uint256 _slowPrice, uint256 _fastPrice, uint256 _currentPrice) public {
-  //   slowPrice = _slowPrice;
-  //   fastPrice = _fastPrice;
-  //   currentPrice = _currentPrice;
-  // }
 
   function setLastRebalanceCurrentPrice(uint256 _lastRebalanceCurrentPrice) public {
     lastRebalanceCurrentPrice = _lastRebalanceCurrentPrice;
@@ -64,8 +44,4 @@ contract MockRebalanceManager is RebalanceManager {
   function _getPairedTokenDecimals() internal view override returns (uint8) {
     return pairedDecimals;
   }
-
-  // function _getTwapPrices(address, address, uint8, int24, int24, int24) internal view override returns (uint256, uint256, uint256) {
-  //   return (slowPrice, fastPrice, currentPrice);
-  // }
 }
