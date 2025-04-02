@@ -14,7 +14,7 @@ import '../interfaces/IRebalanceManager.sol';
 
 import './AlgebraBasePlugin.sol';
 
-// import 'hardhat/console.sol';
+import 'hardhat/console.sol';
 
 abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
   bytes32 public constant ALGEBRA_BASE_PLUGIN_MANAGER = keccak256('ALGEBRA_BASE_PLUGIN_MANAGER');
@@ -206,9 +206,9 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
     if (vault == address(0)) return;
 
     (DecideStatus decideStatus, State newState) = _decideRebalance(obtainTWAPsResult);
-    // console.log('rebalance entered');
-    // console.log('decide status: ', uint256(decideStatus));
-    // console.log('newState: ', uint256(newState));
+    console.log('rebalance entered');
+    console.log('decide status: ', uint256(decideStatus));
+    console.log('newState: ', uint256(newState));
 
     if (decideStatus == DecideStatus.NoNeed || decideStatus == DecideStatus.TooSoon) return;
 
@@ -662,7 +662,7 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
   function _getPriceAccountingDecimals(
     address token0,
     address token1,
-    uint128 token1decimals,
+    uint128 pairedTokendecimals,
     int24 averageTick
   ) private pure returns (uint256 price) {
     uint160 sqrtPriceX96 = TickMath.getSqrtRatioAtTick(averageTick);
@@ -670,8 +670,8 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
       uint256 priceX128 = FullMath.mulDiv(uint160(sqrtPriceX96), uint160(sqrtPriceX96), uint256(type(uint64).max) + 1);
       return
         token1 < token0
-          ? FullMath.mulDiv(priceX128, token1decimals, uint256(type(uint128).max) + 1)
-          : FullMath.mulDiv(uint256(type(uint128).max) + 1, token1decimals, priceX128);
+          ? FullMath.mulDiv(priceX128, pairedTokendecimals, uint256(type(uint128).max) + 1)
+          : FullMath.mulDiv(uint256(type(uint128).max) + 1, pairedTokendecimals, priceX128);
     } else {
       // console.log(token0, token1);
       // console.log(token1decimals);
@@ -680,8 +680,8 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
       // console.log(token1 < token0);
       return
         token1 < token0
-          ? FullMath.mulDiv(uint256(sqrtPriceX96) * uint256(sqrtPriceX96), token1decimals, uint256(type(uint192).max) + 1)
-          : FullMath.mulDiv(uint256(type(uint192).max) + 1, token1decimals, uint256(sqrtPriceX96) * uint256(sqrtPriceX96));
+          ? FullMath.mulDiv(uint256(sqrtPriceX96) * uint256(sqrtPriceX96), pairedTokendecimals, uint256(type(uint192).max) + 1)
+          : FullMath.mulDiv(uint256(type(uint192).max) + 1, pairedTokendecimals, uint256(sqrtPriceX96) * uint256(sqrtPriceX96));
     }
   }
 
