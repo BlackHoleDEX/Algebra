@@ -62,4 +62,12 @@ library Path {
     function skipToken(bytes memory path) internal pure returns (bytes memory) {
         return path.slice(NEXT_OFFSET, path.length - NEXT_OFFSET);
     }
+
+    /// @notice Skips a chunk element from the buffer and returns the remainder
+    /// @param pluginData The swap plugin data
+    /// @param chunkSize The number of bytes to skip
+    /// @return The remaining token elements in the path
+    function skipChunk(bytes memory pluginData, uint256 chunkSize) internal pure returns (bytes memory) {
+        return pluginData.slice(chunkSize, pluginData.length - chunkSize);
+    }
 }

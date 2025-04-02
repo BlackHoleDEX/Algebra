@@ -9,6 +9,7 @@ import {
   NonfungibleTokenPositionDescriptor,
   TestERC20,
   AlgebraFactory,
+  MockPlugin,
   MockPluginFactory,
   AlgebraCustomPoolEntryPoint,
   CustomPoolDeployerTest,
@@ -106,8 +107,11 @@ const completeFixture: () => Promise<{
   const entryPointFactory = await ethers.getContractFactory("AlgebraCustomPoolEntryPoint");
   const entryPoint = await entryPointFactory.deploy(factory) as any as AlgebraCustomPoolEntryPoint;
 
+  const customPluginFactory = await ethers.getContractFactory("MockPlugin");
+  const customPlugin = await customPluginFactory.deploy() as any as MockPlugin;
+
   const customPoolDeployerFactory = await ethers.getContractFactory("CustomPoolDeployerTest");
-  const customPoolDeployer = await customPoolDeployerFactory.deploy(entryPoint, ZERO_ADDRESS) as any as CustomPoolDeployerTest;
+  const customPoolDeployer = await customPoolDeployerFactory.deploy(entryPoint, customPlugin) as any as CustomPoolDeployerTest;
 
   let customPoolDeployerRole = await factory.CUSTOM_POOL_DEPLOYER()
   let poolAdministratorRole = await factory.POOLS_ADMINISTRATOR_ROLE()
@@ -130,7 +134,7 @@ const completeFixture: () => Promise<{
     customPoolDeployer,
     path,
     nft,
-    nftDescriptor: nftDescriptorProxied,
+    nftDescriptor: nftDescriptorProxied
   };
 };
 

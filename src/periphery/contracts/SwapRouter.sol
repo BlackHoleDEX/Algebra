@@ -48,9 +48,21 @@ contract SwapRouter is
         return IAlgebraPool(PoolAddress.computeAddress(poolDeployer, PoolAddress.getPoolKey(deployer, tokenA, tokenB)));
     }
 
+    function skipPluginDataElement(bytes[] memory pluginDataForward) private pure returns (bytes[] memory) {
+        if (pluginDataForward.length > 0){
+            bytes[] memory pluginDataForwardCut = new bytes[](pluginDataForward.length - 1);
+            for(uint i; i < pluginDataForwardCut.length; i++){
+                pluginDataForwardCut[i] = pluginDataForward[i + 1];
+            }
+            return pluginDataForwardCut; 
+        }
+        return new bytes[](0);
+    }
     struct SwapCallbackData {
+        bytes pluginData;
         bytes path;
         address payer;
+        bytes[] pluginDataForward;
     }
 
     /// @inheritdoc IAlgebraSwapCallback
@@ -69,6 +81,7 @@ contract SwapRouter is
             // either initiate the next swap or pay
             if (data.path.hasMultiplePools()) {
                 data.path = data.path.skipToken();
+                data.pluginData = data.pluginDataForward[0];
                 exactOutputInternal(amountToPay, msg.sender, 0, data);
             } else {
                 amountInCached = amountToPay;
@@ -90,7 +103,6 @@ contract SwapRouter is
         (address tokenIn, address deployer, address tokenOut) = data.path.decodeFirstPool();
 
         bool zeroToOne = tokenIn < tokenOut;
-
         (int256 amount0, int256 amount1) = getPool(deployer, tokenIn, tokenOut).swap(
             recipient,
             zeroToOne,
@@ -113,8 +125,10 @@ contract SwapRouter is
             params.recipient,
             params.limitSqrtPrice,
             SwapCallbackData({
+                pluginData: params.pluginData,
                 path: abi.encodePacked(params.tokenIn, params.deployer, params.tokenOut),
-                payer: msg.sender
+                payer: msg.sender,
+                pluginDataForward: new bytes[](0)
             })
         );
         require(amountOut >= params.amountOutMinimum, 'Too little received');
@@ -125,10 +139,9 @@ contract SwapRouter is
         ExactInputParams memory params
     ) external payable override checkDeadline(params.deadline) returns (uint256 amountOut) {
         address payer = msg.sender; // msg.sender pays for the first hop
-
+        uint i;
         while (true) {
             bool hasMultiplePools = params.path.hasMultiplePools();
-
             // the outputs of prior swaps become the inputs to subsequent ones
             params.amountIn = exactInputInternal(
                 params.amountIn,
@@ -136,7 +149,9 @@ contract SwapRouter is
                 0,
                 SwapCallbackData({
                     path: params.path.getFirstPool(), // only the first pool in the path is necessary
-                    payer: payer
+                    payer: payer,
+                    pluginData: params.pluginData[i],
+                    pluginDataForward: new bytes[](0)
                 })
             );
 
@@ -144,6 +159,7 @@ contract SwapRouter is
             if (hasMultiplePools) {
                 payer = address(this); // at this point, the caller has paid
                 params.path = params.path.skipToken();
+                i++;
             } else {
                 amountOut = params.amountIn;
                 break;
@@ -158,8 +174,10 @@ contract SwapRouter is
         ExactInputSingleParams calldata params
     ) external payable override checkDeadline(params.deadline) returns (uint256 amountOut) {
         SwapCallbackData memory data = SwapCallbackData({
+            pluginData: params.pluginData,
             path: abi.encodePacked(params.tokenIn, params.deployer, params.tokenOut),
-            payer: msg.sender
+            payer: msg.sender,
+            pluginDataForward: new bytes[](0)
         });
         address recipient = params.recipient == address(0) ? address(this) : params.recipient;
 
@@ -194,7 +212,7 @@ contract SwapRouter is
         (address tokenOut, address deployer, address tokenIn) = data.path.decodeFirstPool();
 
         bool zeroToOne = tokenIn < tokenOut;
-
+        data.pluginDataForward = skipPluginDataElement(data.pluginDataForward);
         (int256 amount0Delta, int256 amount1Delta) = getPool(deployer, tokenIn, tokenOut).swap(
             recipient,
             zeroToOne,
@@ -224,8 +242,10 @@ contract SwapRouter is
             params.recipient,
             params.limitSqrtPrice,
             SwapCallbackData({
+                pluginData: params.pluginData,
                 path: abi.encodePacked(params.tokenOut, params.deployer, params.tokenIn),
-                payer: msg.sender
+                payer: msg.sender,
+                pluginDataForward: new bytes[](0)
             })
         );
 
@@ -239,12 +259,11 @@ contract SwapRouter is
     ) external payable override checkDeadline(params.deadline) returns (uint256 amountIn) {
         // it's okay that the payer is fixed to msg.sender here, as they're only paying for the "final" exact output
         // swap, which happens first, and subsequent swaps are paid for within nested callback frames
-
         exactOutputInternal(
             params.amountOut,
             params.recipient,
             0,
-            SwapCallbackData({path: params.path, payer: msg.sender})
+            SwapCallbackData({pluginData: params.pluginData[0], path: params.path, payer: msg.sender, pluginDataForward: params.pluginData})
         );
 
         amountIn = amountInCached;

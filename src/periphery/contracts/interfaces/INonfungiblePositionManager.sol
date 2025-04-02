@@ -107,6 +107,7 @@ interface INonfungiblePositionManager is
         uint256 amount1Min;
         address recipient;
         uint256 deadline;
+        bytes pluginData;
     }
 
     /// @notice Creates a new position wrapped in a NFT
@@ -129,6 +130,7 @@ interface INonfungiblePositionManager is
         uint256 amount0Min;
         uint256 amount1Min;
         uint256 deadline;
+        bytes pluginData;
     }
 
     /// @notice Increases the amount of liquidity in a position, with tokens paid by the `msg.sender`
@@ -152,6 +154,7 @@ interface INonfungiblePositionManager is
         uint256 amount0Min;
         uint256 amount1Min;
         uint256 deadline;
+        bytes pluginData;
     }
 
     /// @notice Decreases the amount of liquidity in a position and accounts it to the position

@@ -10,6 +10,7 @@ import '@cryptoalgebra/integral-core/contracts/interfaces/callback/IAlgebraSwapC
 /// https://github.com/Uniswap/v3-periphery
 interface ISwapRouter is IAlgebraSwapCallback {
     struct ExactInputSingleParams {
+        bytes pluginData;
         address tokenIn;
         address tokenOut;
         address deployer;
@@ -26,6 +27,7 @@ interface ISwapRouter is IAlgebraSwapCallback {
     function exactInputSingle(ExactInputSingleParams calldata params) external payable returns (uint256 amountOut);
 
     struct ExactInputParams {
+        bytes[] pluginData;
         bytes path;
         address recipient;
         uint256 deadline;
@@ -39,6 +41,7 @@ interface ISwapRouter is IAlgebraSwapCallback {
     function exactInput(ExactInputParams calldata params) external payable returns (uint256 amountOut);
 
     struct ExactOutputSingleParams {
+        bytes pluginData;
         address tokenIn;
         address tokenOut;
         address deployer;
@@ -56,6 +59,7 @@ interface ISwapRouter is IAlgebraSwapCallback {
     function exactOutputSingle(ExactOutputSingleParams calldata params) external payable returns (uint256 amountIn);
 
     struct ExactOutputParams {
+        bytes[] pluginData;
         bytes path;
         address recipient;
         uint256 deadline;

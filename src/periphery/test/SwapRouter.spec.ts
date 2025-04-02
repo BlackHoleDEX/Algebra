@@ -1,7 +1,7 @@
-import { MaxUint256, Contract, ContractTransactionResponse, Wallet, ZeroAddress } from 'ethers';
+import { MaxUint256, Contract, ContractTransactionResponse, Wallet, ZeroAddress, AbiCoder } from 'ethers';
 import { ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { IWNativeToken, MockTimeNonfungiblePositionManager, MockTimeSwapRouter, TestERC20 } from '../typechain';
+import { IWNativeToken, MockTimeNonfungiblePositionManager, MockTimeSwapRouter, MockPlugin, TestERC20 } from '../typechain';
 import completeFixture from './shared/completeFixture';
 import { FeeAmount, TICK_SPACINGS } from './shared/constants';
 import snapshotGasCost from './shared/snapshotGasCost';
@@ -13,12 +13,15 @@ import { getMaxTick, getMinTick } from './shared/ticks';
 import { computePoolAddress, computeCustomPoolAddress } from './shared/computePoolAddress';
 import { ZERO_ADDRESS } from './CallbackValidation.spec';
 
+import { abi as IAlgebraPoolABI } from '@cryptoalgebra/integral-core/artifacts/contracts/interfaces/IAlgebraPool.sol/IAlgebraPool.json';
+
 type TestERC20WithAddress = TestERC20 & { address: string };
 
 describe('SwapRouter', function () {
   this.timeout(40000);
   let wallet: Wallet;
   let trader: Wallet;
+  let pluginDatas: string[];
 
   let factory: Contract;
   let wnative: IWNativeToken;
@@ -26,8 +29,10 @@ describe('SwapRouter', function () {
   let nft: MockTimeNonfungiblePositionManager;
   let tokens: [TestERC20WithAddress, TestERC20WithAddress, TestERC20WithAddress];
   let path: [string, string, string, string, string];
+  let plugin0: MockPlugin;
+  let plugin1: MockPlugin;
 
-  let getBalances: (who: string | MockTimeSwapRouter) => Promise<{
+  let  getBalances: (who: string | MockTimeSwapRouter) => Promise<{
     wnative: bigint;
     token0: bigint;
     token1: bigint;
@@ -61,6 +66,7 @@ describe('SwapRouter', function () {
       amount0Min: 0,
       amount1Min: 0,
       deadline: 1,
+      pluginData: "0x"
     };
 
     return _nft.mint(liquidityParams);
@@ -86,11 +92,25 @@ describe('SwapRouter', function () {
       token.address = await token.getAddress();
     }
 
+    const pluginContractFactory = await ethers.getContractFactory('MockPlugin');
+
     await createPool(nft, wallet, _tokens[0].address, _tokens[1].address, ZERO_ADDRESS);
+    const pool0Address = await factory.poolByPair(_tokens[0].address, _tokens[1].address);
+    const pool0 = new ethers.Contract(pool0Address, IAlgebraPoolABI, wallet);
+    await pool0.setPluginConfig(1)
+
+    const plugin0Address = await pool0.plugin();
+    plugin0 = (pluginContractFactory.attach(plugin0Address)) as any as MockPlugin; 
 
     await customPoolDeployer.createCustomPool(customPoolDeployer, wallet.address, _tokens[1].getAddress(), _tokens[2].getAddress(), '0x');
     await createPool(nft, wallet, _tokens[1].address, _tokens[2].address, await customPoolDeployer.getAddress());
+    const pool1Address = await factory.computeCustomPoolAddress(await customPoolDeployer.getAddress(), _tokens[1].address, _tokens[2].address);
+    const pool1 = new ethers.Contract(pool1Address, IAlgebraPoolABI, wallet); 
+    await pool1.setPluginConfig(1)  
     
+    let plugin1Address = await pool1.plugin()
+    plugin1 = (pluginContractFactory.attach(plugin1Address)) as any as MockPlugin;
+
     return {
       wnative,
       factory: factory as any as Contract,
@@ -114,7 +134,13 @@ describe('SwapRouter', function () {
   // helper for getting wnative and token balances
   beforeEach('load fixture', async () => {
     ({ router, wnative, factory, tokens, path, nft } = await loadFixture(swapRouterFixture));
+    // encoded 10000, 100000
 
+    pluginDatas = [
+      AbiCoder.defaultAbiCoder().encode(['uint24', 'uint128'], [2000, 10000]),
+      AbiCoder.defaultAbiCoder().encode(['uint24', 'uint128'], [1000, 10001])
+    ];
+    
     getBalances = async (who: string | MockTimeSwapRouter) => {
       let addr;
       if (typeof who == 'string') addr = who;
@@ -158,10 +184,12 @@ describe('SwapRouter', function () {
         amount1Min: 0,
         liquidity: _liquidity,
         deadline: 2,
+        pluginData: "0x"
       });
 
       await expect(
         router.exactInputSingle({
+          pluginData: pluginDatas[0],
           tokenIn: tokens[0].address,
           tokenOut: tokens[1].address,
           deployer: ZERO_ADDRESS,
@@ -185,13 +213,13 @@ describe('SwapRouter', function () {
         const outputIsWNativeToken = _tokens[_tokens.length - 1] === (await wnative.getAddress());
 
         const value = inputIsWNativeToken ? amountIn : 0;
-
         const params = {
+          pluginData: pluginDatas,
           path: encodePath(_tokens),
           recipient: outputIsWNativeToken ? ZeroAddress : trader.address,
           deadline: 1,
           amountIn,
-          amountOutMinimum,
+          amountOutMinimum
         };
 
         const data = [router.interface.encodeFunctionData('exactInput', [params])];
@@ -216,7 +244,7 @@ describe('SwapRouter', function () {
             path.slice(0, 3),
             3,
             1,
-            2
+            2,
           )
         ).to.be.revertedWith('Transaction too old');
       });
@@ -239,6 +267,7 @@ describe('SwapRouter', function () {
           expect(traderAfter.token1).to.be.eq(traderBefore.token1 + 1n);
           expect(poolAfter.token0).to.be.eq(poolBefore.token0 + 3n);
           expect(poolAfter.token1).to.be.eq(poolBefore.token1 - 1n);
+          expect(await plugin0.swapCalldata()).to.be.eq(2000)
         });
 
         it('1 -> 0', async () => {
@@ -262,11 +291,13 @@ describe('SwapRouter', function () {
           expect(traderAfter.token1).to.be.eq(traderBefore.token1 - 3n);
           expect(poolAfter.token0).to.be.eq(poolBefore.token0 - 1n);
           expect(poolAfter.token1).to.be.eq(poolBefore.token1 + 3n);
+          expect(await plugin0.swapCalldata()).to.be.eq(2000)
         });
       });
 
       describe('multi-pool', () => {
         it('0 -> 1 -> 2', async () => {
+
           const traderBefore = await getBalances(trader.address);
 
           await exactInput(
@@ -279,6 +310,8 @@ describe('SwapRouter', function () {
 
           expect(traderAfter.token0).to.be.eq(traderBefore.token0 - 5n);
           expect(traderAfter.token2).to.be.eq(traderBefore.token2 + 1n);
+          expect(await plugin0.swapCalldata()).to.be.eq(2000)
+          expect(await plugin1.swapCalldata()).to.be.eq(1000)
         });
 
         it('2 -> 1 -> 0', async () => {
@@ -290,6 +323,12 @@ describe('SwapRouter', function () {
 
           expect(traderAfter.token2).to.be.eq(traderBefore.token2 - 5n);
           expect(traderAfter.token0).to.be.eq(traderBefore.token0 + 1n);
+          expect(await plugin0.swapCalldata()).to.be.eq(1000)
+          expect(await plugin1.swapCalldata()).to.be.eq(2000)
+        });
+
+        it('gas cost [ @skip-on-coverage ]', async () => {
+          await snapshotGasCost(exactInput(path.slice().reverse(), 5, 1))
         });
 
         it('gas cost [ @skip-on-coverage ]', async () => {
@@ -431,6 +470,7 @@ describe('SwapRouter', function () {
         const value = inputIsWNativeToken ? amountIn : 0;
 
         const params = {
+          pluginData: pluginDatas[0],
           tokenIn,
           tokenOut,
           deployer: deployer,
@@ -487,6 +527,7 @@ describe('SwapRouter', function () {
         expect(traderAfter.token1).to.be.eq(traderBefore.token1 + 1n);
         expect(poolAfter.token0).to.be.eq(poolBefore.token0 + 3n);
         expect(poolAfter.token1).to.be.eq(poolBefore.token1 - 1n);
+        expect(await plugin0.swapCalldata()).to.be.eq(2000)
       });
 
       it('1 -> 0', async () => {
@@ -506,6 +547,11 @@ describe('SwapRouter', function () {
         expect(traderAfter.token1).to.be.eq(traderBefore.token1 - 3n);
         expect(poolAfter.token0).to.be.eq(poolBefore.token0 - 1n);
         expect(poolAfter.token1).to.be.eq(poolBefore.token1 + 3n);
+        expect(await plugin0.swapCalldata()).to.be.eq(2000)
+      });
+
+      it('gas cost [ @skip-on-coverage ]', async () => {
+        await snapshotGasCost(exactInputSingle(tokens[1].address, tokens[0].address, ZERO_ADDRESS))
       });
 
       it('gas cost [ @skip-on-coverage ]', async () => {
@@ -586,6 +632,7 @@ describe('SwapRouter', function () {
         const value = inputIsWNativeToken ? amountIn : 0;
 
         const params = {
+          pluginData: pluginDatas[0],
           tokenIn,
           tokenOut,
           deployer: deployer,
@@ -648,6 +695,7 @@ describe('SwapRouter', function () {
         expect(traderAfter.token1).to.be.eq(traderBefore.token1 + 210618n);
         expect(poolAfter.token0).to.be.eq(poolBefore.token0 + 285000n);
         expect(poolAfter.token1).to.be.eq(poolBefore.token1 - 221703n);
+        expect(await plugin0.swapCalldata()).to.be.eq(2000)
       });
 
       it('1 -> 0', async () => {
@@ -716,6 +764,7 @@ describe('SwapRouter', function () {
         const value = inputIsWNativeToken ? amountInMaximum : 0;
 
         const params = {
+          pluginData: pluginDatas,
           path: encodePath(_tokens.slice().reverse()),
           recipient: outputIsWNativeToken ? ZeroAddress : trader.address,
           deadline: 1,
@@ -768,6 +817,7 @@ describe('SwapRouter', function () {
           expect(traderAfter.token1).to.be.eq(traderBefore.token1 + 1n);
           expect(poolAfter.token0).to.be.eq(poolBefore.token0 + 3n);
           expect(poolAfter.token1).to.be.eq(poolBefore.token1 - 1n);
+          expect(await plugin0.swapCalldata()).to.be.eq(2000)
         });
 
         it('1 -> 0', async () => {
@@ -791,6 +841,19 @@ describe('SwapRouter', function () {
           expect(traderAfter.token1).to.be.eq(traderBefore.token1 - 3n);
           expect(poolAfter.token0).to.be.eq(poolBefore.token0 - 1n);
           expect(poolAfter.token1).to.be.eq(poolBefore.token1 + 3n);
+          expect(await plugin0.swapCalldata()).to.be.eq(2000)
+        });
+
+        it('gas cost [ @skip-on-coverage ]', async () => {
+          const pool = await factory.poolByPair(tokens[1].address, tokens[0].address);
+
+          await snapshotGasCost(  
+            exactOutput(
+              path
+                .slice(0, 3)
+                .reverse()
+            )
+          )
         });
 
         it('gas cost [ @skip-on-coverage ]', async () => {
@@ -820,6 +883,8 @@ describe('SwapRouter', function () {
 
           expect(traderAfter.token0).to.be.eq(traderBefore.token0 - 5n);
           expect(traderAfter.token2).to.be.eq(traderBefore.token2 + 1n);
+          expect(await plugin0.swapCalldata()).to.be.eq(1000)
+          expect(await plugin1.swapCalldata()).to.be.eq(2000)
         });
 
         it('2 -> 1 -> 0', async () => {
@@ -831,6 +896,12 @@ describe('SwapRouter', function () {
 
           expect(traderAfter.token2).to.be.eq(traderBefore.token2 - 5n);
           expect(traderAfter.token0).to.be.eq(traderBefore.token0 + 1n);
+          expect(await plugin0.swapCalldata()).to.be.eq(2000)
+          expect(await plugin1.swapCalldata()).to.be.eq(1000)
+        });
+
+        it('gas cost [ @skip-on-coverage ]', async () => {
+          await snapshotGasCost(exactOutput(path.slice().reverse(), 1, 5))
         });
 
         it('gas cost [ @skip-on-coverage ]', async () => {
@@ -969,6 +1040,7 @@ describe('SwapRouter', function () {
         const value = inputIsWNativeToken ? amountInMaximum : 0;
 
         const params = {
+          pluginData: pluginDatas[0],
           tokenIn,
           tokenOut,
           deployer: ZERO_ADDRESS,
@@ -1023,6 +1095,7 @@ describe('SwapRouter', function () {
         expect(traderAfter.token1).to.be.eq(traderBefore.token1 + 1n);
         expect(poolAfter.token0).to.be.eq(poolBefore.token0 + 3n);
         expect(poolAfter.token1).to.be.eq(poolBefore.token1 - 1n);
+        expect(await plugin0.swapCalldata()).to.be.eq(2000)
       });
 
       it('1 -> 0', async () => {
@@ -1042,6 +1115,11 @@ describe('SwapRouter', function () {
         expect(traderAfter.token1).to.be.eq(traderBefore.token1 - 3n);
         expect(poolAfter.token0).to.be.eq(poolBefore.token0 - 1n);
         expect(poolAfter.token1).to.be.eq(poolBefore.token1 + 3n);
+        expect(await plugin0.swapCalldata()).to.be.eq(2000)
+      });
+
+      it('gas cost [ @skip-on-coverage ]', async () => {
+        await snapshotGasCost(exactOutputSingle(tokens[1].address, tokens[0].address))
       });
 
       it('gas cost [ @skip-on-coverage ]', async () => {
@@ -1112,6 +1190,7 @@ describe('SwapRouter', function () {
       it('#sweepTokenWithFee', async () => {
         const amountOutMinimum = 100;
         const params = {
+          pluginData: pluginDatas,
           path: encodePath([tokens[0].address, ZERO_ADDRESS, tokens[1].address]),
           recipient: await router.getAddress(),
           deadline: 1,
@@ -1142,6 +1221,7 @@ describe('SwapRouter', function () {
 
         const amountOutMinimum = 100;
         const params = {
+          pluginData: pluginDatas,
           path: encodePath([tokens[0].address, ZERO_ADDRESS, await wnative.getAddress()]),
           recipient: await router.getAddress(),
           deadline: 1,

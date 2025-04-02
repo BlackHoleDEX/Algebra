@@ -90,6 +90,7 @@ describe('PositionValue', async () => {
         amount0Min: 0,
         amount1Min: 0,
         deadline: 10,
+        pluginData: "0x"
       });
 
       const swapAmount = expandTo18Decimals(1_000);
@@ -98,6 +99,7 @@ describe('PositionValue', async () => {
 
       // accumulate token0 fees
       await router.exactInput({
+        pluginData: ["0x"],
         recipient: wallets[0].address,
         deadline: 1,
         path: encodePath([await tokens[0].getAddress(), ZERO_ADDRESS, await tokens[1].getAddress()]),
@@ -107,6 +109,7 @@ describe('PositionValue', async () => {
 
       // accumulate token1 fees
       await router.exactInput({
+        pluginData: ["0x"],
         recipient: wallets[0].address,
         deadline: 1,
         path: encodePath([await tokens[1].getAddress(), ZERO_ADDRESS, await tokens[0].getAddress()]),
@@ -152,6 +155,7 @@ describe('PositionValue', async () => {
         amount0Min: 0,
         amount1Min: 0,
         deadline: 10,
+        pluginData: "0x"
       });
 
       const principal = await positionValue.principal(nft, 1, sqrtRatioX96);
@@ -172,6 +176,7 @@ describe('PositionValue', async () => {
         amount0Min: 0,
         amount1Min: 0,
         deadline: 10,
+        pluginData: "0x"
       });
 
       const principal = await positionValue.principal(nft, 1, sqrtRatioX96);
@@ -192,6 +197,7 @@ describe('PositionValue', async () => {
         amount0Min: 0,
         amount1Min: 0,
         deadline: 10,
+        pluginData: "0x"
       });
 
       const principal = await positionValue.principal(nft, 1, sqrtRatioX96);
@@ -212,6 +218,7 @@ describe('PositionValue', async () => {
         amount0Min: 0,
         amount1Min: 0,
         deadline: 10,
+        pluginData: "0x"
       });
 
       const principal = await positionValue.principal(nft, 1, sqrtRatioX96);
@@ -232,6 +239,7 @@ describe('PositionValue', async () => {
         amount0Min: 0,
         amount1Min: 0,
         deadline: 10,
+        pluginData: "0x"
       });
 
       const principal = await positionValue.principal(nft, 1, sqrtRatioX96);
@@ -252,6 +260,7 @@ describe('PositionValue', async () => {
         amount0Min: 0,
         amount1Min: 0,
         deadline: 10,
+        pluginData: "0x"
       });
 
       await snapshotGasCost(positionValue.principalGas(nft, 1, sqrtRatioX96));
@@ -277,6 +286,7 @@ describe('PositionValue', async () => {
         amount0Min: 0,
         amount1Min: 0,
         deadline: 10,
+        pluginData: "0x"
       });
     });
 
@@ -294,6 +304,7 @@ describe('PositionValue', async () => {
           amount0Min: 0,
           amount1Min: 0,
           deadline: 10,
+          pluginData: "0x"
         });
 
         const swapAmount = expandTo18Decimals(1_000);
@@ -302,6 +313,7 @@ describe('PositionValue', async () => {
 
         // accumulate token0 fees
         await router.exactInput({
+          pluginData: ["0x"],
           recipient: wallets[0].address,
           deadline: 1,
           path: encodePath([await tokens[0].getAddress(), ZERO_ADDRESS, await tokens[1].getAddress()]),
@@ -311,6 +323,7 @@ describe('PositionValue', async () => {
 
         // accumulate token1 fees
         await router.exactInput({
+          pluginData: ["0x"],
           recipient: wallets[0].address,
           deadline: 1,
           path: encodePath([await tokens[1].getAddress(), ZERO_ADDRESS, await tokens[0].getAddress()]),
@@ -325,6 +338,7 @@ describe('PositionValue', async () => {
           recipient: wallets[0].address,
           amount0Max: MaxUint128,
           amount1Max: MaxUint128,
+          pluginData: "0x"
         });
         const feeAmounts = await positionValue.fees(nft, tokenId);
 
@@ -340,6 +354,7 @@ describe('PositionValue', async () => {
           amount0Min: 0,
           amount1Min: 0,
           deadline: 1,
+          pluginData: "0x"
         });
 
         const swapAmount = expandTo18Decimals(1_000);
@@ -347,6 +362,7 @@ describe('PositionValue', async () => {
 
         // accumulate more token0 fees after clearing initial amount
         await router.exactInput({
+          pluginData: ["0x"],
           recipient: wallets[0].address,
           deadline: 1,
           path: encodePath([await tokens[0].getAddress(), ZERO_ADDRESS, await tokens[1].getAddress()]),
@@ -359,6 +375,7 @@ describe('PositionValue', async () => {
           recipient: wallets[0].address,
           amount0Max: MaxUint128,
           amount1Max: MaxUint128,
+          pluginData: "0x"
         });
         const feeAmounts = await positionValue.fees(nft, tokenId);
         expect(feeAmounts[0]).to.equal(feesFromCollect[0]);
@@ -384,6 +401,7 @@ describe('PositionValue', async () => {
           amount0Min: 0,
           amount1Min: 0,
           deadline: 10,
+          pluginData: "0x"
         });
 
         await tokens[0].approve(router, MaxUint256);
@@ -391,6 +409,7 @@ describe('PositionValue', async () => {
 
         // accumulate token1 fees
         await router.exactInput({
+          pluginData: ["0x"],
           recipient: wallets[0].address,
           deadline: 1,
           path: encodePath([await tokens[1].getAddress(), ZERO_ADDRESS, await tokens[0].getAddress()]),
@@ -400,6 +419,7 @@ describe('PositionValue', async () => {
 
         // accumulate token0 fees and push price below tickLower
         await router.exactInput({
+          pluginData: ["0x"],
           recipient: wallets[0].address,
           deadline: 1,
           path: encodePath([await tokens[0].getAddress(), ZERO_ADDRESS, await tokens[1].getAddress()]),
@@ -414,6 +434,7 @@ describe('PositionValue', async () => {
           recipient: wallets[0].address,
           amount0Max: MaxUint128,
           amount1Max: MaxUint128,
+          pluginData: "0x"
         });
 
         const feeAmounts = await positionValue.fees(nft, tokenId);
@@ -441,6 +462,7 @@ describe('PositionValue', async () => {
           amount0Min: 0,
           amount1Min: 0,
           deadline: 10,
+          pluginData: "0x"
         });
 
         await tokens[0].approve(router, MaxUint256);
@@ -448,6 +470,7 @@ describe('PositionValue', async () => {
 
         // accumulate token0 fees
         await router.exactInput({
+          pluginData: ["0x"],
           recipient: wallets[0].address,
           deadline: 1,
           path: encodePath([await tokens[0].getAddress(), ZERO_ADDRESS, await tokens[1].getAddress()]),
@@ -457,6 +480,7 @@ describe('PositionValue', async () => {
 
         // accumulate token1 fees and push price above tickUpper
         await router.exactInput({
+          pluginData: ["0x"],
           recipient: wallets[0].address,
           deadline: 1,
           path: encodePath([await tokens[1].getAddress(), ZERO_ADDRESS, await tokens[0].getAddress()]),
@@ -471,6 +495,7 @@ describe('PositionValue', async () => {
           recipient: wallets[0].address,
           amount0Max: MaxUint128,
           amount1Max: MaxUint128,
+          pluginData: "0x"
         });
         const feeAmounts = await positionValue.fees(nft, tokenId);
         expect(feeAmounts[0]).to.equal(feesFromCollect[0]);

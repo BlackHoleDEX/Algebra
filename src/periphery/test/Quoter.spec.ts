@@ -118,6 +118,7 @@ describe('Quoter', () => {
           const value = inputIsWNativeToken ? amountIn : 0;
 
           const params = {
+            pluginData: ["0x", "0x"],
             path: encodePath(tokens),
             recipient: outputIsWNativeToken ? ZeroAddress : trader.address,
             deadline: 1,
