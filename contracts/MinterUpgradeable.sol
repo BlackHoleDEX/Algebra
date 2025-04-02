@@ -47,7 +47,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     IVoter public _voter;
     IVotingEscrow public _ve;
     IRewardsDistributor public _rewards_distributor;
-    address public burnTokenAddress;
+    // address public burnTokenAddress;
 
     mapping(uint256 => bool) public proposals;
 
