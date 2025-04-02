@@ -47,7 +47,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     IVoter public _voter;
     IVotingEscrow public _ve;
     IRewardsDistributor public _rewards_distributor;
-    address public burnTokenAddress;
+    // address public burnTokenAddress;
 
     mapping(uint256 => bool) public proposals;
 
@@ -65,7 +65,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
         _initializer = msg.sender;
         team = msg.sender;
         tailEmissionRate = MAX_BPS;
-        burnTokenAddress=0x000000000000000000000000000000000000dEaD;
+        // burnTokenAddress=0x000000000000000000000000000000000000dEaD;
         teamRate = 500; // 500 bps = 5%
         WEEK = BlackTimeLibrary.WEEK;
         LOCK = BlackTimeLibrary.MAX_LOCK_DURATION;
@@ -78,7 +78,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
         weekly = 10_000_000 * 1e18; // represents a starting weekly emission of 10M BLACK (BLACK has 18 decimals)
         isFirstMint = true;
 
-        burnTokenAddress=0x000000000000000000000000000000000000dEaD;
+        // burnTokenAddress=0x000000000000000000000000000000000000dEaD;
     }
 
     function _initialize(
@@ -207,7 +207,7 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
     }
 
     function circulating_supply() public view returns (uint) {
-        return _black.totalSupply() - _black.balanceOf(address(_ve)) - _black.balanceOf(address(burnTokenAddress));
+        return _black.totalSupply() - _black.balanceOf(address(_ve)));
     }
 
     function check() external view returns(bool){
