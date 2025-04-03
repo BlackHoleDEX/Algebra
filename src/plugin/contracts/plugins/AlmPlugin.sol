@@ -36,7 +36,6 @@ abstract contract AlmPlugin is AlgebraBasePlugin, IAlmPlugin {
   function setRebalanceManager(address _rebalanceManager) external {
     // console.log('setRebalanceManager called');
     _authorize();
-    require(_rebalanceManager != address(0), '_rebalanceManager must be non zero address');
     rebalanceManager = _rebalanceManager;
   }
 
