@@ -120,7 +120,7 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
             genesisPool = genesisFactory.createGenesisPool(_sender, nativeToken, _fundingToken);
 
         require(genesisPool != address(0), "0x");
-        assert(IERC20(nativeToken).transferFrom(_sender, genesisPool, allocationInfo.proposedNativeAmount));
+        IERC20(nativeToken).safeTransferFrom(_sender, genesisPool, allocationInfo.proposedNativeAmount);
 
         address auction = auctionFactory.auctions(auctionIndex);
         auction = auction == address(0) ? auctionFactory.auctions(0) : auction;

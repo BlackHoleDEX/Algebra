@@ -104,7 +104,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
             _token = _incentivesToken[i];
             _amount = _incentivesAmount[i];
             if(_token != address(0) && _amount > 0 && (_token == genesisInfo.nativeToken || tokenHandler.isConnector(_token))){
-                assert(IERC20(_token).transferFrom(_sender, address(this), _amount));
+                IERC20(_token).safeTransferFrom(_sender, address(this), _amount);
                 if(incentives[_token] == 0){
                     incentiveTokens.push(_token);
                 }
@@ -139,7 +139,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
         _amount = _amount <= amount ? _amount : amount;
         require(_amount > 0, "max amt");
 
-        assert(IERC20(genesisInfo.fundingToken).transferFrom(spender, address(this), _amount));
+        IERC20(genesisInfo.fundingToken).safeTransferFrom(spender, address(this), _amount);
 
         if(userDeposits[spender] == 0){
             depositers.push(spender);
@@ -191,7 +191,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
             _amount = incentives[incentiveTokens[i]];
             if(_amount > 0)
             {
-                IERC20(incentiveTokens[i]).approve(external_bribe, _amount);
+                IERC20(incentiveTokens[i]).safeApprove(external_bribe, _amount);
                 IBribe(external_bribe).notifyRewardAmount(incentiveTokens[i], _amount);
             }
         }
@@ -218,14 +218,14 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
     }
 
     function _approveTokens(address router) internal {
-        IERC20(genesisInfo.nativeToken).approve(router, allocationInfo.allocatedNativeAmount);
-        IERC20(genesisInfo.fundingToken).approve(router, allocationInfo.allocatedFundingAmount);
+        IERC20(genesisInfo.nativeToken).safeApprove(router, allocationInfo.allocatedNativeAmount);
+        IERC20(genesisInfo.fundingToken).safeApprove(router, allocationInfo.allocatedFundingAmount);
     }
 
     function _addLiquidityAndDistribute(address _router, uint256 nativeDesired, uint256 fundingDesired, uint256 maturityTime) internal {
         (, , uint _liquidity) = IRouter(_router).addLiquidity(genesisInfo.nativeToken, genesisInfo.fundingToken, genesisInfo.stable, nativeDesired, fundingDesired, 0, 0, address(this), block.timestamp + 100);
         liquidity = _liquidity;
-        IERC20(liquidityPoolInfo.pairAddress).approve(liquidityPoolInfo.gaugeAddress, liquidity);
+        IERC20(liquidityPoolInfo.pairAddress).safeApprove(liquidityPoolInfo.gaugeAddress, liquidity);
         IGauge(liquidityPoolInfo.gaugeAddress).depositsForGenesis(genesisInfo.tokenOwner, block.timestamp + maturityTime, liquidity);
     }
 
@@ -278,7 +278,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
         allocationInfo.refundableNativeAmount = 0;
 
         if(_amount > 0){
-            assert(IERC20(genesisInfo.nativeToken).transfer(msg.sender, _amount));
+            IERC20(genesisInfo.nativeToken).safeTransfer(msg.sender, _amount);
         }
     }
 
@@ -289,7 +289,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
         userDeposits[msg.sender] = 0;
 
         if(_amount > 0){
-            assert(IERC20(genesisInfo.fundingToken).transfer(msg.sender, _amount));
+            IERC20(genesisInfo.fundingToken).safeTransfer(msg.sender, _amount);
         }
     }
 
@@ -317,7 +317,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
             _amount = incentives[incentiveTokens[i]];
             incentives[incentiveTokens[i]] = 0;
 
-            assert(IERC20(incentiveTokens[i]).transfer(msg.sender, _amount));
+            IERC20(incentiveTokens[i]).safeTransfer(msg.sender, _amount);
         }
     }
 
