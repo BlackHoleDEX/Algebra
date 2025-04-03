@@ -1,5 +1,5 @@
 import { Wallet, ZeroAddress } from 'ethers';
-import { ethers } from 'hardhat';
+import { ethers, network } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import checkTimepointEquals from './shared/checkTimepointEquals';
 import { expect } from './shared/expect';
@@ -9,6 +9,22 @@ import { PLUGIN_FLAGS, encodePriceSqrt, expandTo18Decimals, getMaxTick, getMinTi
 import { MockPool, MockAlgebraBasePluginALM, MockAlgebraBasePluginALMFactory, MockTimeVirtualPool, MockVault, RebalanceManager, MockRebalanceManager } from '../typechain';
 
 import snapshotGasCost from './shared/snapshotGasCost';
+
+enum DecideStatus {
+  Normal,
+  Special,
+  NoNeed,
+  TooSoon,
+  NoNeedWithPending,
+  ExtremeVolatility
+}
+
+enum State {
+  OverInventory,
+  Normal,
+  UnderInventory,
+  Special
+}
 
 describe('AlgebraBasePluginALM', () => {
   let wallet: Wallet, other: Wallet;
@@ -567,7 +583,7 @@ describe('AlgebraBasePluginALM', () => {
       await mockPool.swapToTick(10);
     });
 
-    it('over -> special (extreme volatility)', async () => {
+    it('over -> special (high volatility)', async () => {
       const defaultConfig = await plugin.defaultPluginConfig();
       await mockPool.setPlugin(plugin);
       await mockPool.setPluginConfig(BigInt(PLUGIN_FLAGS.AFTER_SWAP_FLAG) | defaultConfig);
@@ -581,6 +597,99 @@ describe('AlgebraBasePluginALM', () => {
       await mockVault.setTotalAmounts(8000, 2000);
       await plugin.advanceTime(3600);
       await mockPool.swapToTick(2000);
+    });
+
+    it('no rebalance - extreme volatility', async () => {
+      const defaultConfig = await plugin.defaultPluginConfig();
+      await mockPool.setPlugin(plugin);
+      await mockPool.setPluginConfig(BigInt(PLUGIN_FLAGS.AFTER_SWAP_FLAG) | defaultConfig);
+
+      await initializeAtZeroTick(mockPool);
+      await deployAndSetRebalanceManager();
+      await rebalanceManager.setDecimals(18, 18);
+      await plugin.initializeALM(rebalanceManager, 3600, 300);
+
+      await rebalanceManager.setDepositTokenBalance(10000n);
+      await mockVault.setTotalAmounts(8000, 2000);
+      await plugin.advanceTime(3600);
+      await expect(mockPool.swapToTick(3000)).to.emit(rebalanceManager, 'MockDecideRebalance').withArgs(DecideStatus.ExtremeVolatility, State.Special);
+    });
+
+    it('no rebalance - too soon', async () => {
+      const defaultConfig = await plugin.defaultPluginConfig();
+      await mockPool.setPlugin(plugin);
+      await mockPool.setPluginConfig(BigInt(PLUGIN_FLAGS.AFTER_SWAP_FLAG) | defaultConfig);
+
+      await initializeAtZeroTick(mockPool);
+      await deployAndSetRebalanceManager();
+      await rebalanceManager.setDecimals(18, 18);
+      await plugin.initializeALM(rebalanceManager, 3600, 300);
+
+      await rebalanceManager.setDepositTokenBalance(10000n);
+      await mockVault.setTotalAmounts(8000, 2000);
+      await plugin.advanceTime(3600);
+      await mockPool.swapToTick(100);
+      await plugin.advanceTime(1800);
+      await expect(mockPool.swapToTick(1000)).to.emit(rebalanceManager, 'MockDecideRebalance').withArgs(DecideStatus.TooSoon, State.Special);
+    });
+
+    it('no rebalance - volatility too low', async () => {
+      const defaultConfig = await plugin.defaultPluginConfig();
+      await mockPool.setPlugin(plugin);
+      await mockPool.setPluginConfig(BigInt(PLUGIN_FLAGS.AFTER_SWAP_FLAG) | defaultConfig);
+
+      await initializeAtZeroTick(mockPool);
+      await deployAndSetRebalanceManager();
+      await rebalanceManager.setDecimals(18, 18);
+      await plugin.initializeALM(rebalanceManager, 3600, 300);
+
+      await rebalanceManager.setDepositTokenBalance(10000n);
+      await mockVault.setTotalAmounts(8000, 2000);
+      await plugin.advanceTime(3600);
+      await expect(mockPool.swapToTick(250)).to.emit(rebalanceManager, 'MockDecideRebalance').withArgs(DecideStatus.TooSoon, State.Normal);
+    });
+
+    it('no rebalance - percentageOfDepositTokenUnused too low', async () => {
+      const defaultConfig = await plugin.defaultPluginConfig();
+      await mockPool.setPlugin(plugin);
+      await mockPool.setPluginConfig(BigInt(PLUGIN_FLAGS.AFTER_SWAP_FLAG) | defaultConfig);
+
+      await initializeAtZeroTick(mockPool);
+      await deployAndSetRebalanceManager();
+      await rebalanceManager.setDecimals(18, 18);
+      await plugin.initializeALM(rebalanceManager, 3600, 300);
+
+      // await rebalanceManager.setDepositTokenBalance(0n);
+      await mockVault.setTotalAmounts(9200, 800);
+      await plugin.advanceTime(3600);
+      await mockPool.swapToTick(10);
+      await plugin.advanceTime(7200);
+      await rebalanceManager.advanceTime(7200);
+
+      // await rebalanceManager.setState(1); // normal state
+      await expect(mockPool.swapToTick(11)).to.emit(rebalanceManager, 'MockDecideRebalance').withArgs(DecideStatus.NoNeedWithPending, State.Normal);
+    });
+
+    it('no rebalance - high volatility in the same block', async () => {
+      const defaultConfig = await plugin.defaultPluginConfig();
+      await mockPool.setPlugin(plugin);
+      await mockPool.setPluginConfig(BigInt(PLUGIN_FLAGS.AFTER_SWAP_FLAG) | defaultConfig);
+
+      await initializeAtZeroTick(mockPool);
+      await deployAndSetRebalanceManager();
+      await rebalanceManager.setDecimals(18, 18);
+      await plugin.initializeALM(rebalanceManager, 3600, 300);
+
+      await rebalanceManager.setDepositTokenBalance(10000n);
+      await mockVault.setTotalAmounts(8000, 2000);
+      await plugin.advanceTime(3600);
+      await rebalanceManager.advanceTime(3600);
+      await network.provider.send("evm_setAutomine", [false]);
+      // https://github.com/NomicFoundation/hardhat/issues/4090
+      await mockPool.swapToTick(1, { gasLimit: 2000000 });
+      const tx = await mockPool.swapToTick(2000, { gasLimit: 2000000 });
+      await network.provider.send("evm_mine");
+      await expect(tx).to.emit(rebalanceManager, 'MockDecideRebalance').withArgs(DecideStatus.TooSoon, State.Special);
     });
   });
 

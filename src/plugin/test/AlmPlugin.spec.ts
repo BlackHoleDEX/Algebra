@@ -139,7 +139,7 @@ describe('#AlmPlugin', () => {
 				const slowTick = 0n;
 				const fastTick = 0n;
 
-				await almPlugin.setDecimals(6, 18);
+				await almPlugin.setDecimals(18, 18);
 
 				await mockVault.setTotalAmounts(
 					BigInt(state.usedToken0),

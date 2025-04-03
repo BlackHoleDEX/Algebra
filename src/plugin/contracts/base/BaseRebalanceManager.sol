@@ -14,7 +14,7 @@ import '../interfaces/IRebalanceManager.sol';
 
 import './AlgebraBasePlugin.sol';
 
-// import 'hardhat/console.sol';
+import 'hardhat/console.sol';
 
 abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
   bytes32 public constant ALGEBRA_BASE_PLUGIN_MANAGER = keccak256('ALGEBRA_BASE_PLUGIN_MANAGER');
@@ -185,19 +185,20 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
   function obtainTWAPAndRebalance(int24 currentTick, int24 slowTwapTick, int24 fastTwapTick, uint32 lastBlockTimestamp) external {
     // console.log('entered obtainTWAPAndRebalance');
     TwapResult memory twapResult = _obtainTWAPs(currentTick, slowTwapTick, fastTwapTick, lastBlockTimestamp);
-    // console.log("TWAP RESULT START");
-    // console.log(twapResult.currentPriceAccountingDecimals);
-    // console.log(twapResult.slowAvgPriceAccountingDecimals);
-    // console.log(twapResult.fastAvgPriceAccountingDecimals);
-    // console.log(twapResult.totalPairedInDeposit);
-    // console.log(twapResult.totalDepositToken);
-    // console.log(twapResult.totalPairedToken);
-    // console.logInt(twapResult.currentTick);
-    // console.log(twapResult.percentageOfDepositTokenUnused);
-    // console.log(twapResult.percentageOfDepositToken);
-    // console.log(twapResult.failedToObtainTWAP);
-    // console.log(twapResult.sameBlock);
-    // console.log("TWAP RESULT END");
+    console.log("TWAP RESULT START");
+    console.log('twapResult.currentPriceAccountingDecimals: ', twapResult.currentPriceAccountingDecimals);
+    console.log('twapResult.slowAvgPriceAccountingDecimals: ', twapResult.slowAvgPriceAccountingDecimals);
+    console.log('twapResult.fastAvgPriceAccountingDecimals: ', twapResult.fastAvgPriceAccountingDecimals);
+    console.log('twapResult.totalPairedInDeposit: ', twapResult.totalPairedInDeposit);
+    console.log('twapResult.totalDepositToken: ', twapResult.totalDepositToken);
+    console.log('twapResult.totalPairedToken :', twapResult.totalPairedToken);
+    console.logInt(twapResult.currentTick);
+    console.log('twapResult.percentageOfDepositTokenUnused: ', twapResult.percentageOfDepositTokenUnused);
+    console.log('twapResult.percentageOfDepositToken: ', twapResult.percentageOfDepositToken);
+    console.log('twapResult.failedToObtainTWAP: ', twapResult.failedToObtainTWAP);
+    console.log('twapResult.sameBlock: ', twapResult.sameBlock);
+    console.log("TWAP RESULT END");
+    console.log('blocknumber: ', block.number);
     _rebalance(twapResult);
   }
 
@@ -206,9 +207,9 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
     if (vault == address(0)) return;
 
     (DecideStatus decideStatus, State newState) = _decideRebalance(obtainTWAPsResult);
-    // console.log('rebalance entered');
-    // console.log('decide status: ', uint256(decideStatus));
-    // console.log('newState: ', uint256(newState));
+    console.log('rebalance entered');
+    console.log('decide status: ', uint256(decideStatus));
+    console.log('newState: ', uint256(newState));
 
     if (decideStatus == DecideStatus.NoNeed || decideStatus == DecideStatus.TooSoon) return;
 
@@ -273,6 +274,8 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
     twapResult.failedToObtainTWAP = false;
 
     twapResult.currentTick = currentTick;
+    console.log('_blockTimestamp(): ', _blockTimestamp());
+    console.log('lastBlockTimestamp: ', lastBlockTimestamp);
     twapResult.sameBlock = _blockTimestamp() == lastBlockTimestamp;
     bool _allowToken1 = allowToken1;
     // console.log("allowToken1: ", allowToken1);
@@ -335,7 +338,7 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
     // console.log('4');
 
     uint256 depositTokenBalance = _getDepositTokenVaultBalance();
-    // console.log('depositTokenBalance: ', depositTokenBalance);
+    console.log('depositTokenBalance: ', depositTokenBalance);
 
     if (depositTokenBalance > 0) {
       uint256 totalTokensAmount = twapResult.totalDepositToken + twapResult.totalPairedInDeposit;
@@ -346,17 +349,18 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
     }
   }
 
-  function _decideRebalance(TwapResult memory twapResult) internal returns (DecideStatus, State) {
+  function _decideRebalance(TwapResult memory twapResult) internal virtual returns (DecideStatus, State) {
     uint256 fastSlowDiff = _calcPercentageDiff(twapResult.fastAvgPriceAccountingDecimals, twapResult.slowAvgPriceAccountingDecimals);
     uint256 fastCurrentDiff = _calcPercentageDiff(twapResult.fastAvgPriceAccountingDecimals, twapResult.currentPriceAccountingDecimals);
-    // console.log('fastSlowDiff: ', fastSlowDiff);
-    // console.log('fastCurrentDiff: ', fastCurrentDiff);
-    // console.log("thresholds.extremeVolatility: ", thresholds.extremeVolatility);
+    console.log('fastSlowDiff: ', fastSlowDiff);
+    console.log('fastCurrentDiff: ', fastCurrentDiff);
+    console.log("thresholds.extremeVolatility: ", thresholds.extremeVolatility);
 
     bool isExtremeVolatility = fastSlowDiff >= thresholds.extremeVolatility || fastCurrentDiff >= thresholds.extremeVolatility;
     if (!isExtremeVolatility) {
       bool isHighVolatility = fastSlowDiff >= thresholds.highVolatility || fastCurrentDiff >= thresholds.highVolatility;
-      // console.log('thresholds.highVolatility: ', thresholds.highVolatility);
+      console.log('thresholds.highVolatility: ', thresholds.highVolatility);
+      console.log('isHighVolatility: ', isHighVolatility);
       if (!isHighVolatility) {
         // console.log('lastRebalanceCurrentPrice: ', lastRebalanceCurrentPrice);
         if (
@@ -364,18 +368,25 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
             lastRebalanceCurrentPrice != 0 &&
             twapResult.percentageOfDepositToken < thresholds.underInventoryThreshold - thresholds.dtrDelta)
         ) {
+          console.log('111');
+          console.log(_blockTimestamp());
+          console.log(lastRebalanceTimestamp);
+          console.log(minTimeBetweenRebalances);
           if (_blockTimestamp() < lastRebalanceTimestamp + minTimeBetweenRebalances) {
             return (DecideStatus.TooSoon, State.Special);
           }
 
           (bool needToRebalance, State newState) = _updateStatus(twapResult);
-          // console.log('needToRebalance: ', needToRebalance);
-          // console.log('newState: ', uint256(newState));
+          console.log('needToRebalance: ', needToRebalance);
+          console.log('newState: ', uint256(newState));
           if (needToRebalance) {
+            console.log('fastCurrentDiff: ', fastCurrentDiff);
+            console.log('thresholds.someVolatility: ', thresholds.someVolatility);
             if (fastCurrentDiff < thresholds.someVolatility) {
               // console.log('fastCurrentDiff < thresholds.someVolatility');
               return (DecideStatus.Normal, newState); // normal rebalance
             } else {
+              console.log('mi tutt?????');
               return (DecideStatus.TooSoon, newState); // too soon
             }
           } else {
@@ -389,16 +400,19 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
           // Проверяем, что сейчас Status != SPECIAL, иначе - ребаланс не делается
 
           if (fastCurrentDiff >= thresholds.someVolatility && twapResult.sameBlock) {
+            console.log('fastCurrentDiff >= thresholds.someVolatility && twapResult.sameBlock');
             // Если fastCurrentDiff >= _someVolatility (low? - 1%):
             // Проверяем, что последний timepoint был записан не в том же блоке, в котором мы исполняем транзакцию, иначе - ребаланс не делается
             return (DecideStatus.TooSoon, State.Special);
           }
         } else {
           // special -> noneed
+          console.log('mi je tut, right?');
           return (DecideStatus.NoNeed, State.Special);
         }
       }
       state = State.Special;
+      console.log('special special????');
       return (DecideStatus.Special, State.Special);
     } else {
       // Если fastSlowDiff >= _extremeVolatility ИЛИ fastCurrentDiff => _extremeVolatility (25%), то считаем, что сейчас экстремальная волатильность и ребаланс не делается
@@ -406,11 +420,15 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
     }
   }
 
-  function _updateStatus(TwapResult memory twapResult) internal view returns (bool, State) {
+  function _updateStatus(TwapResult memory twapResult) internal virtual returns (bool, State) {
     // console.log('twapResult.percentageOfDepositToken: ', twapResult.percentageOfDepositToken);
     // console.log('thresholds.underInventoryThreshold: ', thresholds.underInventoryThreshold);
+    console.log('entered updateStatus');
+    console.log('lastRebalanceCurrentPrice: ', lastRebalanceCurrentPrice);
+    console.log('state: ', uint16(state));
     if (state != State.Special && lastRebalanceCurrentPrice != 0) {
       if (state != State.Normal) {
+        console.log('state != State.OverInventory: ', state != State.OverInventory);
         if (state != State.OverInventory) {
           if (twapResult.percentageOfDepositToken <= thresholds.simulate) {
             // if less than 93%
@@ -428,6 +446,7 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
             return (true, State.OverInventory);
           }
         } else if (twapResult.percentageOfDepositToken >= thresholds.underInventoryThreshold) {
+          console.log('else if (twapResult.percentageOfDepositToken >= thresholds.underInventoryThreshold)');
           // if greater than 77%
           if (twapResult.percentageOfDepositToken <= thresholds.overInventoryThreshold) {
             // if less than 91% (REBALANCE TO NORMAL)
@@ -471,6 +490,7 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
       if (twapResult.percentageOfDepositTokenUnused <= thresholds.depositTokenUnusedThreshold) {
         // if less than 1%
         // console.log('twapResult.percentageOfDepositTokenUnused <= thresholds.depositTokenUnusedThreshold');
+        console.log('twapResult.percentageOfDepositTokenUnused <= thresholds.depositTokenUnusedThreshold????');
         return (false, State.Normal); // no rebalance needed
       } else {
         // CASES:
