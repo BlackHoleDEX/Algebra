@@ -53,6 +53,8 @@ contract MockPool is IAlgebraPoolActions, IAlgebraPoolPermissionedActions, IAlge
   /// @inheritdoc IAlgebraPoolState
   address public override plugin;
 
+  address public factory;
+
   address public override communityVault;
 
   /// @inheritdoc IAlgebraPoolState

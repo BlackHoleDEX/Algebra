@@ -10,6 +10,7 @@ contract RebalanceManager is BaseRebalanceManager {
     // TODO: добавить require'ов
     vault = _vault;
     pool = IAlgebraVault(vault).pool();
+    factory = IAlgebraPool(pool).factory();
 
     tickSpacing = IAlgebraPool(pool).tickSpacing();
 
