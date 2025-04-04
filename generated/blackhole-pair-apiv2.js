@@ -1,4 +1,4 @@
-const blackholePairAPIV2Address = "0x1D4fEb4fCf6B1529FE5920EF2155e64340E1dE23";
+const blackholePairAPIV2Address = "0x927093851E9ABCd6C8bCDbC2E5635a5D3a7927d6";
 
 const blackholePairAPIV2Abi = [
   {
@@ -105,19 +105,6 @@ const blackholePairAPIV2Abi = [
   {
     "inputs": [],
     "name": "MAX_REWARDS",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "WEEK",
     "outputs": [
       {
         "internalType": "uint256",
@@ -256,6 +243,11 @@ const blackholePairAPIV2Abi = [
             "type": "uint256"
           },
           {
+            "internalType": "uint256",
+            "name": "total_emissions",
+            "type": "uint256"
+          },
+          {
             "internalType": "address",
             "name": "emissions_token",
             "type": "address"
@@ -368,6 +360,11 @@ const blackholePairAPIV2Abi = [
             "internalType": "struct BlackholePairAPIV2.Bribes",
             "name": "external_bribes",
             "type": "tuple"
+          },
+          {
+            "internalType": "bool",
+            "name": "isGenesisRunning",
+            "type": "bool"
           }
         ],
         "internalType": "struct BlackholePairAPIV2.pairInfo[]",
@@ -396,7 +393,7 @@ const blackholePairAPIV2Abi = [
         "type": "address"
       }
     ],
-    "name": "getAmountOut1",
+    "name": "getAmountOut",
     "outputs": [
       {
         "components": [
@@ -564,6 +561,11 @@ const blackholePairAPIV2Abi = [
             "type": "uint256"
           },
           {
+            "internalType": "uint256",
+            "name": "total_emissions",
+            "type": "uint256"
+          },
+          {
             "internalType": "address",
             "name": "emissions_token",
             "type": "address"
@@ -676,6 +678,11 @@ const blackholePairAPIV2Abi = [
             "internalType": "struct BlackholePairAPIV2.Bribes",
             "name": "external_bribes",
             "type": "tuple"
+          },
+          {
+            "internalType": "bool",
+            "name": "isGenesisRunning",
+            "type": "bool"
           }
         ],
         "internalType": "struct BlackholePairAPIV2.pairInfo",

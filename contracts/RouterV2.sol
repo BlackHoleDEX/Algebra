@@ -10,10 +10,6 @@
 
 pragma solidity 0.8.13;
 
-interface IPairGenerator {
-    function pairCodeHash() external pure returns (bytes32);
-}
-
 
 interface IBaseV1Factory {
     function allPairsLength() external view returns (uint);
@@ -92,10 +88,8 @@ contract RouterV2 {
     }
 
     address public immutable factory;
-    address public immutable pairGenerator;
     IWETH public immutable wETH;
     uint internal constant MINIMUM_LIQUIDITY = 10**3;
-    bytes32 immutable pairCodeHash;
     
     // swap event for the referral system
     event Swap(address indexed sender,uint amount0In,address _tokenIn, address indexed to, bool stable);  
@@ -105,10 +99,8 @@ contract RouterV2 {
         _;
     }
 
-    constructor(address _factory, address _pairGenerator, address _wETH) {
+    constructor(address _factory, address _wETH) {
         factory = _factory;
-        pairGenerator = _pairGenerator;
-        pairCodeHash = IPairGenerator(_pairGenerator).pairCodeHash();
         wETH = IWETH(_wETH);
     }
 
@@ -155,6 +147,11 @@ contract RouterV2 {
             amountVolatile = IBaseV1Pair(pair).getAmountOut(amountIn, tokenIn);
         }
         return amountStable > amountVolatile ? (amountStable, true) : (amountVolatile, false);
+    }
+
+    function getPoolAmountOut(uint amountIn, address tokenIn, address pair) public view returns (uint amount) {
+        uint amountOut = IBaseV1Pair(pair).getAmountOut(amountIn, tokenIn);
+        return amountOut;
     }
 
     // performs chained getAmountOut calculations on any number of pairs

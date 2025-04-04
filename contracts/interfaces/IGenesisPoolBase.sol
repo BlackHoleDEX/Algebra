@@ -3,7 +3,6 @@ pragma solidity 0.8.13;
 
 interface IGenesisPoolBase {
     struct TokenAllocation {
-        address tokenOwner;
         uint256 proposedNativeAmount;
         uint256 proposedFundingAmount;
         uint256 allocatedNativeAmount;
@@ -18,11 +17,12 @@ interface IGenesisPoolBase {
     }
 
     struct GenesisInfo{
+        address tokenOwner;
         address nativeToken;
         address fundingToken;
         bool stable;
         uint256 duration;
-        uint8 threshold; // multiplied by 100 to support 2 decimals
+        uint256 threshold; // multiplied by 100 to support 2 decimals
         uint256 supplyPercent; 
         uint256 startPrice;
         uint256 startTime;
@@ -44,16 +44,5 @@ interface IGenesisPoolBase {
         LAUNCH,
         PARTIALLY_LAUNCHED,
         NOT_QUALIFIED
-    }
-
-    struct LaunchPoolInfo {
-        address nativeToken;
-        address fundingToken;
-        address poolAddress;
-        address gaugeAddress;
-        uint256 nativeDesired;
-        uint256 fundingDesired;
-        bool stable;
-        address tokenOwner;
     }
 }

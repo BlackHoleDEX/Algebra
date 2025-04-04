@@ -1,4 +1,4 @@
-const routerV2Address = "0x9063A6E4ea4121F3215b82138BA0dEf743c281D4";
+const routerV2Address = "0x832775970dfE3841b26DddE47bE0015EC31e979C";
 
 const routerV2Abi = [
   {
@@ -6,11 +6,6 @@ const routerV2Abi = [
       {
         "internalType": "address",
         "name": "_factory",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_pairGenerator",
         "type": "address"
       },
       {
@@ -329,6 +324,35 @@ const routerV2Abi = [
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "amountIn",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "tokenIn",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "pair",
+        "type": "address"
+      }
+    ],
+    "name": "getPoolAmountOut",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "tokenA",
         "type": "address"
@@ -402,19 +426,6 @@ const routerV2Abi = [
       {
         "internalType": "address",
         "name": "pair",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "pairGenerator",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
         "type": "address"
       }
     ],

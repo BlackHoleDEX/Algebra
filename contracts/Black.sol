@@ -79,4 +79,24 @@ contract Black is IBlack {
         return true;
     }
 
+    function burn(uint256 value) external returns (bool) {
+        _burn(msg.sender, value);
+        return true;
+    }
+
+    function burnFrom(address _from, uint _value) external returns (bool) {
+        uint allowed_from = allowance[_from][msg.sender];
+        if (allowed_from != type(uint).max) {
+            allowance[_from][msg.sender] -= _value;
+        }
+        _burn(_from, _value);
+        return true;
+    }
+
+    function _burn(address _from, uint _amount) internal returns (bool) {
+        totalSupply -= _amount;
+        balanceOf[_from] -= _amount;
+        emit Transfer(_from, address(0x0), _amount);
+        return true;
+    }
 }

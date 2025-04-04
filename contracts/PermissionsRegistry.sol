@@ -63,6 +63,8 @@ contract PermissionsRegistry {
         _roles.push(bytes("GENESIS_MANAGER"));
         _checkRole[(bytes("GENESIS_MANAGER"))] = true;
 
+        _roles.push(bytes("EPOCH_MANAGER"));
+        _checkRole[(bytes("EPOCH_MANAGER"))] = true;
     }
 
     modifier onlyBlackMultisig() {

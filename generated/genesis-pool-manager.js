@@ -1,4 +1,4 @@
-const genesisPoolManagerAddress = "0xD0E4161E5c1cA6a83Aa39d3BfA4b03CbB0d11bCF";
+const genesisPoolManagerAddress = "0x7B7Af039ad5915a36b5c0363b7fe862B074911bE";
 
 const genesisPoolManagerAbi = [
   {
@@ -122,6 +122,32 @@ const genesisPoolManagerAbi = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "WEEK",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "active_period",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -142,6 +168,19 @@ const genesisPoolManagerAbi = [
         "internalType": "contract IAuctionFactory",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "check",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -196,9 +235,9 @@ const genesisPoolManagerAbi = [
             "type": "uint256"
           },
           {
-            "internalType": "uint8",
+            "internalType": "uint256",
             "name": "threshold",
-            "type": "uint8"
+            "type": "uint256"
           },
           {
             "internalType": "uint256",
@@ -327,6 +366,19 @@ const genesisPoolManagerAbi = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "getLiveNaitveTokens",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -372,6 +424,25 @@ const genesisPoolManagerAbi = [
     "name": "initialize",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "liveNativeTokens",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {

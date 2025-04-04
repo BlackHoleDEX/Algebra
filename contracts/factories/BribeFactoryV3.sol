@@ -24,6 +24,7 @@ contract BribeFactoryV3 is OwnableUpgradeable {
     address[] public defaultRewardToken;
 
     IPermissionsRegistry public permissionsRegistry;
+    address public tokenHandler;
 
     modifier onlyAllowed() {
         require(owner() == msg.sender || permissionsRegistry.hasRole("BRIBE_ADMIN",msg.sender), 'ERR: BRIBE_ADMIN');
@@ -31,7 +32,7 @@ contract BribeFactoryV3 is OwnableUpgradeable {
     }
 
     constructor() {}
-    function initialize(address _voter, address _permissionsRegistry) initializer  public {
+    function initialize(address _voter, address _permissionsRegistry, address _tokenHandler) initializer  public {
         __Ownable_init();   //after deploy ownership to multisig
         voter = _voter;
         
@@ -46,6 +47,7 @@ contract BribeFactoryV3 is OwnableUpgradeable {
 
         // registry to check accesses
         permissionsRegistry = IPermissionsRegistry(_permissionsRegistry);
+        tokenHandler = _tokenHandler;
 
     }
 
@@ -55,12 +57,7 @@ contract BribeFactoryV3 is OwnableUpgradeable {
     function createBribe(address _owner,address _token0,address _token1, string memory _type) external returns (address) {
         require(msg.sender == voter || msg.sender == owner(), 'only voter');
 
-        Bribe lastBribe = new Bribe(_owner,voter,address(this), _type);
-
-        if(_token0 != address(0)) lastBribe.addRewardToken(_token0);  
-        if(_token1 != address(0)) lastBribe.addRewardToken(_token1); 
-
-        lastBribe.addRewardTokens(defaultRewardToken);      
+        Bribe lastBribe = new Bribe(_owner,voter,address(this), tokenHandler, _token0, _token1, _type); 
          
         last_bribe = address(lastBribe);
         _bribes.push(last_bribe);
@@ -90,6 +87,12 @@ contract BribeFactoryV3 is OwnableUpgradeable {
         require(owner() == msg.sender, 'not owner');
         require(_permReg != address(0));
         permissionsRegistry = IPermissionsRegistry(_permReg);
+    }
+
+    function setTokenHandler(address _tokenHandler) external {
+        require(owner() == msg.sender, 'not owner');
+        require(_tokenHandler != address(0));
+        tokenHandler = _tokenHandler;
     }
 
     /// @notice set the bribe factory permission registry

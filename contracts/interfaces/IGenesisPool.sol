@@ -11,7 +11,7 @@ interface IGenesisPool {
     function poolStatus() external view returns (IGenesisPoolBase.PoolStatus);
     function userDeposits(address _user) external view returns (uint256);
 
-    function setGenesisPoolInfo(IGenesisPoolBase.GenesisInfo calldata _genesisInfo, IGenesisPoolBase.TokenAllocation calldata _allocationInfo) external;
+    function setGenesisPoolInfo(IGenesisPoolBase.GenesisInfo calldata _genesisInfo, IGenesisPoolBase.TokenAllocation calldata _allocationInfo, address auction) external;
     function rejectPool() external;
     function approvePool(address _pairAddress) external;
     function depositToken(address spender, uint256 amount) external returns (bool);
@@ -23,6 +23,7 @@ interface IGenesisPool {
     function deductAmount(address account, uint256 amount) external;
     function deductAllAmount(address account) external;
     function setAuction(address _auction) external;
+    function getNativeTokenAmount(uint256 depositAmount) external view returns (uint256);
 
     function launch(address router, uint256 maturityTime) external;
 }

@@ -43,11 +43,9 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
     uint256 internal index;                                        // gauge index
     uint256 public maxVotingNum;
-    uint256 internal constant DURATION = 7 days;                   // rewards are released over 7 days
-    uint256 public VOTE_DELAY;                                     // delay between votes in seconds
-    uint256 public constant MAX_VOTE_DELAY = 7 days;               // Max vote delay allowed
-    uint public constant EPOCH_DURATION = 1800; //BlackHole:: Current duration need to change 1 week
-     uint256 internal constant MIN_VOTING_NUM = 10;
+    uint public EPOCH_DURATION;
+    uint256 internal constant MIN_OF_MAX_VOTING_NUM = 10;
+    uint256 internal constant MIN_VOTING_NUM = 10;
 
     mapping(address => uint256) internal supplyIndex;              // gauge    => index
     mapping(address => uint256) public claimable;                  // gauge    => claimable $the
@@ -112,8 +110,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         tokenHandler = _tokenHandler;
         genesisManager = address(0);
         maxVotingNum = 30;
-
-        VOTE_DELAY = 0;
+        EPOCH_DURATION = BlackTimeLibrary.WEEK;
         initflag = false;
     }
 
@@ -159,14 +156,6 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     --------------------------------------------------------------------------------
     --------------------------------------------------------------------------------
     ----------------------------------------------------------------------------- */
-
-    /// @notice set vote delay in seconds
-    function setVoteDelay(uint256 _delay) external VoterAdmin {
-        require(_delay != VOTE_DELAY, "already set");
-        require(_delay <= MAX_VOTE_DELAY, "max delay");
-        emit SetVoteDelay(VOTE_DELAY, _delay);
-        VOTE_DELAY = _delay;
-    }
     
 
     /// @notice Set a new Minter
@@ -280,8 +269,10 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     function replaceFactory(address _pairFactory, address _gaugeFactory, uint256 _pos) external VoterAdmin {
         require(_pairFactory != address(0), 'addr0');
         require(_gaugeFactory != address(0), 'addr0');
-        require(isFactory[_pairFactory], '!fact');
-        require(isGaugeFactory[_gaugeFactory], '!gFact');
+        require(!isFactory[_pairFactory], 'fact');
+        require(!isGaugeFactory[_gaugeFactory], 'gFact');
+        require(_pairFactory.code.length > 0, "!contract");
+        require(_gaugeFactory.code.length > 0, "!contract");
         address oldPF = _factories[_pos];
         address oldGF = _gaugeFactories[_pos];
         isFactory[oldPF] = false;
@@ -335,7 +326,9 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         }
         claimable[_gauge] = 0;
 
-        // Do we need to decrease totalWeight also. For now It's being commented out. 
+        // We shouldn't update totalWeight because if we decrease it other pools will get more emission while in current scenario 
+        // emissionAmount of killed gauge will get transferred back to Minter
+        // We're decreasing totalWeight in case of Reset functionality while resetting vote from killed gauge.
         //totalWeight = totalWeight - weights[poolForGauge[_gauge]];
         emit GaugeKilled(_gauge);
     }
@@ -386,8 +379,8 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
                 IBribe(internal_bribes[gauges[_pool]]).withdraw(uint256(_votes), _tokenId);
                 IBribe(external_bribes[gauges[_pool]]).withdraw(uint256(_votes), _tokenId);
 
-                // if is alive remove _votes, else don't because we already done it in killGauge()
-                if(isAlive[gauges[_pool]]) _totalWeight += _votes;
+                // decrease totalWeight irrespective of gauge is killed/alive for this current pool
+                _totalWeight += _votes;
                 
                 emit Abstained(_tokenId, _votes);
             }
@@ -504,26 +497,6 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         }
     }
 
-    // /// @notice claim bribes rewards given an address
-    // function claimBribes(address[] memory _bribes, address[][] memory _tokens) external {
-    //     for (uint256 i = 0; i < _bribes.length; i++) {
-    //         IBribe(_bribes[i]).getRewardForAddress(msg.sender, _tokens[i]);
-    //     }
-    // }
-
-    /// @notice claim fees rewards given an address
-    // function claimFees(address[] memory _bribes, address[][] memory _tokens) external {
-    //     for (uint256 i = 0; i < _bribes.length; i++) {
-    //         IBribe(_bribes[i]).getRewardForAddress(msg.sender, _tokens[i]);
-    //     }
-    // }    
-
-  
-    /// @notice check if user can vote
-    // function _voteDelay(uint256 _tokenId) internal view {
-    //     require(block.timestamp > lastVoted[_tokenId] + VOTE_DELAY, "ERR: VOTE_DELAY");
-    // }
-
     modifier onlyNewEpoch(uint256 _tokenId) {
         // ensure new epoch since last vote
         if (BlackTimeLibrary.epochStart(block.timestamp) <= lastVoted[_tokenId]) revert("voted");
@@ -569,7 +542,6 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         require(_gaugeType < _factories.length, "gaugetype");
         require(gauges[_pool] == address(0x0), "!exists");
         require(_pool.code.length > 0, "!contract");
-
         bool isPair;
         address _factory = _factories[_gaugeType];
         address _gaugeFactory = _gaugeFactories[_gaugeType];
@@ -595,12 +567,10 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
             //isPair = false;
         }
 
-        // gov can create for any pool, even non-Black pairs
-        if (!IPermissionsRegistry(permissionRegistry).hasRole("GOVERNANCE",msg.sender)) { 
-            require(isPair, "!_pool");
-            require(!ITokenHandler(tokenHandler).isWhitelisted(tokenA) && !ITokenHandler(tokenHandler).isWhitelisted(tokenB), "!whitelisted");
-            require(tokenA != address(0) && tokenB != address(0), "!pair.tokens");
-        }
+        require(ITokenHandler(tokenHandler).isWhitelisted(tokenA) && ITokenHandler(tokenHandler).isWhitelisted(tokenB), "!whitelisted");
+        require(ITokenHandler(tokenHandler).isConnector(tokenA) || ITokenHandler(tokenHandler).isConnector(tokenB), "!connector");
+        require(isPair, "!_pool");
+        require(tokenA != address(0) && tokenB != address(0), "!pair.tokens");
 
         // create internal and external bribe
         address _owner = IPermissionsRegistry(permissionRegistry).blackTeamMultisig();
@@ -771,12 +741,15 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         if (_supplied > 0) {
             uint256 _supplyIndex = supplyIndex[_gauge];
             uint256 _index = index; // get global index0 for accumulated distro
+            // SupplyIndex will be updated for Killed Gauges as well so we don't need to udpate index while reviving gauge.
             supplyIndex[_gauge] = _index; // update _gauge current position to global position
             uint256 _delta = _index - _supplyIndex; // see if there is any difference that need to be accrued
             if (_delta > 0) {
                 uint256 _share = _supplied * _delta / 1e18; // add accrued difference for each supplied token
                 if (isAlive[_gauge]) {
                     claimable[_gauge] += _share;
+                } else {
+                    IERC20Upgradeable(base).safeTransfer(minter, _share); // send rewards back to Minter so they're not stuck in Voter
                 }
             }
         } else {

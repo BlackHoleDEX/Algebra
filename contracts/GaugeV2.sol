@@ -10,6 +10,7 @@ import './interfaces/IPair.sol';
 import './interfaces/IBribe.sol';
 import "./libraries/Math.sol";
 import './interfaces/IGenesisPool.sol';
+import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
 
 interface IRewarder {
     function onReward(
@@ -43,8 +44,8 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     uint256 public lastUpdateTime;
     uint256 public rewardPerTokenStored;
 
-    address public genesisManager;
     address public genesisPool;
+    address public genesisManager;
 
     mapping(address => uint256) public userRewardPerTokenPaid;
     mapping(address => uint256) public rewards;
@@ -79,7 +80,12 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     }
 
     modifier onlyGenesisPool() {
-        require(msg.sender == genesisPool, "!= genesisManager");
+        require(msg.sender == genesisPool, "!= genesisPool");
+        _;
+    }
+
+    modifier onlyGenesisManager() {
+        require(msg.sender == genesisManager, "!= genesisManager");
         _;
     }
 
@@ -93,7 +99,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
         VE = _ve;                               // vested
         TOKEN = IERC20(_token);                 // underlying (LP)
         DISTRIBUTION = _distribution;           // distro address (voter)
-        DURATION = 1800;                      // BlachHole:: temperory value need to chage it back to 7 days
+        DURATION = BlackTimeLibrary.WEEK;                   
 
         internal_bribe = _internal_bribe;       // lp fees goes here
         external_bribe = _external_bribe;       // bribe fees goes here
@@ -312,7 +318,9 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
         uint256 gaugeDeduction =  _amount - genesisDeduction;
 
         _balances[msg.sender] = _balances[msg.sender] - gaugeDeduction;
-        IGenesisPool(genesisPool).deductAmount(msg.sender, genesisDeduction);
+        if(genesisPool != address(0)){
+            IGenesisPool(genesisPool).deductAmount(msg.sender, genesisDeduction);
+        }
     }
 
     ///@notice withdraw all TOKEN and harvest rewardToken
@@ -365,12 +373,7 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
     --------------------------------------------------------------------------------
     ----------------------------------------------------------------------------- */
 
-    /// BLACKHOLE: need to change duration for testing purpose currently 20 minutes
-    function setRewardDuration(uint256 _duration) external {
-        DURATION = _duration;
-    }
-
-    function setGenesisPool(address _genesisPool) external onlyGenesisPool{
+    function setGenesisPool(address _genesisPool) external onlyGenesisManager{
         genesisPool = _genesisPool;
     }
 
@@ -419,19 +422,16 @@ contract GaugeV2 is ReentrancyGuard, Ownable {
             (address _token0, address _token1) = IPair(_token).tokens();
 
             if (_fees0  > 0) {
-                IERC20(_token0).approve(internal_bribe, 0);
-                IERC20(_token0).approve(internal_bribe, _fees0);
+                IERC20(_token0).safeApprove(internal_bribe, 0);
+                IERC20(_token0).safeApprove(internal_bribe, _fees0);
                 IBribe(internal_bribe).notifyRewardAmount(_token0, _fees0);
             } 
             if (_fees1  > 0) {
-                IERC20(_token1).approve(internal_bribe, 0);
-                IERC20(_token1).approve(internal_bribe, _fees1);
+                IERC20(_token1).safeApprove(internal_bribe, 0);
+                IERC20(_token1).safeApprove(internal_bribe, _fees1);
                 IBribe(internal_bribe).notifyRewardAmount(_token1, _fees1);
             } 
             emit ClaimFees(msg.sender, claimed0, claimed1);
         }
     }
-
-
-
 }

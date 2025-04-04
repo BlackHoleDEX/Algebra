@@ -27,6 +27,12 @@ contract FixedAuction is IGenesisPoolBase, IAuction, OwnableUpgradeable {
         return (depositAmount * tokenAllocation.proposedNativeAmount) / tokenAllocation.proposedFundingAmount;
     }
 
+    function getFundingTokenAmount(uint256 depositAmount) external view returns (uint256){
+        address genesisPool = msg.sender;
+        TokenAllocation memory tokenAllocation = IGenesisPool(genesisPool).getAllocationInfo();
+        return (depositAmount * tokenAllocation.proposedFundingAmount) / tokenAllocation.proposedNativeAmount;
+    }
+
     function purchased(uint256 amount) external {
 
     }

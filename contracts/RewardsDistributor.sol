@@ -5,6 +5,7 @@ import './libraries/Math.sol';
 import './interfaces/IERC20.sol';
 import './interfaces/IRewardsDistributor.sol';
 import './interfaces/IVotingEscrow.sol';
+import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
 
 /*
 
@@ -28,12 +29,11 @@ contract RewardsDistributor is IRewardsDistributor {
         uint max_epoch
     );
 
-    uint constant WEEK = 1800;
+    uint256 public WEEK;
 
     uint public start_time;
     uint public time_cursor;
     mapping(uint => uint) public time_cursor_of;
-    mapping(uint => uint) public user_epoch_of;
 
     uint public last_token_time;
     uint[1000000000000000] public tokens_per_week;
@@ -46,6 +46,7 @@ contract RewardsDistributor is IRewardsDistributor {
     address public depositor;
 
     constructor(address _voting_escrow) {
+        WEEK = BlackTimeLibrary.WEEK;
         uint _t = block.timestamp / WEEK * WEEK;
         start_time = _t;
         last_token_time = _t;
@@ -100,22 +101,6 @@ contract RewardsDistributor is IRewardsDistributor {
         _checkpoint_token();
     }
 
-    function _find_timestamp_epoch(address ve, uint _timestamp) internal view returns (uint) {
-        uint _min = 0;
-        uint _max = IVotingEscrow(ve).epoch();
-        for (uint i = 0; i < 128; i++) {
-            if (_min >= _max) break;
-            uint _mid = (_min + _max + 2) / 2;
-            IVotingEscrow.Point memory pt = IVotingEscrow(ve).point_history(_mid);
-            if (pt.ts <= _timestamp) {
-                _min = _mid;
-            } else {
-                _max = _mid - 1;
-            }
-        }
-        return _min;
-    }
-
     function _find_timestamp_user_epoch(address ve, uint tokenId, uint _timestamp, uint max_user_epoch) internal view returns (uint) {
         uint _min = 0;
         uint _max = max_user_epoch;
@@ -140,35 +125,7 @@ contract RewardsDistributor is IRewardsDistributor {
         return Math.max(uint(int256(pt.bias - pt.slope * (int128(int256(_timestamp - pt.ts)))) + int256(pt.permanent + pt.smNFT + pt.smNFTBonus)), 0);
     }
 
-    function _checkpoint_total_supply() internal {
-        address ve = voting_escrow;
-        uint t = time_cursor;
-        uint rounded_timestamp = block.timestamp / WEEK * WEEK;
-        IVotingEscrow(ve).checkpoint();
-
-        for (uint i = 0; i < 20; i++) {
-            if (t > rounded_timestamp) {
-                break;
-            } else {
-                uint epoch = _find_timestamp_epoch(ve, t);
-                IVotingEscrow.Point memory pt = IVotingEscrow(ve).point_history(epoch);
-                int128 dt = 0;
-                if (t > pt.ts) {
-                    dt = int128(int256(t - pt.ts));
-                }
-                ve_supply[t] = Math.max(uint(int256(pt.bias - pt.slope * dt) + int256(pt.permanent + pt.smNFT + pt.smNFTBonus)), 0);
-            }
-            t += WEEK;
-        }
-        time_cursor = t;
-    }
-
-    function checkpoint_total_supply() external {
-        _checkpoint_total_supply();
-    }
-
     function _claim(uint _tokenId, address ve, uint _last_token_time) internal returns (uint) {
-        uint user_epoch = 0;
         uint to_distribute = 0;
 
         uint max_user_epoch = IVotingEscrow(ve).user_point_epoch(_tokenId);
@@ -178,44 +135,31 @@ contract RewardsDistributor is IRewardsDistributor {
 
         uint week_cursor = time_cursor_of[_tokenId];
         if (week_cursor == 0) {
-            user_epoch = _find_timestamp_user_epoch(ve, _tokenId, _start_time, max_user_epoch);
-        } else {
-            user_epoch = user_epoch_of[_tokenId];
+            IVotingEscrow.Point memory user_point = IVotingEscrow(ve).user_point_history(_tokenId, 1);
+            week_cursor = user_point.ts / WEEK * WEEK;
         }
 
-        if (user_epoch == 0) user_epoch = 1;
-
-        IVotingEscrow.Point memory user_point = IVotingEscrow(ve).user_point_history(_tokenId, user_epoch);
-
-        if (week_cursor == 0) week_cursor = user_point.ts / WEEK * WEEK;
         if (week_cursor >= last_token_time) return 0;
         if (week_cursor < _start_time) week_cursor = _start_time;
 
-        IVotingEscrow.Point memory old_user_point;
         uint supply;
 
         for (uint i = 0; i < 50; i++) {
             if (week_cursor >= _last_token_time) break;
-
-            int128 dt = int128(int256(week_cursor + WEEK - 1 - old_user_point.ts));
-            uint balance_of = Math.max(uint(int256(old_user_point.bias - dt * old_user_point.slope + int256(old_user_point.permanent + old_user_point.smNFT + old_user_point.smNFTBonus))), 0);
-            supply = ve_supply[week_cursor];
+            uint balance_of = IVotingEscrow(ve).balanceOfNFTAt(_tokenId, week_cursor + WEEK - 1);
+            supply = IVotingEscrow(ve).totalSupplyAtT(week_cursor + WEEK - 1);
             supply = supply == 0 ? 1 : supply;
             to_distribute += balance_of * tokens_per_week[week_cursor] / supply;
             week_cursor += WEEK;
         }
-
-        user_epoch = Math.min(max_user_epoch, user_epoch - 1);
-        user_epoch_of[_tokenId] = user_epoch;
         time_cursor_of[_tokenId] = week_cursor;
 
-        emit Claimed(_tokenId, to_distribute, user_epoch, max_user_epoch);
+        emit Claimed(_tokenId, to_distribute, week_cursor, max_user_epoch);
 
         return to_distribute;
     }
 
     function _claimable(uint _tokenId, address ve, uint _last_token_time) internal view returns (uint) {
-        uint user_epoch = 0;
         uint to_distribute = 0;
 
         uint max_user_epoch = IVotingEscrow(ve).user_point_epoch(_tokenId);
@@ -225,28 +169,18 @@ contract RewardsDistributor is IRewardsDistributor {
 
         uint week_cursor = time_cursor_of[_tokenId];
         if (week_cursor == 0) {
-            user_epoch = _find_timestamp_user_epoch(ve, _tokenId, _start_time, max_user_epoch);
-        } else {
-            user_epoch = user_epoch_of[_tokenId];
+            IVotingEscrow.Point memory user_point = IVotingEscrow(ve).user_point_history(_tokenId, 1);
+            week_cursor = user_point.ts / WEEK * WEEK;
         }
 
-        if (user_epoch == 0) user_epoch = 1;
-
-        IVotingEscrow.Point memory user_point = IVotingEscrow(ve).user_point_history(_tokenId, user_epoch);
-
-        if (week_cursor == 0) week_cursor = user_point.ts / WEEK * WEEK;
         if (week_cursor >= last_token_time) return 0;
         if (week_cursor < _start_time) week_cursor = _start_time;
-
-        IVotingEscrow.Point memory old_user_point;
         uint supply;
 
         for (uint i = 0; i < 50; i++) {
             if (week_cursor >= _last_token_time) break;
-
-            int128 dt = int128(int256(week_cursor + WEEK - 1 - old_user_point.ts));
-            uint balance_of = Math.max(uint(int256(old_user_point.bias - dt * old_user_point.slope + int256(old_user_point.permanent + old_user_point.smNFT + old_user_point.smNFTBonus))), 0);
-            supply = ve_supply[week_cursor];
+            uint balance_of = IVotingEscrow(ve).balanceOfNFTAt(_tokenId, week_cursor + WEEK - 1);
+            supply = IVotingEscrow(ve).totalSupplyAtT(week_cursor + WEEK - 1);
             supply = supply == 0 ? 1 : supply;
             to_distribute += balance_of * tokens_per_week[week_cursor] / supply;
             week_cursor += WEEK;
@@ -261,7 +195,6 @@ contract RewardsDistributor is IRewardsDistributor {
     }
 
     function claim(uint _tokenId) external returns (uint) {
-        if (block.timestamp >= time_cursor) _checkpoint_total_supply();
         uint _last_token_time = last_token_time;
         _last_token_time = _last_token_time / WEEK * WEEK;
         uint amount = _claim(_tokenId, voting_escrow, _last_token_time);
@@ -280,7 +213,6 @@ contract RewardsDistributor is IRewardsDistributor {
     }
 
     function claim_many(uint[] memory _tokenIds) external returns (bool) {
-        if (block.timestamp >= time_cursor) _checkpoint_total_supply();
         uint _last_token_time = last_token_time;
         _last_token_time = _last_token_time / WEEK * WEEK;
         address _voting_escrow = voting_escrow;

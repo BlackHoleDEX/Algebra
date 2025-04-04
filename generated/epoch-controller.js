@@ -1,4 +1,4 @@
-const epochControllerAddress = "0x00d98F583925044df21832AEd1f306ccdE172500";
+const epochControllerAddress = "0x7bF82007c3f1B7bDfA8e07ed3Db8A1d00f1CaFE4";
 
 const epochControllerAbi = [
   {
@@ -95,6 +95,43 @@ const epochControllerAbi = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "automationRegistry2",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes",
+        "name": "",
+        "type": "bytes"
+      }
+    ],
+    "name": "checkUpPrekeep",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "preUpkeepNeeded",
+        "type": "bool"
+      },
+      {
+        "internalType": "bytes",
+        "name": "",
+        "type": "bytes"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "bytes",
@@ -113,6 +150,19 @@ const epochControllerAbi = [
         "internalType": "bytes",
         "name": "",
         "type": "bytes"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "genesisManager",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -170,6 +220,19 @@ const epochControllerAbi = [
         "type": "bytes"
       }
     ],
+    "name": "performPreUpkeep",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes",
+        "name": "",
+        "type": "bytes"
+      }
+    ],
     "name": "performUpkeep",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -191,6 +254,32 @@ const epochControllerAbi = [
       }
     ],
     "name": "setAutomationRegistry",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_automationRegistry2",
+        "type": "address"
+      }
+    ],
+    "name": "setAutomationRegistry2",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_genesisManager",
+        "type": "address"
+      }
+    ],
+    "name": "setGenesisManager",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

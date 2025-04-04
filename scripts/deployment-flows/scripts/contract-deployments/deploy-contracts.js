@@ -117,11 +117,11 @@ const deployPairFactory = async (pairGeneratorAddress) => {
     
 }
 
-const deployRouterV2 = async(pairFactoryAddress, pairGeneratorAddress) => {
+const deployRouterV2 = async(pairFactoryAddress) => {
     try {
         const wETH = '0x4200000000000000000000000000000000000006'
         const routerV2Contract = await ethers.getContractFactory("RouterV2");
-        const routerV2 = await routerV2Contract.deploy(pairFactoryAddress, pairGeneratorAddress, wETH);
+        const routerV2 = await routerV2Contract.deploy(pairFactoryAddress, wETH);
         txDeployed = await routerV2.deployed();
         console.log("routerV2 address: ", routerV2.address)
         generateConstantFile("RouterV2", routerV2.address);
@@ -177,7 +177,7 @@ const deployVotingEscrow = async(blackAddress) =>{
         generateConstantFile("VotingEscrow", veBlack.address);
         return veBlack.address;
     } catch (error) {
-        console.log("error in deploying veArtProxy: ", error);
+        console.log("error in deploying deployVotingEscrow: ", error);
         process.exit(1);
     }
     
@@ -274,10 +274,10 @@ const createGauges = async(voterV3Address, blackholeV2AbiAddress) => {
     console.log('done creation of gauge tx\n')
 }
 
-const deployBribeV3Factory = async (permissionRegistryAddress) => {
+const deployBribeV3Factory = async (permissionRegistryAddress, tokenHandlerAddress) => {
     try {
         const bribeContractFactory = await ethers.getContractFactory("BribeFactoryV3");
-        const input = [ZERO_ADDRESS, permissionRegistryAddress]
+        const input = [ZERO_ADDRESS, permissionRegistryAddress, tokenHandlerAddress]
         const BribeFactoryV3 = await upgrades.deployProxy(bribeContractFactory, input, {initializer: 'initialize'});
         const txDeployed = await BribeFactoryV3.deployed();
         console.log('deployed bribefactory v3: ', BribeFactoryV3.address)
@@ -340,20 +340,16 @@ const initializeMinter = async (minterUpgradableAddress) => {
     }
 }
 
-const deployEpochController = async(voterV3Address, minterUpgradableAddress) =>{
+const deployEpochController = async(minterUpgradableAddress, voterV3Address, permissionRegistryAddress) =>{
     try {
         data = await ethers.getContractFactory("EpochController");
-        const inputs = [voterV3Address, minterUpgradableAddress];
+        const inputs = [minterUpgradableAddress, voterV3Address, permissionRegistryAddress];
         const EpochController = await upgrades.deployProxy(data, inputs, {initializer: 'initialize'});
         txDeployed = await EpochController.deployed();
 
         console.log('deployed EpochController: ', EpochController.address);
         generateConstantFile("EpochController", EpochController.address);
-
-        // await EpochController.setVoter(voterV3Address);
-        // console.log('Voter set in EpochController');
-        // await EpochController.setMinter(minterUpgradableAddress);
-        // console.log('minter set in EpochController\n');
+        
         return EpochController.address;
     } catch (error) {
         console.log("error in deploying EpochController: ", error);
@@ -361,10 +357,11 @@ const deployEpochController = async(voterV3Address, minterUpgradableAddress) =>{
     }
 }
 
-const setChainLinkAddress = async (epocControllerAddress, chainlinkAutomationRegistryAddress) => {
+const setChainLinkAddress = async (epocControllerAddress, chainlinkAutomationAddress1, chainlinkAutomationAddress2) => {
     try{
         const epochController = await ethers.getContractAt(epochControllerAbi, epocControllerAddress);
-        await epochController.setAutomationRegistry(chainlinkAutomationRegistryAddress);
+        await epochController.setAutomationRegistry(chainlinkAutomationAddress1);
+        await epochController.setAutomationRegistry2(chainlinkAutomationAddress2);
         console.log("setChainLinkAddress succes\n");
     } catch(error){
         console.log("setChainLinkAddress failed: ", error);
@@ -481,10 +478,10 @@ const deployAuctionFacotry = async (fixedAuctionAddress) => {
     }
 }
 
-const deployGenesisFactory = async (tokenHandlerAddress, voterV3Address) => {
+const deployGenesisFactory = async (tokenHandlerAddress) => {
     try {
         data = await ethers.getContractFactory("GenesisPoolFactory");
-        input = [tokenHandlerAddress, voterV3Address] 
+        input = [tokenHandlerAddress] 
         const genesisFactory = await upgrades.deployProxy(data, input, {initializer: 'initialize', gasLimit:210000000});
         const txDeployed = await genesisFactory.deployed();
 
@@ -552,7 +549,7 @@ const setGenesisPoolManagerInVoter = async(voterV3Address, genesisManagerAddress
 
 const setGenesisPoolManagerInPairFactory = async(pairFactoryAddress, genesisManagerAddress) => {
     try {
-        const PairFactoryContract = await ethers.getContractAt(pairFactoryUpgradeableAbi, pairFactoryAddress);
+        const PairFactoryContract = await ethers.getContractAt(pairFactoryAbi, pairFactoryAddress);
         await PairFactoryContract.setGenesisManager(genesisManagerAddress);
         console.log("set genesis manager in pair factory\n");
     } catch (error) {
@@ -560,6 +557,17 @@ const setGenesisPoolManagerInPairFactory = async(pairFactoryAddress, genesisMana
         process.exit(1);
     }
 };
+
+const setGenesisPoolManagerInEpochController = async (epochControllerAddress, genesisManagerAddress) => {
+    try {
+        const EpochControllerContract = await ethers.getContractAt(epochControllerAbi, epochControllerAddress);
+        await EpochControllerContract.setGenesisManager(genesisManagerAddress);
+        console.log("set genesis manager in epoch controller\n");
+    } catch (error) {
+        console.log("error genesis manager in epoch controller", error);
+        process.exit(1);
+    }
+}
 
 const deployGenesisApi = async (genesisManagerAddress, genesisFactoryAddress) => {
     try {
@@ -572,6 +580,21 @@ const deployGenesisApi = async (genesisManagerAddress, genesisFactoryAddress) =>
         generateConstantFile("GenesisPoolAPI", genesisApi.address);
     } catch (error) {
         console.log('error genesis pool API  ', error);
+        process.exit(1);
+    }
+}
+
+const deployTokenApi = async (tokenHandlerAddress) => {
+    try {
+        data = await ethers.getContractFactory("TokenAPI");
+        input = [tokenHandlerAddress] 
+        const tokenApi = await upgrades.deployProxy(data, input, {initializer: 'initialize', gasLimit:210000000});
+        txDeployed = await tokenApi.deployed();
+
+        console.log('deployed token API address: ', tokenApi.address);
+        generateConstantFile("TokenAPI", tokenApi.address);
+    } catch (error) {
+        console.log('error Token API  ', error);
         process.exit(1);
     }
 }
@@ -632,7 +655,7 @@ async function main () {
     const pairFactoryAddress = await deployPairFactory(pairGeneratorAddress);
 
     //deploy router V2
-    const routerV2Address = await deployRouterV2(pairFactoryAddress, pairGeneratorAddress);
+    const routerV2Address = await deployRouterV2(pairFactoryAddress);
 
     // setDibs
     await setDibs(pairFactoryAddress);
@@ -641,7 +664,7 @@ async function main () {
     const votingEscrowAddress = await deployVotingEscrow(blackAddress);
     
     //deploy bribeV3
-    const bribeV3Address = await deployBribeV3Factory(permissionRegistryAddress);
+    const bribeV3Address = await deployBribeV3Factory(permissionRegistryAddress, tokenHandlerAddress);
 
     //deploygaugeV2
     const gaugeV2Address = await deployGaugeV2Factory(permissionRegistryAddress);
@@ -681,14 +704,14 @@ async function main () {
     await setMinterInRewardDistributer(minterUpgradableAddress, rewardsDistributorAddress); //set as depositor
 
     // deploy epoch controller here.
-    const epochControllerAddress = await deployEpochController(voterV3Address, minterUpgradableAddress);
+    const epochControllerAddress = await deployEpochController(minterUpgradableAddress, voterV3Address, permissionRegistryAddress);
 
     // set chainlink address
     // TODO: separate out the setting of chalink address 
-    await setChainLinkAddress(epochControllerAddress, "0xb2C2f24FcC2478f279B6B566419a739FA53c70D3");
+    await setChainLinkAddress(epochControllerAddress, "0xBD3152De270D307d0720b434F75F80af6EE5a380", "0xa92967bB3C05dbB31FDcD779C81c86d623544A95");
 
-    //add black to user Address
-    await addBlackToUserAddress(minterUpgradableAddress);
+    // //add black to user Address
+    // await addBlackToUserAddress(minterUpgradableAddress);
 
     //set voterV3 in voting escrow
     await setVoterV3InVotingEscrow(voterV3Address, votingEscrowAddress);
@@ -707,7 +730,7 @@ async function main () {
     const auctionFactoryAddress = await deployAuctionFacotry(fixedAuctionAddress);
 
     //deploy genesisFactory
-    const genesisFactoryAddress = await deployGenesisFactory(tokenHandlerAddress, voterV3Address);
+    const genesisFactoryAddress = await deployGenesisFactory(tokenHandlerAddress);
 
     //deploy genesisManager
     const genesisManagerAddress = await deployGenesisManager(epochControllerAddress, routerV2Address, permissionRegistryAddress, voterV3Address, pairFactoryAddress, genesisFactoryAddress, auctionFactoryAddress, tokenHandlerAddress);
@@ -724,8 +747,14 @@ async function main () {
     //set genesisManager in pairFactory
     await setGenesisPoolManagerInPairFactory(pairFactoryAddress, genesisManagerAddress);
 
+    //set genesisManager in epochController
+    await setGenesisPoolManagerInEpochController(epochControllerAddress, genesisManagerAddress);
+
     //deploy GenesisApi
     await deployGenesisApi(genesisManagerAddress, genesisFactoryAddress);
+
+    //deploy GenesisApi
+    await deployTokenApi(tokenHandlerAddress);
 
     // await checker(routerV2Address, pairFactoryAddress);
 

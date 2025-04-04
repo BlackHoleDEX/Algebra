@@ -1,4 +1,4 @@
-const voterV3Address = "0x42683C41d87c09EA707C6C48BB2BB365632F67Ae";
+const voterV3Address = "0x0b4DdAcCa3A2d8574ae17F52987b273Ab1DEA46d";
 
 const voterV3Abi = [
   {
@@ -381,32 +381,6 @@ const voterV3Abi = [
   {
     "inputs": [],
     "name": "EPOCH_DURATION",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "MAX_VOTE_DELAY",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "VOTE_DELAY",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1438,19 +1412,6 @@ const voterV3Abi = [
       }
     ],
     "name": "setPermissionsRegistry",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_delay",
-        "type": "uint256"
-      }
-    ],
-    "name": "setVoteDelay",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
