@@ -92,6 +92,11 @@ export default {
       chainId: 84532,
       accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
     },
+    base: {
+      url: `https://base-mainnet.public.blastapi.io`,
+      chainId: 8453,
+      accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
+    },
     maticMainnet: {
       url: `https://rpc-mainnet.matic.quiknode.pro`,
       chainId: 137,
