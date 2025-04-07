@@ -73,7 +73,7 @@ describe('NonfungiblePositionManager', () => {
 
   beforeEach('load fixture', async () => {
     ({ nft, factory, tokens, wnative, router } = await loadFixture(nftFixture));
-    pluginData = AbiCoder.defaultAbiCoder().encode(['uint24', 'uint128'], [2000, 10000])
+    pluginData = "0x"
     poolAddress = computePoolAddress(await factory.poolDeployer(), [
       await tokens[0].getAddress(),
       await tokens[1].getAddress(),
@@ -303,6 +303,7 @@ describe('NonfungiblePositionManager', () => {
     });
 
     it('pass data to plugin', async () => {
+      pluginData = AbiCoder.defaultAbiCoder().encode(['uint24', 'uint128'], [2000, 10000])
       await nft.createAndInitializePoolIfNecessary(
         tokens[0].getAddress(),
         tokens[1].getAddress(),
@@ -568,6 +569,7 @@ describe('NonfungiblePositionManager', () => {
     });
 
     it('pass data to plugin', async () => {
+      pluginData = AbiCoder.defaultAbiCoder().encode(['uint24', 'uint128'], [2000, 10000])
       await nft.createAndInitializePoolIfNecessary(
         tokens[0].getAddress(),
         tokens[1].getAddress(),
@@ -764,6 +766,7 @@ describe('NonfungiblePositionManager', () => {
     });
 
     it('pass data to plugin', async () => {
+      pluginData = AbiCoder.defaultAbiCoder().encode(['uint24', 'uint128'], [2000, 10000])
       await nft.createAndInitializePoolIfNecessary(
         tokens[0].getAddress(),
         tokens[1].getAddress(),

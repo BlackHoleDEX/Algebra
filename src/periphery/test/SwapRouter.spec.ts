@@ -137,8 +137,7 @@ describe('SwapRouter', function () {
     // encoded 10000, 100000
 
     pluginDatas = [
-      AbiCoder.defaultAbiCoder().encode(['uint24', 'uint128'], [2000, 10000]),
-      AbiCoder.defaultAbiCoder().encode(['uint24', 'uint128'], [1000, 10001])
+      "0x","0x"
     ];
     
     getBalances = async (who: string | MockTimeSwapRouter) => {
@@ -267,7 +266,6 @@ describe('SwapRouter', function () {
           expect(traderAfter.token1).to.be.eq(traderBefore.token1 + 1n);
           expect(poolAfter.token0).to.be.eq(poolBefore.token0 + 3n);
           expect(poolAfter.token1).to.be.eq(poolBefore.token1 - 1n);
-          expect(await plugin0.swapCalldata()).to.be.eq(2000)
         });
 
         it('1 -> 0', async () => {
@@ -291,6 +289,15 @@ describe('SwapRouter', function () {
           expect(traderAfter.token1).to.be.eq(traderBefore.token1 - 3n);
           expect(poolAfter.token0).to.be.eq(poolBefore.token0 - 1n);
           expect(poolAfter.token1).to.be.eq(poolBefore.token1 + 3n);
+        });
+
+        it('0 -> 1 with plugin data', async () => { 
+          pluginDatas = [
+            AbiCoder.defaultAbiCoder().encode(['uint24', 'uint128'], [2000, 10000]),
+            AbiCoder.defaultAbiCoder().encode(['uint24', 'uint128'], [1000, 10001])
+          ];
+
+          await exactInput(path.slice(0, 3));
           expect(await plugin0.swapCalldata()).to.be.eq(2000)
         });
       });
@@ -310,8 +317,6 @@ describe('SwapRouter', function () {
 
           expect(traderAfter.token0).to.be.eq(traderBefore.token0 - 5n);
           expect(traderAfter.token2).to.be.eq(traderBefore.token2 + 1n);
-          expect(await plugin0.swapCalldata()).to.be.eq(2000)
-          expect(await plugin1.swapCalldata()).to.be.eq(1000)
         });
 
         it('2 -> 1 -> 0', async () => {
@@ -323,6 +328,17 @@ describe('SwapRouter', function () {
 
           expect(traderAfter.token2).to.be.eq(traderBefore.token2 - 5n);
           expect(traderAfter.token0).to.be.eq(traderBefore.token0 + 1n);
+
+        });
+
+        it('2 -> 1 -> 0 with plugin data', async () => {
+          pluginDatas = [
+            AbiCoder.defaultAbiCoder().encode(['uint24', 'uint128'], [2000, 10000]),
+            AbiCoder.defaultAbiCoder().encode(['uint24', 'uint128'], [1000, 10001])
+          ];
+
+          await exactInput(path.slice().reverse(), 5, 1);
+
           expect(await plugin0.swapCalldata()).to.be.eq(1000)
           expect(await plugin1.swapCalldata()).to.be.eq(2000)
         });
@@ -523,7 +539,6 @@ describe('SwapRouter', function () {
         expect(traderAfter.token1).to.be.eq(traderBefore.token1 + 1n);
         expect(poolAfter.token0).to.be.eq(poolBefore.token0 + 3n);
         expect(poolAfter.token1).to.be.eq(poolBefore.token1 - 1n);
-        expect(await plugin0.swapCalldata()).to.be.eq(2000)
       });
 
       it('1 -> 0', async () => {
@@ -543,6 +558,16 @@ describe('SwapRouter', function () {
         expect(traderAfter.token1).to.be.eq(traderBefore.token1 - 3n);
         expect(poolAfter.token0).to.be.eq(poolBefore.token0 - 1n);
         expect(poolAfter.token1).to.be.eq(poolBefore.token1 + 3n);
+      });
+
+      it('1 -> 0 with plugin data', async () => {
+        pluginDatas = [
+          AbiCoder.defaultAbiCoder().encode(['uint24', 'uint128'], [2000, 10000]),
+          AbiCoder.defaultAbiCoder().encode(['uint24', 'uint128'], [1000, 10001])
+        ];
+
+        await exactInputSingle(tokens[1].address, tokens[0].address, ZERO_ADDRESS);
+
         expect(await plugin0.swapCalldata()).to.be.eq(2000)
       });
 
@@ -687,7 +712,6 @@ describe('SwapRouter', function () {
         expect(traderAfter.token1).to.be.eq(traderBefore.token1 + 210618n);
         expect(poolAfter.token0).to.be.eq(poolBefore.token0 + 285000n);
         expect(poolAfter.token1).to.be.eq(poolBefore.token1 - 221703n);
-        expect(await plugin0.swapCalldata()).to.be.eq(2000)
       });
 
       it('1 -> 0', async () => {
@@ -707,6 +731,17 @@ describe('SwapRouter', function () {
         expect(traderAfter.token1).to.be.eq(traderBefore.token1 - 300000n);
         expect(poolAfter.token0).to.be.eq(poolBefore.token0 - 221703n);
         expect(poolAfter.token1).to.be.eq(poolBefore.token1 + 285000n);
+      });
+
+      it('1 -> 0 with pluginData', async () => {
+        pluginDatas = [
+          AbiCoder.defaultAbiCoder().encode(['uint24', 'uint128'], [2000, 10000]),
+          AbiCoder.defaultAbiCoder().encode(['uint24', 'uint128'], [1000, 10001])
+        ];
+
+        await exactInputSingleSupportingFeeOnTransferTokens(tokens[1].address, tokens[0].address, ZERO_ADDRESS);
+
+        expect(await plugin0.swapCalldata()).to.be.eq(2000)
       });
 
       it('gas cost [ @skip-on-coverage ]', async () => {
@@ -809,7 +844,6 @@ describe('SwapRouter', function () {
           expect(traderAfter.token1).to.be.eq(traderBefore.token1 + 1n);
           expect(poolAfter.token0).to.be.eq(poolBefore.token0 + 3n);
           expect(poolAfter.token1).to.be.eq(poolBefore.token1 - 1n);
-          expect(await plugin0.swapCalldata()).to.be.eq(2000)
         });
 
         it('1 -> 0', async () => {
@@ -833,12 +867,20 @@ describe('SwapRouter', function () {
           expect(traderAfter.token1).to.be.eq(traderBefore.token1 - 3n);
           expect(poolAfter.token0).to.be.eq(poolBefore.token0 - 1n);
           expect(poolAfter.token1).to.be.eq(poolBefore.token1 + 3n);
+        });
+
+        it('0 -> 1 with plugin data', async () => {
+          pluginDatas = [
+            AbiCoder.defaultAbiCoder().encode(['uint24', 'uint128'], [2000, 10000]),
+            AbiCoder.defaultAbiCoder().encode(['uint24', 'uint128'], [1000, 10001])
+          ];
+
+          await exactOutput(path.slice(0, 3));
+
           expect(await plugin0.swapCalldata()).to.be.eq(2000)
         });
 
         it('gas cost [ @skip-on-coverage ]', async () => {
-          const pool = await factory.poolByPair(tokens[1].address, tokens[0].address);
-
           await snapshotGasCost(  
             exactOutput(
               path
@@ -863,8 +905,6 @@ describe('SwapRouter', function () {
 
           expect(traderAfter.token0).to.be.eq(traderBefore.token0 - 5n);
           expect(traderAfter.token2).to.be.eq(traderBefore.token2 + 1n);
-          expect(await plugin0.swapCalldata()).to.be.eq(1000)
-          expect(await plugin1.swapCalldata()).to.be.eq(2000)
         });
 
         it('2 -> 1 -> 0', async () => {
@@ -876,6 +916,15 @@ describe('SwapRouter', function () {
 
           expect(traderAfter.token2).to.be.eq(traderBefore.token2 - 5n);
           expect(traderAfter.token0).to.be.eq(traderBefore.token0 + 1n);
+        });
+
+        it('2 -> 1 -> 0 with plugin data', async () => {
+          pluginDatas = [
+            AbiCoder.defaultAbiCoder().encode(['uint24', 'uint128'], [2000, 10000]),
+            AbiCoder.defaultAbiCoder().encode(['uint24', 'uint128'], [1000, 10001])
+          ];
+          await exactOutput(path.slice().reverse(), 1, 5);
+
           expect(await plugin0.swapCalldata()).to.be.eq(2000)
           expect(await plugin1.swapCalldata()).to.be.eq(1000)
         });
@@ -1071,7 +1120,6 @@ describe('SwapRouter', function () {
         expect(traderAfter.token1).to.be.eq(traderBefore.token1 + 1n);
         expect(poolAfter.token0).to.be.eq(poolBefore.token0 + 3n);
         expect(poolAfter.token1).to.be.eq(poolBefore.token1 - 1n);
-        expect(await plugin0.swapCalldata()).to.be.eq(2000)
       });
 
       it('1 -> 0', async () => {
@@ -1091,6 +1139,15 @@ describe('SwapRouter', function () {
         expect(traderAfter.token1).to.be.eq(traderBefore.token1 - 3n);
         expect(poolAfter.token0).to.be.eq(poolBefore.token0 - 1n);
         expect(poolAfter.token1).to.be.eq(poolBefore.token1 + 3n);
+      });
+
+      it('1 -> 0', async () => {
+        pluginDatas = [
+          AbiCoder.defaultAbiCoder().encode(['uint24', 'uint128'], [2000, 10000]),
+          AbiCoder.defaultAbiCoder().encode(['uint24', 'uint128'], [1000, 10001])
+        ]
+        await exactOutputSingle(tokens[1].address, tokens[0].address);
+
         expect(await plugin0.swapCalldata()).to.be.eq(2000)
       });
 
