@@ -1133,15 +1133,15 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         require(canSplit[msg.sender] || canSplit[address(0)], "SplitNotAllowed");
         require(attachments[_from] == 0 && !voted[_from], "attach");
         require(_isApprovedOrOwner(msg.sender, _from), "NotApprovedOrOwner");
-        LockedBalance memory newLocked = locked[_from];
+        IVotingEscrow.LockedBalance memory newLocked = locked[_from];
         require(newLocked.end > block.timestamp || newLocked.isPermanent, "lock exp");
         int128 _splitAmount =  int128(int256(_amount));
         require(_splitAmount != 0, "ZeroAmount");
         require(newLocked.amount > _splitAmount, "AmountTooBig");
 
         _burn(_from);
-        locked[_from] = LockedBalance(0, 0, false, false);
-        _checkpoint(_from, newLocked, LockedBalance(0, 0, false, false));
+        locked[_from] = IVotingEscrow.LockedBalance(0, 0, false, false);
+        _checkpoint(_from, newLocked, IVotingEscrow.LockedBalance(0, 0, false, false));
 
         newLocked.amount -= _splitAmount;
         _tokenId1 = _createSplitNFT(msg.sender, newLocked);
@@ -1161,10 +1161,10 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         );
     }
 
-    function _createSplitNFT(address _to, LockedBalance memory _newLocked) private returns (uint256 _tokenId) {
+    function _createSplitNFT(address _to, IVotingEscrow.LockedBalance memory _newLocked) private returns (uint256 _tokenId) {
         _tokenId = ++tokenId;
         locked[_tokenId] = _newLocked;
-        _checkpoint(_tokenId, LockedBalance(0, 0, false, false), _newLocked);
+        _checkpoint(_tokenId, IVotingEscrow.LockedBalance(0, 0, false, false), _newLocked);
         _mint(_to, _tokenId);
     }
 
