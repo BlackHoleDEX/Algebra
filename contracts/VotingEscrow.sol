@@ -1137,6 +1137,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         uint _from,
         uint _amount
     ) external nonreentrant returns (uint256 _tokenId1, uint256 _tokenId2) {
+        address owner = idToOwner[_from];
         require(canSplit[msg.sender] || canSplit[address(0)], "SplitNotAllowed");
         require(attachments[_from] == 0 && !voted[_from], "attach");
         require(_isApprovedOrOwner(msg.sender, _from), "NotApprovedOrOwner");
@@ -1156,10 +1157,10 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         _checkpoint(_from, newLocked, IVotingEscrow.LockedBalance(0, 0, false, false));
 
         newLocked.amount -= _splitAmount;
-        _tokenId1 = _createSplitNFT(msg.sender, newLocked);
+        _tokenId1 = _createSplitNFT(owner, newLocked);
 
         newLocked.amount = _splitAmount;
-        _tokenId2 = _createSplitNFT(msg.sender, newLocked);
+        _tokenId2 = _createSplitNFT(owner, newLocked);
 
         emit Split(
             _from,
