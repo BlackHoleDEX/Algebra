@@ -11,10 +11,10 @@ import '@cryptoalgebra/integral-core/contracts/interfaces/callback/IAlgebraSwapC
 interface ISwapRouter is IAlgebraSwapCallback {
 
     /// @notice Data struct for swap callbacks
-    /// @member pluginData Data to be passed to the pool plugin
+    /// @member pluginData Data passed to the pool plugin
     /// @member path Swap path
-    /// @member payer Payer of the swap
-    /// @member pluginDataForward Array of plugin data to be used in exactOutput multihop swap
+    /// @member payer The address that pays for the swap
+    /// @member pluginDataForward Array of plugin data elements that used in exactOutput multihop swap
     struct SwapCallbackData {
         bytes pluginData;
         bytes path;
@@ -48,7 +48,7 @@ interface ISwapRouter is IAlgebraSwapCallback {
     }
 
     /// @notice Swaps `amountIn` of one token for as much as possible of another along the specified path
-    /// @dev pluginData array length should be equal to the number of swap hop
+    /// @dev pluginData array length should be equal to the number of swap hops
     /// @param params The parameters necessary for the multi-hop swap, encoded as `ExactInputParams` in calldata
     /// @return amountOut The amount of the received token
     function exactInput(ExactInputParams calldata params) external payable returns (uint256 amountOut);
