@@ -3,7 +3,7 @@ pragma solidity =0.8.20;
 
 import '@cryptoalgebra/integral-core/contracts/interfaces/plugin/IAlgebraPlugin.sol';
 import '@cryptoalgebra/integral-core/contracts/interfaces/IAlgebraPool.sol';
-import '../SwapRouter.sol';
+import '../interfaces/ISwapRouter.sol';
 import '../base/LiquidityManagement.sol';
 import '../libraries/PoolAddress.sol';
 
@@ -60,8 +60,8 @@ contract MockPlugin is IAlgebraPlugin {
     }
 
     function beforeSwap(address, address, bool, int256, uint160, bool, bytes calldata data) external returns (bytes4, uint24, uint24) {
-        SwapRouter.SwapCallbackData memory swapData;
-        if (data.length > 0 ) swapData = abi.decode(data, (SwapRouter.SwapCallbackData));
+        ISwapRouter.SwapCallbackData memory swapData;
+        if (data.length > 0 ) swapData = abi.decode(data, (ISwapRouter.SwapCallbackData));
         swapCalldata = swapData.pluginData.length > 0 ? abi.decode(swapData.pluginData, (uint24)) : 0;
         return (IAlgebraPlugin.beforeSwap.selector, 0, 0);
     }

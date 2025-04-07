@@ -58,12 +58,7 @@ contract SwapRouter is
         }
         return new bytes[](0);
     }
-    struct SwapCallbackData {
-        bytes pluginData;
-        bytes path;
-        address payer;
-        bytes[] pluginDataForward;
-    }
+
 
     /// @inheritdoc IAlgebraSwapCallback
     function algebraSwapCallback(int256 amount0Delta, int256 amount1Delta, bytes calldata _data) external override {

@@ -9,6 +9,18 @@ import '@cryptoalgebra/integral-core/contracts/interfaces/callback/IAlgebraSwapC
 /// @dev Credit to Uniswap Labs under GPL-2.0-or-later license:
 /// https://github.com/Uniswap/v3-periphery
 interface ISwapRouter is IAlgebraSwapCallback {
+
+    /// @notice Data struct for swap callbacks
+    /// @member pluginData Data to be passed to the pool plugin
+    /// @member path Swap path
+    /// @member payer Payer of the swap
+    /// @member pluginDataForward Array of plugin data to be used in exactOutput multihop swap
+    struct SwapCallbackData {
+        bytes pluginData;
+        bytes path;
+        address payer;
+        bytes[] pluginDataForward;
+    }
     struct ExactInputSingleParams {
         bytes pluginData;
         address tokenIn;
@@ -36,6 +48,7 @@ interface ISwapRouter is IAlgebraSwapCallback {
     }
 
     /// @notice Swaps `amountIn` of one token for as much as possible of another along the specified path
+    /// @dev pluginData array length should be equal to the number of swap hop
     /// @param params The parameters necessary for the multi-hop swap, encoded as `ExactInputParams` in calldata
     /// @return amountOut The amount of the received token
     function exactInput(ExactInputParams calldata params) external payable returns (uint256 amountOut);
@@ -69,6 +82,7 @@ interface ISwapRouter is IAlgebraSwapCallback {
 
     /// @notice Swaps as little as possible of one token for `amountOut` of another along the specified path (reversed)
     /// @dev If native token is used as input, this function should be accompanied by a `refundNativeToken` in multicall to avoid potential loss of native tokens
+    /// @dev pluginData array length should be equal to the number of swap hops
     /// @param params The parameters necessary for the multi-hop swap, encoded as `ExactOutputParams` in calldata
     /// @return amountIn The amount of the input token
     function exactOutput(ExactOutputParams calldata params) external payable returns (uint256 amountIn);
