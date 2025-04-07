@@ -1140,9 +1140,14 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         require(canSplit[msg.sender] || canSplit[address(0)], "SplitNotAllowed");
         require(attachments[_from] == 0 && !voted[_from], "attach");
         require(_isApprovedOrOwner(msg.sender, _from), "NotApprovedOrOwner");
+
         IVotingEscrow.LockedBalance memory newLocked = locked[_from];
         require(newLocked.end > block.timestamp || newLocked.isPermanent, "lock exp");
-        int128 _splitAmount =  int128(int256(_amount));
+        
+        int128 _splitAmount = newLocked.isSMNFT ? 
+            int128(int256(_amount + calculate_sm_nft_bonus(_amount))) : 
+            int128(int256(_amount));
+        
         require(_splitAmount != 0, "ZeroAmount");
         require(newLocked.amount > _splitAmount, "AmountTooBig");
 
