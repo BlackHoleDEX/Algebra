@@ -1082,7 +1082,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         IVotingEscrow.LockedBalance memory _locked0 = locked[_from];
         IVotingEscrow.LockedBalance memory _locked1 = locked[_to];
         require(_locked1.end > block.timestamp ||  _locked1.isPermanent,"lock exp");
-        require((_locked0.isSMNFT ? _locked1.isSMNFT : true) && (_locked0.isPermanent ? _locked1.isPermanent : true), "smNFT / per");
+        require((_locked0.isSMNFT ? _locked1.isSMNFT : true) && (_locked0.isPermanent ? _locked1.isPermanent && !_locked1.isSMNFT : true), "smNFT / per");
         
         uint value0 = uint(int256(_locked0.amount));
         uint end = _locked0.end >= _locked1.end ? _locked0.end : _locked1.end;
@@ -1096,13 +1096,20 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         newLockedTo.isSMNFT = _locked1.isSMNFT;
 
         if(newLockedTo.isSMNFT){
-            newLockedTo.amount = _locked1.amount + _locked0.amount + int128(int256(calculate_sm_nft_bonus(uint256(int256(_locked0.amount)))));
-            smNFTBalance += value0;
-            //assert(IERC20(token).transfer(burnTokenAddress, value0));
-            assert(_black.burn(value0));
+            if (!_locked0.isSMNFT) {
+                // If source wasn't SMNFT, add bonus for its amount
+                newLockedTo.amount = _locked1.amount + _locked0.amount + int128(int256(calculate_sm_nft_bonus(uint256(int256(_locked0.amount)))));
+                smNFTBalance += value0;
+                assert(_black.burn(value0));
+            } else {
+                // If source was already SMNFT, just add amounts (both already include their bonuses)
+                newLockedTo.amount = _locked1.amount + _locked0.amount;
+            }
         } else if (newLockedTo.isPermanent){
             newLockedTo.amount = _locked1.amount + _locked0.amount;
-            permanentLockBalance += value0;
+            if (!_locked0.isPermanent) {  // Only add if source wasn't already permanent
+                permanentLockBalance += value0;
+            }
         }else{
             newLockedTo.amount = _locked1.amount + _locked0.amount;
             newLockedTo.end = end;
