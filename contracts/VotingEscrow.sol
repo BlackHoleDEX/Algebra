@@ -76,6 +76,16 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         uint256 _locktime,
         uint256 _ts
     );
+    event Split(
+        uint256 indexed _from,
+        uint256 indexed _tokenId1,
+        uint256 indexed _tokenId2,
+        address _sender,
+        uint256 _splitAmount1,
+        uint256 _splitAmount2,
+        uint256 _locktime,
+        uint256 _ts
+    );
     
     event MetadataUpdate(uint256 _tokenId);
     event BatchMetadataUpdate(uint256 _fromTokenId, uint256 _toTokenId);
@@ -571,6 +581,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
     uint public epoch;
     mapping(uint => int128) public slope_changes; // time -> signed slope change
     uint public supply;
+    mapping(address => bool) public canSplit;
+
 
     uint internal constant MULTIPLIER = 1 ether;
 
@@ -1326,6 +1338,54 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
             block.timestamp
         );
         emit MetadataUpdate(_to);
+    }
+
+
+    function split(
+        uint _from,
+        uint _amount
+    ) external nonreentrant returns (uint256 _tokenId1, uint256 _tokenId2) {
+        require(canSplit[msg.sender] || canSplit[address(0)], "SplitNotAllowed");
+        require(attachments[_from] == 0 && !voted[_from], "attach");
+        require(_isApprovedOrOwner(msg.sender, _from), "NotApprovedOrOwner");
+        LockedBalance memory newLocked = locked[_from];
+        require(newLocked.end > block.timestamp || newLocked.isPermanent, "lock exp");
+        int128 _splitAmount =  int128(int256(_amount));
+        require(_splitAmount != 0, "ZeroAmount");
+        require(newLocked.amount > _splitAmount, "AmountTooBig");
+
+        _burn(_from);
+        locked[_from] = LockedBalance(0, 0, false, false);
+        _checkpoint(_from, newLocked, LockedBalance(0, 0, false, false));
+
+        newLocked.amount -= _splitAmount;
+        _tokenId1 = _createSplitNFT(msg.sender, newLocked);
+
+        newLocked.amount = _splitAmount;
+        _tokenId2 = _createSplitNFT(msg.sender, newLocked);
+
+        emit Split(
+            _from,
+            _tokenId1,
+            _tokenId2,
+            msg.sender,
+            uint(int256(locked[_tokenId1].amount)),
+            uint(int256(_splitAmount)),
+            newLocked.end,
+            block.timestamp
+        );
+    }
+
+    function _createSplitNFT(address _to, LockedBalance memory _newLocked) private returns (uint256 _tokenId) {
+        _tokenId = ++tokenId;
+        locked[_tokenId] = _newLocked;
+        _checkpoint(_tokenId, LockedBalance(0, 0, false, false), _newLocked);
+        _mint(_to, _tokenId);
+    }
+
+    function toggleSplit(address _account, bool _bool) external {
+        require(msg.sender == team, "NotTeam");
+        canSplit[_account] = _bool;
     }
 
     /*///////////////////////////////////////////////////////////////
