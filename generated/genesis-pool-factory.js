@@ -1,4 +1,4 @@
-const genesisPoolFactoryAddress = "0x054923954A2Ac9BE1Ae00832A8833446356063c3";
+const genesisPoolFactoryAddress = "0x5fC798241F41d67a0546BF922bC140f449731032";
 
 const genesisPoolFactoryAbi = [
   {
@@ -79,6 +79,25 @@ const genesisPoolFactoryAbi = [
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "allGenesisPools",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "tokenOwner",
         "type": "address"
@@ -121,6 +140,11 @@ const genesisPoolFactoryAbi = [
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
@@ -154,7 +178,7 @@ const genesisPoolFactoryAbi = [
     "inputs": [
       {
         "internalType": "address",
-        "name": "",
+        "name": "nativeToken",
         "type": "address"
       }
     ],
@@ -173,12 +197,26 @@ const genesisPoolFactoryAbi = [
     "inputs": [
       {
         "internalType": "address",
-        "name": "_tokenHandler",
+        "name": "nativeToken",
         "type": "address"
-      },
+      }
+    ],
+    "name": "getGenesisPools",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
       {
         "internalType": "address",
-        "name": "_voter",
+        "name": "_tokenHandler",
         "type": "address"
       }
     ],
@@ -206,6 +244,24 @@ const genesisPoolFactoryAbi = [
         "internalType": "address",
         "name": "nativeToken",
         "type": "address"
+      }
+    ],
+    "name": "removeGenesisPool",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "nativeToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
       }
     ],
     "name": "removeGenesisPool",
@@ -257,19 +313,6 @@ const genesisPoolFactoryAbi = [
     "name": "transferOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "voter",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   }
 ];

@@ -160,13 +160,13 @@ contract AutomatedVotingManager is Initializable, OwnableUpgradeable, Reentrancy
             uint256 totalRewardsPerVotingPower = 0;
 
             for (uint256 j = 0; j < IBribe(bribeInternal).rewardsListLength(); j++) {
-                address token = IBribe(bribeInternal).rewardTokens(j);
+                address token = IBribe(bribeInternal).bribeTokens(j);
                 uint256 internalBribes = IBribe(bribeInternal).tokenRewardsPerEpoch(token, epochStart);
                 totalRewardsPerVotingPower += (internalBribes);
             }
 
             for (uint256 j = 0; j < IBribe(bribeExternal).rewardsListLength(); j++) {
-                address token = IBribe(bribeExternal).rewardTokens(j);
+                address token = IBribe(bribeExternal).bribeTokens(j);
                 uint256 externalBribes = IBribe(bribeExternal).tokenRewardsPerEpoch(token, epochStart);
                 totalRewardsPerVotingPower += (externalBribes);
             }

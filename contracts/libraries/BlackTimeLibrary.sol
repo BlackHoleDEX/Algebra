@@ -2,6 +2,7 @@
 pragma solidity 0.8.13;
 
 library BlackTimeLibrary {
+
     uint256 internal constant WEEK = 7 * 86400;
     uint internal constant NO_VOTING_WINDOW = 3600;
     uint256 internal constant MAX_LOCK_DURATION = 86400 * 365 * 4;

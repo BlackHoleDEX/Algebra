@@ -1,4 +1,4 @@
-const epochControllerAddress = "0x7bF82007c3f1B7bDfA8e07ed3Db8A1d00f1CaFE4";
+const epochControllerAddress = "0x9a991C215D13db648bc0b96F739C57d3456d31C3";
 
 const epochControllerAbi = [
   {
@@ -160,7 +160,7 @@ const epochControllerAbi = [
     "name": "genesisManager",
     "outputs": [
       {
-        "internalType": "address",
+        "internalType": "contract IGenesisPoolManager",
         "name": "",
         "type": "address"
       }
@@ -178,6 +178,11 @@ const epochControllerAbi = [
       {
         "internalType": "address",
         "name": "_voter",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_permissionsRegistry",
         "type": "address"
       }
     ],
@@ -236,6 +241,19 @@ const epochControllerAbi = [
     "name": "performUpkeep",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "permissionsRegistry",
+    "outputs": [
+      {
+        "internalType": "contract IPermissionsRegistry",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {

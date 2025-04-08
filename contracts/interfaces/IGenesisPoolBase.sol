@@ -26,6 +26,7 @@ interface IGenesisPoolBase {
         uint256 supplyPercent; 
         uint256 startPrice;
         uint256 startTime;
+        uint256 maturityTime;
     }
 
     struct LiquidityPool {

@@ -8,7 +8,7 @@ interface IBribe {
     function notifyRewardAmount(address token, uint amount) external;
     function left(address token) external view returns (uint);
     function getReward(uint tokenId, address[] memory tokens) external;
-    function rewardTokens(uint256 i) external view returns(address); 
+    function bribeTokens(uint256 i) external view returns(address); 
     function rewardsListLength() external view returns (uint256);
     function tokenRewardsPerEpoch(address _token, uint256 epochStart) external view returns(uint256);
 }

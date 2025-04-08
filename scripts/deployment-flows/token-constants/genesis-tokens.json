@@ -44,7 +44,7 @@
   {
     "name": "ANON",
     "ticker": "ANON",
-    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x79bbf4508b1391af3a0f4b30bb5fc4aa9ab0e07c/logo.sv",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x79bbf4508b1391af3a0f4b30bb5fc4aa9ab0e07c/logo.svg",
     "decimal": 18,
     "address": "0xFF94f43F0d6aE54F48E557399bF9CDbd1330C708"
   },
@@ -75,5 +75,61 @@
     "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x1c4cca7c5db003824208adda61bd749e55f463a3/logo.svg",
     "decimal": 18,
     "address": "0xe75a01793A7ED23A85860644Ed117A6D91d53c6e"
+  },
+  {
+    "name": "AITECH",
+    "ticker": "AITECH",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens/8453/0xd71552d9e08e5351adb52163b3bbbc4d7de53ce1/logo.svg",
+    "decimal": 18,
+    "address": "0xD66e781D4319c895EE6F96C805c1A735E6a87b1C"
+  },
+  {
+    "name": "BMX",
+    "ticker": "BMX",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x548f93779fbc992010c07467cbaf329dd5f059b7/logo.svg",
+    "decimal": 18,
+    "address": "0x4e248fd031358eF52778bdaecF95C094c428C268"
+  },
+  {
+    "name": "BOLD",
+    "ticker": "BOLD",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x087c440f251ff6cfe62b86dde1be558b95b4bb9b/logo.svg",
+    "decimal": 18,
+    "address": "0x274D8F4E2120b4cbdfB30B9F2f65DdFF202d6b64"
+  },
+  {
+    "name": "ETHFI",
+    "ticker": "ETHFI",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x6c240dda6b5c336df09a4d011139beaaa1ea2aa2/logo.svg",
+    "decimal": 18,
+    "address": "0x55ed616c575F444EE4188b1F62Ab983cA9E8A50c"
+  },
+  {
+    "name": "EXTRA",
+    "ticker": "EXTRA",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0x2dad3a13ef0c6366220f989157009e501e7938f8/logo.svg",
+    "decimal": 18,
+    "address": "0x425f91F4d5743B60DD656A4e276F95D4a797785E"
+  },
+  {
+    "name": "FAI",
+    "ticker": "FAI",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0xb33ff54b9f7242ef1593d2c9bcd8f9df46c77935/logo.svg",
+    "decimal": 18,
+    "address": "0x9338FEb15052Ee6C398EBbe3D96E6681eedF8E08"
+  },
+  {
+    "name": "FARM",
+    "ticker": "FARM",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0xd08a2917653d4e460893203471f0000826fb4034/logo.svg",
+    "decimal": 18,
+    "address": "0xC95c237B9e3C0a3B555B3A09b7Dedc22FC831cf7"
+  },
+  {
+    "name": "FLAY",
+    "ticker": "FLAY",
+    "logo": "https://raw.githubusercontent.com/SmolDapp/tokenAssets/main/tokens//8453/0xf1a7000000950c7ad8aff13118bb7ab561a448ee/logo.svg",
+    "decimal": 18,
+    "address": "0xB9ca77cC590a712c499cE46bA0562B9D280fd6e8"
   }
 ]
