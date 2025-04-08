@@ -65,7 +65,6 @@ contract MinterUpgradeable is IMinter, OwnableUpgradeable {
         _initializer = msg.sender;
         team = msg.sender;
         tailEmissionRate = MAX_BPS;
-        burnTokenAddress=0x000000000000000000000000000000000000dEaD;
         teamRate = 500; // 500 bps = 5%
         WEEK = BlackTimeLibrary.WEEK;
         LOCK = BlackTimeLibrary.MAX_LOCK_DURATION;

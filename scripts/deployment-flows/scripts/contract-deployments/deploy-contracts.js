@@ -161,8 +161,16 @@ const deployBloackholeV2Abi = async(voterV3Address, routerV2Address)=>{
     }
 }
 
+const deployVotingBalanceLogic = async() => {
+    const VotingBalanceLogic = await ethers.getContractFactory("VotingBalanceLogic");
+    const votingBalanceLogic = await VotingBalanceLogic.deploy();
+    await votingBalanceLogic.deployed();
+    console.log("VotingBalanceLogic deployed at:", votingBalanceLogic.address);
+    return votingBalanceLogic.address;
+}
 
-const deployVotingEscrow = async(blackAddress) =>{
+
+const deployVotingEscrow = async(blackAddress, votingBalanceLogicAddress) =>{
     try {
         const VeArtProxyUpgradeableContract = await ethers.getContractFactory("VeArtProxyUpgradeable");
         const veArtProxy = await upgrades.deployProxy(VeArtProxyUpgradeableContract,[], {initializer: 'initialize'});
@@ -170,7 +178,11 @@ const deployVotingEscrow = async(blackAddress) =>{
         console.log("veArtProxy Address: ", veArtProxy.address)
         generateConstantFile("VeArtProxyUpgradeable", veArtProxy.address);
 
-        const VotingEscrowContract = await ethers.getContractFactory("VotingEscrow");
+        const VotingEscrowContract = await ethers.getContractFactory("VotingEscrow", {
+            libraries: {
+                VotingBalanceLogic: votingBalanceLogicAddress,
+            },
+        });
         const veBlack = await VotingEscrowContract.deploy(blackAddress, veArtProxy.address, ZERO_ADDRESS);
         txDeployed = await veBlack.deployed();
         console.log("veBlack Address: ", veBlack.address);
@@ -660,8 +672,10 @@ async function main () {
     // setDibs
     await setDibs(pairFactoryAddress);
 
+    const votingBalanceLogicAddress = await deployVotingBalanceLogic();
+
     //deploy voting  escrow
-    const votingEscrowAddress = await deployVotingEscrow(blackAddress);
+    const votingEscrowAddress = await deployVotingEscrow(blackAddress, votingBalanceLogicAddress);
     
     //deploy bribeV3
     const bribeV3Address = await deployBribeV3Factory(permissionRegistryAddress, tokenHandlerAddress);
