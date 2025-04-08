@@ -270,7 +270,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
         return (poolStatus, token, amount);
     }
 
-    function claimaNative() external {
+    function claimNative() external {
         require(poolStatus == PoolStatus.NOT_QUALIFIED || poolStatus == PoolStatus.PARTIALLY_LAUNCHED, "!= status");
         require(msg.sender == genesisInfo.tokenOwner, "!= owner");
 
