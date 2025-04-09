@@ -1090,7 +1090,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         IVotingEscrow.LockedBalance memory _locked0 = locked[_from];
         IVotingEscrow.LockedBalance memory _locked1 = locked[_to];
         require(_locked1.end > block.timestamp ||  _locked1.isPermanent,"lock exp");
-        require((_locked0.isSMNFT ? _locked1.isSMNFT : true) && (_locked0.isPermanent ? _locked1.isPermanent && !_locked1.isSMNFT : true), "smNFT / per");
+        require(_locked0.isPermanent ? (_locked0.isSMNFT ? _locked1.isSMNFT :  _locked1.isPermanent && !_locked1.isSMNFT) : true, "smNFT / per");
         
         uint value0 = uint(int256(_locked0.amount));
         uint end = _locked0.end >= _locked1.end ? _locked0.end : _locked1.end;
