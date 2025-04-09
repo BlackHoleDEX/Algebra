@@ -4,50 +4,69 @@ pragma solidity =0.8.20;
 import '@cryptoalgebra/integral-core/contracts/libraries/Plugins.sol';
 import '@cryptoalgebra/integral-core/contracts/interfaces/IAlgebraPool.sol';
 
-import '@cryptoalgebra/integral-periphery/contracts/interfaces/ISwapRouter.sol';
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 import '../interfaces/IBasePluginV1Factory.sol';
 import '../interfaces/IAlgebraVirtualPool.sol';
-import '../interfaces/plugins/IFarmingPlugin.sol';
+import '../interfaces/plugins/IManagedSwapFeePlugin.sol';
 
 import '../base/AlgebraBasePlugin.sol';
 
 
 /// @title Algebra Integral 1.2.1 managed swap fee plugin
 /// @notice This plugin get fees value from the swap router and apply that fees to swap
-abstract contract FarmingProxyPlugin is AlgebraBasePlugin, IFarmingPlugin {
+abstract contract ManagedSwapFeePlugin is AlgebraBasePlugin, IManagedSwapFeePlugin {
   using Plugins for uint8;
+  using ECDSA for bytes32;
 
   uint8 private constant defaultPluginConfig = uint8(Plugins.BEFORE_SWAP_FLAG);
 
-  uint96 public nonce;
-  address public router; // TODO rename?
+  address public router;
   mapping(address => bool) public whitelistedAddresses;
+  mapping(bytes32 => bool) private usedNonces;
 
-  struct PluginData {
-    uint24 fee;
-    uint96 nonce;
-    bytes signature;
-  }
-
-  function isWhitelisted(address _address) public view returns (bool) {
-    return whitelistedAddresses[_address];
-  }
-
-  function setStakerAddress(address _router) external  {
-    _authorize();
+  constructor(address _router) {
     router = _router;
   }
 
-  function getFee(bytes calldata pluginData) internal returns (uint24 fee){
-    bytes memory signature;
-    (fee, nonce, signature) = _parsePluginData(pluginData);
-     
+  function setRouterAddress(address _router) external {
+    _authorize();
+    router = _router;
+    emit RouterAddress(_router);
   }
 
-  function _parsePluginData(bytes calldata pluginData) internal returns(uint24, uint96, bytes memory) {
+  function whitelistAddress(address _address) external {
+    _authorize();
+    whitelistedAddresses[_address] = true;
+    emit WhitelistedAddress(_address);
+  }
+
+  function _getManagedFee(bytes memory pluginData) internal returns (uint24){
+    (bytes32 nonce, uint24 fee, address user, uint32 expireTime,bytes memory signature) = _parsePluginData(pluginData);
+    if(fee >= 1000000) revert FeeExceedsLimit();
+    if(usedNonces[nonce]) revert InvalidNonce();
+    if(expireTime < block.timestamp) revert Expired();
+    if(user != tx.origin) revert NotAllowed();
+
+    verifySignature(getParamsHash(nonce, fee, user, expireTime), signature);
+    usedNonces[nonce] = true;
+    return fee;
+  }
+
+  function _parsePluginData(bytes memory pluginData) private pure returns(bytes32, uint24, address, uint32, bytes memory) {
     PluginData memory data = abi.decode(pluginData, (PluginData));
-    return (data.fee, data.nonce, data.signature);
+    return (data.nonce, data.fee, data.user, data.expire, data.signature);
+  }
+
+  function verifySignature(bytes32 hash, bytes memory signature) private view returns (address) {
+    address recoveredSigner = hash.recover(signature);
+    if(!whitelistedAddresses[recoveredSigner]) revert NotWhitelisted();
+
+    return recoveredSigner;
+  }
+
+  function getParamsHash(bytes32 nonce, uint24 fee, address user, uint32 expire) private pure returns (bytes32) {
+    return keccak256(abi.encodePacked(nonce, fee, user, expire));
   }
 
 }

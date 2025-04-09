@@ -25,7 +25,7 @@ const DEFAULT_COMPILER_SETTINGS: SolcUserConfig = {
     evmVersion: 'paris',
     optimizer: {
       enabled: true,
-      runs: 200,
+      runs: 0,
     },
     metadata: {
       bytecodeHash: 'none',
@@ -73,6 +73,9 @@ export default {
   },
   solidity: {
     compilers: [HIGHEST_OPTIMIZER_COMPILER_SETTINGS],
+    overrides: {
+      'contracts/ManagedSwapFeeBasePluginFactory.sol': DEFAULT_COMPILER_SETTINGS,
+    },
   },
   docgen: {
     outputDir: '../../docs/Contracts/Plugin',

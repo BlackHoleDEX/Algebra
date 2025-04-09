@@ -2,12 +2,13 @@
 pragma solidity =0.8.20;
 
 import '@cryptoalgebra/integral-core/contracts/libraries/Plugins.sol';
-
 import '@cryptoalgebra/integral-core/contracts/interfaces/plugin/IAlgebraPlugin.sol';
+
+import '@cryptoalgebra/integral-periphery/contracts/interfaces/ISwapRouter.sol';
 
 import './plugins/DynamicFeePlugin.sol';
 import './plugins/FarmingProxyPlugin.sol';
-import './plugins/SlidingFeePlugin.sol';
+import './plugins/ManagedSwapFeePlugin.sol';
 import './plugins/VolatilityOraclePlugin.sol';
 
 /// @title Algebra Integral 1.2.1 managed swap fee plugin
@@ -22,8 +23,9 @@ contract ManagedSwapFeeBasePlugin is DynamicFeePlugin, FarmingProxyPlugin, Volat
     address _pool,
     address _factory,
     address _pluginFactory,
-    AlgebraFeeConfiguration memory _config
-  ) AlgebraBasePlugin(_pool, _factory, _pluginFactory) DynamicFeePlugin(_config) {}
+    AlgebraFeeConfiguration memory _config,
+    address _router
+  ) AlgebraBasePlugin(_pool, _factory, _pluginFactory) DynamicFeePlugin(_config) ManagedSwapFeePlugin(_router) {}
 
   // ###### HOOKS ######
 
@@ -49,10 +51,16 @@ contract ManagedSwapFeeBasePlugin is DynamicFeePlugin, FarmingProxyPlugin, Volat
     return IAlgebraPlugin.afterModifyPosition.selector;
   }
 
-  function beforeSwap(address, address, bool, int256, uint160, bool, bytes calldata) external override onlyPool returns (bytes4, uint24, uint24) {
+  function beforeSwap(address sender, address, bool, int256, uint160, bool, bytes calldata swapCallbackData) external override onlyPool returns (bytes4, uint24, uint24) {
     _writeTimepoint();
     uint88 volatilityAverage = _getAverageVolatilityLast();
     uint24 fee = _getCurrentFee(volatilityAverage);
+    if (sender == router ){
+      ISwapRouter.SwapCallbackData memory swapData = abi.decode(swapCallbackData, (ISwapRouter.SwapCallbackData));
+      if(swapData.pluginData.length > 0) {
+        fee = _getManagedFee(swapData.pluginData);
+      }
+    }
     return (IAlgebraPlugin.beforeSwap.selector, fee, 0);
   }
 
