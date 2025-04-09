@@ -584,8 +584,16 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
     /// @param _tokenId token of the NFT
     /// @param _idx User epoch number
     /// @return Epoch time of the checkpoint
-    function user_point_history__ts(uint _tokenId, uint _idx) external view returns (uint) {
-        return votingBalanceLogicData.user_point_history[_tokenId][_idx].ts;
+    function user_point_history(uint _tokenId, uint _idx) external view returns (IVotingEscrow.Point memory) {
+        return votingBalanceLogicData.user_point_history[_tokenId][_idx];
+    }
+
+    function point_history(uint epoch) external view returns (IVotingEscrow.Point memory) {
+        return votingBalanceLogicData.point_history[epoch];
+    }
+
+    function user_point_epoch(uint tokenId) external view returns (uint) {
+        return votingBalanceLogicData.user_point_epoch[tokenId];
     }
 
     /// @notice Record global and per-user data to checkpoint

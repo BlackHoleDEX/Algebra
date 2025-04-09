@@ -57,7 +57,7 @@ library VotingDelegationLib {
                     ? self.checkpoints[srcRep][srcRepNum - 1].tokenIds
                     : self.checkpoints[srcRep][0].tokenIds;
                 uint32 nextSrcRepNum = findCheckpointToWrite(self, srcRep, block.timestamp);
-                bool _isCheckpointInNewBlock = (nextSrcRepNum != srcRepNum - 1);
+                bool _isCheckpointInNewBlock = (srcRepNum > 0) ? (nextSrcRepNum != srcRepNum - 1) : true;
                 Checkpoint storage cpSrcRep = self.checkpoints[srcRep][nextSrcRepNum];
                 uint[] storage srcRepNew = cpSrcRep.tokenIds;
                 cpSrcRep.timestamp = block.timestamp;
@@ -89,7 +89,7 @@ library VotingDelegationLib {
                     ? self.checkpoints[dstRep][dstRepNum - 1].tokenIds
                     : self.checkpoints[dstRep][0].tokenIds;
                 uint32 nextDstRepNum = findCheckpointToWrite(self, dstRep, block.timestamp);
-                bool _isCheckpointInNewBlock = (nextDstRepNum != dstRepNum - 1);
+                bool _isCheckpointInNewBlock = (dstRepNum > 0) ? (nextDstRepNum != dstRepNum - 1) : true;
                 Checkpoint storage cpDstRep = self.checkpoints[dstRep][nextDstRepNum];
                 uint[] storage dstRepNew = cpDstRep.tokenIds;
                 cpDstRep.timestamp = block.timestamp;
@@ -129,7 +129,7 @@ library VotingDelegationLib {
                     ? _self.checkpoints[_srcRep][srcRepNum - 1].tokenIds
                     : _self.checkpoints[_srcRep][0].tokenIds;
                 uint32 nextSrcRepNum = findCheckpointToWrite(_self,_srcRep, block.timestamp);
-                bool _isCheckpointInNewBlock = (nextSrcRepNum != srcRepNum - 1);
+                bool _isCheckpointInNewBlock = (srcRepNum > 0) ? (nextSrcRepNum != srcRepNum - 1) : true;
                 // if(_isCheckpointInNewBlock) {
                 Checkpoint storage cpSrcRep = _self.checkpoints[_srcRep][nextSrcRepNum];
                 uint[] storage srcRepNew = cpSrcRep.tokenIds;
@@ -163,7 +163,7 @@ library VotingDelegationLib {
                     ? _self.checkpoints[_dstRep][dstRepNum - 1].tokenIds
                     : _self.checkpoints[_dstRep][0].tokenIds;
                 uint32 nextDstRepNum = findCheckpointToWrite(_self,_dstRep, block.timestamp);
-                bool _isCheckpointInNewBlock = (nextDstRepNum != dstRepNum - 1);
+                bool _isCheckpointInNewBlock = (dstRepNum > 0) ? (nextDstRepNum != dstRepNum - 1) : true;
                 Checkpoint storage cpDstRep = _self.checkpoints[_dstRep][nextDstRepNum];
                 uint[] storage dstRepNew = cpDstRep.tokenIds;
                 cpDstRep.timestamp = block.timestamp;
