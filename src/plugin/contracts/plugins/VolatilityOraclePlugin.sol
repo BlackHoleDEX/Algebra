@@ -10,6 +10,8 @@ import '../interfaces/plugins/IVolatilityOracle.sol';
 import '../libraries/VolatilityOracle.sol';
 import '../base/AlgebraBasePlugin.sol';
 
+// import 'hardhat/console.sol';
+
 /// @title Algebra Integral 1.2.1 VolatilityOraclePlugin plugin
 /// @notice This contract stores timepoints and calculates adaptive fee and statistical averages
 abstract contract VolatilityOraclePlugin is AlgebraBasePlugin, IVolatilityOracle {
@@ -34,7 +36,9 @@ abstract contract VolatilityOraclePlugin is AlgebraBasePlugin, IVolatilityOracle
 
   /// @inheritdoc IVolatilityOracle
   function initialize() external override {
+    // console.log('initialize called');
     require(!isInitialized, 'Already initialized');
+    // console.log("plugin address in solidity: ", address(this));
     require(_getPluginInPool() == address(this), 'Plugin not attached');
     (uint160 price, int24 tick, , ) = _getPoolState();
     require(price != 0, 'Pool is not initialized');
@@ -113,5 +117,36 @@ abstract contract VolatilityOraclePlugin is AlgebraBasePlugin, IVolatilityOracle
   function _getLastTick() internal view returns (int24 lastTick) {
     VolatilityOracle.Timepoint memory lastTimepoint = timepoints[timepointIndex];
     return lastTimepoint.tick;
+  }
+
+  function _getLastBlockTimestamp() internal view returns (uint32 blockTimestamp) {
+    VolatilityOracle.Timepoint memory lastTimepoint = timepoints[timepointIndex];
+    return lastTimepoint.blockTimestamp;
+  }
+
+  // норм что перенес? если да, то надо бы сделать функцию external которая получает timeWeightedAverageTick и поменять OracleLibrary.consult
+  function _getTwapTick(uint32 period) internal view returns (int24 timeWeightedAverageTick) {
+    require(period != 0, 'Period is zero');
+
+    uint32[] memory secondAgos = new uint32[](2);
+    secondAgos[0] = period;
+    secondAgos[1] = 0;
+
+    (, int24 tick, , ) = _getPoolState();
+    (int56[] memory tickCumulatives, ) = timepoints.getTimepoints(_blockTimestamp(), secondAgos, tick, timepointIndex);
+
+    int56 tickCumulativesDelta = tickCumulatives[1] - tickCumulatives[0];
+
+    timeWeightedAverageTick = int24(tickCumulativesDelta / int56(uint56(period)));
+
+    // Always round to negative infinity
+    if (tickCumulativesDelta < 0 && (tickCumulativesDelta % int56(uint56(period)) != 0)) timeWeightedAverageTick--;
+  }
+
+  function _ableToGetTimepoints(uint32 period) internal view returns (bool) {
+    uint16 lastIndex = timepoints.getOldestIndex(timepointIndex);
+    uint32 oldestTimestamp = timepoints[lastIndex].blockTimestamp;
+
+    return VolatilityOracle._lteConsideringOverflow(oldestTimestamp, _blockTimestamp() - period, _blockTimestamp());
   }
 }

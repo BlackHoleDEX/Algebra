@@ -87,9 +87,14 @@ export default {
       chainId: 41,
       accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
     },
-    beraTestnet: {
-      url: `https://artio.rpc.berachain.com/`,
-      chainId: 80085,
+    baseTestnet: {
+      url: `https://base-sepolia-rpc.publicnode.com`,
+      chainId: 84532,
+      accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
+    },
+    base: {
+      url: `https://base-mainnet.public.blastapi.io`,
+      chainId: 8453,
       accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
     },
     maticMainnet: {
@@ -115,6 +120,14 @@ export default {
         urls: {
           apiURL: 'https://seitrace.com/api',
           browserURL: 'https://seitrace.com/',
+        },
+      },
+      {
+        network: 'baseTestnet',
+        chainId: 84532,
+        urls: {
+          apiURL: 'https://api-sepolia.basescan.org/api',
+          browserURL: 'https://sepolia.basescan.org/',
         },
       },
       {

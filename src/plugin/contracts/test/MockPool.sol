@@ -13,6 +13,8 @@ import '@cryptoalgebra/integral-core/contracts/interfaces/pool/IAlgebraPoolPermi
 import '@cryptoalgebra/integral-core/contracts/interfaces/pool/IAlgebraPoolErrors.sol';
 import '@cryptoalgebra/integral-core/contracts/interfaces/plugin/IAlgebraPlugin.sol';
 
+import 'hardhat/console.sol';
+
 /// @title Mock of Algebra concentrated liquidity pool for plugins testing
 contract MockPool is IAlgebraPoolActions, IAlgebraPoolPermissionedActions, IAlgebraPoolState {
   struct GlobalState {
@@ -50,6 +52,8 @@ contract MockPool is IAlgebraPoolActions, IAlgebraPoolPermissionedActions, IAlge
 
   /// @inheritdoc IAlgebraPoolState
   address public override plugin;
+
+  address public factory;
 
   address public override communityVault;
 
@@ -180,6 +184,7 @@ contract MockPool is IAlgebraPoolActions, IAlgebraPoolPermissionedActions, IAlge
     globalState.price = TickMath.getSqrtRatioAtTick(targetTick);
     globalState.tick = targetTick;
 
+    console.log('pluginConfig: ', globalState.pluginConfig);
     if (globalState.pluginConfig & Plugins.AFTER_SWAP_FLAG != 0) {
       _plugin.afterSwap(msg.sender, msg.sender, true, 0, 0, 0, 0, '');
     }

@@ -1,5 +1,5 @@
 import { ethers } from 'hardhat';
-import { MockFactory, MockPool, MockTimeAlgebraBasePluginV1, MockTimeAlgebraBasePluginV2, MockTimeDSFactoryV2, MockTimeDSFactory, BasePluginV1Factory, BasePluginV2Factory } from '../../typechain';
+import { MockFactory, MockPool, MockTimeAlgebraBasePluginV1, MockTimeAlgebraBasePluginV2, MockTimeDSFactoryV2, MockTimeDSFactory, BasePluginV1Factory, BasePluginV2Factory, MockAlgebraBasePluginALMFactory, MockVault, RebalanceManager, MockAlgebraBasePluginALM, MockRebalanceManager } from '../../typechain';
 
 type Fixture<T> = () => Promise<T>;
 interface MockFactoryFixture {
@@ -94,6 +94,43 @@ export const pluginFixtureV2: Fixture<PluginFixture> = async function (): Promis
   const plugin = mockDSOperatorFactory.attach(pluginAddress) as any as MockTimeAlgebraBasePluginV2;
 
   return {
+    plugin,
+    mockPluginFactory,
+    mockPool,
+    mockFactory,
+  };
+};
+
+interface ALMPluginFixture extends MockFactoryFixture {
+  mockVault: MockVault;
+  plugin: MockAlgebraBasePluginALM;
+  mockPluginFactory: MockAlgebraBasePluginALMFactory;
+  mockPool: MockPool;
+}
+
+export const pluginFixtureALM: Fixture<ALMPluginFixture> = async function (): Promise<ALMPluginFixture> {
+  const { mockFactory } = await mockFactoryFixture();
+  //const { token0, token1, token2 } = await tokensFixture()
+
+  const mockPoolFactory = await ethers.getContractFactory('MockPool');
+  const mockPool = (await mockPoolFactory.deploy()) as any as MockPool;
+
+  const mockPluginFactoryFactory = await ethers.getContractFactory('MockAlgebraBasePluginALMFactory');
+  const mockPluginFactory = (await mockPluginFactoryFactory.deploy(mockFactory)) as any as MockAlgebraBasePluginALMFactory;
+
+  const mockVaultFactory = await ethers.getContractFactory('MockVault');
+  const mockVault = await mockVaultFactory.deploy(await mockPool.getAddress(), true, false) as any as MockVault;
+
+  await mockVault.setAllowTokens(true, false);
+
+  await mockPluginFactory.beforeCreatePoolHook(mockPool, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, ZERO_ADDRESS, '0x');
+  const pluginAddress = await mockPluginFactory.pluginByPool(mockPool);
+
+  const mockAlgebraBasePluginALMFactory = await ethers.getContractFactory('MockAlgebraBasePluginALM');
+  const plugin = mockAlgebraBasePluginALMFactory.attach(pluginAddress) as any as MockAlgebraBasePluginALM;
+
+  return {
+    mockVault,
     plugin,
     mockPluginFactory,
     mockPool,
