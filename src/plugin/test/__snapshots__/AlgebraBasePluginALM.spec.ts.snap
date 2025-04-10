@@ -1,3 +1,93 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`AlgebraBasePluginALM #DynamicFeeManager #adaptiveFee single huge spike after day 1`] = `
+Array [
+  "Fee: 123 ",
+  "Fee: 123 ",
+  "Fee: 123 ",
+  "Fee: 123 ",
+  "Fee: 123 ",
+  "Fee: 123 ",
+  "Fee: 123 ",
+  "Fee: 123 ",
+  "Fee: 123 ",
+  "Fee: 123 ",
+  "Fee: 123 ",
+  "Fee: 123 ",
+  "Fee: 123 ",
+  "Fee: 123 ",
+  "Fee: 123 ",
+  "Fee: 123 ",
+  "Fee: 123 ",
+  "Fee: 123 ",
+  "Fee: 123 ",
+  "Fee: 123 ",
+  "Fee: 124 ",
+  "Fee: 124 ",
+  "Fee: 124 ",
+  "Fee: 124 ",
+  "Fee: 100 ",
+]
+`;
+
+exports[`AlgebraBasePluginALM #DynamicFeeManager #adaptiveFee single huge spike after initialization 1`] = `
+Array [
+  "Fee: 3714 ",
+  "Fee: 3000 ",
+  "Fee: 3000 ",
+  "Fee: 2965 ",
+  "Fee: 2602 ",
+  "Fee: 1733 ",
+  "Fee: 995 ",
+  "Fee: 607 ",
+  "Fee: 411 ",
+  "Fee: 309 ",
+  "Fee: 250 ",
+  "Fee: 215 ",
+  "Fee: 191 ",
+  "Fee: 174 ",
+  "Fee: 163 ",
+  "Fee: 154 ",
+  "Fee: 147 ",
+  "Fee: 142 ",
+  "Fee: 139 ",
+  "Fee: 135 ",
+  "Fee: 132 ",
+  "Fee: 130 ",
+  "Fee: 128 ",
+  "Fee: 126 ",
+  "Fee: 100 ",
+]
+`;
+
+exports[`AlgebraBasePluginALM #DynamicFeeManager #adaptiveFee single huge step after day 1`] = `
+Array [
+  "Fee: 3000 ",
+  "Fee: 3000 ",
+  "Fee: 3000 ",
+  "Fee: 3000 ",
+  "Fee: 3000 ",
+  "Fee: 3000 ",
+  "Fee: 3000 ",
+  "Fee: 3000 ",
+  "Fee: 3000 ",
+  "Fee: 3000 ",
+  "Fee: 3000 ",
+  "Fee: 3000 ",
+  "Fee: 3000 ",
+  "Fee: 3000 ",
+  "Fee: 3000 ",
+  "Fee: 3000 ",
+  "Fee: 3000 ",
+  "Fee: 3000 ",
+  "Fee: 3000 ",
+  "Fee: 3000 ",
+  "Fee: 3000 ",
+  "Fee: 3000 ",
+  "Fee: 3000 ",
+  "Fee: 3000 ",
+  "Fee: 100 ",
+]
+`;
+
 exports[`AlgebraBasePluginALM AlgebraBasePluginV1 external methods #changeFeeConfiguration feeConfig getter gas cost [ @skip-on-coverage ] 1`] = `21065`;
