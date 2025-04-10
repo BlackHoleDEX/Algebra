@@ -543,7 +543,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         address owner = ownerOf(_tokenId);
 
         // Clear approval
-        approve(address(0), _tokenId);
+        delete idToApprovals[_tokenId];
         // checkpoint for gov
         VotingDelegationLib.moveTokenDelegates(cpData, delegates(owner), address(0), _tokenId, ownerOf);
         // Remove token
