@@ -250,20 +250,13 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
         }
       } else {
         IAlgebraVault(vault).setDepositMax(0, 0);
-        // pendingRebalanceTimestamp = 0;
         state = State.Special;
         _pause();
       }
     } else {
-      // pendingRebalanceTimestamp = 0;
       lastRebalanceTimestamp = _blockTimestamp();
       lastRebalanceCurrentPrice = obtainTWAPsResult.currentPriceAccountingDecimals;
     }
-
-    // чекируем decideStatus
-    // если нужен ребаланс
-    // вызываем getrangeswithstate или getRangesWithoutState, получаем ренжи
-    // IAlgebraVault(vault).rebalance(ranges.tick1, ranges.tick2, ....);
   }
 
   function _obtainTWAPs(
