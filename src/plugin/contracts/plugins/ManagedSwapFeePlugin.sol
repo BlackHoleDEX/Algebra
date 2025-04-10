@@ -12,7 +12,6 @@ import '../interfaces/plugins/IManagedSwapFeePlugin.sol';
 
 import '../base/AlgebraBasePlugin.sol';
 
-
 /// @title Algebra Integral 1.2.1 managed swap fee plugin
 /// @notice This plugin get fees value from the swap router and apply that fees to swap
 abstract contract ManagedSwapFeePlugin is AlgebraBasePlugin, IManagedSwapFeePlugin {
@@ -21,34 +20,34 @@ abstract contract ManagedSwapFeePlugin is AlgebraBasePlugin, IManagedSwapFeePlug
 
   uint8 private constant defaultPluginConfig = uint8(Plugins.BEFORE_SWAP_FLAG);
 
-  address public router;
-  mapping(address => bool) public whitelistedAddresses;
+  address public override router;
+  mapping(address => bool) public override whitelistedAddresses;
   mapping(bytes32 => bool) private usedNonces;
 
   constructor(address _router) {
     router = _router;
   }
 
-  function setRouterAddress(address _router) external {
+  function setRouterAddress(address _router) external override {
     _authorize();
     router = _router;
     emit RouterAddress(_router);
   }
 
-  function whitelistAddress(address _address) external {
+  function setWhitelistStatus(address _address, bool status) external override{
     _authorize();
-    whitelistedAddresses[_address] = true;
-    emit WhitelistedAddress(_address);
+    whitelistedAddresses[_address] = status;
+    emit WhitelistedAddress(_address, status);
   }
 
   function _getManagedFee(bytes memory pluginData) internal returns (uint24){
-    (bytes32 nonce, uint24 fee, address user, uint32 expireTime,bytes memory signature) = _parsePluginData(pluginData);
+    (bytes32 nonce, uint24 fee, address user, uint32 expireTime, bytes memory signature) = _parsePluginData(pluginData);
     if(fee >= 1000000) revert FeeExceedsLimit();
     if(usedNonces[nonce]) revert InvalidNonce();
     if(expireTime < block.timestamp) revert Expired();
     if(user != tx.origin) revert NotAllowed();
 
-    verifySignature(getParamsHash(nonce, fee, user, expireTime), signature);
+    verifySignature(ECDSA.toEthSignedMessageHash(getParamsHash(nonce, fee, user, expireTime)), signature);
     usedNonces[nonce] = true;
     return fee;
   }
@@ -66,7 +65,7 @@ abstract contract ManagedSwapFeePlugin is AlgebraBasePlugin, IManagedSwapFeePlug
   }
 
   function getParamsHash(bytes32 nonce, uint24 fee, address user, uint32 expire) private pure returns (bytes32) {
-    return keccak256(abi.encodePacked(nonce, fee, user, expire));
+    return keccak256(abi.encode(nonce, fee, user, expire));
   }
 
 }

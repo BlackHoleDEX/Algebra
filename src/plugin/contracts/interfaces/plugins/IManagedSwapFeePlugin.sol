@@ -15,12 +15,9 @@ interface IManagedSwapFeePlugin {
     /// @param newRouter The new router address
     event RouterAddress(address indexed newRouter);
 
-    event WhitelistedAddress(address indexed _address);
+    event WhitelistedAddress(address indexed _address, bool status);
 
     /// @notice Struct representing plugin data
-    /// @param nonce The unique nonce for the plugin data
-    /// @param fee The fee value to be applied to the swap
-    /// @param signature The signature verifying the plugin data
     struct PluginData {
         bytes32 nonce;
         uint24 fee;
@@ -28,6 +25,9 @@ interface IManagedSwapFeePlugin {
         uint32 expire;
         bytes signature;
     }
+
+    
+    function router() external view returns (address);
 
     /// @notice Checks if an address is whitelisted
     /// @param _address The address to check
@@ -37,5 +37,10 @@ interface IManagedSwapFeePlugin {
     /// @notice Sets the router address
     /// @param _router The address of the router to set
     function setRouterAddress(address _router) external;
+
+    /// @notice Whitelists an address
+    /// @param _address The address to whitelist
+    function setWhitelistStatus(address _address, bool status) external;
+
 
 }
