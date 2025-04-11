@@ -79,7 +79,6 @@ contract AlmPluginTest is BaseRebalanceManager {
     console.logInt(twapResult.currentTick);
     console.log(twapResult.percentageOfDepositTokenUnused);
     console.log(twapResult.percentageOfDepositToken);
-    console.log(twapResult.failedToObtainTWAP);
     console.log(twapResult.sameBlock);
     console.log('TWAP RESULT END');
 

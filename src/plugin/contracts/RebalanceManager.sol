@@ -19,7 +19,7 @@ contract RebalanceManager is BaseRebalanceManager {
     minTimeBetweenRebalances = _minTimeBetweenRebalances;
 
     allowToken1 = _allowToken1;
-    state = State.OverInventory; // поч overinventory?
+    state = State.OverInventory;
     lastRebalanceTimestamp = 0;
     lastRebalanceCurrentPrice = 0;
 

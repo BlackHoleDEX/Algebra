@@ -115,6 +115,8 @@ export const pluginFixtureALM: Fixture<ALMPluginFixture> = async function (): Pr
   const mockPoolFactory = await ethers.getContractFactory('MockPool');
   const mockPool = (await mockPoolFactory.deploy()) as any as MockPool;
 
+  await mockPool.setFactory(mockFactory);
+
   const mockPluginFactoryFactory = await ethers.getContractFactory('MockAlgebraBasePluginALMFactory');
   const mockPluginFactory = (await mockPluginFactoryFactory.deploy(mockFactory)) as any as MockAlgebraBasePluginALMFactory;
 

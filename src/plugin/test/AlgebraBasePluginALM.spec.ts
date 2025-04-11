@@ -6,7 +6,7 @@ import { expect } from './shared/expect';
 import { TEST_POOL_START_TIME, pluginFixtureALM } from './shared/fixtures';
 import { PLUGIN_FLAGS, encodePriceSqrt, expandTo18Decimals, getMaxTick, getMinTick } from './shared/utilities';
 
-import { MockPool, MockAlgebraBasePluginALM, MockAlgebraBasePluginALMFactory, MockTimeVirtualPool, MockVault, RebalanceManager, MockRebalanceManager } from '../typechain';
+import { MockPool, MockAlgebraBasePluginALM, MockAlgebraBasePluginALMFactory, MockTimeVirtualPool, MockVault, RebalanceManager, MockRebalanceManager, MockFactory } from '../typechain';
 
 import snapshotGasCost from './shared/snapshotGasCost';
 
@@ -34,6 +34,7 @@ describe('AlgebraBasePluginALM', () => {
   let plugin: MockAlgebraBasePluginALM; // modified plugin
   let mockPluginFactory: MockAlgebraBasePluginALMFactory; // modified plugin factory
   let mockPool: MockPool; // mock of AlgebraPool
+  let mockFactory: MockFactory;
 
   let minTick = getMinTick(60);
   let maxTick = getMaxTick(60);
@@ -51,7 +52,7 @@ describe('AlgebraBasePluginALM', () => {
         normalThreshold: 8100, // было 8000
         underInventoryThreshold: 7800, // было 7700
         overInventoryThreshold: 9100,
-        priceChangeThreshold: 100,
+        priceChangeThreshold: 50,
         extremeVolatility: 2500,
         highVolatility: 900, // было 500
         someVolatility: 200, // было 100
@@ -76,7 +77,7 @@ describe('AlgebraBasePluginALM', () => {
   });
 
   beforeEach('deploy test AlgebraBasePlugin', async () => {
-    ({ mockVault, plugin, mockPluginFactory, mockPool } = await loadFixture(pluginFixtureALM));
+    ({ mockVault, plugin, mockPluginFactory, mockPool, mockFactory } = await loadFixture(pluginFixtureALM));
   });
 
   describe('#Initialize', async () => {
@@ -560,6 +561,33 @@ describe('AlgebraBasePluginALM', () => {
       await deployAndSetRebalanceManager();
     });
 
+    describe('setters', () => {
+      before('prepare signers', async () => {
+        [wallet, other] = await (ethers as any).getSigners();
+      });
+
+      beforeEach('grant role', async () => {
+        await mockFactory.grantRole(await rebalanceManager.ALGEBRA_BASE_PLUGIN_MANAGER(), wallet);
+        expect(await mockFactory.hasRoleOrOwner(await rebalanceManager.ALGEBRA_BASE_PLUGIN_MANAGER(), wallet)).to.be.equals(true);
+      });
+
+      it('setPriceChangeThreshold', async () => {
+        await expect(rebalanceManager.setPriceChangeThreshold(10000)).to.be.revertedWith('Invalid price change threshold');
+        await rebalanceManager.setPriceChangeThreshold(50);
+        expect((await rebalanceManager.thresholds())[5]).to.be.equals(50);
+      });
+
+      it('setPercentages', async () => {
+        await expect(rebalanceManager.setPercentages(0, 0, 0)).to.be.revertedWith('Invalid base low percent');
+        await expect(rebalanceManager.setPercentages(100, 0, 0)).to.be.revertedWith('Invalid base high percent');
+        await expect(rebalanceManager.setPercentages(100, 100, 0)).to.be.revertedWith('Invalid limit reserve percent');
+        await rebalanceManager.setPercentages(100, 200, 300);
+        expect((await rebalanceManager.thresholds())[10]).to.be.equals(100);
+        expect((await rebalanceManager.thresholds())[11]).to.be.equals(200);
+        expect((await rebalanceManager.thresholds())[12]).to.be.equals(300);
+      });
+    });
+
     async function checkState(expectedState: State) {
       expect((await rebalanceManager.state())).to.be.eq(expectedState);
     }
@@ -842,6 +870,63 @@ describe('AlgebraBasePluginALM', () => {
         .to.emit(rebalanceManager, 'MockUpdateStatus').withArgs(true, State.Normal)
         .to.emit(rebalanceManager, 'MockDecideRebalance').withArgs(DecideStatus.Normal, State.Normal);
       await checkState(State.Normal);
+    });
+
+    it('over -> over -> under', async () => {
+      await rebalanceManager.setDecimals(18, 18);
+      await plugin.initializeALM(rebalanceManager, 3600, 300);
+
+      await rebalanceManager.setDepositTokenBalance(10000n);
+      await mockVault.setTotalAmounts(10000, 0);
+      await plugin.advanceTime(5000);
+      await expect(mockPool.swapToTick(0)).to.emit(rebalanceManager, 'MockDecideRebalance').withArgs(DecideStatus.Normal, State.OverInventory);
+      await checkState(State.OverInventory);
+
+      await mockVault.setTotalAmounts(7500, 2500);
+      await rebalanceManager.advanceTime(7200);
+      await plugin.advanceTime(7200);
+      await expect(mockPool.swapToTick(0))
+        .to.emit(rebalanceManager, 'MockUpdateStatus').withArgs(true, State.UnderInventory)
+        .to.emit(rebalanceManager, 'MockDecideRebalance').withArgs(DecideStatus.Normal, State.UnderInventory);
+      await checkState(State.UnderInventory);
+    });
+
+    it('over -> over -> current, priceChange < priceChangeThreshold', async () => {
+      await rebalanceManager.setDecimals(18, 18);
+      await plugin.initializeALM(rebalanceManager, 3600, 300);
+
+      await rebalanceManager.setDepositTokenBalance(10000n);
+      await mockVault.setTotalAmounts(10000, 0);
+      await plugin.advanceTime(5000);
+      await expect(mockPool.swapToTick(0)).to.emit(rebalanceManager, 'MockDecideRebalance').withArgs(DecideStatus.Normal, State.OverInventory);
+      await checkState(State.OverInventory);
+
+      await mockVault.setTotalAmounts(9200, 800);
+      await rebalanceManager.advanceTime(7200);
+      await plugin.advanceTime(7200);
+      await expect(mockPool.swapToTick(100))
+        .to.emit(rebalanceManager, 'MockUpdateStatus').withArgs(true, State.OverInventory)
+        .to.emit(rebalanceManager, 'MockDecideRebalance').withArgs(DecideStatus.Normal, State.OverInventory);
+      await checkState(State.OverInventory);
+    });
+
+    it('over -> normal -> under', async () => {
+      await rebalanceManager.setDecimals(18, 18);
+      await plugin.initializeALM(rebalanceManager, 3600, 300);
+
+      await rebalanceManager.setDepositTokenBalance(10000n);
+      await mockVault.setTotalAmounts(8000, 2000);
+      await plugin.advanceTime(5000);
+      await expect(mockPool.swapToTick(0)).to.emit(rebalanceManager, 'MockDecideRebalance').withArgs(DecideStatus.Normal, State.Normal);
+      await checkState(State.Normal);
+
+      await mockVault.setTotalAmounts(7700, 2300);
+      await rebalanceManager.advanceTime(7200);
+      await plugin.advanceTime(7200);
+      await expect(mockPool.swapToTick(0))
+        .to.emit(rebalanceManager, 'MockUpdateStatus').withArgs(true, State.UnderInventory)
+        .to.emit(rebalanceManager, 'MockDecideRebalance').withArgs(DecideStatus.Normal, State.UnderInventory);
+      await checkState(State.UnderInventory);
     });
   });
 

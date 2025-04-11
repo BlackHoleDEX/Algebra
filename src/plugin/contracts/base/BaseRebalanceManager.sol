@@ -30,7 +30,6 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
     int24 currentTick;
     uint16 percentageOfDepositTokenUnused; // 10000 = 100%
     uint16 percentageOfDepositToken; // 10000 = 100%
-    bool failedToObtainTWAP;
     bool sameBlock;
   }
 
@@ -207,6 +206,7 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
   function _rebalance(TwapResult memory obtainTWAPsResult) internal {
     if (paused) return;
     if (vault == address(0)) return;
+    if (obtainTWAPsResult.totalDepositToken + obtainTWAPsResult.totalPairedInDeposit == 0) return;
 
     (DecideStatus decideStatus, State newState) = _decideRebalance(obtainTWAPsResult);
     // console.log('rebalance entered');
@@ -266,7 +266,6 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
     uint32 lastBlockTimestamp
   ) internal view returns (TwapResult memory twapResult) {
     // // console.log('entered obtain twaps');
-    twapResult.failedToObtainTWAP = false;
 
     twapResult.currentTick = currentTick;
     // console.log('_blockTimestamp(): ', _blockTimestamp());
@@ -322,13 +321,7 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
     } else {
       uint256 totalTokensAmount = twapResult.totalDepositToken + twapResult.totalPairedInDeposit;
       // // console.log("totalTokensAmount: ", totalTokensAmount);
-      // TOOD: планировали убирать failedToObtainTwap, подумать что с этим делать (наверное в rebalance прост)
-      // if (twapResult.totalDepositToken + twapResult.totalPairedInDeposit) return;
-      if (totalTokensAmount == 0) {
-        twapResult.failedToObtainTWAP = true;
-        return twapResult;
-      }
-      uint16 percentageOfDepositToken = uint16((twapResult.totalDepositToken * 10000) / totalTokensAmount);
+      uint16 percentageOfDepositToken = totalTokensAmount == 0 ? 0 : uint16((twapResult.totalDepositToken * 10000) / totalTokensAmount);
       twapResult.percentageOfDepositToken = percentageOfDepositToken;
     }
 
@@ -462,9 +455,8 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
         }
 
         uint256 priceChange = _calcPercentageDiff(lastRebalanceCurrentPrice, twapResult.currentPriceAccountingDecimals); // percentage diff between lastRebalanceCurrentPrice and currentPriceAccountingDecimals
-        // // console.log('priceChange: ', priceChange);
-        // // console.log('priceChange: ', priceChange);
-        // // console.log('threshold: ', thresholds.priceChangeThreshold);
+        // console.log('priceChange: ', priceChange);
+        // console.log('threshold: ', thresholds.priceChangeThreshold);
         if (priceChange > thresholds.priceChangeThreshold) {
           // CASES:
           // 1. we are still under-inventory and price changed by more than (1/0.5)%
