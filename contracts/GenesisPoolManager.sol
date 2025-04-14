@@ -108,7 +108,12 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         address _fundingToken = genesisPoolInfo.fundingToken;
         require(tokenHandler.isConnector(_fundingToken), "conn !=");
         bool _stable = genesisPoolInfo.stable;
-        require(pairFactory.getPair(nativeToken, _fundingToken, _stable) == address(0), "exist pair");
+        
+        address pairAddress = pairFactory.getPair(nativeToken, _fundingToken, _stable);
+        if (pairAddress != address(0)) {
+            require(IERC20(nativeToken).balanceOf(pairAddress) == 0, "pair native bal > 0");
+            require(IERC20(_fundingToken).balanceOf(pairAddress) == 0, "pair funding bal > 0");
+        }
 
         require(genesisPoolInfo.duration >= MIN_DURATION && genesisPoolInfo.threshold >= MIN_THRESHOLD && genesisPoolInfo.startPrice > 0, "genesis info");
         require(genesisPoolInfo.supplyPercent > 0 && genesisPoolInfo.supplyPercent <= 10000, "supplyPercent"); 
@@ -148,7 +153,13 @@ contract GenesisPoolManager is IGenesisPoolBase, IGenesisPoolManager, OwnableUpg
         GenesisInfo memory genesisInfo =  IGenesisPool(genesisPool).getGenesisInfo();
         require(genesisInfo.startTime + genesisInfo.duration - BlackTimeLibrary.NO_GENESIS_DEPOSIT_WINDOW > block.timestamp, "time");
 
-        address pairAddress = pairFactory.createPair(nativeToken, genesisInfo.fundingToken, genesisInfo.stable);
+        address pairAddress = pairFactory.getPair(nativeToken, genesisInfo.fundingToken, genesisInfo.stable);
+        if (pairAddress == address(0)) {
+            pairAddress = pairFactory.createPair(nativeToken, genesisInfo.fundingToken, genesisInfo.stable);
+        } else {
+            require(IERC20(nativeToken).balanceOf(pairAddress) == 0, "pair native bal > 0");
+            require(IERC20(genesisInfo.fundingToken).balanceOf(pairAddress) == 0, "pair funding bal > 0");
+        }
         pairFactory.setGenesisStatus(pairAddress, true);
 
         liveNativeTokens.push(nativeToken);
