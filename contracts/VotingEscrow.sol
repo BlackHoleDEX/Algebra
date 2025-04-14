@@ -544,12 +544,12 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
 
         // Clear approval
         delete idToApprovals[_tokenId];
-        // checkpoint for gov
-        VotingDelegationLib.moveTokenDelegates(cpData, delegates(owner), address(0), _tokenId, ownerOf);
         // Remove token
         //_removeTokenFrom(msg.sender, _tokenId);
         _removeTokenFrom(owner, _tokenId);
-        
+        // checkpoint for gov
+        VotingDelegationLib.moveTokenDelegates(cpData, delegates(owner), address(0), _tokenId, ownerOf);
+
         emit Transfer(owner, address(0), _tokenId);
     }
 
@@ -1095,9 +1095,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         uint value0 = uint(int256(_locked0.amount));
         uint end = _locked0.end >= _locked1.end ? _locked0.end : _locked1.end;
 
-        _burn(_from);
         locked[_from] = IVotingEscrow.LockedBalance(0, 0, false, false);
         _checkpoint(_from, _locked0, IVotingEscrow.LockedBalance(0, 0, false, false));
+        _burn(_from);
 
         IVotingEscrow.LockedBalance memory newLockedTo;
         newLockedTo.isPermanent = _locked1.isPermanent;
@@ -1106,7 +1106,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         if(newLockedTo.isSMNFT){
             if (!_locked0.isSMNFT) {
                 // If source wasn't SMNFT, add bonus for its amount
-                newLockedTo.amount = _locked1.amount + _locked0.amount + int128(int256(calculate_sm_nft_bonus(uint256(int256(_locked0.amount)))));
+                newLockedTo.amount = _locked1.amount + _locked0.amount + int128(int256(calculate_sm_nft_bonus(value0)));
                 smNFTBalance += value0;
                 assert(_black.burn(value0));
             } else {
@@ -1160,9 +1160,9 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         require(_splitAmount != 0, "ZeroAmount");
         require(newLocked.amount > _splitAmount, "AmountTooBig");
 
-        _burn(_from);
         locked[_from] = IVotingEscrow.LockedBalance(0, 0, false, false);
         _checkpoint(_from, newLocked, IVotingEscrow.LockedBalance(0, 0, false, false));
+        _burn(_from);
 
         newLocked.amount -= _splitAmount;
         _tokenId1 = _createSplitNFT(owner, newLocked);
