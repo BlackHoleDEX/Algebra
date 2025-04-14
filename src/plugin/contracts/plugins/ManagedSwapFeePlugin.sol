@@ -47,7 +47,7 @@ abstract contract ManagedSwapFeePlugin is AlgebraBasePlugin, IManagedSwapFeePlug
     if(expireTime < block.timestamp) revert Expired();
     if(user != tx.origin) revert NotAllowed();
 
-    verifySignature(ECDSA.toEthSignedMessageHash(getParamsHash(nonce, fee, user, expireTime)), signature);
+    _verifySignature(ECDSA.toEthSignedMessageHash(_getParamsHash(nonce, fee, user, expireTime)), signature);
     usedNonces[nonce] = true;
     return fee;
   }
@@ -57,14 +57,12 @@ abstract contract ManagedSwapFeePlugin is AlgebraBasePlugin, IManagedSwapFeePlug
     return (data.nonce, data.fee, data.user, data.expire, data.signature);
   }
 
-  function verifySignature(bytes32 hash, bytes memory signature) private view returns (address) {
+  function _verifySignature(bytes32 hash, bytes memory signature) private view {
     address recoveredSigner = hash.recover(signature);
     if(!whitelistedAddresses[recoveredSigner]) revert NotWhitelisted();
-
-    return recoveredSigner;
   }
 
-  function getParamsHash(bytes32 nonce, uint24 fee, address user, uint32 expire) private pure returns (bytes32) {
+  function _getParamsHash(bytes32 nonce, uint24 fee, address user, uint32 expire) private pure returns (bytes32) {
     return keccak256(abi.encode(nonce, fee, user, expire));
   }
 

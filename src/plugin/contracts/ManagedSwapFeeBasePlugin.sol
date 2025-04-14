@@ -52,14 +52,20 @@ contract ManagedSwapFeeBasePlugin is DynamicFeePlugin, FarmingProxyPlugin, Volat
   }
 
   function beforeSwap(address sender, address, bool, int256, uint160, bool, bytes calldata swapCallbackData) external override onlyPool returns (bytes4, uint24, uint24) {
+    uint24 fee;
+    
     _writeTimepoint();
-    uint88 volatilityAverage = _getAverageVolatilityLast();
-    uint24 fee = _getCurrentFee(volatilityAverage);
-    if (sender == router ){
+    if (sender == router){
       ISwapRouter.SwapCallbackData memory swapData = abi.decode(swapCallbackData, (ISwapRouter.SwapCallbackData));
       if(swapData.pluginData.length > 0) {
         fee = _getManagedFee(swapData.pluginData);
+      } else {
+        uint88 volatilityAverage = _getAverageVolatilityLast();
+        fee = _getCurrentFee(volatilityAverage);
       }
+    } else {
+      uint88 volatilityAverage = _getAverageVolatilityLast();
+      fee = _getCurrentFee(volatilityAverage);
     }
     return (IAlgebraPlugin.beforeSwap.selector, fee, 0);
   }
