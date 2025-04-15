@@ -15,7 +15,7 @@ async function main () {
         const jsonData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8'));
         const addresses = jsonData.map(obj => obj.address);
 
-        const nativeToken = addresses[1];
+        const nativeToken = "0xB9ca77cC590a712c499cE46bA0562B9D280fd6e8"
 
         const GenesisManagerContract = await ethers.getContractAt(genesisPoolManagerAbi, genesisPoolManagerAddress);
         await GenesisManagerContract.approveGenesisPool(nativeToken);

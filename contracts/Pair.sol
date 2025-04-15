@@ -162,7 +162,7 @@ contract Pair is IPair {
     function _update0(uint amount) internal {
         // get referral fee
         address _dibs = PairFactory(factory).dibs();
-        uint256 _maxRef = PairFactory(factory).MAX_REFERRAL_FEE();
+        uint256 _maxRef = PairFactory(factory).getReferralFee(address(this));
         uint256 _referralFee = (_dibs != address(0)) ? (amount * _maxRef / 10000) : 0;
         if (_referralFee > 0) {
             _safeTransfer(token0, _dibs, _referralFee); // Transfer referral fees
@@ -187,7 +187,7 @@ contract Pair is IPair {
     function _update1(uint amount) internal {
         // get referral fee
         address _dibs = PairFactory(factory).dibs();
-        uint256 _maxRef = PairFactory(factory).MAX_REFERRAL_FEE();
+        uint256 _maxRef = PairFactory(factory).getReferralFee(address(this));
         uint256 _referralFee = (_dibs != address(0)) ? (amount * _maxRef / 10000) : 0;
          if (_referralFee > 0) {
              _safeTransfer(token1, _dibs, _referralFee); // transfer the fees out to PairFees

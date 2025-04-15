@@ -78,7 +78,7 @@ contract BlackGovernor is
             epochTimeHash
         );
         require(
-            state(proposalId) == ProposalState.Pending,
+            state(_proposalId) == ProposalState.Pending,
             "Governor: too late to cancel"
         );
         require(

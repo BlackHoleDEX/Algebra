@@ -3,6 +3,7 @@ const path = require("path");
 const { ethers } = require("hardhat");
 const { blackAbi } = require("../../../../generated/black")
 const { BigNumber } = require("ethers");
+const { generateConstantFile } = require('../../../blackhole-scripts/postDeployment/generator');
 
 const deployedTokensPath = path.resolve(__dirname, "../../token-constants/deployed-tokens.json");
 const deployedTokens = require(deployedTokensPath);
@@ -12,6 +13,7 @@ const deployBlack = async () => {
         const blackFactory = await blackContract.deploy();
         await blackFactory.deployed();
         console.log("Black token deployed at:", blackFactory.address);
+        generateConstantFile("Black", blackFactory.address);
         return blackFactory.address;
     } catch (error) {
         console.log("Error deploying Black:", error);
@@ -48,7 +50,7 @@ async function main() {
     // const receiver = owner.address;
     // const receiver = "0xa7243fc6FB83b0490eBe957941a339be4Db11c29";
     const receiver = owner.address;
-    const mintAmount = 100000;
+    const mintAmount = 500000;
     //  const mintAmount = <add_mint_amount>;
 
     // Deploy Black token

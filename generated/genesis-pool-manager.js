@@ -1,4 +1,4 @@
-const genesisPoolManagerAddress = "0x7B7Af039ad5915a36b5c0363b7fe862B074911bE";
+const genesisPoolManagerAddress = "0x766Fe9E20162cc4b6ED32Fe8E437E3F054B4733a";
 
 const genesisPoolManagerAbi = [
   {
@@ -135,19 +135,6 @@ const genesisPoolManagerAbi = [
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "active_period",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "address",
@@ -216,6 +203,11 @@ const genesisPoolManagerAbi = [
         "components": [
           {
             "internalType": "address",
+            "name": "tokenOwner",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
             "name": "nativeToken",
             "type": "address"
           },
@@ -253,6 +245,11 @@ const genesisPoolManagerAbi = [
             "internalType": "uint256",
             "name": "startTime",
             "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maturityTime",
+            "type": "uint256"
           }
         ],
         "internalType": "struct IGenesisPoolBase.GenesisInfo",
@@ -261,11 +258,6 @@ const genesisPoolManagerAbi = [
       },
       {
         "components": [
-          {
-            "internalType": "address",
-            "name": "tokenOwner",
-            "type": "address"
-          },
           {
             "internalType": "uint256",
             "name": "proposedNativeAmount",
@@ -504,6 +496,19 @@ const genesisPoolManagerAbi = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "pre_epoch_period",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -569,6 +574,42 @@ const genesisPoolManagerAbi = [
   },
   {
     "inputs": [
+      {
+        "internalType": "address",
+        "name": "_nativeToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_startTime",
+        "type": "uint256"
+      }
+    ],
+    "name": "setGenesisStartTime",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_maturityTime",
+        "type": "uint256"
+      }
+    ],
+    "name": "setMaturityTime",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_nativeToken",
+        "type": "address"
+      },
       {
         "internalType": "uint256",
         "name": "_maturityTime",

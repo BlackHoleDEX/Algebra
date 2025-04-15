@@ -104,7 +104,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
             _token = _incentivesToken[i];
             _amount = _incentivesAmount[i];
             if(_token != address(0) && _amount > 0 && (_token == genesisInfo.nativeToken || tokenHandler.isConnector(_token))){
-                assert(IERC20(_token).transferFrom(_sender, address(this), _amount));
+                IERC20(_token).safeTransferFrom(_sender, address(this), _amount);
                 if(incentives[_token] == 0){
                     incentiveTokens.push(_token);
                 }
@@ -139,7 +139,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
         _amount = _amount <= amount ? _amount : amount;
         require(_amount > 0, "max amt");
 
-        assert(IERC20(genesisInfo.fundingToken).transferFrom(spender, address(this), _amount));
+        IERC20(genesisInfo.fundingToken).safeTransferFrom(spender, address(this), _amount);
 
         if(userDeposits[spender] == 0){
             depositers.push(spender);
@@ -191,7 +191,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
             _amount = incentives[incentiveTokens[i]];
             if(_amount > 0)
             {
-                IERC20(incentiveTokens[i]).approve(external_bribe, _amount);
+                IERC20(incentiveTokens[i]).safeApprove(external_bribe, _amount);
                 IBribe(external_bribe).notifyRewardAmount(incentiveTokens[i], _amount);
             }
         }
@@ -218,14 +218,14 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
     }
 
     function _approveTokens(address router) internal {
-        IERC20(genesisInfo.nativeToken).approve(router, allocationInfo.allocatedNativeAmount);
-        IERC20(genesisInfo.fundingToken).approve(router, allocationInfo.allocatedFundingAmount);
+        IERC20(genesisInfo.nativeToken).safeApprove(router, allocationInfo.allocatedNativeAmount);
+        IERC20(genesisInfo.fundingToken).safeApprove(router, allocationInfo.allocatedFundingAmount);
     }
 
     function _addLiquidityAndDistribute(address _router, uint256 nativeDesired, uint256 fundingDesired, uint256 maturityTime) internal {
         (, , uint _liquidity) = IRouter(_router).addLiquidity(genesisInfo.nativeToken, genesisInfo.fundingToken, genesisInfo.stable, nativeDesired, fundingDesired, 0, 0, address(this), block.timestamp + 100);
         liquidity = _liquidity;
-        IERC20(liquidityPoolInfo.pairAddress).approve(liquidityPoolInfo.gaugeAddress, liquidity);
+        IERC20(liquidityPoolInfo.pairAddress).safeApprove(liquidityPoolInfo.gaugeAddress, liquidity);
         IGauge(liquidityPoolInfo.gaugeAddress).depositsForGenesis(genesisInfo.tokenOwner, block.timestamp + maturityTime, liquidity);
     }
 
@@ -242,6 +242,9 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
     }
 
     function launch(address router, uint256 maturityTime) external onlyManager {
+        if(genesisInfo.maturityTime > 0) {
+            maturityTime = genesisInfo.maturityTime;
+        }
         if(_eligbleForCompleteLaunch()){
             _launchCompletely(router, maturityTime);
         }else{
@@ -249,61 +252,44 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
         }
     }
 
-    function claimableUnallocatedAmount() public view returns(PoolStatus, address[] memory addresses, uint256[] memory amounts){
-        uint claimableCnt = 1;
-        if(poolStatus == PoolStatus.NOT_QUALIFIED && msg.sender == genesisInfo.tokenOwner){
-            claimableCnt++;
-        }
-
-        addresses = new address[](claimableCnt);
-        amounts = new uint256[](claimableCnt);
-
-        if(poolStatus == PoolStatus.PARTIALLY_LAUNCHED){
-            if(msg.sender == genesisInfo.tokenOwner){
-                addresses[0] = genesisInfo.nativeToken;
-                amounts[0] = allocationInfo.refundableNativeAmount;
-            } 
-        }else if(poolStatus == PoolStatus.NOT_QUALIFIED){
-            addresses[0] = genesisInfo.fundingToken;
-            amounts[0] = userDeposits[msg.sender];
-            if(msg.sender == genesisInfo.tokenOwner){
-                addresses[1] = genesisInfo.nativeToken;
-                amounts[1] = allocationInfo.refundableNativeAmount;
+    function claimableNative() public view returns(PoolStatus, address token, uint256 amount){
+        if(msg.sender == genesisInfo.tokenOwner){
+            if(poolStatus == PoolStatus.PARTIALLY_LAUNCHED || poolStatus == PoolStatus.NOT_QUALIFIED){
+                token = genesisInfo.nativeToken;
+                amount = allocationInfo.refundableNativeAmount;
             }
         }
-        
-        return (PoolStatus.DEFAULT, addresses, amounts);
+        return (poolStatus, token, amount);
     }
 
-    function claimUnallocatedAmount() external {
+    function claimableDeposits() public view returns(PoolStatus, address token, uint256 amount){
+        if(poolStatus == PoolStatus.NOT_QUALIFIED){
+            token = genesisInfo.fundingToken;
+            amount = userDeposits[msg.sender];
+        }
+        return (poolStatus, token, amount);
+    }
+
+    function claimNative() external {
         require(poolStatus == PoolStatus.NOT_QUALIFIED || poolStatus == PoolStatus.PARTIALLY_LAUNCHED, "!= status");
+        require(msg.sender == genesisInfo.tokenOwner, "!= owner");
 
-        uint256 _amount;
-        if(poolStatus == PoolStatus.PARTIALLY_LAUNCHED){
-            if(msg.sender == genesisInfo.tokenOwner){
-                _amount = allocationInfo.refundableNativeAmount;
-                allocationInfo.refundableNativeAmount = 0;
+        uint256 _amount = allocationInfo.refundableNativeAmount;
+        allocationInfo.refundableNativeAmount = 0;
 
-                if(_amount > 0){
-                    assert(IERC20(genesisInfo.nativeToken).transfer(msg.sender, _amount));
-                }
-            } 
-        }else if(poolStatus == PoolStatus.NOT_QUALIFIED){
-            if(msg.sender == genesisInfo.tokenOwner){
-                _amount = allocationInfo.refundableNativeAmount;
-                allocationInfo.refundableNativeAmount = 0;
+        if(_amount > 0){
+            IERC20(genesisInfo.nativeToken).safeTransfer(msg.sender, _amount);
+        }
+    }
 
-                if(_amount > 0){
-                    assert(IERC20(genesisInfo.nativeToken).transfer(msg.sender, _amount));
-                }
-            }
+    function claimDeposits() external {
+        require(poolStatus == PoolStatus.NOT_QUALIFIED, "!= status");
 
-            _amount = userDeposits[msg.sender];
-            userDeposits[msg.sender] = 0;
+        uint256 _amount = userDeposits[msg.sender];
+        userDeposits[msg.sender] = 0;
 
-            if(_amount > 0){
-                assert(IERC20(genesisInfo.fundingToken).transfer(msg.sender, _amount));
-            }
+        if(_amount > 0){
+            IERC20(genesisInfo.fundingToken).safeTransfer(msg.sender, _amount);
         }
     }
 
@@ -331,7 +317,7 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
             _amount = incentives[incentiveTokens[i]];
             incentives[incentiveTokens[i]] = 0;
 
-            assert(IERC20(incentiveTokens[i]).transfer(msg.sender, _amount));
+            IERC20(incentiveTokens[i]).safeTransfer(msg.sender, _amount);
         }
     }
 
@@ -412,4 +398,15 @@ contract GenesisPool is IGenesisPool, IGenesisPoolBase {
         require(poolStatus == PoolStatus.NATIVE_TOKEN_DEPOSITED, "!= status");
         auction = IAuction(_auction);
     }
+
+    function setMaturityTime(uint256 _maturityTime) external onlyManager{
+        genesisInfo.maturityTime = _maturityTime;
+    }
+
+    function setStartTime(uint256 _startTime) external onlyManager{
+        _startTime = BlackTimeLibrary.epochStart(_startTime);
+        require(_startTime + genesisInfo.duration - BlackTimeLibrary.NO_GENESIS_DEPOSIT_WINDOW > block.timestamp, "time");
+        genesisInfo.startTime = _startTime;
+    }
+
 }

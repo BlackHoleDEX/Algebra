@@ -219,7 +219,7 @@ contract BlackClaims is IBlackClaims {
             require(transfer_success, "FAILED TRANSFER");
         }
         token.approve(address(_ve), staked_reward);
-        uint _tokenId = _ve.create_lock_for(staked_reward, MAX_PERIOD, msg.sender, false);
+        uint _tokenId = _ve.create_lock_for(staked_reward, MAX_PERIOD, msg.sender, true);
         emit StakedRewards(msg.sender, staked_reward);
         return _tokenId;
     }

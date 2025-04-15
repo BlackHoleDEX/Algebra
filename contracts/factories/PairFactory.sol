@@ -28,6 +28,7 @@ contract PairFactory is IPairFactory, OwnableUpgradeable {
     address[] public allPairs;
     mapping(address => bool) public isPair; 
     mapping(address => uint256) public customFees; 
+    mapping(address => uint256) public customReferralFees; 
     mapping(address => bool) public isGenesis; 
 
     event PairCreated(address indexed token0, address indexed token1, bool stable, address pair, uint);
@@ -103,11 +104,23 @@ contract PairFactory is IPairFactory, OwnableUpgradeable {
         customFees[_pairAddress] = _fees;
     }
 
+    function setCustomReferralFee(address _pairAddress, uint256 _refFee) external onlyManager {
+        require(isPair[_pairAddress], "Inv pair");
+        customReferralFees[_pairAddress] = _refFee;
+    }
+
     function getFee(address _pairAddress, bool _stable) public view returns (uint256) {
         if (customFees[_pairAddress] > 0) { 
             return customFees[_pairAddress];
         }
         return _stable ? stableFee : volatileFee;
+    }
+
+    function getReferralFee(address _pairAddress) public view returns (uint256) {
+        if (customReferralFees[_pairAddress] > 0) { 
+            return customReferralFees[_pairAddress];
+        }
+        return MAX_REFERRAL_FEE;
     }
 
     function getIsGenesis(address _pairAddress) public view returns (bool) {

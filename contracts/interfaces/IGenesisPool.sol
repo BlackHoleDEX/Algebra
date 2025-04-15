@@ -26,4 +26,6 @@ interface IGenesisPool {
     function getNativeTokenAmount(uint256 depositAmount) external view returns (uint256);
 
     function launch(address router, uint256 maturityTime) external;
+    function setMaturityTime(uint256 _maturityTime) external;
+    function setStartTime(uint256 _startTime) external;
 }

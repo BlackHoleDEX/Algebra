@@ -3,7 +3,8 @@ const { ethers } = require("hardhat");
 const fs = require('fs');
 const path = require('path');
 const { genesisPoolManagerAbi, genesisPoolManagerAddress } = require('../../../../generated/genesis-pool-manager');
-const { genesisPoolFactoryAbi } = require('../../../../generated/genesis-pool-factory');
+const { genesisPoolFactoryAbi, genesisPoolFactoryAddress } = require('../../../../generated/genesis-pool-factory');
+const { genesisPoolAbi } = require('../../../../generated/genesis-pool');
 
 async function main () {
 
@@ -13,21 +14,24 @@ async function main () {
   console.log("ownerAddress : ", accounts[1].address)
 
     try{
-        const GenesisPoolApi = await ethers.getContractAt(genesisPoolAPIAbi, "0x6E49D82979e4a23184d16Afa96876c9852F0AD09");
-        const signers = GenesisPoolApi.connect(accounts[1]); 
-        const genesisPoolsData = await signers.getAllUserRelatedGenesisPools(accounts[1].address);
+        const GenesisPoolManager = await ethers.getContractAt(genesisPoolManagerAbi, genesisPoolManagerAddress);
 
-        console.log("genesisPool : ", genesisPoolsData);
+        const genesisFactory = await GenesisPoolManager.genesisFactory();
+        console.log("genesisFactory : ", genesisFactory)
 
-        const GenesisPoolManager = await ethers.getContractAt(genesisPoolManagerAbi, '0xF6c64e5cBe8fafb44eAb82353245e890EBcE943c');
         const nativeTokens = await GenesisPoolManager.getAllNaitveTokens();
 
         console.log("nativeTokens : ", nativeTokens);
-        // const genesisPools = genesisPoolsData[0];
+   
+        const GenesisFactory = await ethers.getContractAt(genesisPoolFactoryAbi, genesisPoolFactoryAddress);
 
-        // for(const genesisPool of genesisPools){
-        //     console.log("genesisPool : ", genesisPool);
-        // }
+        for(let i=0;i<nativeTokens.length;i++){
+          const genesiPools = await GenesisFactory.getGenesisPools(nativeTokens[i]);
+          console.log("genesis pools : ", genesiPools)
+          const Genesis = await ethers.getContractAt(genesisPoolAbi, genesiPools[0]);
+          console.log("status : ", await Genesis.poolStatus())
+        }
+
     }
     catch(error){
         console.log("Error in genesis api : ", error)

@@ -12,8 +12,8 @@ contract GenesisPoolFactory is IGenesisPoolFactory, OwnableUpgradeable {
     address public genesisManager;
     address public tokenHandler;
 
-    mapping(address => address) public getGenesisPool;
-    address[] public genesisPools;
+    mapping(address => address[]) public genesisPools;
+    address[] public allGenesisPools;
 
     event GenesisCreated(address indexed nativeToken, address indexed fundingToken);
     event GenesisManagerChanged(address indexed oldManager, address indexed newManager);
@@ -38,23 +38,51 @@ contract GenesisPoolFactory is IGenesisPoolFactory, OwnableUpgradeable {
     }
 
     function genesisPoolsLength() external view returns (uint256){
-        return genesisPools.length;
+        return allGenesisPools.length;
     }
 
     function removeGenesisPool(address nativeToken) external onlyManager {
-        getGenesisPool[nativeToken] = address(0);
+        uint length = genesisPools[nativeToken].length;
+        uint256 i;
+        for (i = 0; i < length; i++) {
+            genesisPools[nativeToken][i] = address(0);
+        }
+    }
+
+    function removeGenesisPool(address nativeToken, uint256 index) external onlyManager {
+        genesisPools[nativeToken][index] = address(0);
     }
 
     function createGenesisPool(address tokenOwner, address nativeToken, address fundingToken) external onlyManager returns (address genesisPool) {
         require(nativeToken != address(0), "0x"); 
-        require(getGenesisPool[nativeToken] == address(0), "exists");
+        require(getGenesisPool(nativeToken) == address(0), "exists");
 
-        bytes32 salt = keccak256(abi.encodePacked(nativeToken, fundingToken));
+        bytes32 salt = keccak256(abi.encodePacked(nativeToken, fundingToken, genesisPools[nativeToken].length));
         genesisPool = address(new GenesisPool{salt: salt}(genesisManager, tokenHandler, tokenOwner, nativeToken, fundingToken));
 
-        getGenesisPool[nativeToken] = genesisPool;
-        genesisPools.push(genesisPool);
+        genesisPools[nativeToken].push(genesisPool);
+        allGenesisPools.push(genesisPool);
 
         emit GenesisCreated(nativeToken, fundingToken);
     }
+
+    function getGenesisPools(address nativeToken) external view returns (address[] memory){
+        return genesisPools[nativeToken];
+    }
+
+    function getGenesisPool(address nativeToken) public view returns (address) {
+        address[] memory pools = genesisPools[nativeToken];
+        uint length = pools.length;
+
+        if (length == 0) {
+            return address(0);
+        }
+        if(IGenesisPool(pools[length - 1]).poolStatus() != IGenesisPoolBase.PoolStatus.NOT_QUALIFIED)
+        {
+            return pools[length - 1];
+        }
+
+        return address(0);
+    }
+
 }

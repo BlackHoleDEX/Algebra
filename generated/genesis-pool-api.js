@@ -1,4 +1,4 @@
-const genesisPoolAPIAddress = "0x58C6DF34386f0612aE02a14D9aF02746E5667f16";
+const genesisPoolAPIAddress = "0x41Cf2FfB4A1dFe06089B62c2c8Bf49CAF6D0Bea9";
 
 const genesisPoolAPIAbi = [
   {
@@ -123,11 +123,6 @@ const genesisPoolAPIAbi = [
           {
             "components": [
               {
-                "internalType": "address",
-                "name": "tokenOwner",
-                "type": "address"
-              },
-              {
                 "internalType": "uint256",
                 "name": "proposedNativeAmount",
                 "type": "uint256"
@@ -178,6 +173,11 @@ const genesisPoolAPIAbi = [
             "components": [
               {
                 "internalType": "address",
+                "name": "tokenOwner",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
                 "name": "nativeToken",
                 "type": "address"
               },
@@ -214,6 +214,11 @@ const genesisPoolAPIAbi = [
               {
                 "internalType": "uint256",
                 "name": "startTime",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "maturityTime",
                 "type": "uint256"
               }
             ],
@@ -312,11 +317,6 @@ const genesisPoolAPIAbi = [
           {
             "components": [
               {
-                "internalType": "address",
-                "name": "tokenOwner",
-                "type": "address"
-              },
-              {
                 "internalType": "uint256",
                 "name": "proposedNativeAmount",
                 "type": "uint256"
@@ -367,6 +367,11 @@ const genesisPoolAPIAbi = [
             "components": [
               {
                 "internalType": "address",
+                "name": "tokenOwner",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
                 "name": "nativeToken",
                 "type": "address"
               },
@@ -403,6 +408,11 @@ const genesisPoolAPIAbi = [
               {
                 "internalType": "uint256",
                 "name": "startTime",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "maturityTime",
                 "type": "uint256"
               }
             ],
@@ -501,11 +511,6 @@ const genesisPoolAPIAbi = [
           {
             "components": [
               {
-                "internalType": "address",
-                "name": "tokenOwner",
-                "type": "address"
-              },
-              {
                 "internalType": "uint256",
                 "name": "proposedNativeAmount",
                 "type": "uint256"
@@ -556,6 +561,11 @@ const genesisPoolAPIAbi = [
             "components": [
               {
                 "internalType": "address",
+                "name": "tokenOwner",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
                 "name": "nativeToken",
                 "type": "address"
               },
@@ -592,6 +602,11 @@ const genesisPoolAPIAbi = [
               {
                 "internalType": "uint256",
                 "name": "startTime",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "maturityTime",
                 "type": "uint256"
               }
             ],
@@ -690,11 +705,6 @@ const genesisPoolAPIAbi = [
           {
             "components": [
               {
-                "internalType": "address",
-                "name": "tokenOwner",
-                "type": "address"
-              },
-              {
                 "internalType": "uint256",
                 "name": "proposedNativeAmount",
                 "type": "uint256"
@@ -745,6 +755,11 @@ const genesisPoolAPIAbi = [
             "components": [
               {
                 "internalType": "address",
+                "name": "tokenOwner",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
                 "name": "nativeToken",
                 "type": "address"
               },
@@ -781,6 +796,11 @@ const genesisPoolAPIAbi = [
               {
                 "internalType": "uint256",
                 "name": "startTime",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "maturityTime",
                 "type": "uint256"
               }
             ],
