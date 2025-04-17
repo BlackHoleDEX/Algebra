@@ -24,32 +24,18 @@ module.exports = {
   },
 
   networks: {
-    baseSepolia: {
-      url: "https://base-sepolia.g.alchemy.com/v2/zY8fO9bbJbzywRt0xRheXQWpWjWiCqop",
-      chainId: 84532, // Sepolia's Chain ID
-      accounts: [
-        `0x${process.env.PRIVATEKEY}`, 
-        `0x${process.env.SECONDPRIVATEKEY}`, 
-        `0x${process.env.THIRDPRIVATEKEY}`
-      ],
-      gas: 21000000,
+    avalanche: {
+      url: "https://api.avax.network/ext/bc/C/rpc", // Mainnet RPC
+      chainId: 43114,
+      accounts: [`0x${process.env.PRIVATEKEY}`],
+      gas: 8000000,
     },
-    ethSepolia: {
-      url: "https://eth-sepolia.g.alchemy.com/v2/vlFIIvUdyv4c6EdNQJ8Vw64sl6U1qhpnMf/V1K2P2IXeBVoM82ECzg",
-      chainId: 11155111, // Ethereum Sepolia's Chain ID
-      accounts: [
-        `0x${process.env.PRIVATEKEY}`,
-        `0x${process.env.SECONDPRIVATEKEY}`,
-        `0x${process.env.THIRDPRIVATEKEY}`
-      ],
-      gas: 21000000,
+    fuji: {
+      url: "https://api.avax-test.network/ext/bc/C/rpc", // Fuji Testnet RPC
+      chainId: 43113,
+      accounts: [`0x${process.env.PRIVATEKEY}`],
+      gas: 8000000,
     },
-    // baseMainnet: {
-    //   url: "",
-    //   chainId: 8453,
-    //   accounts: [PRIVATEKEY_DEPLOYMENT],
-    //   gas: "auto",
-    // },
   },
 
   etherscan: {
