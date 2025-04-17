@@ -818,7 +818,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
 
         require(_value > 0, "ZV"); // dev: need non-zero value
         require(_locked.amount > 0, 'ZL');
-        require(_locked.end > block.timestamp, 'EXP');
+        require(_locked.end > block.timestamp || _locked.isPermanent, 'EXP');
 
         if (_locked.isSMNFT) smNFTBalance += _value;
         else if (_locked.isPermanent) permanentLockBalance += _value;
