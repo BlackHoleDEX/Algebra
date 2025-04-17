@@ -146,7 +146,7 @@ contract veNFTAPI is Initializable {
 
     function getAllNFT(uint256 _amounts, uint256 _offset) external view returns(veNFT[] memory _veNFT){
 
-        require(_amounts <= MAX_RESULTS, 'too many nfts');
+        require(_amounts <= MAX_RESULTS, 'TOO_MANY');
         _veNFT = new veNFT[](_amounts);
 
         uint i = _offset;
@@ -387,8 +387,8 @@ contract veNFTAPI is Initializable {
     
 
     function setOwner(address _owner) external {
-        require(msg.sender == owner, 'not owner');
-        require(_owner != address(0), 'zeroAddr');
+        require(msg.sender == owner, 'NA');
+        require(_owner != address(0), 'ZA');
         owner = _owner;
         emit Owner(msg.sender, _owner);
     }
