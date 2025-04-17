@@ -4,6 +4,7 @@ import { expect } from './shared/expect';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ZERO_ADDRESS, limitOrderPluginFixture } from './shared/fixtures';
 import { encodePriceSqrt, MAX_SQRT_RATIO, MIN_SQRT_RATIO} from './shared/utilities';
+import { sortedTokens } from './shared/tokenSort';
 
 import { LimitOrderPlugin, LimitOrderPluginFactory, TestERC20, IWNativeToken, AlgebraLimitOrderPlugin } from '../typechain';
 
@@ -76,9 +77,10 @@ describe('LimitOrders', () => {
     let pluginAddress = await poolWnative1.plugin();
     let plugin = (pluginContractFacroty.attach(pluginAddress)) as any as AlgebraLimitOrderPlugin;
 
+    const [token0Sorted, token1Sorted] = await sortedTokens(wnative, token1);
     await plugin.setLimitOrderPlugin(loPlugin);
     expect(await loPlugin.initialized(poolWnative1)).to.be.eq(false);
-    await loPlugin.place({token0: await wnative.getAddress(), token1: await token1.getAddress(), deployer: ZeroAddress}, -60, true, 10n**8n);
+    await loPlugin.place({token0: await token0Sorted.getAddress(), token1: await token1Sorted.getAddress(), deployer: ZeroAddress}, -60, true, 10n**8n);
 
     expect(await loPlugin.initialized(poolWnative1)).to.be.eq(true);
     expect(await loPlugin.tickLowerLasts(poolWnative1)).to.be.eq(-6960)
