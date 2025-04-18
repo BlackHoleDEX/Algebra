@@ -1067,25 +1067,25 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
     }
 
     function abstain(uint _tokenId) external {
-        require(msg.sender == voter, "NA");
+        require(msg.sender == voter);
         voted[_tokenId] = false;
     }
 
     function attach(uint _tokenId) external {
-        require(msg.sender == voter, "NA");
+        require(msg.sender == voter);
         attachments[_tokenId] = attachments[_tokenId] + 1;
     }
 
     function detach(uint _tokenId) external {
-        require(msg.sender == voter, "NA");
+        require(msg.sender == voter);
         attachments[_tokenId] = attachments[_tokenId] - 1;
     }
 
     function merge(uint _from, uint _to) external nonreentrant {
         require(attachments[_from] == 0 && !voted[_from], "ATT");
         require(_from != _to, "SAME");
-        require(_isApprovedOrOwner(msg.sender, _from), "NAO1");
-        require(_isApprovedOrOwner(msg.sender, _to), "NAO2");
+        require(_isApprovedOrOwner(msg.sender, _from) && 
+        _isApprovedOrOwner(msg.sender, _to), "NAO");
 
         IVotingEscrow.LockedBalance memory _locked0 = locked[_from];
         IVotingEscrow.LockedBalance memory _locked1 = locked[_to];
@@ -1190,7 +1190,7 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
     }
 
     function toggleSplit(address _account, bool _bool) external {
-        require(msg.sender == team, "NA");
+        require(msg.sender == team);
         canSplit[_account] = _bool;
     }
 
@@ -1353,8 +1353,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
     }
 
     function setSmNFTBonus(uint _bonus) external {
-        require(msg.sender == team, "IA");
-        require(_bonus <= PRECISISON, "RHIGH");
+        require(msg.sender == team);
+        require(_bonus <= PRECISISON);
         SMNFT_BONUS = _bonus;
     }
 
