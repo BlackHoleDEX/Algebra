@@ -1,4 +1,4 @@
-const blackAddress = "0x111373E023899c5e425Dd3EadAecd2879cdaBfe5";
+const blackAddress = "0x83a52B1CC09B8b642b027D0b47b3633656aFd02B";
 
 const blackAbi = [
   {

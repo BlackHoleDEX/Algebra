@@ -1128,8 +1128,8 @@ contract VotingEscrow is IERC721, IERC721Metadata, IBlackHoleVotes {
         locked[_to] = newLockedTo;
 
         if(voted[_to]) {
-             IVoter(voter).poke(_to);
-         }
+            IVoter(voter).poke(_to);
+        }
         emit Merge(
             msg.sender,
             _from,
