@@ -1,4 +1,4 @@
-const auctionFactoryAddress = "0x1E8923920de789BDEaf7243359081C412b346cd4";
+const auctionFactoryAddress = "0x6FE2ba61271E73e0911Aa0F63F49897588495C80";
 
 const auctionFactoryAbi = [
   {

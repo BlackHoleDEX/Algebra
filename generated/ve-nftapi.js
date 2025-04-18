@@ -1,4 +1,4 @@
-const veNFTAPIAddress = "0x30E9477c64A7f75ef3784C4e6606669bB62F30fB";
+const veNFTAPIAddress = "0xB1E81E0f76fD2D91187C65d7D0CF2b230c68adb1";
 
 const veNFTAPIAbi = [
   {
@@ -558,7 +558,17 @@ const veNFTAPIAbi = [
     "inputs": [
       {
         "internalType": "address",
-        "name": "_votingEscrow",
+        "name": "_voter",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_rewarddistro",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_gaugeFactory",
         "type": "address"
       }
     ],
@@ -617,19 +627,6 @@ const veNFTAPIAbi = [
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_gaugeFactory",
-        "type": "address"
-      }
-    ],
-    "name": "setGaugeFactory",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

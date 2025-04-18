@@ -1,4 +1,4 @@
-const votingEscrowAddress = "0x0032567969E82549C7922362609505b642b3A801";
+const votingEscrowAddress = "0x7b675fC9f0c1f80215A84aa3E9Ca5Fc14dBBE5Cb";
 
 const votingEscrowAbi = [
   {

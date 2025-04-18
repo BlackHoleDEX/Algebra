@@ -1,4 +1,4 @@
-const pairFactoryAddress = "0xbe5A502935645e1C1E29380b16D283D3c6da017e";
+const pairFactoryAddress = "0x6E0639628b33Aa3f4572a6606e48a9a6C8ae2399";
 
 const pairFactoryAbi = [
   {
@@ -189,6 +189,25 @@ const pairFactoryAbi = [
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "customReferralFees",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "dibs",
     "outputs": [
@@ -294,6 +313,25 @@ const pairFactoryAbi = [
         "internalType": "address",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_pairAddress",
+        "type": "address"
+      }
+    ],
+    "name": "getReferralFee",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -436,6 +474,24 @@ const pairFactoryAbi = [
       }
     ],
     "name": "setCustomFees",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_pairAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_refFee",
+        "type": "uint256"
+      }
+    ],
+    "name": "setCustomReferralFee",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

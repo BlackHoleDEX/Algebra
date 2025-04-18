@@ -49,9 +49,7 @@ const setPermissionRegistryRoles = async (permissionRegistryAddress, ownerAddres
 
     for (const element of permissionRegistryRolesInStringFormat) {
         try {
-            const setRoleTx = await permissionRegistryContract.setRoleFor(ownerAddress, element, {
-                gasLimit: 21000000,
-            });
+            const setRoleTx = await permissionRegistryContract.setRoleFor(ownerAddress, element);
             await setRoleTx.wait(); // Wait for the transaction to be mined
             console.log(`Role ${ownerAddress} = ${element}`);
         } catch (err) {
@@ -277,9 +275,7 @@ const createGauges = async(voterV3Address, blackholeV2AbiAddress) => {
         const currentGaugeAddress = await voterV3Contract.gauges(currentAddress);
         console.log("currentGaugeAddress", currentGaugeAddress);
         if(currentGaugeAddress === ZERO_ADDRESS){
-            const createGaugeTx = await voterV3Contract.createGauge(currentAddress, BigInt(0), {
-                gasLimit: 21000000
-            });
+            const createGaugeTx = await voterV3Contract.createGauge(currentAddress, BigInt(0));
 
         }
     }
@@ -415,7 +411,7 @@ const deployveNFT = async (voterV3Address, rewardsDistributorAddress, gaugeV2Add
     try {
         data = await ethers.getContractFactory("veNFTAPI");
         input = [voterV3Address, rewardsDistributorAddress, gaugeV2Address] 
-        const veNFTAPI = await upgrades.deployProxy(data, input, {initializer: 'initialize', gasLimit:210000000});
+        const veNFTAPI = await upgrades.deployProxy(data, input, {initializer: 'initialize'});
         txDeployed = await veNFTAPI.deployed();
 
         console.log('deployed venftapi address: ', veNFTAPI.address);
@@ -537,9 +533,7 @@ const setGenesisManagerRole = async (permissionRegistryAddress, genesisManagerAd
     const permissionRegistryContract = await ethers.getContractAt(permissionsRegistryAbi, permissionRegistryAddress);
 
     try {
-        const setRoleTx = await permissionRegistryContract.setRoleFor(genesisManagerAddress, "GENESIS_MANAGER", {
-            gasLimit: 21000000,
-        });
+        const setRoleTx = await permissionRegistryContract.setRoleFor(genesisManagerAddress, "GENESIS_MANAGER");
         await setRoleTx.wait(); // Wait for the transaction to be mined
         console.log('setRoleFor in permissionRegistry\n');
     } catch (err) {
@@ -722,7 +716,7 @@ async function main () {
 
     // set chainlink address
     // TODO: separate out the setting of chalink address 
-    await setChainLinkAddress(epochControllerAddress, "0x859e9da8b3FBEEd0Dff61a2262B6AEB66081413A", "0x9e12f224D5077a78a84580c8Eb0D499260fC45d5");
+    // await setChainLinkAddress(epochControllerAddress, "0x859e9da8b3FBEEd0Dff61a2262B6AEB66081413A", "0x9e12f224D5077a78a84580c8Eb0D499260fC45d5");
 
     // //add black to user Address
     // await addBlackToUserAddress(minterUpgradableAddress);

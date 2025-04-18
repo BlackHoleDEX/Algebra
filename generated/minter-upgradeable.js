@@ -1,4 +1,4 @@
-const minterUpgradeableAddress = "0x310A9f577882932B9EeDB49e48bF81dBb9C039A2";
+const minterUpgradeableAddress = "0x71D63F915032fE591488E7e67922941DDC756bb4";
 
 const minterUpgradeableAbi = [
   {
@@ -315,19 +315,6 @@ const minterUpgradeableAbi = [
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "burnTokenAddress",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
       }
     ],
     "stateMutability": "view",
