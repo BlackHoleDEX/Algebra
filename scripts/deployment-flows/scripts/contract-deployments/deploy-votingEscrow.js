@@ -40,7 +40,7 @@ const deployveNFT = async (votingEscrow) => {
     try {
         data = await ethers.getContractFactory("veNFTAPI");
         input = [votingEscrow] 
-        const veNFTAPI = await upgrades.deployProxy(data, input, {initializer: 'initialize', gasLimit:210000000, timeout: 180000, pollingInterval: 3000});
+        const veNFTAPI = await upgrades.deployProxy(data, input, {initializer: 'initialize', timeout: 180000, pollingInterval: 3000});
         txDeployed = await veNFTAPI.deployed();
 
         console.log('deployed venftapi address: ', veNFTAPI.address);
@@ -60,10 +60,11 @@ async function main () {
     const ownerAddress = owner.address;
 
     const votingBalanceLogicAddress = await deployVotingBalanceLogic();
-    // console.log("votingBalanceLogicAddress ", votingBalanceLogicAddress)
+    console.log("votingBalanceLogicAddress ", votingBalanceLogicAddress)
 
     //deploy voting  escrow
-    const blackAddress = deployedTokens[0].address;
+    // const blackAddress = deployedTokens[0].address;
+    const blackAddress = "0x43d105B33c415d703fFAdB2BB9c5064b01E7E098";
     const votingEscrowAddress = await deployVotingEscrow(blackAddress, votingBalanceLogicAddress);
     
     //deploy veNFT
