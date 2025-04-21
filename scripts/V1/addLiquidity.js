@@ -53,10 +53,8 @@ async function main () {
         amountAMin,
         amountBMin,
         to,
-        deadline,
-    {
-        gasLimit: 21000000
-    });
+        deadline
+    );
     const awaitedTx = await tx.wait(); 
 }
 

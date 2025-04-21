@@ -1,4 +1,4 @@
-const tokenAPIAddress = "0xe43DAe6731361a71830EFd7E4e1de34fc3e8232A";
+const tokenAPIAddress = "0xFADD35a32014ae35Af674348D2FEd5CD06628276";
 
 const tokenAPIAbi = [
   {

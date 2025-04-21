@@ -219,7 +219,7 @@ const genesisPoolAbi = [
   },
   {
     "inputs": [],
-    "name": "claimaNative",
+    "name": "claimNative",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
