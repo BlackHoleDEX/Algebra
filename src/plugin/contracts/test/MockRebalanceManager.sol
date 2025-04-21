@@ -34,6 +34,10 @@ contract MockRebalanceManager is RebalanceManager {
     state = _state;
   }
 
+  function setAllowToken1(bool _allowToken1) public {
+    allowToken1 = _allowToken1;
+  }
+
   function setLastRebalanceCurrentPrice(uint256 _lastRebalanceCurrentPrice) public {
     lastRebalanceCurrentPrice = _lastRebalanceCurrentPrice;
   }
@@ -42,7 +46,6 @@ contract MockRebalanceManager is RebalanceManager {
     (depositTokenDecimals, pairedTokenDecimals) = (_depositDecimals, _pairedDecimals);
 
     decimalsSum = _depositDecimals + _pairedDecimals;
-    // console.log('decimals sum: ', decimalsSum);
     tokenDecimals = allowToken1 ? _pairedDecimals : _depositDecimals;
   }
 

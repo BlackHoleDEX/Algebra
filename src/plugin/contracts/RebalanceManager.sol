@@ -7,7 +7,6 @@ contract RebalanceManager is BaseRebalanceManager {
   constructor(address _vault, uint32 _minTimeBetweenRebalances, Thresholds memory _thresholds) {
     require(_vault != address(0), 'Invalid vault address');
     paused = false;
-    // TODO: добавить require'ов
     vault = _vault;
     pool = IAlgebraVault(vault).pool();
     factory = IAlgebraPool(pool).factory();
@@ -32,17 +31,14 @@ contract RebalanceManager is BaseRebalanceManager {
     address _pairedToken = _allowToken1 ? token0 : token1;
     pairedToken = _pairedToken;
     uint8 _pairedTokenDecimals = _getPairedTokenDecimals();
-    // console.log('_pairedTokenDecimals: ', _pairedTokenDecimals);
     pairedTokenDecimals = _pairedTokenDecimals;
 
     address _depositToken = _allowToken1 ? token1 : token0;
     depositToken = _depositToken;
     uint8 _depositTokenDecimals = _getDepositTokenDecimals();
     depositTokenDecimals = _depositTokenDecimals;
-    // console.log('_depositTokenDecimals: ', _depositTokenDecimals);
 
     decimalsSum = _depositTokenDecimals + _pairedTokenDecimals;
-    // console.log('decimals sum: ', decimalsSum);
     tokenDecimals = _allowToken1 ? _pairedTokenDecimals : _depositTokenDecimals;
   }
 }

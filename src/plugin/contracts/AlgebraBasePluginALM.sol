@@ -10,8 +10,6 @@ import './plugins/AlmPlugin.sol';
 import './plugins/SlidingFeePlugin.sol';
 import './plugins/VolatilityOraclePlugin.sol';
 
-// import 'hardhat/console.sol';
-
 /// @title Algebra Integral 1.2.1 ALM plugin
 contract AlgebraBasePluginALM is AlmPlugin, DynamicFeePlugin, VolatilityOraclePlugin {
   using Plugins for uint8;
@@ -59,15 +57,9 @@ contract AlgebraBasePluginALM is AlmPlugin, DynamicFeePlugin, VolatilityOraclePl
   }
 
   function afterSwap(address, address, bool, int256, uint160, int256, int256, bytes calldata) external override onlyPool returns (bytes4) {
-	// console.log('entered after swap');
-  //                                 to prevent pause rebalanceManager
     if (rebalanceManager != address(0)) {
-      require(gasleft() >= 1600000, 'Not enough gas left');
-      if (!_ableToGetTimepoints(slowTwapPeriod)) {
-        return IAlgebraPlugin.afterSwap.selector;
-      }
-
-      ( , int24 currentTick, , ) = _getPoolState();
+      if (!_ableToGetTimepoints(slowTwapPeriod)) return IAlgebraPlugin.afterSwap.selector;
+      (, int24 currentTick, , ) = _getPoolState();
       uint32 lastBlockTimestamp = _getLastBlockTimestamp();
 
       int24 slowTwapTick = _getTwapTick(slowTwapPeriod);
@@ -75,7 +67,6 @@ contract AlgebraBasePluginALM is AlmPlugin, DynamicFeePlugin, VolatilityOraclePl
 
       _obtainTWAPAndRebalance(currentTick, slowTwapTick, fastTwapTick, lastBlockTimestamp);
     }
-
     return IAlgebraPlugin.afterSwap.selector;
   }
 

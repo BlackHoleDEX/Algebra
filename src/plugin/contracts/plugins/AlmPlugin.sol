@@ -5,8 +5,6 @@ import '../base/AlgebraBasePlugin.sol';
 import '../interfaces/plugins/IAlmPlugin.sol';
 import '../interfaces/IRebalanceManager.sol';
 
-// import 'hardhat/console.sol';
-
 abstract contract AlmPlugin is AlgebraBasePlugin, IAlmPlugin {
   address public rebalanceManager;
   uint32 public slowTwapPeriod;
@@ -34,17 +32,11 @@ abstract contract AlmPlugin is AlgebraBasePlugin, IAlmPlugin {
   }
 
   function setRebalanceManager(address _rebalanceManager) external {
-    // console.log('setRebalanceManager called');
     _authorize();
     rebalanceManager = _rebalanceManager;
   }
 
-  function _obtainTWAPAndRebalance(
-    int24 currentTick,
-    int24 slowTwapTick,
-    int24 fastTwapTick,
-    uint32 lastBlockTimestamp
-  ) internal {
+  function _obtainTWAPAndRebalance(int24 currentTick, int24 slowTwapTick, int24 fastTwapTick, uint32 lastBlockTimestamp) internal {
     IRebalanceManager(rebalanceManager).obtainTWAPAndRebalance(currentTick, slowTwapTick, fastTwapTick, lastBlockTimestamp);
   }
 }

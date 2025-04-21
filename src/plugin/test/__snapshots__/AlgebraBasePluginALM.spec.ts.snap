@@ -90,4 +90,34 @@ Array [
 ]
 `;
 
+exports[`AlgebraBasePluginALM #DynamicFeeManager #adaptiveFee single huge step after initialization 1`] = `
+Array [
+  "Fee: 15000 ",
+  "Fee: 15000 ",
+  "Fee: 15000 ",
+  "Fee: 15000 ",
+  "Fee: 14311 ",
+  "Fee: 11402 ",
+  "Fee: 7651 ",
+  "Fee: 5386 ",
+  "Fee: 4312 ",
+  "Fee: 3795 ",
+  "Fee: 3525 ",
+  "Fee: 3371 ",
+  "Fee: 3277 ",
+  "Fee: 3216 ",
+  "Fee: 3174 ",
+  "Fee: 3144 ",
+  "Fee: 3123 ",
+  "Fee: 3106 ",
+  "Fee: 3093 ",
+  "Fee: 3083 ",
+  "Fee: 3075 ",
+  "Fee: 3068 ",
+  "Fee: 3062 ",
+  "Fee: 3058 ",
+  "Fee: 3037 ",
+]
+`;
+
 exports[`AlgebraBasePluginALM AlgebraBasePluginV1 external methods #changeFeeConfiguration feeConfig getter gas cost [ @skip-on-coverage ] 1`] = `21065`;
