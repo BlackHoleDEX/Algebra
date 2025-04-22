@@ -22441,117 +22441,6 @@
 			}
 		},
 		{
-			"transactionHash": "0x538e4461d7fa7d0b9100f63654e32d0e82cf1ae62877b71fe86e31d562e481bb",
-			"state": {
-				"depositToken": 0,
-				"blockNumber": 38112445,
-				"lastRebalancePrice": "370296838670246037",
-				"state": "2",
-				"currentTick": "8224",
-				"currentPrice": "439393952267665177",
-				"twapSlow": "377210740912768029",
-				"twapFast": "414842641430683733",
-				"depositTokenBalance": "0",
-				"pairedTokenBalance": "0",
-				"usedToken0": "293692461285167642596904",
-				"usedToken1": "0",
-				"priceChangeTrigger": "100",
-				"simulateTrigger": "9400",
-				"normalTrigger": "8000",
-				"underTrigger": "7700",
-				"overTrigger": "9100",
-				"depositTokenUnusedThreshold": "100",
-				"extremeVolatility": "2500",
-				"highVolatility": "900",
-				"someVolatility": "100",
-				"dtrDelta": "300",
-				"baseLowPct": "2000",
-				"baseHighPct": "1000",
-				"limitReservePct": "500"
-			},
-			"rebalance": {
-				"basePosition": {
-					"bottomTick": "8220",
-					"topTick": "887220"
-				},
-				"limitPosition": null
-			}
-		},
-		{
-			"transactionHash": "0x96921e5895ea65640a1a8317c4c3beed28ffd528f0fd1f50733e5c6008e39d09",
-			"state": {
-				"depositToken": 0,
-				"blockNumber": 38114903,
-				"lastRebalancePrice": "439393952267665177",
-				"state": "3",
-				"currentTick": "8173",
-				"currentPrice": "441640472858491523",
-				"twapSlow": "444965061803580467",
-				"twapFast": "441640472858491523",
-				"depositTokenBalance": "282135261859350582752780",
-				"pairedTokenBalance": "0",
-				"usedToken0": "282135261859350582754688",
-				"usedToken1": "0",
-				"priceChangeTrigger": "100",
-				"simulateTrigger": "9400",
-				"normalTrigger": "8000",
-				"underTrigger": "7700",
-				"overTrigger": "9100",
-				"depositTokenUnusedThreshold": "100",
-				"extremeVolatility": "2500",
-				"highVolatility": "900",
-				"someVolatility": "100",
-				"dtrDelta": "300",
-				"baseLowPct": "4000",
-				"baseHighPct": "1000",
-				"limitReservePct": "500"
-			},
-			"rebalance": {
-				"basePosition": {
-					"bottomTick": "8220",
-					"topTick": "13320"
-				},
-				"limitPosition": null
-			}
-		},
-		{
-			"transactionHash": "0x72c90cb3986552ec557d883b66970e06ce4f803100c31915300e9d1e10294b1b",
-			"state": {
-				"depositToken": 0,
-				"blockNumber": 38117364,
-				"lastRebalancePrice": "441640472858491523",
-				"state": "0",
-				"currentTick": "7911",
-				"currentPrice": "453363771736942526",
-				"twapSlow": "453001243876122102",
-				"twapFast": "453363771736942526",
-				"depositTokenBalance": "3201196668600000000000",
-				"pairedTokenBalance": "0",
-				"usedToken0": "285336458527950582754687",
-				"usedToken1": "0",
-				"priceChangeTrigger": "100",
-				"simulateTrigger": "9400",
-				"normalTrigger": "8000",
-				"underTrigger": "7700",
-				"overTrigger": "9100",
-				"depositTokenUnusedThreshold": "100",
-				"extremeVolatility": "2500",
-				"highVolatility": "900",
-				"someVolatility": "100",
-				"dtrDelta": "300",
-				"baseLowPct": "4000",
-				"baseHighPct": "1000",
-				"limitReservePct": "500"
-			},
-			"rebalance": {
-				"basePosition": {
-					"bottomTick": "7920",
-					"topTick": "13020"
-				},
-				"limitPosition": null
-			}
-		},
-		{
 			"transactionHash": "0xf150e13166d2d0f6a87316dc51567708a55ff4b38212c39019acf7e1a9e5368b",
 			"state": {
 				"depositToken": 0,
@@ -40429,43 +40318,6 @@
 					"bottomTick": "14160",
 					"topTick": "15540"
 				}
-			}
-		},
-		{
-			"transactionHash": "0x31991eeba6c6894168339939958bba4d86d1a08137ed7b0162e9341dc2560cf7",
-			"state": {
-				"depositToken": 0,
-				"blockNumber": 44349151,
-				"lastRebalancePrice": "210762757486194186",
-				"state": "2",
-				"currentTick": "517",
-				"currentPrice": "949616162817984047",
-				"twapSlow": "952183462389618715",
-				"twapFast": "948477363777678762",
-				"depositTokenBalance": "81818660638796358128589",
-				"pairedTokenBalance": "0",
-				"usedToken0": "275421033294174531318774",
-				"usedToken1": "658759974015514072037",
-				"priceChangeTrigger": "100",
-				"simulateTrigger": "9300",
-				"normalTrigger": "8000",
-				"underTrigger": "7700",
-				"overTrigger": "9100",
-				"depositTokenUnusedThreshold": "100",
-				"extremeVolatility": "2500",
-				"highVolatility": "900",
-				"someVolatility": "100",
-				"dtrDelta": "300",
-				"baseLowPct": "2500",
-				"baseHighPct": "1500",
-				"limitReservePct": "500"
-			},
-			"rebalance": {
-				"basePosition": {
-					"bottomTick": "540",
-					"topTick": "3420"
-				},
-				"limitPosition": null
 			}
 		},
 		{
@@ -59306,43 +59158,6 @@
 					"bottomTick": "6720",
 					"topTick": "7680"
 				}
-			}
-		},
-		{
-			"transactionHash": "0xa99259be21f4de03cff3760f312a59d4430bbeca2193a91b8af777399d99ee8d",
-			"state": {
-				"depositToken": 0,
-				"blockNumber": 46510117,
-				"lastRebalancePrice": "463772298795160589",
-				"state": "2",
-				"currentTick": "6547",
-				"currentPrice": "519614926765430097",
-				"twapSlow": "520342860701676913",
-				"twapFast": "519614926765430097",
-				"depositTokenBalance": "2948031285363365473117",
-				"pairedTokenBalance": "1",
-				"usedToken0": "425167551670617577643857",
-				"usedToken1": "1",
-				"priceChangeTrigger": "100",
-				"simulateTrigger": "9300",
-				"normalTrigger": "8000",
-				"underTrigger": "7700",
-				"overTrigger": "9100",
-				"depositTokenUnusedThreshold": "100",
-				"extremeVolatility": "2500",
-				"highVolatility": "500",
-				"someVolatility": "100",
-				"dtrDelta": "300",
-				"baseLowPct": "2000",
-				"baseHighPct": "1000",
-				"limitReservePct": "500"
-			},
-			"rebalance": {
-				"basePosition": {
-					"bottomTick": "6600",
-					"topTick": "8820"
-				},
-				"limitPosition": null
 			}
 		},
 		{
