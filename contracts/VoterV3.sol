@@ -423,7 +423,7 @@ contract VoterV3 is OwnableUpgradeable, ReentrancyGuardUpgradeable {
         require(_poolVote.length == _weights.length, "weights length !=");
         require(_poolVote.length <= maxVotingNum, "pool length exceeds maxVotingNum");
         uint256 _timestamp = block.timestamp;
-        if ((_timestamp > BlackTimeLibrary.epochVoteEnd(_timestamp)) && !ITokenHandler(tokenHandler).isWhitelistedNFT(_tokenId) && msg.sender != avm){
+        if ((_timestamp >= BlackTimeLibrary.epochVoteEnd(_timestamp)) && !ITokenHandler(tokenHandler).isWhitelistedNFT(_tokenId) && msg.sender != avm){
             revert("not whitelisted or avm");
         }
         _vote(_tokenId, _poolVote, _weights);
