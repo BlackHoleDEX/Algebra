@@ -142,6 +142,14 @@ export default {
         },
       },
       {
+        network: 'holesky',
+        chainId: 17000,
+        urls: {
+          apiURL: 'https://api-holesky.etherscan.io/api',
+          browserURL: 'https://holesky.etherscan.io/',
+        },
+      },
+      {
         network: 'beraTestnet',
         chainId: 80085,
         urls: {
