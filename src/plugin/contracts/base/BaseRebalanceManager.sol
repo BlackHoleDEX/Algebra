@@ -216,7 +216,7 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
 
         if (ranges.baseUpper - ranges.baseLower <= 300 || ranges.limitUpper - ranges.limitLower <= 300) return;
 
-        require(gasleft() >= 1000000, 'Not enough gas left');
+        require(gasleft() >= 1600000, 'Not enough gas left');
         try IAlgebraVault(vault).rebalance(ranges.baseLower, ranges.baseUpper, ranges.limitLower, ranges.limitUpper, 0) {
           lastRebalanceTimestamp = _blockTimestamp();
           lastRebalanceCurrentPrice = obtainTWAPsResult.currentPriceAccountingDecimals;
@@ -281,7 +281,7 @@ abstract contract BaseRebalanceManager is IRebalanceManager, Timestamp {
       twapResult.percentageOfDepositToken = 10000;
     } else {
       uint256 totalTokensAmount = twapResult.totalDepositToken + twapResult.totalPairedInDeposit;
-      uint16 percentageOfDepositToken = totalTokensAmount == 0 ? 0 : uint16((twapResult.totalDepositToken * 10000) / totalTokensAmount);
+      uint16 percentageOfDepositToken = uint16((twapResult.totalDepositToken * 10000) / totalTokensAmount);
       twapResult.percentageOfDepositToken = percentageOfDepositToken;
     }
 
