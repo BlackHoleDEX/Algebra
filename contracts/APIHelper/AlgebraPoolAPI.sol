@@ -151,10 +151,10 @@ contract AlgebraPoolAPI is Initializable {
         info.feeGrowthGlobal1X128 = pool.totalFeeGrowth1Token();
 
         // Get Token Info - Wrap in safe calls if tokens might not implement standard ERC20/might revert
-        info.token0_symbol = _safeGetSymbol(info.token0);
-        info.token1_symbol = _safeGetSymbol(info.token1);
-        info.token0_decimals = _safeGetDecimals(info.token0);
-        info.token1_decimals = _safeGetDecimals(info.token1);
+        info.token0_symbol = IERC20(info.token0).symbol();
+        info.token1_symbol = IERC20(info.token1).symbol();
+        info.token0_decimals = IERC20(info.token0).decimals();
+        info.token1_decimals = IERC20(info.token1).decimals();
 
         // Get User Balances (if user address provided)
         if (_user != address(0)) {
@@ -235,10 +235,10 @@ contract AlgebraPoolAPI is Initializable {
              // 3. (Optional) Get token symbols and decimals
              // This adds extra external calls, increasing gas cost further.
              // Only include if necessary for the API consumer.
-             positionsInfo[i].token0_symbol = _safeGetSymbol(positionsInfo[i].token0);
-             positionsInfo[i].token1_symbol = _safeGetSymbol(positionsInfo[i].token1);
-             positionsInfo[i].token0_decimals = _safeGetDecimals(positionsInfo[i].token0);
-             positionsInfo[i].token1_decimals = _safeGetDecimals(positionsInfo[i].token1);
+             positionsInfo[i].token0_symbol = IERC20(positionsInfo[i].token0).symbol();
+             positionsInfo[i].token1_symbol = IERC20(positionsInfo[i].token1).symbol();
+             positionsInfo[i].token0_decimals = IERC20(positionsInfo[i].token0).decimals();
+             positionsInfo[i].token1_decimals = IERC20(positionsInfo[i].token1).decimals();
         }
     }
 
