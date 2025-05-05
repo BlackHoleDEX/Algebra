@@ -12,6 +12,9 @@
     "chai": "^4.3.7",
     "dotenv": "^16.4.7",
     "hardhat": "^2.12.7",
-    "solc": "^0.8.13"
+    "solc": "^0.8.13",
+    "@cryptoalgebra/integral-core": "~1.2.1",
+    "@cryptoalgebra/integral-periphery": "~1.2.1",
+    "@cryptoalgebra/integral-base-plugin": "~1.2.1"
   }
 }
