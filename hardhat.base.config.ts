@@ -77,6 +77,11 @@ export default {
       chainId: 17000,
       accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
     },
+    avaxTestnet: {
+      url: `https://avalanche-fuji-c-chain-rpc.publicnode.com`,
+      chainId: 43113,
+      accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
+    },
     blastTestnet: {
       url: `https://blast-sepolia.blockpi.network/v1/rpc/public`,
       chainId: 168587773,
@@ -118,10 +123,10 @@ export default {
         },
       },
       {
-        network: 'mode',
-        chainId: 34443,
+        network: 'avaxTestnet',
+        chainId: 43113,
         urls: {
-          apiURL: 'https://explorer.mode.network/api',
+          apiURL: 'https://api.routescan.io/v2/network/testnet/evm/43113/etherscan/api',
           browserURL: 'https://explorer.mode.network/',
         },
       },
