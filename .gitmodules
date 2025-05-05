@@ -13,3 +13,6 @@
 [submodule "lib/LayerZero"]
 	path = lib/LayerZero
 	url = https://github.com/LayerZero-Labs/LayerZero
+[submodule "contracts/Algebra"]
+	path = contracts/Algebra
+	url = https://github.com/cryptoalgebra/Algebra.git
