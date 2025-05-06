@@ -10,6 +10,13 @@
 
 pragma solidity 0.8.13;
 
+import './interfaces/IAlgebraCLFactory.sol';
+import '@cryptoalgebra/integral-periphery/contracts/interfaces/IQuoterV2.sol';
+import '@cryptoalgebra/integral-periphery/contracts/interfaces/ISwapRouter.sol';
+
+import {BlackTimeLibrary} from "./libraries/BlackTimeLibrary.sol";
+
+
 
 interface IBaseV1Factory {
     function allPairsLength() external view returns (uint);
@@ -82,14 +89,21 @@ contract RouterV2 {
 	using Math for uint;
 
     struct route {
+        address pair;
         address from;
         address to;
         bool stable;
+        bool concentrated;
     }
 
     address public immutable factory;
     IWETH public immutable wETH;
     uint internal constant MINIMUM_LIQUIDITY = 10**3;
+
+    ISwapRouter public swapRouter;
+    address public owner;
+    IAlgebraCLFactory public algebraFactory;
+    IQuoterV2 public quoterV2;
     
     // swap event for the referral system
     event Swap(address indexed sender,uint amount0In,address _tokenIn, address indexed to, bool stable);  
@@ -99,9 +113,13 @@ contract RouterV2 {
         _;
     }
 
-    constructor(address _factory, address _wETH) {
+    constructor(address _factory, address _wETH, address _swapRouter, address _algebraFactory, address _quoterV2) {
+        owner = msg.sender;
         factory = _factory;
         wETH = IWETH(_wETH);
+        swapRouter = ISwapRouter(_swapRouter);
+        algebraFactory = IAlgebraCLFactory(_algebraFactory);
+        quoterV2 = IQuoterV2(_quoterV2);
     }
 
     receive() external payable {
@@ -155,14 +173,31 @@ contract RouterV2 {
     }
 
     // performs chained getAmountOut calculations on any number of pairs
-    function getAmountsOut(uint amountIn, route[] memory routes) public view returns (uint[] memory amounts) {
+    function getAmountsOut(uint amountIn, route[] memory routes) public returns (uint[] memory amounts) {
         require(routes.length >= 1, 'BaseV1Router: INVALID_PATH');
         amounts = new uint[](routes.length+1);
         amounts[0] = amountIn;
+
+        IQuoterV2.QuoteExactInputSingleParams memory clInputParams;
+        
         for (uint i = 0; i < routes.length; i++) {
-            address pair = pairFor(routes[i].from, routes[i].to, routes[i].stable);
-            if (IBaseV1Factory(factory).isPair(pair)) {
-                amounts[i+1] = IBaseV1Pair(pair).getAmountOut(amounts[i], routes[i].from);
+
+            if(routes[i].concentrated){
+                clInputParams = IQuoterV2.QuoteExactInputSingleParams ({
+                    tokenIn: routes[i].from,
+                    tokenOut: routes[i].to,
+                    deployer: IAlgebraCLFactory(algebraFactory).poolDeployer(),
+                    amountIn: amounts[i],
+                    limitSqrtPrice: 0
+                });
+
+                (amounts[i+1], , , , , ) 
+                    = IQuoterV2(quoterV2).quoteExactInputSingle(clInputParams);
+            }
+            else{
+                if (IBaseV1Factory(factory).isPair(routes[i].pair)) {
+                    amounts[i+1] = IBaseV1Pair(routes[i].pair).getAmountOut(amounts[i], routes[i].from);
+                }
             }
         }
     }
@@ -394,9 +429,27 @@ contract RouterV2 {
             uint amountOut = amounts[i + 1];
             (uint amount0Out, uint amount1Out) = routes[i].from == token0 ? (uint(0), amountOut) : (amountOut, uint(0));
             address to = i < routes.length - 1 ? pairFor(routes[i+1].from, routes[i+1].to, routes[i+1].stable) : _to;
-            IBaseV1Pair(pairFor(routes[i].from, routes[i].to, routes[i].stable)).swap(
-                amount0Out, amount1Out, to, new bytes(0)
-            );
+
+            if(routes[i].concentrated){
+                ISwapRouter.ExactInputSingleParams memory inputParams;
+                inputParams = ISwapRouter.ExactInputSingleParams ({
+                    tokenIn: routes[i].from,
+                    tokenOut: routes[i].to,
+                    deployer: IAlgebraCLFactory(algebraFactory).poolDeployer(),
+                    recipient: msg.sender,
+                    deadline: block.timestamp + 600,
+                    amountIn: amounts[i],
+                    amountOutMinimum: 0,
+                    limitSqrtPrice: 0
+                });
+
+                amounts[i+1] = ISwapRouter(swapRouter).exactInputSingle(inputParams);
+            }
+            else{
+                IBaseV1Pair(pairFor(routes[i].from, routes[i].to, routes[i].stable)).swap(
+                    amount0Out, amount1Out, to, new bytes(0)
+                );
+            }
 
             emit Swap(msg.sender,amounts[i],routes[i].from, _to, routes[i].stable); 
         }
@@ -433,7 +486,7 @@ contract RouterV2 {
         amounts = getAmountsOut(amountIn, routes);
         require(amounts[amounts.length - 1] >= amountOutMin, 'BaseV1Router: INSUFFICIENT_OUTPUT_AMOUNT');
         _safeTransferFrom(
-            routes[0].from, msg.sender, pairFor(routes[0].from, routes[0].to, routes[0].stable), amounts[0]
+            routes[0].from, msg.sender, routes[0].pair, amounts[0]
         );
         _swap(amounts, routes, to);
     }
@@ -621,5 +674,20 @@ contract RouterV2 {
         require(amountOut >= amountOutMin, 'BaseV1Router: INSUFFICIENT_OUTPUT_AMOUNT');
         wETH.withdraw(amountOut);
         _safeTransferETH(to, amountOut);
+    }
+
+    function setSwapRouter(address _swapRouter) external {
+        require(msg.sender == owner, '!owner');
+        swapRouter = ISwapRouter(_swapRouter);
+    }
+
+    function setAlgebraFactory(address _algebraFactory) external {
+        require(msg.sender == owner, '!owner');
+        algebraFactory = IAlgebraCLFactory(_algebraFactory);
+    }
+
+    function setQuoterV2(address _quoterV2) external {
+        require(msg.sender == owner, '!owner');
+        quoterV2 = IQuoterV2(_quoterV2);
     }
 }

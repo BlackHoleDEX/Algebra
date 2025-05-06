@@ -16,8 +16,11 @@ import '../interfaces/IVoter.sol';
 import '../interfaces/IVotingEscrow.sol';
 import '../../contracts/Pair.sol';
 import '../interfaces/IRouter.sol';
+import '../interfaces/IAlgebraCLFactory.sol';
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import '@cryptoalgebra/integral-periphery/contracts/interfaces/IQuoterV2.sol';
+import '@cryptoalgebra/integral-core/contracts/interfaces/IAlgebraPool.sol';
 
 import "hardhat/console.sol";
 
@@ -116,6 +119,7 @@ contract BlackholePairAPIV2 is Initializable {
         address from;
         address to;
         bool stable;
+        bool concentrated;
         uint amountOut;
     }
 
@@ -123,21 +127,32 @@ contract BlackholePairAPIV2 is Initializable {
         address _pair1;
         address _pair2;
         address _pairMid;
-        IPair ipair1;
-        IPair ipair2;
-        IPair ipairMid;
+        bool isBasic1;
+        bool isBasic2; 
+        bool isBasicMid; 
         address otherToken1;
         address otherToken2;
         uint256 minAmount;
         bool foundPath;
     }
 
+    struct CLOutputData {
+        uint256 amountOut;
+        uint256 amountIn;
+        uint160 sqrtPriceX96After;
+        uint32 initializedTicksCrossed;
+        uint256 gasEstimate;
+        uint16 fee;
+    }
+
     uint256 public constant MAX_PAIRS = 1000;
     uint256 public constant MAX_EPOCHS = 200;
     uint256 public constant MAX_REWARDS = 16;
 
-
     IPairFactory public pairFactory;
+    IAlgebraCLFactory public algebraFactory;
+    IQuoterV2 public quoterV2;
+
     IVoter public voter;
     IRouter public routerV2;
 
@@ -152,13 +167,17 @@ contract BlackholePairAPIV2 is Initializable {
 
     constructor() {}
 
-    function initialize(address _voter, address _router) initializer public {
+    function initialize(address _voter, address _router, address _algebraFactory, address _quoterV2) initializer public {
   
         owner = msg.sender;
 
         voter = IVoter(_voter);
 
         routerV2 = IRouter(_router);
+
+        algebraFactory = IAlgebraCLFactory(_algebraFactory);
+
+        quoterV2 = IQuoterV2(_quoterV2);
 
         pairFactory = IPairFactory(voter.factories()[0]);
         underlyingToken = IVotingEscrow(voter._ve()).token();
@@ -431,11 +450,17 @@ contract BlackholePairAPIV2 is Initializable {
         emit Voter(_oldVoter, _voter);
     }
 
-    function getAmountOut(uint amountIn, address tokenIn, address tokenOut) external view returns (swapRoute memory swapRoutes){
+    function getAmountOut(uint amountIn, address tokenIn, address tokenOut) external returns (swapRoute memory swapRoutes){ //TODO:: this was view initially check
         
         SwapRouteHelperData memory swapRouteHelperData;
+        IQuoterV2.QuoteExactInputSingleParams memory clInputParams;
+        CLOutputData memory clOutputData;
+
         bool stable;
+
         swapRouteHelperData.minAmount = 0;
+
+        //This is for direct Basic pool
 
         (swapRouteHelperData.minAmount, stable) = routerV2.getAmountOut(amountIn, tokenIn, tokenOut);
 
@@ -453,31 +478,83 @@ contract BlackholePairAPIV2 is Initializable {
             }
         }
 
-        uint totPairs = pairFactory.allPairsLength();
+        //This is for direct Concentrated pool
+
+        clInputParams = IQuoterV2.QuoteExactInputSingleParams({
+            tokenIn: tokenIn,
+            tokenOut: tokenOut,
+            deployer: IAlgebraCLFactory(algebraFactory).poolDeployer(),
+            amountIn: amountIn,
+            limitSqrtPrice: 0
+        });
+
+        (clOutputData.amountOut, clOutputData.amountIn, clOutputData.sqrtPriceX96After, clOutputData.initializedTicksCrossed, clOutputData.gasEstimate, clOutputData.fee) 
+            = IQuoterV2(quoterV2).quoteExactInputSingle(clInputParams);
+
+        if (clOutputData.amountOut > swapRouteHelperData.minAmount) {
+            
+            swapRouteHelperData.minAmount = clOutputData.amountOut;
+            swapRouteHelperData._pair1 = IAlgebraCLFactory(algebraFactory).poolByPair(tokenIn, tokenOut);
+
+            if(swapRouteHelperData._pair1 != address(0)){
+                swapRoutes.routes = new route[](1);
+                swapRoutes.routes[0] = _createRoute(swapRouteHelperData._pair1, tokenIn, tokenOut, false, swapRouteHelperData.minAmount);
+                swapRoutes.amountOut = swapRouteHelperData.minAmount;
+                swapRoutes.hops = 1;
+            }
+            else{
+                swapRouteHelperData.minAmount = 0;
+            }
+        }
+
+
+        uint totBasicPairs = pairFactory.allPairsLength();
+        uint totConcentratedPairs = IAlgebraCLFactory(algebraFactory).allPairsLength();
+        
         uint i;
         uint j;
+
         swapRouteHelperData.foundPath = false;
-        swapRoute memory swapRouteFromHopping;
+        swapRoute memory swapRouteFromHopping; 
+
+        for(i = 0; i < totBasicPairs + totConcentratedPairs; i++){
+
+            if(i >= totBasicPairs){
+                swapRouteHelperData._pair1 = algebraFactory.allPairs(i - totBasicPairs);
+                swapRouteHelperData.isBasic1 = false;
+                if(tokenIn != IAlgebraPool(swapRouteHelperData._pair1).token0() && tokenIn != IAlgebraPool(swapRouteHelperData._pair1).token1()) continue;
+                swapRouteHelperData.otherToken1 = tokenIn == IAlgebraPool(swapRouteHelperData._pair1).token0() ? IAlgebraPool(swapRouteHelperData._pair1).token1() : IAlgebraPool(swapRouteHelperData._pair1).token0();
+            }
+
+            else{
+                swapRouteHelperData._pair1 = pairFactory.allPairs(i);
+                swapRouteHelperData.isBasic1 = true;
+                if(pairFactory.isGenesis(swapRouteHelperData._pair1)) continue;
+                if(tokenIn != IPair(swapRouteHelperData._pair1).token0() && tokenIn != IPair(swapRouteHelperData._pair1).token1()) continue;
+                swapRouteHelperData.otherToken1 = tokenIn == IPair(swapRouteHelperData._pair1).token0() ? IPair(swapRouteHelperData._pair1).token1() : IPair(swapRouteHelperData._pair1).token0();
+            }
 
 
-        for(i = 0; i < totPairs; i++){
-            swapRouteHelperData._pair1 = pairFactory.allPairs(i);
-            swapRouteHelperData.ipair1 = IPair(swapRouteHelperData._pair1);
+            for(j = 0; j < totBasicPairs + totConcentratedPairs; j++){
 
-            if(pairFactory.isGenesis(swapRouteHelperData._pair1)) continue;
-            if(tokenIn != swapRouteHelperData.ipair1.token0() && tokenIn != swapRouteHelperData.ipair1.token1()) continue;
-
-            swapRouteHelperData.otherToken1 = tokenIn == swapRouteHelperData.ipair1.token0() ? swapRouteHelperData.ipair1.token1() : swapRouteHelperData.ipair1.token0();
-
-            for(j = 0; j < totPairs; j++){
                 if(j == i )continue;
-                swapRouteHelperData._pair2 = pairFactory.allPairs(j);
-                swapRouteHelperData.ipair2 = IPair(swapRouteHelperData._pair2);
 
-                if(pairFactory.isGenesis(swapRouteHelperData._pair2)) continue;
-                if(tokenOut != swapRouteHelperData.ipair2.token0() && tokenOut != swapRouteHelperData.ipair2.token1()) continue;
+                if(j >= totBasicPairs){
+                    swapRouteHelperData._pair2 = algebraFactory.allPairs(j - totBasicPairs);
+                    swapRouteHelperData.isBasic2 = false;
+                    if(tokenOut != IAlgebraPool(swapRouteHelperData._pair2).token0() && tokenOut != IAlgebraPool(swapRouteHelperData._pair2).token1()) continue;
+                    swapRouteHelperData.otherToken2 = tokenOut == IAlgebraPool(swapRouteHelperData._pair2).token0() ? IAlgebraPool(swapRouteHelperData._pair2).token1() : IAlgebraPool(swapRouteHelperData._pair2).token0();
+                }
 
-                swapRouteHelperData.otherToken2 = tokenOut == swapRouteHelperData.ipair2.token0() ? swapRouteHelperData.ipair2.token1() : swapRouteHelperData.ipair2.token0();
+                else{
+                    swapRouteHelperData._pair2 = pairFactory.allPairs(j);
+                    swapRouteHelperData.isBasic2 = true;
+                    if(pairFactory.isGenesis(swapRouteHelperData._pair2)) continue;
+                    if(tokenOut != IPair(swapRouteHelperData._pair2).token0() && tokenOut != IPair(swapRouteHelperData._pair2).token1()) continue;
+                    swapRouteHelperData.otherToken2 = tokenOut == IPair(swapRouteHelperData._pair2).token0() ? IPair(swapRouteHelperData._pair2).token1() : IPair(swapRouteHelperData._pair2).token0();
+                }
+
+                
 
                 if(swapRouteHelperData.otherToken1 == swapRouteHelperData.otherToken2){
                     swapRouteHelperData.foundPath = false;
@@ -488,19 +565,37 @@ contract BlackholePairAPIV2 is Initializable {
                     continue;
                 }
 
+
+                swapRouteHelperData._pairMid = IAlgebraCLFactory(algebraFactory).poolByPair(swapRouteHelperData.otherToken1, swapRouteHelperData.otherToken2);
+
+                if(swapRouteHelperData._pairMid != address(0)){
+                    if(swapRouteHelperData._pairMid != swapRouteHelperData._pair1 && swapRouteHelperData._pairMid != swapRouteHelperData._pair2){
+                        swapRouteHelperData.foundPath = false;
+                        swapRouteHelperData.isBasicMid = false;
+                        swapRouteFromHopping = _getPoolSwapRoutesFromThreeHop(swapRouteHelperData, amountIn, tokenIn, tokenOut);
+                        if(swapRouteHelperData.foundPath){
+                            swapRoutes = swapRouteFromHopping;
+                        }
+                    }
+                }
+
                 swapRouteHelperData._pairMid = pairFactory.getPair(swapRouteHelperData.otherToken1, swapRouteHelperData.otherToken2, true);
+
                 if(swapRouteHelperData._pairMid != swapRouteHelperData._pair1 && swapRouteHelperData._pairMid != swapRouteHelperData._pair2){
                     swapRouteHelperData.foundPath = false;
-                    swapRouteFromHopping = _getSwapRoutesFromThreeHop(swapRouteHelperData, amountIn, tokenIn, tokenOut);
+                    swapRouteHelperData.isBasicMid = true;
+                    swapRouteFromHopping = _getPoolSwapRoutesFromThreeHop(swapRouteHelperData, amountIn, tokenIn, tokenOut);
                     if(swapRouteHelperData.foundPath){
                         swapRoutes = swapRouteFromHopping;
                     }
                 }
             
                 swapRouteHelperData._pairMid = pairFactory.getPair(swapRouteHelperData.otherToken1, swapRouteHelperData.otherToken2, false);
+
                 if(swapRouteHelperData._pairMid != swapRouteHelperData._pair1 && swapRouteHelperData._pairMid != swapRouteHelperData._pair2){
                     swapRouteHelperData.foundPath = false;
-                    swapRouteFromHopping =  _getSwapRoutesFromThreeHop(swapRouteHelperData, amountIn, tokenIn, tokenOut);
+                    swapRouteHelperData.isBasicMid = true;
+                    swapRouteFromHopping =  _getPoolSwapRoutesFromThreeHop(swapRouteHelperData, amountIn, tokenIn, tokenOut);
                     if(swapRouteHelperData.foundPath){
                         swapRoutes = swapRouteFromHopping;
                     }
@@ -510,36 +605,38 @@ contract BlackholePairAPIV2 is Initializable {
         }
     }
 
-    function _getSwapRoutesFromThreeHop(SwapRouteHelperData memory swapRouteFromHopping, uint amountIn, address tokenIn, address tokenOut) internal view returns (swapRoute memory swapRoutes){
+    function _getPoolSwapRoutesFromThreeHop(SwapRouteHelperData memory swapRouteFromHopping, uint amountIn, address tokenIn, address tokenOut) internal returns (swapRoute memory swapRoutes){
         uint256[] memory amounts;
 
-        if(!pairFactory.isPair(swapRouteFromHopping._pairMid)) return swapRoutes;
-        if(pairFactory.isGenesis(swapRouteFromHopping._pairMid)) return swapRoutes;
+        if(swapRouteFromHopping.isBasicMid){
+            if(!pairFactory.isPair(swapRouteFromHopping._pairMid)) return swapRoutes;
+            if(pairFactory.isGenesis(swapRouteFromHopping._pairMid)) return swapRoutes;
+        }
+        
+        
+        amounts = _getAmountViaHopping(amountIn, tokenIn, swapRouteFromHopping.otherToken1, swapRouteFromHopping.otherToken2, tokenOut, swapRouteFromHopping);
 
-        swapRouteFromHopping.ipairMid = IPair(swapRouteFromHopping._pairMid);
-
-        amounts = _getAmountViaHopping(amountIn, tokenIn, swapRouteFromHopping.otherToken1, swapRouteFromHopping.otherToken2, swapRouteFromHopping);
         if(amounts[0] > 0 && amounts[1] > 0 && amounts[2] > 0 && amounts[2] > swapRouteFromHopping.minAmount){
             swapRouteFromHopping.minAmount = amounts[2];
             swapRouteFromHopping.foundPath = true;
             swapRoutes.routes = new route[](3);
-            swapRoutes.routes[0] = _createRoute(swapRouteFromHopping._pair1, tokenIn, swapRouteFromHopping.otherToken1, swapRouteFromHopping.ipair1.isStable(), amounts[0]);
-            swapRoutes.routes[1] = _createRoute(swapRouteFromHopping._pairMid, swapRouteFromHopping.otherToken1, swapRouteFromHopping.otherToken2, swapRouteFromHopping.ipairMid.isStable(), amounts[1]);
-            swapRoutes.routes[2] = _createRoute(swapRouteFromHopping._pair2, swapRouteFromHopping.otherToken2, tokenOut, swapRouteFromHopping.ipair2.isStable(), amounts[2]);
+            swapRoutes.routes[0] = _createRoute(swapRouteFromHopping._pair1, tokenIn, swapRouteFromHopping.otherToken1, swapRouteFromHopping.isBasic1, amounts[0]);
+            swapRoutes.routes[1] = _createRoute(swapRouteFromHopping._pairMid, swapRouteFromHopping.otherToken1, swapRouteFromHopping.otherToken2, swapRouteFromHopping.isBasicMid, amounts[1]);
+            swapRoutes.routes[2] = _createRoute(swapRouteFromHopping._pair2, swapRouteFromHopping.otherToken2, tokenOut, swapRouteFromHopping.isBasic2, amounts[2]);
             swapRoutes.amountOut = amounts[2];
             swapRoutes.hops = 3;
         }
         return swapRoutes;
     }
 
-    function _getSwapRoutesFromTwoHop(SwapRouteHelperData memory swapRouteFromHopping, uint amountIn, address tokenIn, address tokenOut) internal view returns (swapRoute memory swapRoutes){
-        uint256[] memory amounts = _getAmountViaHopping(amountIn, tokenIn, swapRouteFromHopping.otherToken1, swapRouteFromHopping);
+    function _getSwapRoutesFromTwoHop(SwapRouteHelperData memory swapRouteFromHopping, uint amountIn, address tokenIn, address tokenOut) internal returns (swapRoute memory swapRoutes){
+        uint256[] memory amounts = _getAmountViaHopping(amountIn, tokenIn, swapRouteFromHopping.otherToken1, tokenOut, swapRouteFromHopping);
         if(amounts[0] > 0 && amounts[1] > 0 && amounts[1] > swapRouteFromHopping.minAmount){
             swapRouteFromHopping.minAmount = amounts[1];
             swapRouteFromHopping.foundPath = true;
             swapRoutes.routes = new route[](2);
-            swapRoutes.routes[0] = _createRoute(swapRouteFromHopping._pair1, tokenIn, swapRouteFromHopping.otherToken1, swapRouteFromHopping.ipair1.isStable(), amounts[0]);
-            swapRoutes.routes[1] = _createRoute(swapRouteFromHopping._pair2, swapRouteFromHopping.otherToken1, tokenOut, swapRouteFromHopping.ipair2.isStable(), amounts[1]);
+            swapRoutes.routes[0] = _createRoute(swapRouteFromHopping._pair1, tokenIn, swapRouteFromHopping.otherToken1, swapRouteFromHopping.isBasic1, amounts[0]);
+            swapRoutes.routes[1] = _createRoute(swapRouteFromHopping._pair2, swapRouteFromHopping.otherToken1, tokenOut, swapRouteFromHopping.isBasic2, amounts[1]);
             swapRoutes.amountOut = amounts[1];
             swapRoutes.hops = 2;
         }
@@ -547,32 +644,70 @@ contract BlackholePairAPIV2 is Initializable {
     }
 
 
-    function _getAmountViaHopping(uint amountIn, address tokenIn, address tokenMid, SwapRouteHelperData memory swapRouteHelperData) internal view returns (uint256[] memory amounts){
+    function _getAmountViaHopping(uint amountIn, address tokenIn, address tokenMid, address tokenOut, SwapRouteHelperData memory swapRouteHelperData) internal returns (uint256[] memory amounts){
+
         amounts = new uint256[](2);
 
-        amounts[0] = routerV2.getPoolAmountOut(amountIn, tokenIn, swapRouteHelperData._pair1);
-        amounts[1] = routerV2.getPoolAmountOut(amounts[0], tokenMid, swapRouteHelperData._pair2);
+        amounts[0] = _getAmountOut(swapRouteHelperData, amountIn, tokenIn, tokenMid);
+        amounts[1] = _getAmountOut(swapRouteHelperData, amounts[0], tokenMid, tokenOut);
 
         return amounts;
     }
 
-    function _getAmountViaHopping(uint amountIn, address tokenIn, address tokenMid1, address tokenMid2, SwapRouteHelperData memory swapRouteHelperData) internal view returns (uint256[] memory amounts){
+    function _getAmountViaHopping(uint amountIn, address tokenIn, address tokenMid1, address tokenMid2, address tokenOut, SwapRouteHelperData memory swapRouteHelperData) internal returns (uint256[] memory amounts){
+
         amounts = new uint256[](3);
 
-        amounts[0] = routerV2.getPoolAmountOut(amountIn, tokenIn, swapRouteHelperData._pair1);
-        amounts[1] = routerV2.getPoolAmountOut(amounts[0], tokenMid1, swapRouteHelperData._pairMid);
-        amounts[2] = routerV2.getPoolAmountOut(amounts[1], tokenMid2, swapRouteHelperData._pair2);
+        amounts[0] = _getAmountOut(swapRouteHelperData, amountIn, tokenIn, tokenMid1);
+        amounts[1] = _getAmountOut(swapRouteHelperData, amounts[0], tokenMid1, tokenMid2);
+        amounts[2] = _getAmountOut(swapRouteHelperData, amounts[1], tokenMid2, tokenOut);
 
         return amounts;
     }
 
-    function _createRoute(address pair, address from, address to, bool stable, uint amountOut) internal pure returns (route memory) {
+    function _getAmountOut(SwapRouteHelperData memory swapRouteHelperData, uint amountIn, address tokenIn, address tokenOut) internal returns (uint256){
+
+        IQuoterV2.QuoteExactInputSingleParams memory clInputParams;
+        CLOutputData memory clOutputData;
+        uint256 amountOut;
+
+        if(swapRouteHelperData.isBasic1){
+            amountOut = routerV2.getPoolAmountOut(amountIn, tokenIn, swapRouteHelperData._pair1);
+        }
+        else{
+            clInputParams = IQuoterV2.QuoteExactInputSingleParams({
+                tokenIn: tokenIn,
+                tokenOut: tokenOut,
+                deployer: IAlgebraCLFactory(algebraFactory).poolDeployer(),
+                amountIn: amountIn,
+                limitSqrtPrice: 0
+            });
+            (clOutputData.amountOut, clOutputData.amountIn, clOutputData.sqrtPriceX96After, clOutputData.initializedTicksCrossed, clOutputData.gasEstimate, clOutputData.fee) 
+            = quoterV2.quoteExactInputSingle(clInputParams);
+            amountOut = clOutputData.amountOut;
+        }
+
+        return amountOut;
+    }
+
+    function _createRoute(address pair, address from, address to, bool isBasic, uint amountOut) internal view returns (route memory) {
         return route({
             pair: pair,
             from: from,
             to: to,
-            stable: stable,
+            stable: isBasic ? IPair(pair).isStable() : false,
+            concentrated: !isBasic,
             amountOut: amountOut
         });
+    }
+
+    function setAlgebraFactory(address _algebraFactory) external {
+        require(msg.sender == owner, '!owner');
+        algebraFactory = IAlgebraCLFactory(_algebraFactory);
+    }
+
+    function setQuoterV2(address _quoterV2) external {
+        require(msg.sender == owner, '!owner');
+        quoterV2 = IQuoterV2(_quoterV2);
     }
 }
