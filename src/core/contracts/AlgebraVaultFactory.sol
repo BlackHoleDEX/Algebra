@@ -8,6 +8,8 @@ contract AlgebraVaultFactory is IAlgebraVaultFactory {
   address private immutable algebraFactory;
   address public algebraFeeManager;
 
+  address public owner;
+
   mapping(address => address) public poolToVault;
 
   event VaultCreatedForPool(address indexed pool, address indexed vaultAddress, address indexed algebraFeeManagerForVault, address caller);
@@ -17,6 +19,7 @@ contract AlgebraVaultFactory is IAlgebraVaultFactory {
     require(_algebraFeeManager != address(0), 'ZERO_ALGEBRA_FEE_MANAGER');
     algebraFactory = _algebraFactory;
     algebraFeeManager = _algebraFeeManager;
+    owner = msg.sender;
   }
 
   /// @inheritdoc IAlgebraVaultFactory
@@ -37,5 +40,17 @@ contract AlgebraVaultFactory is IAlgebraVaultFactory {
   function getVaultForPool(address poolAddress) external view override returns (address communityFeeVault) {
     communityFeeVault = poolToVault[poolAddress];
     require(communityFeeVault != address(0), 'VAULT_NOT_FOUND');
+  }
+
+  function setAlgebraFeeManager(address _algebraFeeManager) public {
+    require(msg.sender == owner, 'NOT_OWNER');
+    require(_algebraFeeManager != address(0), 'ZERO_ALGEBRA_FEE_MANAGER');
+    algebraFeeManager = _algebraFeeManager;
+  }
+
+  function setOwner(address _newOwner) external {
+    require(msg.sender == owner, 'NOT_OWNER');
+    require(_newOwner != address(0), 'ZERO_ADDRESS');
+    owner = _newOwner;
   }
 }
