@@ -23,15 +23,15 @@ async function main() {
   console.log('AlgebraPoolDeployer to:', poolDeployer.target);
   console.log('AlgebraFactory deployed to:', factory.target);
 
-  const vaultFactory = await hre.ethers.getContractFactory('AlgebraCommunityVault');
-  const vault = await vaultFactory.deploy(factory, deployer.address);
+  // const vaultFactory = await hre.ethers.getContractFactory('AlgebraCommunityVault');
+  // const vault = await vaultFactory.deploy(factory, deployer.address);
 
-  await vault.waitForDeployment();
+  // await vault.waitForDeployment();
 
-  console.log('AlgebraCommunityVault deployed to:', vault.target);
+  // console.log('AlgebraCommunityVault deployed to:', vault.target);
 
-  const vaultFactoryStubFactory = await hre.ethers.getContractFactory('AlgebraVaultFactoryStub');
-  const vaultFactoryStub = await vaultFactoryStubFactory.deploy(vault);
+  const vaultFactoryStubFactory = await hre.ethers.getContractFactory('AlgebraVaultFactory');
+  const vaultFactoryStub = await vaultFactoryStubFactory.deploy(factory.target, deployer.address);
 
   await vaultFactoryStub.waitForDeployment();
 
