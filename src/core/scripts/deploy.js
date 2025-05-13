@@ -63,7 +63,7 @@ async function main() {
   let deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'));
   deploysData.poolDeployer = poolDeployer.target;
   deploysData.factory = factory.target;
-  deploysData.vault = vault.target;
+  // deploysData.vault = vault.target;
   deploysData.vaultFactory = vaultFactoryStub.target;
   fs.writeFileSync(deployDataPath, JSON.stringify(deploysData), 'utf-8');
 }
