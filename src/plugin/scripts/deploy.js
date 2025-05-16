@@ -14,7 +14,7 @@ async function main() {
 
     console.log("PluginFactory to:", dsFactory.target);
 
-    const FarmingProxyPluginFactory = await hre.ethers.getContractFactory("BasePluginV1Factory");
+    const FarmingProxyPluginFactory = await hre.ethers.getContractFactory("AlgebraFarmingProxyPluginFactory");
     const fpFactory = await FarmingProxyPluginFactory.deploy();
 
     await fpFactory.waitForDeployment()
@@ -27,6 +27,7 @@ async function main() {
     console.log('Updated plugin factory address in factory')
 
     deploysData.BasePluginV1Factory = dsFactory.target;
+    deploysData.AlgebraFarmingProxyPluginFactory = fpFactory.target;
     fs.writeFileSync(deployDataPath, JSON.stringify(deploysData), 'utf-8');
 
 }
