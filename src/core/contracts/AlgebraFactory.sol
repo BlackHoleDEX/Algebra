@@ -55,7 +55,7 @@ contract AlgebraFactory is IAlgebraFactory, Ownable2Step, AccessControlEnumerabl
   /// @inheritdoc IAlgebraFactory
   mapping(address => mapping(address => mapping(address => address))) public override customPoolByPair;
 
-  address[] public allPairs; 
+  address[] public allPairs;
 
   /// @inheritdoc IAlgebraFactory
   /// @dev keccak256 of AlgebraPool init bytecode. Used to compute pool address deterministically
@@ -240,5 +240,9 @@ contract AlgebraFactory is IAlgebraFactory, Ownable2Step, AccessControlEnumerabl
     if (owner() != address(0)) {
       _grantRole(DEFAULT_ADMIN_ROLE, owner());
     }
+  }
+
+  function allPairsLength() external view returns (uint) {
+    return allPairs.length;
   }
 }
