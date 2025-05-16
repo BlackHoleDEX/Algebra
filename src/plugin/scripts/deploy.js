@@ -14,6 +14,13 @@ async function main() {
 
     console.log("PluginFactory to:", dsFactory.target);
 
+    const FarmingProxyPluginFactory = await hre.ethers.getContractFactory("BasePluginV1Factory");
+    const fpFactory = await FarmingProxyPluginFactory.deploy();
+
+    await fpFactory.waitForDeployment()
+
+    console.log("FarmingProxyPluginFactory to:", fpFactory.target);
+
     const factory = await hre.ethers.getContractAt('IAlgebraFactory', deploysData.factory)
 
     await factory.setDefaultPluginFactory(dsFactory.target)
