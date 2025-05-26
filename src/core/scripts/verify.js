@@ -26,7 +26,7 @@ async function main() {
   await hre.run('verify:verify', {
     contract: "contracts/AlgebraVaultFactory.sol:AlgebraVaultFactory",
     address: deploysData.vaultFactory,
-    constructorArguments: [deploysData.factory, deployer.address],
+    constructorArguments: [deploysData.factory],
 
   });
 }
