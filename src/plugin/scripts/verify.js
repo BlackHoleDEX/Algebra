@@ -4,7 +4,7 @@ const path = require('path');
 
 async function main() {
 
-    const deployDataPath = path.resolve(__dirname, '../../../deploys.json');
+    const deployDataPath = path.resolve(__dirname, '../../../'+(process.env.DEPLOY_ENV || '')+'deploys.json');
     let deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'));
 
     const BasePluginV1Factory = deploysData.BasePluginV1Factory;

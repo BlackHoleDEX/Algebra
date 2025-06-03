@@ -59,7 +59,7 @@ async function main() {
 
   // await (await factory.transferOwnership(partnerAddress)).wait()
 
-  const deployDataPath = path.resolve(__dirname, '../../../deploys.json');
+  const deployDataPath = path.resolve(__dirname, '../../../'+(process.env.DEPLOY_ENV || '')+'deploys.json');
   let deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'));
   deploysData.poolDeployer = poolDeployer.target;
   deploysData.factory = factory.target;
