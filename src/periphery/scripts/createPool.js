@@ -7,7 +7,7 @@ const AlgebraFactoryComplied = require('@cryptoalgebra/integral-core/artifacts/c
 const { ZeroAddress } = require('ethers');
 
 async function main() {
-  const deployDataPath = path.resolve(__dirname, '../../../deploys.json');
+  const deployDataPath = path.resolve(__dirname, '../../../'+(process.env.DEPLOY_ENV || '')+'deploys.json');
   let deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'));
 
   // WNativeTokenAddress

@@ -108,6 +108,12 @@ export default {
       chainId: 10243,
       accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
     },
+    avalanche: {
+      url: "https://api.avax.network/ext/bc/C/rpc", // Mainnet RPC
+      chainId: 43114,
+      accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
+      gas: 15_000_000,
+    },
   },
   etherscan: {
     // Your API key for Etherscan
@@ -128,6 +134,14 @@ export default {
         urls: {
           apiURL: 'https://api.routescan.io/v2/network/testnet/evm/43113/etherscan/api',
           browserURL: 'https://explorer.mode.network/',
+        },
+      },
+      {
+        network: 'avalanche',
+        chainId: 43114,
+        urls: {
+          apiURL: 'https://api.routescan.io/v2/network/mainnet/evm/43114/etherscan/api',
+          browserURL: 'https://snowtrace.io/',
         },
       },
       {

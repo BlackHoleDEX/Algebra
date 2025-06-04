@@ -4,7 +4,7 @@ const path = require('path')
 const BasePluginV1FactoryComplied = require('@cryptoalgebra/integral-base-plugin/artifacts/contracts/BasePluginV1Factory.sol/BasePluginV1Factory.json');
 
 async function main() {
-  const deployDataPath = path.resolve(__dirname, '../../../deploys.json')
+  const deployDataPath = path.resolve(__dirname, '../../../'+(process.env.DEPLOY_ENV || '')+'deploys.json')
   const deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'))
 
   const AlgebraEternalFarmingFactory = await hre.ethers.getContractFactory('AlgebraEternalFarming')

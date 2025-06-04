@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 async function main() {
-  const deployDataPath = path.resolve(__dirname, '../../../deploys.json');
+  const deployDataPath = path.resolve(__dirname, '../../../'+(process.env.DEPLOY_ENV || '')+'deploys.json');
   let deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'));
 
   const [deployer] = await hre.ethers.getSigners();
@@ -18,15 +18,15 @@ async function main() {
     constructorArguments: [deploysData.factory],
   });
 
-  await hre.run('verify:verify', {
-    address: deploysData.vault,
-    constructorArguments: [deploysData.factory, deployer.address],
-  });
+  // await hre.run('verify:verify', {
+  //   address: deploysData.vault,
+  //   constructorArguments: [deploysData.factory, deployer.address],
+  // });
 
   await hre.run('verify:verify', {
-    contract: "contracts/AlgebraVaultFactoryStub.sol:AlgebraVaultFactoryStub",
+    contract: "contracts/AlgebraVaultFactory.sol:AlgebraVaultFactory",
     address: deploysData.vaultFactory,
-    constructorArguments: [deploysData.vault],
+    constructorArguments: [deploysData.factory],
 
   });
 }

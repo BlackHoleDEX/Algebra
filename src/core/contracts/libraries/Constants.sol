@@ -14,11 +14,11 @@ library Constants {
   uint16 internal constant MAX_DEFAULT_FEE = 5e4; // max default fee value in hundredths of a bip (5%)
 
   int24 internal constant INIT_DEFAULT_TICK_SPACING = 60;
-  int24 internal constant MAX_TICK_SPACING = 500;
+  int24 internal constant MAX_TICK_SPACING = 2000;
   int24 internal constant MIN_TICK_SPACING = 1;
 
   // the frequency with which the accumulated community fees are sent to the vault
-  uint32 internal constant FEE_TRANSFER_FREQUENCY = 8 hours;
+  uint32 internal constant FEE_TRANSFER_FREQUENCY = 5 seconds;
 
   // max(uint128) / (MAX_TICK - MIN_TICK)
   uint128 internal constant MAX_LIQUIDITY_PER_TICK = 191757638537527648490752896198553;
