@@ -44,6 +44,4 @@ contract AlgebraVaultFactory is IAlgebraVaultFactory {
     require(_newOwner != address(0), 'ZERO_ADDRESS');
     owner = _newOwner;
   }
-
-  //Todo: should we have factory setter
 }
