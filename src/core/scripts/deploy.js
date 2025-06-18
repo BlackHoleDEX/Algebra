@@ -4,6 +4,7 @@ const path = require('path');
 
 async function main() {
   const [deployer] = await hre.ethers.getSigners();
+  console.log(`Deploying ${deployer.address}`);
   // precompute
   const poolDeployerAddress = hre.ethers.getCreateAddress({
     from: deployer.address,
