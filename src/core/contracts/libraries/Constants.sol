@@ -13,7 +13,7 @@ library Constants {
   uint16 internal constant INIT_DEFAULT_FEE = 0.5e4; // init default fee value in hundredths of a bip (0.5%)
   uint16 internal constant MAX_DEFAULT_FEE = 5e4; // max default fee value in hundredths of a bip (5%)
 
-  int24 internal constant INIT_DEFAULT_TICK_SPACING = 60;
+  int24 internal constant INIT_DEFAULT_TICK_SPACING = 200;
   int24 internal constant MAX_TICK_SPACING = 2000;
   int24 internal constant MIN_TICK_SPACING = 1;
 
