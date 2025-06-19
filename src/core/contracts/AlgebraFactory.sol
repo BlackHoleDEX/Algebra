@@ -55,11 +55,11 @@ contract AlgebraFactory is IAlgebraFactory, Ownable2Step, AccessControlEnumerabl
   /// @inheritdoc IAlgebraFactory
   mapping(address => mapping(address => mapping(address => address))) public override customPoolByPair;
 
-  address[] public allPairs; 
+  address[] public allPairs;
 
   /// @inheritdoc IAlgebraFactory
   /// @dev keccak256 of AlgebraPool init bytecode. Used to compute pool address deterministically
-  bytes32 public constant POOL_INIT_CODE_HASH = 0xa18736c3ee97fe3c96c9428c0cc2a9116facec18e84f95f9da30543f8238a782;
+  bytes32 public constant POOL_INIT_CODE_HASH = 0xae009e914d7367e9d6b71fe6f2d0e739a50b5055a96ae6f46f15a901de70af5c;
 
   constructor(address _poolDeployer) {
     require(_poolDeployer != address(0));
@@ -240,5 +240,9 @@ contract AlgebraFactory is IAlgebraFactory, Ownable2Step, AccessControlEnumerabl
     if (owner() != address(0)) {
       _grantRole(DEFAULT_ADMIN_ROLE, owner());
     }
+  }
+
+  function allPairsLength() external view returns (uint) {
+    return allPairs.length;
   }
 }

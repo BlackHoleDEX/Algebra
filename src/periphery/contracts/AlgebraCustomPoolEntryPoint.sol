@@ -80,6 +80,10 @@ contract AlgebraCustomPoolEntryPoint is IAlgebraCustomPoolEntryPoint {
         IAlgebraPool(pool).setFee(newFee);
     }
 
+    function setCommunityFee(address pool, uint16 newCommunityFee) external onlyCustomDeployer(pool) {
+        IAlgebraPool(pool).setCommunityFee(newCommunityFee);
+    }
+
     function _checkIfDeployer(address pool) internal view {
         address token0 = IAlgebraPool(pool).token0();
         address token1 = IAlgebraPool(pool).token1();

@@ -4,6 +4,7 @@ const path = require('path');
 
 async function main() {
   const [deployer] = await hre.ethers.getSigners();
+  console.log(`Deploying ${deployer.address}`);
   // precompute
   const poolDeployerAddress = hre.ethers.getCreateAddress({
     from: deployer.address,
@@ -29,9 +30,8 @@ async function main() {
   // await vault.waitForDeployment();
 
   // console.log('AlgebraCommunityVault deployed to:', vault.target);
-
   const vaultFactoryStubFactory = await hre.ethers.getContractFactory('AlgebraVaultFactory');
-  const vaultFactoryStub = await vaultFactoryStubFactory.deploy(factory.target, deployer.address);
+  const vaultFactoryStub = await vaultFactoryStubFactory.deploy(factory.target);
 
   await vaultFactoryStub.waitForDeployment();
 
@@ -41,30 +41,30 @@ async function main() {
   await setVaultTx.wait()
 
   // protocol fee settings
-  const algebraFeeRecipient = "0x6cbd743d9b97DA1855E64893D3226F8eDCa16e76" 
-  const partnerAddress = "0x8ec18CcA7E8d40861dc07C217a6426f60005A661" // owner address, must be changed
-  const algebraFeeShare =  100 // specified on algebraVault, 100% of community fee by default(3% of all fees) 
-  const defaultCommunityFee = 200 // 3% by default
+  // const algebraFeeRecipient = "0x8ec18CcA7E8d40861dc07C217a6426f60005A661"
+  // const partnerAddress = "0x8ec18CcA7E8d40861dc07C217a6426f60005A661" // owner address, must be changed
+  const algebraFeeShare =  20 // specified on algebraVault, 100% of community fee by default(3% of all fees) 
+  const defaultCommunityFee = 1000 // 3% by default
 
   const setCommunityFeeTx = await factory.setDefaultCommunityFee(defaultCommunityFee)
   await setCommunityFeeTx.wait()
 
-  const changeAlgebraFeeReceiverTx = await vault.changeAlgebraFeeReceiver(algebraFeeRecipient)
-  await changeAlgebraFeeReceiverTx.wait()
+  // const changeAlgebraFeeReceiverTx = await vault.changeAlgebraFeeReceiver(algebraFeeRecipient)
+  // await changeAlgebraFeeReceiverTx.wait()
 
-  const changePartnerFeeReceiverTx = await vault.changeCommunityFeeReceiver(partnerAddress)
-  await changePartnerFeeReceiverTx.wait()
+  // const changePartnerFeeReceiverTx = await vault.changeCommunityFeeReceiver(partnerAddress)
+  // await changePartnerFeeReceiverTx.wait()
 
-  await (await vault.proposeAlgebraFeeChange(algebraFeeShare)).wait()
-  await (await vault.acceptAlgebraFeeChangeProposal(algebraFeeShare)).wait()
+  // await (await vault.proposeAlgebraFeeChange(algebraFeeShare)).wait()
+  // await (await vault.acceptAlgebraFeeChangeProposal(algebraFeeShare)).wait()
 
-  await (await factory.transferOwnership(partnerAddress)).wait()
+  // await (await factory.transferOwnership(partnerAddress)).wait()
 
-  const deployDataPath = path.resolve(__dirname, '../../../deploys.json');
+  const deployDataPath = path.resolve(__dirname, '../../../'+(process.env.DEPLOY_ENV || '')+'deploys.json');
   let deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'));
   deploysData.poolDeployer = poolDeployer.target;
   deploysData.factory = factory.target;
-  deploysData.vault = vault.target;
+  // deploysData.vault = vault.target;
   deploysData.vaultFactory = vaultFactoryStub.target;
   fs.writeFileSync(deployDataPath, JSON.stringify(deploysData), 'utf-8');
 }

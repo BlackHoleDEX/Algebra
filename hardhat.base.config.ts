@@ -1,8 +1,9 @@
 const path = require('path');
 const config = require('dotenv').config({ path: path.resolve(__dirname, '.env') });
-const { ETHERSCAN_API_KEY, BSCSCAN_API_KEY, POLYGONSCAN_API_KEY, MNEMONIC, DEPLOY_GAS_LIMIT_MAX, DEPLOY_GAS_PRICE, INFURA_ID_PROJECT } =
+const { ETHERSCAN_API_KEY, BSCSCAN_API_KEY, POLYGONSCAN_API_KEY, DEPLOY_GAS_LIMIT_MAX, DEPLOY_GAS_PRICE, INFURA_ID_PROJECT } =
   config.parsed || {};
 
+const MNEMONIC = process.env.MNEMONIC;
 export default {
   networks: {
     hardhat: {
@@ -78,9 +79,9 @@ export default {
       accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
     },
     avaxTestnet: {
-      url: `https://avalanche-fuji-c-chain-rpc.publicnode.com`,
+      url: `https://avax-fuji.g.alchemy.com/v2/bHds16apHy83EsIrekOu0`,
       chainId: 43113,
-      accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
+      accounts: [`0x${MNEMONIC}`],
     },
     blastTestnet: {
       url: `https://blast-sepolia.blockpi.network/v1/rpc/public`,
@@ -108,6 +109,12 @@ export default {
       chainId: 10243,
       accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
     },
+    avalanche: {
+      url: "https://api.avax.network/ext/bc/C/rpc", // Mainnet RPC
+      chainId: 43114,
+      accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
+      gas: 15_000_000,
+    },
   },
   etherscan: {
     // Your API key for Etherscan
@@ -128,6 +135,14 @@ export default {
         urls: {
           apiURL: 'https://api.routescan.io/v2/network/testnet/evm/43113/etherscan/api',
           browserURL: 'https://explorer.mode.network/',
+        },
+      },
+      {
+        network: 'avalanche',
+        chainId: 43114,
+        urls: {
+          apiURL: 'https://api.routescan.io/v2/network/mainnet/evm/43114/etherscan/api',
+          browserURL: 'https://snowtrace.io/',
         },
       },
       {

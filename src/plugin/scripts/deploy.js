@@ -4,7 +4,7 @@ const path = require('path');
 
 async function main() {
 
-    const deployDataPath = path.resolve(__dirname, '../../../deploys.json')
+    const deployDataPath = path.resolve(__dirname, '../../../'+(process.env.DEPLOY_ENV || '')+'deploys.json')
     const deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'))
 
     const BasePluginV1Factory = await hre.ethers.getContractFactory("BasePluginV1Factory");
@@ -14,12 +14,20 @@ async function main() {
 
     console.log("PluginFactory to:", dsFactory.target);
 
+    const FarmingProxyPluginFactory = await hre.ethers.getContractFactory("AlgebraFarmingProxyPluginFactory");
+    const fpFactory = await FarmingProxyPluginFactory.deploy();
+
+    await fpFactory.waitForDeployment()
+
+    console.log("FarmingProxyPluginFactory to:", fpFactory.target);
+
     const factory = await hre.ethers.getContractAt('IAlgebraFactory', deploysData.factory)
 
     await factory.setDefaultPluginFactory(dsFactory.target)
     console.log('Updated plugin factory address in factory')
 
     deploysData.BasePluginV1Factory = dsFactory.target;
+    deploysData.AlgebraFarmingProxyPluginFactory = fpFactory.target;
     fs.writeFileSync(deployDataPath, JSON.stringify(deploysData), 'utf-8');
 
 }
