@@ -78,7 +78,7 @@ export default {
       accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
     },
     avaxTestnet: {
-      url: `https://avalanche-fuji-c-chain-rpc.publicnode.com`,
+      url: `https://avax-fuji.g.alchemy.com/v2/bHds16apHy83EsIrekOu0`,
       chainId: 43113,
       accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
     },
