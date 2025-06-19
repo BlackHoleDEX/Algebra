@@ -3,13 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 async function main() {
-  const network = process.argv[2];
-  const multisigAddress = ''; //@Todo : replace this
-
-  if (!network) {
-    console.error('Please provide network name as first argument');
-    process.exit(1);
-  }
+  const multisigAddress = process.env.MULTI_SIG_WALLET; //@Todo : replace this
 
   if (!multisigAddress) {
     console.error('Please provide multisig wallet address as second argument');
@@ -22,10 +16,9 @@ async function main() {
   }
 
   console.log(`Starting ownership transfer to multisig: ${multisigAddress}`);
-  console.log(`Network: ${network}`);
 
   // Read deployment addresses (environment-specific)
-  const deployDataPath = path.resolve(__dirname, '../' + (process.env.DEPLOY_ENV || '') + 'deploys.json');
+  const deployDataPath = path.resolve(__dirname, '../../../' + (process.env.DEPLOY_ENV || '') + 'deploys.json');
   let deploysData;
   try {
     deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'));
@@ -39,8 +32,8 @@ async function main() {
   console.log(`Current deployer address: ${deployer.address}`);
 
   // Contract interfaces
-  const AlgebraFactoryABI = require('../src/core/artifacts/contracts/AlgebraFactory.sol/AlgebraFactory.json').abi;
-  const AlgebraVaultFactoryABI = require('../src/core/artifacts/contracts/AlgebraVaultFactory.sol/AlgebraVaultFactory.json').abi;
+  const AlgebraFactoryABI = require('../artifacts/contracts/AlgebraFactory.sol/AlgebraFactory.json').abi;
+  const AlgebraVaultFactoryABI = require('../artifacts/contracts/AlgebraVaultFactory.sol/AlgebraVaultFactory.json').abi;
 
   console.log('\n=== STARTING OWNERSHIP TRANSFER ===\n');
 
