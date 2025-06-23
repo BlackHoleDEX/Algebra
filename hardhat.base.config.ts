@@ -84,7 +84,7 @@ export default {
       accounts: [`0x${MNEMONIC}`],
     },
     sepoliaTestnet: {
-      url: `https://sepolia.drpc.org`,
+      url: `https://bitter-solitary-frost.ethereum-sepolia.quiknode.pro/ca090f980f3013fc7d11ecfb8812b0a99894f408/`,
       chainId: 11155111,
       accounts: [`0x${MNEMONIC}`],
     },
