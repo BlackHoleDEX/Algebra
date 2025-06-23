@@ -83,6 +83,11 @@ export default {
       chainId: 43113,
       accounts: [`0x${MNEMONIC}`],
     },
+    sepoliaTestnet: {
+      url: `https://sepolia.drpc.org`,
+      chainId: 11155111,
+      accounts: [`0x${MNEMONIC}`],
+    },
     blastTestnet: {
       url: `https://blast-sepolia.blockpi.network/v1/rpc/public`,
       chainId: 168587773,
@@ -135,6 +140,14 @@ export default {
         urls: {
           apiURL: 'https://api.routescan.io/v2/network/testnet/evm/43113/etherscan/api',
           browserURL: 'https://explorer.mode.network/',
+        },
+      },
+      {
+        network: 'sepoliaTestnet',
+        chainId: 11155111,
+        urls: {
+          apiURL: 'https://api-sepolia.etherscan.io/api',
+          browserURL: 'https://sepolia.etherscan.io',
         },
       },
       {
