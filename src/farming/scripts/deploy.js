@@ -3,12 +3,17 @@ const fs = require('fs')
 const path = require('path')
 const BasePluginV1FactoryComplied = require('@cryptoalgebra/integral-base-plugin/artifacts/contracts/BasePluginV1Factory.sol/BasePluginV1Factory.json');
 
+async function getFeeData() {
+  const { maxFeePerGas, maxPriorityFeePerGas } = await hre.ethers.provider.getFeeData();
+  return { maxFeePerGas, maxPriorityFeePerGas };
+}
+
 async function main() {
   const deployDataPath = path.resolve(__dirname, '../../../'+(process.env.DEPLOY_ENV || '')+'deploys.json')
   const deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'))
 
   const AlgebraEternalFarmingFactory = await hre.ethers.getContractFactory('AlgebraEternalFarming')
-  const feeData1 = await hre.ethers.provider.getFeeData();
+  const feeData1 = await getFeeData();
   const AlgebraEternalFarming = await AlgebraEternalFarmingFactory.deploy(
     deploysData.poolDeployer,
     deploysData.nonfungiblePositionManager,
@@ -21,7 +26,7 @@ async function main() {
   console.log('AlgebraEternalFarming deployed to:', AlgebraEternalFarming.target)
 
   const FarmingCenterFactory = await hre.ethers.getContractFactory('FarmingCenter')
-  const feeData2 = await hre.ethers.provider.getFeeData();
+  const feeData2 = await getFeeData();
   const FarmingCenter = await FarmingCenterFactory.deploy(
     AlgebraEternalFarming.target,
     deploysData.nonfungiblePositionManager,
@@ -33,13 +38,13 @@ async function main() {
   await FarmingCenter.waitForDeployment()
   console.log('FarmingCenter deployed to:', FarmingCenter.target)
 
-  const feeData3 = await hre.ethers.provider.getFeeData();
+  const feeData3 = await getFeeData();
   await (await AlgebraEternalFarming.setFarmingCenterAddress(FarmingCenter.target, { ...feeData3 })).wait()
   console.log('Updated farming center address in eternal(incentive) farming')
 
   const pluginFactory = await hre.ethers.getContractAt(BasePluginV1FactoryComplied.abi, deploysData.BasePluginV1Factory)
 
-  const feeData4 = await hre.ethers.provider.getFeeData();
+  const feeData4 = await getFeeData();
   await (await pluginFactory.setFarmingAddress(FarmingCenter.target, { ...feeData4 })).wait()
   console.log('Updated farming center address in plugin factory')
 
@@ -47,7 +52,7 @@ async function main() {
     'INonfungiblePositionManager',
     deploysData.nonfungiblePositionManager
   )
-  const feeData5 = await hre.ethers.provider.getFeeData();
+  const feeData5 = await getFeeData();
   await (await posManager.setFarmingCenter(FarmingCenter.target, { ...feeData5 })).wait()
 
   fs.writeFileSync(deployDataPath, JSON.stringify(deploysData), 'utf-8');

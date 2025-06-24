@@ -2,13 +2,20 @@ const hre = require("hardhat");
 const fs = require('fs');
 const path = require('path');
 
+
+async function getFeeData() {
+    const { maxFeePerGas, maxPriorityFeePerGas } = await hre.ethers.provider.getFeeData();
+    return { maxFeePerGas, maxPriorityFeePerGas };
+}
+
+
 async function main() {
 
     const deployDataPath = path.resolve(__dirname, '../../../'+(process.env.DEPLOY_ENV || '')+'deploys.json')
     const deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'))
 
     const BasePluginV1Factory = await hre.ethers.getContractFactory("BasePluginV1Factory");
-    const feeData1 = await hre.ethers.provider.getFeeData();
+    const feeData1 = await getFeeData();
     const dsFactory = await BasePluginV1Factory.deploy(deploysData.factory, { ...feeData1 });
 
     await dsFactory.waitForDeployment()
@@ -16,7 +23,7 @@ async function main() {
     console.log("PluginFactory to:", dsFactory.target);
 
     const FarmingProxyPluginFactory = await hre.ethers.getContractFactory("AlgebraFarmingProxyPluginFactory");
-    const feeData2 = await hre.ethers.provider.getFeeData();
+    const feeData2 = await getFeeData();
     const fpFactory = await FarmingProxyPluginFactory.deploy({ ...feeData2 });
 
     await fpFactory.waitForDeployment()
@@ -25,7 +32,7 @@ async function main() {
 
     const factory = await hre.ethers.getContractAt('IAlgebraFactory', deploysData.factory)
 
-    const feeData3 = await hre.ethers.provider.getFeeData();
+    const feeData3 = await getFeeData();
     await factory.setDefaultPluginFactory(dsFactory.target, { ...feeData3 })
     console.log('Updated plugin factory address in factory')
 
