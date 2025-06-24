@@ -2,7 +2,6 @@ const hre = require('hardhat');
 const fs = require('fs');
 const path = require('path');
 
-
 async function main() {
   const multisigAddress = process.env.MULTI_SIG_WALLET; //@Todo : replace this
 
@@ -50,7 +49,11 @@ async function main() {
 
       if (currentOwner.toLowerCase() === deployer.address.toLowerCase()) {
         console.log('   Initiating ownership transfer...');
-        const tx = await factory.transferOwnership(multisigAddress);
+        const { maxFeePerGas, maxPriorityFeePerGas } = await hre.ethers.provider.getFeeData();
+        const tx = await factory.transferOwnership(multisigAddress, {
+          maxFeePerGas,
+          maxPriorityFeePerGas
+        });
         await tx.wait();
         console.log(`   ✅ Transfer initiated. Transaction: ${tx.hash}`);
         console.log(`   ⚠️  IMPORTANT: Multisig must call acceptOwnership() to complete the transfer`);
@@ -74,7 +77,11 @@ async function main() {
 
       if (currentOwner.toLowerCase() === deployer.address.toLowerCase()) {
         console.log('   Transferring ownership...');
-        const tx = await vaultFactory.setOwner(multisigAddress);
+        const { maxFeePerGas, maxPriorityFeePerGas } = await hre.ethers.provider.getFeeData();
+        const tx = await vaultFactory.setOwner(multisigAddress, {
+          maxFeePerGas,
+          maxPriorityFeePerGas
+        });
         await tx.wait();
         console.log(`   ✅ Ownership transferred. Transaction: ${tx.hash}`);
       } else {
@@ -103,7 +110,11 @@ async function main() {
 
         if (currentAdmin.toLowerCase() === deployer.address.toLowerCase()) {
           console.log('   Transferring ProxyAdmin ownership...');
-          const tx = await proxyAdmin.transferOwnership(multisigAddress);
+          const { maxFeePerGas, maxPriorityFeePerGas } = await hre.ethers.provider.getFeeData();
+          const tx = await proxyAdmin.transferOwnership(multisigAddress, {
+            maxFeePerGas,
+            maxPriorityFeePerGas
+          });
           await tx.wait();
           console.log(`   ✅ ProxyAdmin ownership transferred. Transaction: ${tx.hash}`);
         } else {
