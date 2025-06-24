@@ -18,6 +18,11 @@ async function main() {
     constructorArguments: [deploysData.factory],
   });
 
+/*TO VERIFY AlgebraPool.sol
+  await hre.run('verify:verify', {
+    address: "0x25b0612699c64595Db6736490305f1b30A5aA6cF",
+    constructorArguments: [],
+  });*/
   // await hre.run('verify:verify', {
   //   address: deploysData.vault,
   //   constructorArguments: [deploysData.factory, deployer.address],
