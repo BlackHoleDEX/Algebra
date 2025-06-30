@@ -47,18 +47,18 @@ async function main() {
   console.log('AlgebraVaultFactoryStub deployed to:', vaultFactoryStub.target);
 
   const feeData5 = await getFeeData();
-  const setVaultTx = await factory.setVaultFactory(vaultFactoryStub);
+  const setVaultTx = await factory.setVaultFactory(vaultFactoryStub, feeData5);
   await setVaultTx.wait();
 
   // protocol fee settings
   // const algebraFeeRecipient = "0x8ec18CcA7E8d40861dc07C217a6426f60005A661"
   // const partnerAddress = "0x8ec18CcA7E8d40861dc07C217a6426f60005A661" // owner address, must be changed
-  const algebraFeeShare = 20; // specified on algebraVault, 100% of community fee by default(3% of all fees)
-  const defaultCommunityFee = 0; // 3% by default
+  // const algebraFeeShare = 20; // specified on algebraVault, 100% of community fee by default(3% of all fees)
+  // const defaultCommunityFee = 0; // 3% by default
 
-  const feeData6 = await getFeeData();
-  const setCommunityFeeTx = await factory.setDefaultCommunityFee(defaultCommunityFee, feeData6);
-  await setCommunityFeeTx.wait();
+  // const feeData6 = await getFeeData();
+  // const setCommunityFeeTx = await factory.setDefaultCommunityFee(defaultCommunityFee, feeData6);
+  // await setCommunityFeeTx.wait();
 
   // const feeData7 = await getFeeData();
   // const changeAlgebraFeeReceiverTx = await vault.changeAlgebraFeeReceiver(algebraFeeRecipient, feeData7)
