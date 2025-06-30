@@ -47,7 +47,7 @@ async function main() {
   console.log('AlgebraVaultFactoryStub deployed to:', vaultFactoryStub.target);
 
   const feeData5 = await getFeeData();
-  const setVaultTx = await factory.setVaultFactory(vaultFactoryStub, feeData5);
+  const setVaultTx = await factory.setVaultFactory(vaultFactoryStub);
   await setVaultTx.wait();
 
   // protocol fee settings
