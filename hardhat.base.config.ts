@@ -124,7 +124,7 @@ export default {
   etherscan: {
     // Your API key for Etherscan
     // Obtain one at https://etherscan.io/
-    apiKey: { sepoliaTestnet: `${process.env.APIKEY??"UNKNOWN"}` },
+    apiKey: { sepoliaTestnet: `${process.env.APIKEY??"UNKNOWN"}`, avaxTestnet: `${process.env.APIKEY??"UNKNOWN"}` },
     customChains: [
       {
         network: 'seiTestnet',
