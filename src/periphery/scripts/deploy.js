@@ -20,6 +20,11 @@ async function main() {
   if (!WNativeTokenAddress) {
     throw new Error('WNativeToken address is required');
   }
+  const NativeTokenTickerName = process.env.NATIVE_TOKEN_TICKER_NAME;
+  if (!NativeTokenTickerName) {
+    throw new Error('NativeTokenTickerName is required');
+  }
+
   const signers = await hre.ethers.getSigners();
   const ProxyAdmin = signers[0].address;
 
@@ -120,7 +125,7 @@ async function main() {
   const feeData9 = await getFeeData();
   const NonfungibleTokenPositionDescriptor = await NonfungibleTokenPositionDescriptorFactory.deploy(
     WNativeTokenAddress,
-    'AVAX',
+    NativeTokenTickerName,
     [],
     { ...feeData9 }
   );
