@@ -16,7 +16,10 @@ async function main() {
   let deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'));
 
   // WNativeTokenAddress
-  const WNativeTokenAddress = '0xb3B3CbEd8243682845C2ff23Ea1FD48e6144E34F';
+  const WNativeTokenAddress = process.env.WNATIVE_TOKEN_ADDRESS;
+  if (!WNativeTokenAddress) {
+    throw new Error('WNativeToken address is required');
+  }
   const signers = await hre.ethers.getSigners();
   const ProxyAdmin = signers[0].address;
 

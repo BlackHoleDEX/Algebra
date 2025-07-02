@@ -8,7 +8,7 @@ async function main() {
     let deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'));
 
     const BasePluginV1Factory = deploysData.BasePluginV1Factory;
-    const AlgebraFarmingProxyPluginFactory = deployDataPath.AlgebraFarmingProxyPluginFactory;
+    const AlgebraFarmingProxyPluginFactory = deploysData.AlgebraFarmingProxyPluginFactory;
 
     await hre.run("verify:verify", {
         address: BasePluginV1Factory,
