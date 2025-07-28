@@ -120,6 +120,11 @@ export default {
       accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
       gas: 15_000_000,
     },
+    bnbTestnet: {
+      url: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+      chainId: 97,
+      accounts: [`0x${MNEMONIC}`],
+    },
   },
   etherscan: {
     // Your API key for Etherscan
@@ -182,6 +187,14 @@ export default {
           browserURL: 'https://artio.beratrail.io/',
         },
       },
+      {
+        network: 'bnbTestnet',
+        chainId: 97,
+        urls: {
+          apiURL: "https://api-testnet.bscscan.com/api",
+          browserURL: "https://testnet.bscscan.com",
+        },
+      }
     ],
   },
 };
