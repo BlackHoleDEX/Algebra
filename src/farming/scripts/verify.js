@@ -23,6 +23,13 @@ async function main() {
         ],
         });
 
+/*
+    // TODO:: VERIFY EternalVirtualPool
+     await hre.run('verify:verify', {
+       address: "0x45204AC8f938b44bfb0f19be6d2794EeFBfe08B2",
+       constructorArguments: ["0x01A8A00A6fC8106B94f84aAbAef689Fd0D77271A", "0xdB2093a4DF635dcE499A0db0BBA9ABe39dB6594A"],
+     });*/
+
 }
 
 main()
