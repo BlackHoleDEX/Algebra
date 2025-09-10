@@ -21,6 +21,13 @@ async function main() {
         address: AlgebraFarmingProxyPluginFactory,
         constructorArguments: [],
         });
+
+
+     /* TODO:: VERIFY AlgebraFarmingProxyPlugin
+      await hre.run('verify:verify', {
+        address: "0xdB2093a4DF635dcE499A0db0BBA9ABe39dB6594A",
+        constructorArguments: ["0x41100C6D2c6920B10d12Cd8D59c8A9AA2eF56fC7", "0x512eb749541B7cf294be882D636218c84a5e9E5F", "0x27ae8c52A41EC52A4150BA6321007eC41702c0F0"],
+      });*/
     
 }
 
