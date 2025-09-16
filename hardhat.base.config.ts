@@ -115,7 +115,7 @@ export default {
       accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
     },
     avalanche: {
-      url: "https://api.avax.network/ext/bc/C/rpc", // Mainnet RPC
+      url: 'https://api.avax.network/ext/bc/C/rpc', // Mainnet RPC
       chainId: 43114,
       accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
       gas: 15_000_000,
@@ -124,7 +124,12 @@ export default {
   etherscan: {
     // Your API key for Etherscan
     // Obtain one at https://etherscan.io/
-    apiKey: { sepoliaTestnet: `${process.env.APIKEY??"UNKNOWN"}`, avaxTestnet: `${process.env.APIKEY??"UNKNOWN"}`, avalanche: `${process.env.APIKEY??"UNKNOWN"}` },
+    apiKey: {
+      sepoliaTestnet: `${process.env.APIKEY ?? 'UNKNOWN'}`,
+      avaxTestnet: `${process.env.APIKEY ?? 'UNKNOWN'}`,
+      avalanche: `${process.env.APIKEY ?? 'UNKNOWN'}`,
+      bscTestnet: ETHERSCAN_API_KEY || process.env.ETHERSCAN_API_KEY || 'YOUR_ETHERSCAN_API_KEY_HERE',
+    },
     customChains: [
       {
         network: 'seiTestnet',
@@ -186,10 +191,10 @@ export default {
         network: 'bscTestnet',
         chainId: 97,
         urls: {
-          apiURL: "https://api-testnet.bscscan.com/api",
-          browserURL: "https://testnet.bscscan.com",
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=97',
+          browserURL: 'https://testnet.bscscan.com/',
         },
-      }
+      },
     ],
   },
 };
