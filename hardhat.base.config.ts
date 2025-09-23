@@ -120,6 +120,12 @@ export default {
       accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
       gas: 15_000_000,
     },
+    baseSepolia: {
+      url: `https://sepolia.base.org`,
+      chainId: 84532,
+      accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
+      gas: 15_000_000,
+    },
   },
   etherscan: {
     // Your API key for Etherscan
@@ -193,6 +199,14 @@ export default {
         urls: {
           apiURL: 'https://api.etherscan.io/v2/api?chainid=97',
           browserURL: 'https://testnet.bscscan.com/',
+        },
+      },
+      {
+        network: 'baseSepolia',
+        chainId: 84532,
+        urls: {
+          apiURL: 'https://api-sepolia.basescan.org/api',
+          browserURL: 'https://sepolia.basescan.org',
         },
       },
     ],
