@@ -35,9 +35,15 @@ interface IBasePluginV2Factory is IAlgebraPluginFactory {
   /// @notice Create plugin for already existing pool
   /// @param token0 The address of first token in pool
   /// @param token1 The address of second token in pool
+  /// @return The address of created plugin
+  function createPluginForExistingPool(address token0, address token1) external returns (address);
+
+  /// @notice Create plugin for already existing pool
+  /// @param token0 The address of first token in pool
+  /// @param token1 The address of second token in pool
   /// @param customPoolDeployer The address of custom pool deployer
   /// @return The address of created plugin
-  function createPluginForExistingPool(address token0, address token1, address customPoolDeployer) external returns (address);
+  function createPluginForExistingCustomPool(address token0, address token1, address customPoolDeployer) external returns (address);
 
   /// @dev updates farmings manager address on the factory
   /// @param newFarmingAddress The new tokenomics contract address
