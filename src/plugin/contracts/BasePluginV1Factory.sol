@@ -60,7 +60,7 @@ contract BasePluginV1Factory is IBasePluginV1Factory {
   /// @inheritdoc IBasePluginV1Factory
   function createPluginForExistingCustomPool(address token0, address token1, address customPoolDeployer) external override returns (address) {
     IAlgebraFactory factory = IAlgebraFactory(algebraFactory);
-    require(factory.hasRoleOrOwner(factory.POOLS_ADMINISTRATOR_ROLE(), msg.sender));
+    require(msg.sender == customPoolDeployer, 'Only custom pool deployer');
     require(token0 != token1);
     (token0, token1) = token0 < token1 ? (token0, token1) : (token1, token0);
     require(token0 != address(0));
