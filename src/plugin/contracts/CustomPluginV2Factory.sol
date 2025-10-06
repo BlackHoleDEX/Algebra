@@ -16,9 +16,8 @@ contract CustomPluginV2Factory is BasePluginV2Factory, ICustomPluginV2Factory {
     require(token0 != token1);
     (token0, token1) = token0 < token1 ? (token0, token1) : (token1, token0);
     require(token0 != address(0));
-    address pool = customPoolDeployer == address(0)
-      ? factory.poolByPair(token0, token1)
-      : factory.customPoolByPair(customPoolDeployer, token0, token1);
+    require(customPoolDeployer != address(0), 'Custom pool deployer is required');
+    address pool = factory.customPoolByPair(customPoolDeployer, token0, token1);
     require(pool != address(0), 'Pool not exist');
 
     return _createPlugin(pool);

@@ -23,13 +23,26 @@ async function main() {
     console.log("PluginFactory to:", dsFactory.target);
 
     /**
-     * @dev This below call setDefaultPluginFactory will fail because the factory's owner is multisi
+     * @dev This below call setDefaultPluginFactory will fail because the factory's owner is multisig.
      * It'll work as long as it's completely new deployment.
+     * Now we set only if current value is zero; otherwise skip.
      */
-    // const factory = await hre.ethers.getContractAt('IAlgebraFactory', deploysData.factory)
-    // const feeData3 = await getFeeData();
-    // await factory.setDefaultPluginFactory(dsFactory.target, { ...feeData3 })
-    // console.log('Updated plugin factory address in factory')
+    const factory = await hre.ethers.getContractAt('IAlgebraFactory', deploysData.factory)
+    const currentDefault = await factory.defaultPluginFactory().catch(() => hre.ethers.ZeroAddress)
+
+    if (currentDefault === hre.ethers.ZeroAddress) {
+        const feeData3 = await getFeeData();
+        try {
+            const tx = await factory.setDefaultPluginFactory(dsFactory.target, { ...feeData3 })
+            console.log('setDefaultPluginFactory tx:', tx.hash)
+            await tx.wait()
+            console.log('Updated plugin factory address in Pairfactory')
+        } catch (e) {
+            console.log('setDefaultPluginFactory failed Reason:', e?.message || e)
+        }
+    } else {
+        console.log('Default plugin factory already set');
+    }
 
     deploysData.BasePluginV1Factory = dsFactory.target;
     fs.writeFileSync(deployDataPath, JSON.stringify(deploysData), 'utf-8');
