@@ -50,16 +50,6 @@ contract MockTimeDSFactory is IBasePluginV1Factory {
     return _createPlugin(pool);
   }
 
-  function createPluginForExistingCustomPool(address token0, address token1, address customPoolDeployer) external override returns (address) {
-    IAlgebraFactory factory = IAlgebraFactory(algebraFactory);
-    require(factory.hasRoleOrOwner(factory.POOLS_ADMINISTRATOR_ROLE(), msg.sender));
-
-    address pool = factory.customPoolByPair(customPoolDeployer, token0, token1);
-    require(pool != address(0), 'Pool not exist');
-
-    return _createPlugin(pool);
-  }
-
   function setPluginForPool(address pool, address plugin) external {
     pluginByPool[pool] = plugin;
   }

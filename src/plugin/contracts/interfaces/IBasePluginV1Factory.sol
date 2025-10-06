@@ -49,13 +49,6 @@ interface IBasePluginV1Factory is IAlgebraPluginFactory {
   /// @return The address of created plugin
   function createPluginForExistingPool(address token0, address token1) external returns (address);
 
-  /// @notice Create plugin for already existing pool
-  /// @param token0 The address of first token in pool
-  /// @param token1 The address of second token in pool
-  /// @param customPoolDeployer The address of custom pool deployer
-  /// @return The address of created plugin
-  function createPluginForExistingCustomPool(address token0, address token1, address customPoolDeployer) external returns (address);
-
   /// @notice Changes initial fee configuration for new pools
   /// @dev changes coefficients for sigmoids: α / (1 + e^( (β-x) / γ))
   /// alpha1 + alpha2 + baseFee (max possible fee) must be <= type(uint16).max and gammas must be > 0
