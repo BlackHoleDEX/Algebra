@@ -22,22 +22,16 @@ async function main() {
 
     console.log("PluginFactory to:", dsFactory.target);
 
-    const FarmingProxyPluginFactory = await hre.ethers.getContractFactory("AlgebraFarmingProxyPluginFactory");
-    const feeData2 = await getFeeData();
-    const fpFactory = await FarmingProxyPluginFactory.deploy({ ...feeData2 });
-
-    await fpFactory.waitForDeployment()
-
-    console.log("FarmingProxyPluginFactory to:", fpFactory.target);
-
-    const factory = await hre.ethers.getContractAt('IAlgebraFactory', deploysData.factory)
-
-    const feeData3 = await getFeeData();
-    await factory.setDefaultPluginFactory(dsFactory.target, { ...feeData3 })
-    console.log('Updated plugin factory address in factory')
+    /**
+     * @dev This below call setDefaultPluginFactory will fail because the factory's owner is multisi
+     * It'll work as long as it's completely new deployment.
+     */
+    // const factory = await hre.ethers.getContractAt('IAlgebraFactory', deploysData.factory)
+    // const feeData3 = await getFeeData();
+    // await factory.setDefaultPluginFactory(dsFactory.target, { ...feeData3 })
+    // console.log('Updated plugin factory address in factory')
 
     deploysData.BasePluginV1Factory = dsFactory.target;
-    deploysData.AlgebraFarmingProxyPluginFactory = fpFactory.target;
     fs.writeFileSync(deployDataPath, JSON.stringify(deploysData), 'utf-8');
 
 }
