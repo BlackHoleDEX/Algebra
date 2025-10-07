@@ -21,7 +21,7 @@ export default {
       gas: 10000000,
     },
     ethmainnet: {
-      url: `https://ethereum.publicnode.com`, // Public Ethereum RPC
+      url: `${process.env.RPC_URL??"https://ethereum.publicnode.com"}`, // Public Ethereum RPC
       chainId: 1,
       accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
       gas: 15_000_000,
