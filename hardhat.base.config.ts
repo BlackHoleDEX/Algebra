@@ -20,8 +20,11 @@ export default {
       chainId: 1337,
       gas: 10000000,
     },
-    mainnet: {
-      url: `https://mainnet.infura.io/v3/${INFURA_ID_PROJECT}`,
+    ethmainnet: {
+      url: `https://ethereum.publicnode.com`, // Public Ethereum RPC
+      chainId: 1,
+      accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
+      gas: 15_000_000,
     },
     ropsten: {
       url: `https://ropsten.infura.io/v3/${INFURA_ID_PROJECT}`,
@@ -131,12 +134,21 @@ export default {
     // Your API key for Etherscan
     // Obtain one at https://etherscan.io/
     apiKey: {
+      ethmainnet: `${process.env.APIKEY ?? 'UNKNOWN'}`,
       sepoliaTestnet: `${process.env.APIKEY ?? 'UNKNOWN'}`,
       avaxTestnet: `${process.env.APIKEY ?? 'UNKNOWN'}`,
       avalanche: `${process.env.APIKEY ?? 'UNKNOWN'}`,
       bscTestnet: ETHERSCAN_API_KEY || process.env.ETHERSCAN_API_KEY || 'YOUR_ETHERSCAN_API_KEY_HERE',
     },
     customChains: [
+      {
+        network: 'ethmainnet',
+        chainId: 1,
+        urls: {
+          apiURL: 'https://api.etherscan.io/api',
+          browserURL: 'https://etherscan.io',
+        },
+      },
       {
         network: 'seiTestnet',
         chainId: 713715,
