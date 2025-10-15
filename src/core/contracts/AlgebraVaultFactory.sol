@@ -27,6 +27,7 @@ contract AlgebraVaultFactory is IAlgebraVaultFactory {
     address, // token0
     address // token1
   ) external override returns (address communityFeeVault) {
+    require(msg.sender == algebraFactory, 'ONLY_ALGEBRA_FACTORY');
     require(poolToVault[poolAddress] == address(0), 'VAULT_ALREADY_EXISTS');
     communityFeeVault = address(new AlgebraCommunityVault(algebraFactory, deployer));
     poolToVault[poolAddress] = communityFeeVault;
