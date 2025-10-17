@@ -44,6 +44,27 @@ async function main() {
         console.log('Default plugin factory already set');
     }
 
+    // Set default fee configuration with alpha1, alpha2, and baseFee as 0
+    const feeConfiguration = {
+        alpha1: 0,      // max value of the first sigmoid
+        alpha2: 0,      // max value of the second sigmoid
+        beta1: 0,   // shift along the x-axis for the first sigmoid
+        beta2: 0,   // shift along the x-axis for the second sigmoid
+        gamma1: 0,  // horizontal stretch factor for the first sigmoid
+        gamma2: 0,  // horizontal stretch factor for the second sigmoid
+        baseFee: 0      // minimum possible fee
+    };
+
+    const feeData2 = await getFeeData();
+    try {
+        const tx = await dsFactory.setDefaultFeeConfiguration(feeConfiguration, { ...feeData2 });
+        console.log('setDefaultFeeConfiguration tx:', tx.hash);
+        await tx.wait();
+        console.log('Updated default fee configuration with alpha1=0, alpha2=0, baseFee=0');
+    } catch (e) {
+        console.log('setDefaultFeeConfiguration failed Reason:', e?.message || e);
+    }
+
     deploysData.BasePluginV1Factory = dsFactory.target;
     fs.writeFileSync(deployDataPath, JSON.stringify(deploysData), 'utf-8');
 
