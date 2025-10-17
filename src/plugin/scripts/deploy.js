@@ -50,8 +50,8 @@ async function main() {
         alpha2: 0,      // max value of the second sigmoid
         beta1: 0,   // shift along the x-axis for the first sigmoid
         beta2: 0,   // shift along the x-axis for the second sigmoid
-        gamma1: 0,  // horizontal stretch factor for the first sigmoid
-        gamma2: 0,  // horizontal stretch factor for the second sigmoid
+        gamma1: 10,  // horizontal stretch factor for the first sigmoid
+        gamma2: 10,  // horizontal stretch factor for the second sigmoid
         baseFee: 0      // minimum possible fee
     };
 
