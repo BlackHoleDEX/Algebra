@@ -14,7 +14,7 @@ async function main() {
     const deployDataPath = path.resolve(__dirname, '../../../'+(process.env.DEPLOY_ENV || '')+'deploys.json')
     const deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'))
 
-    const BasePluginV1Factory = await hre.ethers.getContractFactory("BasePluginV1Factory");
+    const BasePluginV1Factory = await hre.ethers.getContractFactory("CustomPluginV1Factory");
     const feeData1 = await getFeeData();
     const dsFactory = await BasePluginV1Factory.deploy(deploysData.factory, { ...feeData1 });
 
