@@ -188,14 +188,28 @@ contract QuoterV2 is IQuoterV2, IAlgebraSwapCallback, PeripheryImmutableState {
 
             // the outputs of prior swaps become the inputs to subsequent ones
             uint256 _gasEstimate;
-            (
-                amountOutList[i],
-                amountInList[i],
-                sqrtPriceX96AfterList[i],
-                initializedTicksCrossedList[i],
-                _gasEstimate,
-                feeList[i]
-            ) = quoteExactInputSingle(params);
+            {
+                // Reduce stack pressure by capturing into locals first
+                uint256 _amountOut;
+                uint256 _amountIn;
+                uint160 _sqrtPriceX96After;
+                uint32 _initializedTicksCrossed;
+                uint16 _fee;
+                (
+                    _amountOut,
+                    _amountIn,
+                    _sqrtPriceX96After,
+                    _initializedTicksCrossed,
+                    _gasEstimate,
+                    _fee
+                ) = quoteExactInputSingle(params);
+
+                amountOutList[i] = _amountOut;
+                amountInList[i] = _amountIn;
+                sqrtPriceX96AfterList[i] = _sqrtPriceX96After;
+                initializedTicksCrossedList[i] = _initializedTicksCrossed;
+                feeList[i] = _fee;
+            }
 
             amountInRequired = amountOutList[i];
             gasEstimate += _gasEstimate;
@@ -290,14 +304,28 @@ contract QuoterV2 is IQuoterV2, IAlgebraSwapCallback, PeripheryImmutableState {
 
             // the inputs of prior swaps become the outputs of subsequent ones
             uint256 _gasEstimate;
-            (
-                amountOutList[i],
-                amountInList[i],
-                sqrtPriceX96AfterList[i],
-                initializedTicksCrossedList[i],
-                _gasEstimate,
-                feeList[i]
-            ) = quoteExactOutputSingle(params);
+            {
+                // Reduce stack pressure by capturing into locals first
+                uint256 _amountOut;
+                uint256 _amountIn;
+                uint160 _sqrtPriceX96After;
+                uint32 _initializedTicksCrossed;
+                uint16 _fee;
+                (
+                    _amountOut,
+                    _amountIn,
+                    _sqrtPriceX96After,
+                    _initializedTicksCrossed,
+                    _gasEstimate,
+                    _fee
+                ) = quoteExactOutputSingle(params);
+
+                amountOutList[i] = _amountOut;
+                amountInList[i] = _amountIn;
+                sqrtPriceX96AfterList[i] = _sqrtPriceX96After;
+                initializedTicksCrossedList[i] = _initializedTicksCrossed;
+                feeList[i] = _fee;
+            }
 
             amountOutRequired = amountInList[i];
             gasEstimate += _gasEstimate;
