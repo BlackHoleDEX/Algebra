@@ -168,67 +168,62 @@ contract QuoterV2 is IQuoterV2, IAlgebraSwapCallback, PeripheryImmutableState {
             uint16[] memory feeList
         )
     {
-        amountOutList = new uint256[](path.numPools());
-        amountInList = new uint256[](path.numPools());
-        sqrtPriceX96AfterList = new uint160[](path.numPools());
-        initializedTicksCrossedList = new uint32[](path.numPools());
-        feeList = new uint16[](path.numPools());
+        uint256 numPools = path.numPools();
+        QuoteResult memory result = QuoteResult({
+            amountOutList: new uint256[](numPools),
+            amountInList: new uint256[](numPools),
+            sqrtPriceX96AfterList: new uint160[](numPools),
+            initializedTicksCrossedList: new uint32[](numPools),
+            feeList: new uint16[](numPools)
+        });
 
         uint256 i = 0;
         while (true) {
-            QuoteExactInputSingleParams memory params;
-            {
-                (address tokenIn, address deployer, address tokenOut) = path.decodeFirstPool();
-
-                params.tokenIn = tokenIn;
-                params.deployer = deployer;
-                params.tokenOut = tokenOut;
-                params.amountIn = amountInRequired;
-            }
-
-            // the outputs of prior swaps become the inputs to subsequent ones
             uint256 _gasEstimate;
-            {
-                // Reduce stack pressure by capturing into locals first
-                uint256 _amountOut;
-                uint256 _amountIn;
-                uint160 _sqrtPriceX96After;
-                uint32 _initializedTicksCrossed;
-                uint16 _fee;
-                (
-                    _amountOut,
-                    _amountIn,
-                    _sqrtPriceX96After,
-                    _initializedTicksCrossed,
-                    _gasEstimate,
-                    _fee
-                ) = quoteExactInputSingle(params);
+            (_gasEstimate, amountInRequired) = _processInputQuote(path, amountInRequired, i, result);
 
-                amountOutList[i] = _amountOut;
-                amountInList[i] = _amountIn;
-                sqrtPriceX96AfterList[i] = _sqrtPriceX96After;
-                initializedTicksCrossedList[i] = _initializedTicksCrossed;
-                feeList[i] = _fee;
-            }
-
-            amountInRequired = amountOutList[i];
             gasEstimate += _gasEstimate;
             i++;
 
-            // decide whether to continue or terminate
             if (path.hasMultiplePools()) {
                 path = path.skipToken();
             } else {
                 return (
-                    amountOutList,
-                    amountInList,
-                    sqrtPriceX96AfterList,
-                    initializedTicksCrossedList,
+                    result.amountOutList,
+                    result.amountInList,
+                    result.sqrtPriceX96AfterList,
+                    result.initializedTicksCrossedList,
                     gasEstimate,
-                    feeList
+                    result.feeList
                 );
             }
         }
+    }
+
+    function _processInputQuote(
+        bytes memory path,
+        uint256 amountInRequired,
+        uint256 i,
+        QuoteResult memory result
+    ) private returns (uint256 gasEstimate, uint256 nextAmountRequired) {
+        QuoteExactInputSingleParams memory params;
+        (address tokenIn, address deployer, address tokenOut) = path.decodeFirstPool();
+
+        params.tokenIn = tokenIn;
+        params.deployer = deployer;
+        params.tokenOut = tokenOut;
+        params.amountIn = amountInRequired;
+
+        (
+            result.amountOutList[i],
+            result.amountInList[i],
+            result.sqrtPriceX96AfterList[i],
+            result.initializedTicksCrossedList[i],
+            gasEstimate,
+            result.feeList[i]
+        ) = quoteExactInputSingle(params);
+
+        nextAmountRequired = result.amountOutList[i];
     }
 
     function quoteExactOutputSingle(
@@ -284,66 +279,69 @@ contract QuoterV2 is IQuoterV2, IAlgebraSwapCallback, PeripheryImmutableState {
             uint16[] memory feeList
         )
     {
-        amountOutList = new uint256[](path.numPools());
-        amountInList = new uint256[](path.numPools());
-        sqrtPriceX96AfterList = new uint160[](path.numPools());
-        initializedTicksCrossedList = new uint32[](path.numPools());
-        feeList = new uint16[](path.numPools());
+        uint256 numPools = path.numPools();
+        QuoteResult memory result = QuoteResult({
+            amountOutList: new uint256[](numPools),
+            amountInList: new uint256[](numPools),
+            sqrtPriceX96AfterList: new uint160[](numPools),
+            initializedTicksCrossedList: new uint32[](numPools),
+            feeList: new uint16[](numPools)
+        });
 
         uint256 i = 0;
         while (true) {
-            QuoteExactOutputSingleParams memory params;
-            {
-                (address tokenOut, address deployer, address tokenIn) = path.decodeFirstPool();
-
-                params.tokenIn = tokenIn;
-                params.deployer = deployer;
-                params.tokenOut = tokenOut;
-                params.amount = amountOutRequired;
-            }
-
-            // the inputs of prior swaps become the outputs of subsequent ones
             uint256 _gasEstimate;
-            {
-                // Reduce stack pressure by capturing into locals first
-                uint256 _amountOut;
-                uint256 _amountIn;
-                uint160 _sqrtPriceX96After;
-                uint32 _initializedTicksCrossed;
-                uint16 _fee;
-                (
-                    _amountOut,
-                    _amountIn,
-                    _sqrtPriceX96After,
-                    _initializedTicksCrossed,
-                    _gasEstimate,
-                    _fee
-                ) = quoteExactOutputSingle(params);
+            (_gasEstimate, amountOutRequired) = _processOutputQuote(path, amountOutRequired, i, result);
 
-                amountOutList[i] = _amountOut;
-                amountInList[i] = _amountIn;
-                sqrtPriceX96AfterList[i] = _sqrtPriceX96After;
-                initializedTicksCrossedList[i] = _initializedTicksCrossed;
-                feeList[i] = _fee;
-            }
-
-            amountOutRequired = amountInList[i];
             gasEstimate += _gasEstimate;
             i++;
 
-            // decide whether to continue or terminate
             if (path.hasMultiplePools()) {
                 path = path.skipToken();
             } else {
                 return (
-                    amountOutList,
-                    amountInList,
-                    sqrtPriceX96AfterList,
-                    initializedTicksCrossedList,
+                    result.amountOutList,
+                    result.amountInList,
+                    result.sqrtPriceX96AfterList,
+                    result.initializedTicksCrossedList,
                     gasEstimate,
-                    feeList
+                    result.feeList
                 );
             }
         }
+    }
+
+    function _processOutputQuote(
+        bytes memory path,
+        uint256 amountOutRequired,
+        uint256 i,
+        QuoteResult memory result
+    ) private returns (uint256 gasEstimate, uint256 nextAmountRequired) {
+        QuoteExactOutputSingleParams memory params;
+        (address tokenOut, address deployer, address tokenIn) = path.decodeFirstPool();
+
+        params.tokenIn = tokenIn;
+        params.deployer = deployer;
+        params.tokenOut = tokenOut;
+        params.amount = amountOutRequired;
+
+        (
+            result.amountOutList[i],
+            result.amountInList[i],
+            result.sqrtPriceX96AfterList[i],
+            result.initializedTicksCrossedList[i],
+            gasEstimate,
+            result.feeList[i]
+        ) = quoteExactOutputSingle(params);
+
+        nextAmountRequired = result.amountInList[i];
+    }
+
+    struct QuoteResult {
+        uint256[] amountOutList;
+        uint256[] amountInList;
+        uint160[] sqrtPriceX96AfterList;
+        uint32[] initializedTicksCrossedList;
+        uint16[] feeList;
     }
 }
