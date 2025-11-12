@@ -42,12 +42,6 @@ async function main() {
   await (await AlgebraEternalFarming.setFarmingCenterAddress(FarmingCenter.target, { ...feeData3 })).wait()
   console.log('Updated farming center address in eternal(incentive) farming')
 
-  const pluginFactory = await hre.ethers.getContractAt(BasePluginV1FactoryComplied.abi, deploysData.BasePluginV1Factory)
-
-  const feeData4 = await getFeeData();
-  await (await pluginFactory.setFarmingAddress(FarmingCenter.target, { ...feeData4 })).wait()
-  console.log('Updated farming center address in BasePluginV1Factory')
-
   if (deploysData.BasePluginV3Factory) {
     const pluginV3Factory = await hre.ethers.getContractAt('IBasePluginV3Factory', deploysData.BasePluginV3Factory)
 
