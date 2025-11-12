@@ -1,7 +1,10 @@
 const hre = require('hardhat')
 const fs = require('fs')
 const path = require('path')
-const BasePluginV1FactoryComplied = require('@cryptoalgebra/integral-base-plugin/artifacts/contracts/BasePluginV1Factory.sol/BasePluginV1Factory.json');
+
+const BasePluginV3FactoryComplied = require('../../plugin/artifacts/contracts/BasePluginV3Factory.sol/BasePluginV3Factory.json');
+const NonfungiblePositionManagerComplied = require('../../periphery/artifacts/contracts/NonfungiblePositionManager.sol/NonfungiblePositionManager.json');
+
 
 async function getFeeData() {
   const { maxFeePerGas, maxPriorityFeePerGas } = await hre.ethers.provider.getFeeData();
@@ -43,7 +46,7 @@ async function main() {
   console.log('Updated farming center address in eternal(incentive) farming')
 
   if (deploysData.BasePluginV3Factory) {
-    const pluginV3Factory = await hre.ethers.getContractAt('IBasePluginV3Factory', deploysData.BasePluginV3Factory)
+    const pluginV3Factory = await hre.ethers.getContractAt(BasePluginV3FactoryComplied.abi, deploysData.BasePluginV3Factory)
 
     const feeData6 = await getFeeData();
     await (await pluginV3Factory.setFarmingAddress(FarmingCenter.target, { ...feeData6 })).wait()
@@ -51,7 +54,7 @@ async function main() {
   }
 
   const posManager = await hre.ethers.getContractAt(
-    'INonfungiblePositionManager',
+    NonfungiblePositionManagerComplied.abi,
     deploysData.nonfungiblePositionManager
   )
   const feeData5 = await getFeeData();
