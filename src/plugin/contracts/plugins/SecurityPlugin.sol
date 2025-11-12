@@ -37,8 +37,8 @@ abstract contract SecurityPlugin is AlgebraBasePlugin, ISecurityPlugin {
   }
 
   function setSecurityRegistry(address _securityRegistry) external override {
-    securityRegistry = _securityRegistry;
     require(msg.sender == pluginFactory || IAlgebraFactory(factory).hasRoleOrOwner(ALGEBRA_BASE_PLUGIN_MANAGER, msg.sender));
+    securityRegistry = _securityRegistry;
     emit SecurityRegistry(_securityRegistry);
   }
 
