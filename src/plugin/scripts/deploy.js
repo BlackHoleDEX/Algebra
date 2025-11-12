@@ -14,13 +14,15 @@ async function main() {
     const deployDataPath = path.resolve(__dirname, '../../../'+(process.env.DEPLOY_ENV || '')+'deploys.json')
     const deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'))
 
-    const BasePluginV1Factory = await hre.ethers.getContractFactory("CustomPluginV1Factory");
+    const BasePluginV3Factory = await hre.ethers.getContractFactory("BasePluginV3Factory");
     const feeData1 = await getFeeData();
-    const dsFactory = await BasePluginV1Factory.deploy(deploysData.factory, { ...feeData1 });
+    const pluginFactory = await BasePluginV3Factory.deploy(deploysData.factory, { ...feeData1 });
 
-    await dsFactory.waitForDeployment()
+    await pluginFactory.waitForDeployment()
 
-    console.log("PluginFactory to:", dsFactory.target);
+    console.log("PluginFactory to:", pluginFactory.target);
+
+    
 
     /**
      * @dev This below call setDefaultPluginFactory will fail because the factory's owner is multisig.
@@ -33,7 +35,7 @@ async function main() {
     if (currentDefault === hre.ethers.ZeroAddress) {
         const feeData3 = await getFeeData();
         try {
-            const tx = await factory.setDefaultPluginFactory(dsFactory.target, { ...feeData3 })
+            const tx = await factory.setDefaultPluginFactory(pluginFactory.target, { ...feeData3 })
             console.log('setDefaultPluginFactory tx:', tx.hash)
             await tx.wait()
             console.log('Updated plugin factory address in Pairfactory')
@@ -57,7 +59,7 @@ async function main() {
 
     const feeData2 = await getFeeData();
     try {
-        const tx = await dsFactory.setDefaultFeeConfiguration(feeConfiguration, { ...feeData2 });
+        const tx = await pluginFactory.setDefaultFeeConfiguration(feeConfiguration, { ...feeData2 });
         console.log('setDefaultFeeConfiguration tx:', tx.hash);
         await tx.wait();
         console.log('Updated default fee configuration with alpha1=0, alpha2=0, baseFee=0');
@@ -65,7 +67,28 @@ async function main() {
         console.log('setDefaultFeeConfiguration failed Reason:', e?.message || e);
     }
 
-    deploysData.BasePluginV1Factory = dsFactory.target;
+    // Deploy SecurityRegistry
+    const SecurityRegistry = await hre.ethers.getContractFactory("SecurityRegistry");
+    const feeData4 = await getFeeData();
+    const securityRegistry = await SecurityRegistry.deploy(deploysData.factory, { ...feeData4 });
+
+    await securityRegistry.waitForDeployment();
+
+    console.log("SecurityRegistry deployed to:", securityRegistry.target);
+
+    // Set SecurityRegistry in BasePluginV3Factory
+    const feeData5 = await getFeeData();
+    try {
+        const tx = await pluginFactory.setSecurityRegistry(securityRegistry.target, { ...feeData5 });
+        console.log('setSecurityRegistry tx:', tx.hash);
+        await tx.wait();
+        console.log('Updated security registry address in BasePluginV3Factory');
+    } catch (e) {
+        console.log('setSecurityRegistry failed Reason:', e?.message || e);
+    }
+
+    deploysData.BasePluginV3Factory = pluginFactory.target;
+    deploysData.SecurityRegistry = securityRegistry.target;
     fs.writeFileSync(deployDataPath, JSON.stringify(deploysData), 'utf-8');
 
 }

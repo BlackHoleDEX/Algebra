@@ -6,12 +6,7 @@ import '../plugins/SecurityRegistry.sol';
 import '../base/BasePlugin.sol';
 
 contract SecurityPluginTest is SecurityPlugin {
-  constructor(
-    address pool,
-    address factory,
-    address pluginFactory,
-    address securityRegistry
-  ) AlgebraBasePlugin(pool, factory, pluginFactory) SecurityPlugin(securityRegistry) {
+  constructor(address pool, address factory, address pluginFactory, address securityRegistry) AlgebraBasePlugin(pool, factory, pluginFactory) {
     // AlgebraBasePlugin already runs BasePlugin(pool, pluginFactory),
     // so no extra constructor calls are needed.
   }

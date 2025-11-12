@@ -46,7 +46,15 @@ async function main() {
 
   const feeData4 = await getFeeData();
   await (await pluginFactory.setFarmingAddress(FarmingCenter.target, { ...feeData4 })).wait()
-  console.log('Updated farming center address in plugin factory')
+  console.log('Updated farming center address in BasePluginV1Factory')
+
+  if (deploysData.BasePluginV3Factory) {
+    const pluginV3Factory = await hre.ethers.getContractAt('IBasePluginV3Factory', deploysData.BasePluginV3Factory)
+
+    const feeData6 = await getFeeData();
+    await (await pluginV3Factory.setFarmingAddress(FarmingCenter.target, { ...feeData6 })).wait()
+    console.log('Updated farming center address in BasePluginV3Factory')
+  }
 
   const posManager = await hre.ethers.getContractAt(
     'INonfungiblePositionManager',
