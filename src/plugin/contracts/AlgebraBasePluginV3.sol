@@ -58,7 +58,6 @@ contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
     } else {
       _checkStatus();
     }
-    _updatePluginConfigInPool(defaultPluginConfig); // should not be called, reset config
     return (IAlgebraPlugin.beforeModifyPosition.selector, 0);
   }
 
@@ -84,7 +83,6 @@ contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
   /// @dev unused
   function beforeFlash(address, address, uint256, uint256, bytes calldata) external override onlyPool returns (bytes4) {
     _checkStatus();
-    _updatePluginConfigInPool(defaultPluginConfig); // should not be called, reset config
     return IAlgebraPlugin.beforeFlash.selector;
   }
 

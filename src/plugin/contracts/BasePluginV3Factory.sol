@@ -65,7 +65,6 @@ contract BasePluginV3Factory is IBasePluginV3Factory {
   function _createPlugin(address pool) internal returns (address) {
     require(pluginByPool[pool] == address(0), 'Already created');
     address plugin = address(new AlgebraBasePluginV3(pool, algebraFactory, address(this), defaultFeeConfiguration));
-    IDynamicFeeManager(plugin).changeFeeConfiguration(defaultFeeConfiguration);
     ISecurityPlugin(plugin).setSecurityRegistry(securityRegistry);
     pluginByPool[pool] = plugin;
     return plugin;
