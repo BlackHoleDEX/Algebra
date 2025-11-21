@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity =0.8.20;
+pragma solidity ^0.8.13;
 
 import '../libraries/PriceMovementMath.sol';
 import '../libraries/LowGasSafeMath.sol';
@@ -41,68 +41,87 @@ abstract contract SwapCalculation is AlgebraPoolBase {
     uint256 pluginFeeAmount;
   }
 
-  function _calculateSwap(
-    uint24 overrideFee,
-    uint24 pluginFee,
-    bool zeroToOne,
-    int256 amountRequired,
-    uint160 limitSqrtPrice
-  ) internal returns (int256 amount0, int256 amount1, uint160 currentPrice, int24 currentTick, uint128 currentLiquidity, FeesAmount memory fees) {
-    if (amountRequired == 0) revert zeroAmountRequired();
-    if (amountRequired == type(int256).min) revert invalidAmountRequired(); // to avoid problems when changing sign
+  // Add these structs at the top of the contract or in a separate file
+  struct CalculateSwapParams {
+    uint24 overrideFee;
+    uint24 pluginFee;
+    bool zeroToOne;
+    int256 amountRequired;
+    uint160 limitSqrtPrice;
+  }
+
+  struct SwapResult {
+    int256 amount0;
+    int256 amount1;
+    uint160 currentPrice;
+    int24 currentTick;
+    uint128 currentLiquidity;
+  }
+
+  // Replace the function signature
+  function _calculateSwap(CalculateSwapParams memory params) internal returns (SwapResult memory result, FeesAmount memory fees) {
+    if (params.amountRequired == 0) revert zeroAmountRequired();
+    if (params.amountRequired == type(int256).min) revert invalidAmountRequired();
 
     SwapCalculationCache memory cache;
-    (cache.amountRequiredInitial, cache.exactInput, cache.pluginFee) = (amountRequired, amountRequired > 0, pluginFee);
+    (cache.amountRequiredInitial, cache.exactInput, cache.pluginFee) = (params.amountRequired, params.amountRequired > 0, params.pluginFee);
 
-    // load from one storage slot
-    (currentLiquidity, cache.prevInitializedTick, cache.nextInitializedTick) = (liquidity, prevTickGlobal, nextTickGlobal);
+    // Load from one storage slot
+    (result.currentLiquidity, cache.prevInitializedTick, cache.nextInitializedTick) = (liquidity, prevTickGlobal, nextTickGlobal);
 
-    // load from one storage slot too
-    (currentPrice, currentTick, cache.fee, cache.communityFee) = (globalState.price, globalState.tick, globalState.lastFee, globalState.communityFee);
-    if (currentPrice == 0) revert notInitialized();
-    if (overrideFee != 0) {
-      cache.fee = overrideFee + pluginFee;
+    // Load from one storage slot too
+    (result.currentPrice, result.currentTick, cache.fee, cache.communityFee) = (
+      globalState.price,
+      globalState.tick,
+      globalState.lastFee,
+      globalState.communityFee
+    );
+
+    if (result.currentPrice == 0) revert notInitialized();
+
+    if (params.overrideFee != 0) {
+      cache.fee = params.overrideFee + params.pluginFee;
       if (cache.fee >= 1e6) revert incorrectPluginFee();
     } else {
-      if (pluginFee != 0) {
-        cache.fee += pluginFee;
+      if (params.pluginFee != 0) {
+        cache.fee += params.pluginFee;
         if (cache.fee >= 1e6) revert incorrectPluginFee();
       }
     }
 
-    if (zeroToOne) {
-      if (limitSqrtPrice >= currentPrice || limitSqrtPrice <= TickMath.MIN_SQRT_RATIO) revert invalidLimitSqrtPrice();
+    if (params.zeroToOne) {
+      if (params.limitSqrtPrice >= result.currentPrice || params.limitSqrtPrice <= TickMath.MIN_SQRT_RATIO) revert invalidLimitSqrtPrice();
       cache.totalFeeGrowthInput = totalFeeGrowth0Token;
     } else {
-      if (limitSqrtPrice <= currentPrice || limitSqrtPrice >= TickMath.MAX_SQRT_RATIO) revert invalidLimitSqrtPrice();
+      if (params.limitSqrtPrice <= result.currentPrice || params.limitSqrtPrice >= TickMath.MAX_SQRT_RATIO) revert invalidLimitSqrtPrice();
       cache.totalFeeGrowthInput = totalFeeGrowth1Token;
     }
 
+    int256 amountRequired = params.amountRequired;
     PriceMovementCache memory step;
+
     unchecked {
       // swap until there is remaining input or output tokens or we reach the price limit
       do {
-        int24 nextTick = zeroToOne ? cache.prevInitializedTick : cache.nextInitializedTick;
-        step.stepSqrtPrice = currentPrice;
+        int24 nextTick = params.zeroToOne ? cache.prevInitializedTick : cache.nextInitializedTick;
+        step.stepSqrtPrice = result.currentPrice;
         step.nextTickPrice = TickMath.getSqrtRatioAtTick(nextTick);
 
-        (currentPrice, step.input, step.output, step.feeAmount) = PriceMovementMath.movePriceTowardsTarget(
-          zeroToOne, // if zeroToOne then the price is moving down
-          currentPrice,
-          (zeroToOne == (step.nextTickPrice < limitSqrtPrice)) // move the price to the nearest of the next tick and the limit price
-            ? limitSqrtPrice
-            : uint160(step.nextTickPrice), // cast is safe
-          currentLiquidity,
+        (result.currentPrice, step.input, step.output, step.feeAmount) = PriceMovementMath.movePriceTowardsTarget(
+          params.zeroToOne,
+          result.currentPrice,
+          (params.zeroToOne == (step.nextTickPrice < params.limitSqrtPrice)) ? params.limitSqrtPrice : uint160(step.nextTickPrice),
+          result.currentLiquidity,
           amountRequired,
           cache.fee
         );
 
         if (cache.exactInput) {
-          amountRequired -= (step.input + step.feeAmount).toInt256(); // decrease remaining input amount
-          cache.amountCalculated = cache.amountCalculated.sub(step.output.toInt256()); // decrease calculated output amount
+          amountRequired -= (step.input + step.feeAmount).toInt256();
+          cache.amountCalculated = cache.amountCalculated.sub(step.output.toInt256());
         } else {
-          amountRequired += step.output.toInt256(); // increase remaining output amount (since its negative)
-          cache.amountCalculated = cache.amountCalculated.add((step.input + step.feeAmount).toInt256()); // increase calculated input amount
+          amountRequired += step.output.toInt256();
+          cache.amountCalculated = cache.amountCalculated.add((step.input + step.feeAmount).toInt256());
         }
 
         if (cache.communityFee > 0) {
@@ -117,42 +136,42 @@ abstract contract SwapCalculation is AlgebraPoolBase {
           fees.pluginFeeAmount += delta;
         }
 
-        if (currentLiquidity > 0) cache.totalFeeGrowthInput += FullMath.mulDiv(step.feeAmount, Constants.Q128, currentLiquidity);
+        if (result.currentLiquidity > 0) cache.totalFeeGrowthInput += FullMath.mulDiv(step.feeAmount, Constants.Q128, result.currentLiquidity);
 
-        // min or max tick can not be crossed due to limitSqrtPrice check
-        if (currentPrice == step.nextTickPrice) {
-          // crossing tick
+        if (result.currentPrice == step.nextTickPrice) {
           if (!cache.crossedAnyTick) {
             cache.crossedAnyTick = true;
-            cache.totalFeeGrowthOutput = zeroToOne ? totalFeeGrowth1Token : totalFeeGrowth0Token;
+            cache.totalFeeGrowthOutput = params.zeroToOne ? totalFeeGrowth1Token : totalFeeGrowth0Token;
           }
 
           int128 liquidityDelta;
-          if (zeroToOne) {
+          if (params.zeroToOne) {
             (liquidityDelta, cache.prevInitializedTick, ) = ticks.cross(nextTick, cache.totalFeeGrowthInput, cache.totalFeeGrowthOutput);
             liquidityDelta = -liquidityDelta;
-            (currentTick, cache.nextInitializedTick) = (nextTick - 1, nextTick);
+            (result.currentTick, cache.nextInitializedTick) = (nextTick - 1, nextTick);
           } else {
             (liquidityDelta, , cache.nextInitializedTick) = ticks.cross(nextTick, cache.totalFeeGrowthOutput, cache.totalFeeGrowthInput);
-            (currentTick, cache.prevInitializedTick) = (nextTick, nextTick);
+            (result.currentTick, cache.prevInitializedTick) = (nextTick, nextTick);
           }
-          currentLiquidity = LiquidityMath.addDelta(currentLiquidity, liquidityDelta);
-        } else if (currentPrice != step.stepSqrtPrice) {
-          currentTick = TickMath.getTickAtSqrtRatio(currentPrice); // the price has changed but hasn't reached the target
-          break; // since the price hasn't reached the target, amountRequired should be 0
+          result.currentLiquidity = LiquidityMath.addDelta(result.currentLiquidity, liquidityDelta);
+        } else if (result.currentPrice != step.stepSqrtPrice) {
+          result.currentTick = TickMath.getTickAtSqrtRatio(result.currentPrice);
+          break;
         }
-      } while (amountRequired != 0 && currentPrice != limitSqrtPrice); // check stop condition
+      } while (amountRequired != 0 && result.currentPrice != params.limitSqrtPrice);
 
-      int256 amountSpent = cache.amountRequiredInitial - amountRequired; // spent amount could be less than initially specified (e.g. reached limit)
-      (amount0, amount1) = zeroToOne == cache.exactInput ? (amountSpent, cache.amountCalculated) : (cache.amountCalculated, amountSpent);
+      int256 amountSpent = cache.amountRequiredInitial - amountRequired;
+      (result.amount0, result.amount1) = params.zeroToOne == cache.exactInput
+        ? (amountSpent, cache.amountCalculated)
+        : (cache.amountCalculated, amountSpent);
     }
 
-    (globalState.price, globalState.tick) = (currentPrice, currentTick);
+    (globalState.price, globalState.tick) = (result.currentPrice, result.currentTick);
 
     if (cache.crossedAnyTick) {
-      (liquidity, prevTickGlobal, nextTickGlobal) = (currentLiquidity, cache.prevInitializedTick, cache.nextInitializedTick);
+      (liquidity, prevTickGlobal, nextTickGlobal) = (result.currentLiquidity, cache.prevInitializedTick, cache.nextInitializedTick);
     }
-    if (zeroToOne) {
+    if (params.zeroToOne) {
       totalFeeGrowth0Token = cache.totalFeeGrowthInput;
     } else {
       totalFeeGrowth1Token = cache.totalFeeGrowthInput;

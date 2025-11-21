@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity =0.8.20;
+pragma solidity ^0.8.13;
 
 import '../interfaces/callback/IAlgebraSwapCallback.sol';
 import '../interfaces/callback/IAlgebraMintCallback.sol';
@@ -41,7 +41,7 @@ abstract contract AlgebraPoolBase is IAlgebraPool, Timestamp {
   }
 
   /// @inheritdoc IAlgebraPoolImmutables
-  uint128 public constant override maxLiquidityPerTick = Constants.MAX_LIQUIDITY_PER_TICK;
+  uint128 public constant override maxLiquidityPerTick = 191757638537527648490752896198553;
   /// @inheritdoc IAlgebraPoolImmutables
   address public immutable override factory;
   /// @inheritdoc IAlgebraPoolImmutables

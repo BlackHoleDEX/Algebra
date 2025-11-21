@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity =0.8.20;
+pragma solidity ^0.8.13;
 pragma abicoder v1;
 
 import './base/AlgebraPoolBase.sol';
@@ -255,15 +255,17 @@ contract AlgebraPool is AlgebraPoolBase, TickStructure, ReentrancyGuard, Positio
 
     {
       // scope to prevent "stack too deep"
-      SwapEventParams memory eventParams;
-      FeesAmount memory fees;
-      (amount0, amount1, eventParams.currentPrice, eventParams.currentTick, eventParams.currentLiquidity, fees) = _calculateSwap(
-        overrideFee,
-        pluginFee,
-        zeroToOne,
-        amountRequired,
-        limitSqrtPrice
-      );
+      CalculateSwapParams memory calculateSwapParams = CalculateSwapParams({
+        overrideFee: overrideFee,
+        pluginFee: pluginFee,
+        zeroToOne: zeroToOne,
+        amountRequired: amountRequired,
+        limitSqrtPrice: limitSqrtPrice
+      });
+      (SwapResult memory result, FeesAmount memory fees) = _calculateSwap(calculateSwapParams);
+      amount0 = result.amount0;
+      amount1 = result.amount1;
+
       (uint256 balance0Before, uint256 balance1Before) = _updateReserves();
       if (zeroToOne) {
         unchecked {
@@ -281,16 +283,7 @@ contract AlgebraPool is AlgebraPoolBase, TickStructure, ReentrancyGuard, Positio
         _changeReserves(amount0, amount1, 0, fees.communityFeeAmount, 0, fees.pluginFeeAmount); // reflect reserve change and pay communityFee
       }
 
-      _emitSwapEvent(
-        recipient,
-        amount0,
-        amount1,
-        eventParams.currentPrice,
-        eventParams.currentLiquidity,
-        eventParams.currentTick,
-        overrideFee,
-        pluginFee
-      );
+      _emitSwapEvent(recipient, amount0, amount1, result.currentPrice, result.currentLiquidity, result.currentTick, overrideFee, pluginFee);
     }
 
     _unlock();
@@ -306,75 +299,144 @@ contract AlgebraPool is AlgebraPoolBase, TickStructure, ReentrancyGuard, Positio
     uint160 limitSqrtPrice,
     bytes calldata data
   ) external override returns (int256 amount0, int256 amount1) {
-    if (amountToSell < 0) revert invalidAmountRequired(); // we support only exactInput here
+    if (amountToSell < 0) revert invalidAmountRequired();
 
-    _lock();
-    // firstly we are getting tokens from the original caller of the transaction
-    // since the pool can get less/more tokens then expected, _amountToSell_ can be changed
-    {
-      // scope to prevent "stack too deep"
-      int256 amountReceived;
-      if (zeroToOne) {
-        uint256 balanceBefore = _balanceToken0();
-        _swapCallback(amountToSell, 0, data); // callback to get tokens from the msg.sender
-        uint256 balanceAfter = _balanceToken0();
-        amountReceived = (balanceAfter - balanceBefore).toInt256();
-        _changeReserves(amountReceived, 0, 0, 0, 0, 0);
-      } else {
-        uint256 balanceBefore = _balanceToken1();
-        _swapCallback(0, amountToSell, data); // callback to get tokens from the msg.sender
-        uint256 balanceAfter = _balanceToken1();
-        amountReceived = (balanceAfter - balanceBefore).toInt256();
-        _changeReserves(0, amountReceived, 0, 0, 0, 0);
-      }
-      if (amountReceived != amountToSell) amountToSell = amountReceived;
-    }
+    // Step 1: Handle payment in advance
+    amountToSell = _handlePaymentInAdvance(zeroToOne, amountToSell, data);
     if (amountToSell == 0) revert insufficientInputAmount();
 
-    _unlock();
-    (uint24 overrideFee, uint24 pluginFee) = _beforeSwap(recipient, zeroToOne, amountToSell, limitSqrtPrice, true, data);
+    // Step 2: Execute swap calculation
+    (amount0, amount1) = _executeSwapCalculation(
+      SwapParams({
+        leftoversRecipient: leftoversRecipient,
+        recipient: recipient,
+        zeroToOne: zeroToOne,
+        amountToSell: amountToSell,
+        limitSqrtPrice: limitSqrtPrice
+      }),
+      data
+    );
+  }
+
+  // Helper function 1: Handle payment in advance
+  function _handlePaymentInAdvance(bool zeroToOne, int256 amountToSell, bytes calldata data) private returns (int256) {
     _lock();
 
+    int256 amountReceived;
+    if (zeroToOne) {
+      uint256 balanceBefore = _balanceToken0();
+      _swapCallback(amountToSell, 0, data);
+      amountReceived = (_balanceToken0() - balanceBefore).toInt256();
+      _changeReserves(amountReceived, 0, 0, 0, 0, 0);
+    } else {
+      uint256 balanceBefore = _balanceToken1();
+      _swapCallback(0, amountToSell, data);
+      amountReceived = (_balanceToken1() - balanceBefore).toInt256();
+      _changeReserves(0, amountReceived, 0, 0, 0, 0);
+    }
+
+    _unlock();
+    return amountReceived != amountToSell ? amountReceived : amountToSell;
+  }
+
+  struct SwapParams {
+    address leftoversRecipient;
+    address recipient;
+    bool zeroToOne;
+    int256 amountToSell;
+    uint160 limitSqrtPrice;
+  }
+
+  // Helper function 2: Execute swap calculation
+  function _executeSwapCalculation(SwapParams memory params, bytes calldata data) private returns (int256 amount0, int256 amount1) {
+    uint24 overrideFee;
+    uint24 pluginFee;
+
+    // Scope 1: Get fees
+    {
+      (overrideFee, pluginFee) = _beforeSwap(params.recipient, params.zeroToOne, params.amountToSell, params.limitSqrtPrice, true, data);
+    }
+
+    _lock();
     _updateReserves();
 
-    SwapEventParams memory eventParams;
-    FeesAmount memory fees;
-    (amount0, amount1, eventParams.currentPrice, eventParams.currentTick, eventParams.currentLiquidity, fees) = _calculateSwap(
-      overrideFee,
-      pluginFee,
-      zeroToOne,
-      amountToSell,
-      limitSqrtPrice
-    );
+    // Use single scope for all swap calculation variables
+    // Scope 2: Calculate swap (variables cleared after)
+    {
+      uint160 currentPrice;
+      int24 currentTick;
+      uint128 currentLiquidity;
+      FeesAmount memory fees;
+      SwapResult memory result;
 
+      CalculateSwapParams memory calculateSwapParams = CalculateSwapParams({
+        overrideFee: overrideFee,
+        pluginFee: pluginFee,
+        zeroToOne: params.zeroToOne,
+        amountRequired: params.amountToSell,
+        limitSqrtPrice: params.limitSqrtPrice
+      });
+
+      (result, fees) = _calculateSwap(calculateSwapParams);
+      amount0 = result.amount0;
+      amount1 = result.amount1;
+      currentPrice = result.currentPrice;
+      currentTick = result.currentTick;
+      currentLiquidity = result.currentLiquidity;
+
+      // Apply fee adjustments and emit event in same scope
+      _applyFeesAndEmit(
+        params.leftoversRecipient,
+        params.recipient,
+        params.zeroToOne,
+        params.amountToSell,
+        amount0,
+        amount1,
+        currentPrice,
+        currentTick,
+        currentLiquidity,
+        overrideFee,
+        pluginFee,
+        fees
+      );
+    }
+
+    _unlock();
+    {
+      _afterSwap(params.recipient, params.zeroToOne, params.amountToSell, params.limitSqrtPrice, amount0, amount1, data);
+    }
+  }
+
+  // Helper function 3: Apply fees and emit event
+  function _applyFeesAndEmit(
+    address leftoversRecipient,
+    address recipient,
+    bool zeroToOne,
+    int256 amountToSell,
+    int256 amount0,
+    int256 amount1,
+    uint160 currentPrice,
+    int24 currentTick,
+    uint128 currentLiquidity,
+    uint24 overrideFee,
+    uint24 pluginFee,
+    FeesAmount memory fees
+  ) private {
     unchecked {
-      // transfer to the recipient
       if (zeroToOne) {
-        if (amount1 < 0) _transfer(token1, recipient, uint256(-amount1)); // amount1 cannot be > 0
-        uint256 leftover = uint256(amountToSell - amount0); // return the leftovers
-        if (leftover != 0) _transfer(token0, leftoversRecipient, leftover);
-        _changeReserves(-leftover.toInt256(), amount1, fees.communityFeeAmount, 0, fees.pluginFeeAmount, 0); // reflect reserve change and pay communityFee
+        if (amount1 < 0) _transfer(token1, recipient, uint256(-amount1));
+        uint256 leftover = uint256(amountToSell - amount0);
+        if (leftover != 0) _transfer(token0, leftoversRecipient, leftover); // Store leftoversRecipient temporarily
+        _changeReserves(-leftover.toInt256(), amount1, fees.communityFeeAmount, 0, fees.pluginFeeAmount, 0);
       } else {
-        if (amount0 < 0) _transfer(token0, recipient, uint256(-amount0)); // amount0 cannot be > 0
-        uint256 leftover = uint256(amountToSell - amount1); // return the leftovers
+        if (amount0 < 0) _transfer(token0, recipient, uint256(-amount0));
+        uint256 leftover = uint256(amountToSell - amount1);
         if (leftover != 0) _transfer(token1, leftoversRecipient, leftover);
-        _changeReserves(amount0, -leftover.toInt256(), 0, fees.communityFeeAmount, 0, fees.pluginFeeAmount); // reflect reserve change and pay communityFee
+        _changeReserves(amount0, -leftover.toInt256(), 0, fees.communityFeeAmount, 0, fees.pluginFeeAmount);
       }
     }
 
-    _emitSwapEvent(
-      recipient,
-      amount0,
-      amount1,
-      eventParams.currentPrice,
-      eventParams.currentLiquidity,
-      eventParams.currentTick,
-      overrideFee,
-      pluginFee
-    );
-
-    _unlock();
-    _afterSwap(recipient, zeroToOne, amountToSell, limitSqrtPrice, amount0, amount1, data);
+    _emitSwapEvent(recipient, amount0, amount1, currentPrice, currentLiquidity, currentTick, overrideFee, pluginFee);
   }
 
   /// @dev internal function to reduce bytecode size
