@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity =0.8.20;
+pragma solidity ^0.8.13;
 
 import './interfaces/IBasePluginV2Factory.sol';
 import './AlgebraBasePluginV2.sol';

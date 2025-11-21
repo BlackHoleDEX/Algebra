@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity =0.8.20;
+pragma solidity ^0.8.13;
 pragma abicoder v1;
 
 import './base/AlgebraPoolBase.sol';
@@ -255,15 +255,17 @@ contract AlgebraPool is AlgebraPoolBase, TickStructure, ReentrancyGuard, Positio
 
     {
       // scope to prevent "stack too deep"
-      SwapEventParams memory eventParams;
-      FeesAmount memory fees;
-      (amount0, amount1, eventParams.currentPrice, eventParams.currentTick, eventParams.currentLiquidity, fees) = _calculateSwap(
-        overrideFee,
-        pluginFee,
-        zeroToOne,
-        amountRequired,
-        limitSqrtPrice
-      );
+      CalculateSwapParams memory calculateSwapParams = CalculateSwapParams({
+        overrideFee: overrideFee,
+        pluginFee: pluginFee,
+        zeroToOne: zeroToOne,
+        amountRequired: amountRequired,
+        limitSqrtPrice: limitSqrtPrice
+      });
+      (SwapResult memory result, FeesAmount memory fees) = _calculateSwap(calculateSwapParams);
+      amount0 = result.amount0;
+      amount1 = result.amount1;
+
       (uint256 balance0Before, uint256 balance1Before) = _updateReserves();
       if (zeroToOne) {
         unchecked {
@@ -281,16 +283,7 @@ contract AlgebraPool is AlgebraPoolBase, TickStructure, ReentrancyGuard, Positio
         _changeReserves(amount0, amount1, 0, fees.communityFeeAmount, 0, fees.pluginFeeAmount); // reflect reserve change and pay communityFee
       }
 
-      _emitSwapEvent(
-        recipient,
-        amount0,
-        amount1,
-        eventParams.currentPrice,
-        eventParams.currentLiquidity,
-        eventParams.currentTick,
-        overrideFee,
-        pluginFee
-      );
+      _emitSwapEvent(recipient, amount0, amount1, result.currentPrice, result.currentLiquidity, result.currentTick, overrideFee, pluginFee);
     }
 
     _unlock();
@@ -298,7 +291,7 @@ contract AlgebraPool is AlgebraPoolBase, TickStructure, ReentrancyGuard, Positio
   }
 
   /// @inheritdoc IAlgebraPoolActions
-function swapWithPaymentInAdvance(
+  function swapWithPaymentInAdvance(
     address leftoversRecipient,
     address recipient,
     bool zeroToOne,
@@ -313,23 +306,22 @@ function swapWithPaymentInAdvance(
     if (amountToSell == 0) revert insufficientInputAmount();
 
     // Step 2: Execute swap calculation
-    (amount0, amount1) = _executeSwapCalculation(SwapParams({
-      leftoversRecipient: leftoversRecipient,
-      recipient: recipient,
-      zeroToOne: zeroToOne,
-      amountToSell: amountToSell,
-      limitSqrtPrice: limitSqrtPrice
-    }), data);
+    (amount0, amount1) = _executeSwapCalculation(
+      SwapParams({
+        leftoversRecipient: leftoversRecipient,
+        recipient: recipient,
+        zeroToOne: zeroToOne,
+        amountToSell: amountToSell,
+        limitSqrtPrice: limitSqrtPrice
+      }),
+      data
+    );
   }
 
   // Helper function 1: Handle payment in advance
-  function _handlePaymentInAdvance(
-    bool zeroToOne,
-    int256 amountToSell,
-    bytes calldata data
-  ) private returns (int256) {
+  function _handlePaymentInAdvance(bool zeroToOne, int256 amountToSell, bytes calldata data) private returns (int256) {
     _lock();
-    
+
     int256 amountReceived;
     if (zeroToOne) {
       uint256 balanceBefore = _balanceToken0();
@@ -342,7 +334,7 @@ function swapWithPaymentInAdvance(
       amountReceived = (_balanceToken1() - balanceBefore).toInt256();
       _changeReserves(0, amountReceived, 0, 0, 0, 0);
     }
-    
+
     _unlock();
     return amountReceived != amountToSell ? amountReceived : amountToSell;
   }
@@ -353,28 +345,18 @@ function swapWithPaymentInAdvance(
     bool zeroToOne;
     int256 amountToSell;
     uint160 limitSqrtPrice;
-}
+  }
 
   // Helper function 2: Execute swap calculation
-  function _executeSwapCalculation(
-    SwapParams memory params,
-    bytes calldata data
-) private returns (int256 amount0, int256 amount1) {
-  uint24 overrideFee;
+  function _executeSwapCalculation(SwapParams memory params, bytes calldata data) private returns (int256 amount0, int256 amount1) {
+    uint24 overrideFee;
     uint24 pluginFee;
-    
+
     // Scope 1: Get fees
     {
-        (overrideFee, pluginFee) = _beforeSwap(
-            params.recipient,
-            params.zeroToOne,
-            params.amountToSell,
-            params.limitSqrtPrice,
-            true,
-            data
-        );
+      (overrideFee, pluginFee) = _beforeSwap(params.recipient, params.zeroToOne, params.amountToSell, params.limitSqrtPrice, true, data);
     }
-    
+
     _lock();
     _updateReserves();
 
@@ -385,14 +367,22 @@ function swapWithPaymentInAdvance(
       int24 currentTick;
       uint128 currentLiquidity;
       FeesAmount memory fees;
-      
-      (amount0, amount1, currentPrice, currentTick, currentLiquidity, fees) = _calculateSwap(
-        overrideFee,
-        pluginFee,
-        params.zeroToOne,
-        params.amountToSell,
-        params.limitSqrtPrice
-      );
+      SwapResult memory result;
+
+      CalculateSwapParams memory calculateSwapParams = CalculateSwapParams({
+        overrideFee: overrideFee,
+        pluginFee: pluginFee,
+        zeroToOne: params.zeroToOne,
+        amountRequired: params.amountToSell,
+        limitSqrtPrice: params.limitSqrtPrice
+      });
+
+      (result, fees) = _calculateSwap(calculateSwapParams);
+      amount0 = result.amount0;
+      amount1 = result.amount1;
+      currentPrice = result.currentPrice;
+      currentTick = result.currentTick;
+      currentLiquidity = result.currentLiquidity;
 
       // Apply fee adjustments and emit event in same scope
       _applyFeesAndEmit(
@@ -411,7 +401,8 @@ function swapWithPaymentInAdvance(
       );
     }
 
-    _unlock();{
+    _unlock();
+    {
       _afterSwap(params.recipient, params.zeroToOne, params.amountToSell, params.limitSqrtPrice, amount0, amount1, data);
     }
   }
@@ -445,16 +436,7 @@ function swapWithPaymentInAdvance(
       }
     }
 
-    _emitSwapEvent(
-      recipient,
-      amount0,
-      amount1,
-      currentPrice,
-      currentLiquidity,
-      currentTick,
-      overrideFee,
-      pluginFee
-    );
+    _emitSwapEvent(recipient, amount0, amount1, currentPrice, currentLiquidity, currentTick, overrideFee, pluginFee);
   }
 
   /// @dev internal function to reduce bytecode size
