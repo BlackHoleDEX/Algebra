@@ -68,6 +68,9 @@
     "undici": "5.28.3",
     "cross-spawn": "7.0.6",
     "flat": "6.0.1",
-    "underscore": "1.13.7"
+    "underscore": "1.13.7",
+    "solidity-coverage": {
+      "minimatch": "3.0.5"
+    }
   }
 }
