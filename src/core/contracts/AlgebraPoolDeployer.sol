@@ -3,6 +3,7 @@ pragma solidity =0.8.20;
 pragma abicoder v1;
 
 import './interfaces/IAlgebraPoolDeployer.sol';
+// import 'hardhat/console.sol';
 
 import './AlgebraPool.sol';
 
@@ -39,6 +40,10 @@ contract AlgebraPoolDeployer is IAlgebraPoolDeployer {
       _encodedParams = abi.encode(deployer, token0, token1);
     }
     pool = address(new AlgebraPool{salt: keccak256(_encodedParams)}());
+    // bytes32 codeHash = keccak256(type(AlgebraPool).creationCode);
+    // console.logBytes32(codeHash);
+    // console.log("code hash: %s", codeHash);
+
     (cache0, cache1) = (bytes32(0), bytes32(0));
   }
 
