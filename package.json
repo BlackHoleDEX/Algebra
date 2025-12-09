@@ -30,7 +30,7 @@
     "hardhat-gas-reporter": "1.0.10",
     "hardhat-output-validator": "0.1.19",
     "husky": "7.0.2",
-    "lerna": "9.0.3",
+    "lerna": "6.6.2",
     "mocha": "11.7.5",
     "mocha-chai-jest-snapshot": "1.1.0",
     "prettier": "2.8.8",
@@ -69,6 +69,7 @@
     "cross-spawn": "7.0.6",
     "flat": "6.0.1",
     "underscore": "1.13.7",
+    "semver": "7.7.3",
     "solidity-coverage": {
       "minimatch": "3.0.5"
     }
