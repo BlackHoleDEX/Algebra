@@ -27,19 +27,19 @@
   "dependencies": {
     "@openzeppelin/contracts": "4.9.6",
     "@uniswap/v2-core": "1.0.1",
-    "@cryptoalgebra/integral-core": "~1.2.8"
+    "@cryptoalgebra/integral-core": "1.2.9"
   },
   "devDependencies": {
     "is-svg": "4.3.1"
   },
   "scripts": {
-    "compile": "npm --prefix ../core run compile  && hardhat compile",
+    "compile": "pnpm --prefix ../core run compile  && hardhat compile",
     "test": "hardhat test",
     "expand-abi": "hardhat expand-abi",
     "precommit": "pretty-quick --staged --pattern '**/*.sol'",
     "solhint": "solhint ./contracts/**/*.sol",
-    "coverage": "npm --prefix ../core run compile && hardhat coverage",
-    "prepublish": "hardhat clean && npm run compile && npm run expand-abi"
+    "coverage": "pnpm --prefix ../core run compile && hardhat coverage",
+    "prepublish": "hardhat clean && pnpm run compile && pnpm run expand-abi"
   },
   "engines": {
     "npm": ">=8.0.0",
