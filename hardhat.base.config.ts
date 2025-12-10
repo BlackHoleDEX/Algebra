@@ -133,13 +133,7 @@ export default {
   etherscan: {
     // Your API key for Etherscan
     // Obtain one at https://etherscan.io/
-    apiKey: {
-      ethmainnet: `${process.env.APIKEY ?? 'UNKNOWN'}`,
-      sepoliaTestnet: `${process.env.APIKEY ?? 'UNKNOWN'}`,
-      avaxTestnet: `${process.env.APIKEY ?? 'UNKNOWN'}`,
-      avalanche: `${process.env.APIKEY ?? 'UNKNOWN'}`,
-      bscTestnet: ETHERSCAN_API_KEY || process.env.ETHERSCAN_API_KEY || 'YOUR_ETHERSCAN_API_KEY_HERE',
-    },
+    apiKey: `${process.env.APIKEY??"UNKNOWN"}`,
     customChains: [
       {
         network: 'ethmainnet',
@@ -169,7 +163,15 @@ export default {
         network: 'sepoliaTestnet',
         chainId: 11155111,
         urls: {
-          apiURL: 'https://api-sepolia.etherscan.io/api',
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=11155111',
+          browserURL: 'https://sepolia.etherscan.io',
+        },
+      },
+      {
+        network: 'sepolia',
+        chainId: 11155111,
+        urls: {
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=11155111',
           browserURL: 'https://sepolia.etherscan.io',
         },
       },
