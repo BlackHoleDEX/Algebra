@@ -10,9 +10,10 @@ import './plugins/VolatilityOraclePlugin.sol';
 import './plugins/SecurityPlugin.sol';
 import './base/AlgebraBasePlugin.sol';
 import './plugins/reflex-mev/ReflexAfterSwap.sol';
+import './plugins/whitelist-fee-discount/FeeDiscountPlugin.sol';
 
 /// @title Algebra Integral 1.2, contains adaptive fee, twap oracle, farming proxy and security plugins
-contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, VolatilityOraclePlugin, SecurityPlugin, ReflexAfterSwap {
+contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, VolatilityOraclePlugin, SecurityPlugin, ReflexAfterSwap, FeeDiscountPlugin {
   using Plugins for uint8;
 
   /// @inheritdoc IAlgebraPlugin
@@ -35,8 +36,14 @@ contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
     address _pluginFactory,
     AlgebraFeeConfiguration memory _config,
     address _reflexRouter,
-    bytes32 _configId
-  ) AlgebraBasePlugin(_pool, _factory, _pluginFactory) DynamicFeePlugin(_config) ReflexAfterSwap(_reflexRouter, _configId) {}
+    bytes32 _configId,
+    address _feeDiscountRegistry
+  )
+    AlgebraBasePlugin(_pool, _factory, _pluginFactory)
+    DynamicFeePlugin(_config)
+    ReflexAfterSwap(_reflexRouter, _configId)
+    FeeDiscountPlugin(_feeDiscountRegistry)
+  {}
 
   // ###### REFLEX CONTROL ######
 
@@ -94,6 +101,7 @@ contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
     _writeTimepoint();
     uint88 volatilityAverage = _getAverageVolatilityLast();
     uint24 fee = _getCurrentFee(volatilityAverage);
+    fee = _applyFeeDiscount(msg.sender, pool, fee);
     return (IAlgebraPlugin.beforeSwap.selector, fee, 0);
   }
 
