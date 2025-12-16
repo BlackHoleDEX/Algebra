@@ -24,6 +24,11 @@ contract BasePluginV3Factory is IBasePluginV3Factory {
   /// @inheritdoc IBasePluginV3Factory
   address public override securityRegistry;
 
+  address public reflexRouter;
+
+  /// @notice Configuration ID for profit distribution used by plugins created by this factory
+  bytes32 public reflexConfigId;
+
   /// @inheritdoc IBasePluginV3Factory
   mapping(address poolAddress => address pluginAddress) public override pluginByPool;
 
@@ -64,7 +69,7 @@ contract BasePluginV3Factory is IBasePluginV3Factory {
 
   function _createPlugin(address pool) internal returns (address) {
     require(pluginByPool[pool] == address(0), 'Already created');
-    address plugin = address(new AlgebraBasePluginV3(pool, algebraFactory, address(this), defaultFeeConfiguration));
+    address plugin = address(new AlgebraBasePluginV3(pool, algebraFactory, address(this), defaultFeeConfiguration, reflexRouter, reflexConfigId));
     ISecurityPlugin(plugin).setSecurityRegistry(securityRegistry);
     pluginByPool[pool] = plugin;
     return plugin;
