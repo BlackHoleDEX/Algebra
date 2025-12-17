@@ -99,11 +99,6 @@ contract BasePluginV3Factory is IBasePluginV3Factory {
     emit DefaultFeeConfiguration(newConfig);
   }
 
-  // function _validateFeeConfiguration(AlgebraFeeConfiguration memory _config) internal pure {
-  //   require(uint256(_config.alpha1) + uint256(_config.alpha2) + uint256(_config.baseFee) <= type(uint16).max, 'Max fee exceeded');
-  //   require(_config.gamma1 != 0 && _config.gamma2 != 0, 'Gammas must be > 0');
-  // }
-
   /// @inheritdoc IBasePluginV3Factory
   function setFarmingAddress(address newFarmingAddress) external override onlyAdministrator {
     require(farmingAddress != newFarmingAddress);
