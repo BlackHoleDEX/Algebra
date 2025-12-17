@@ -2,8 +2,10 @@
 pragma solidity =0.8.20;
 
 import './interfaces/IBasePluginV3Factory.sol';
+import '@cryptoalgebra/integral-core/contracts/interfaces/IAlgebraFactory.sol';
 import './libraries/AdaptiveFee.sol';
-import './AlgebraBasePluginV3.sol';
+import './interfaces/IBasePluginV3Deployer.sol';
+import './interfaces/plugins/ISecurityPlugin.sol';
 
 /// @title Algebra Integral 1.2 default plugin factory
 /// @notice This contract creates Algebra adaptive fee plugins for Algebra liquidity pools
@@ -14,6 +16,9 @@ contract BasePluginV3Factory is IBasePluginV3Factory {
 
   /// @inheritdoc IBasePluginV3Factory
   address public immutable override algebraFactory;
+
+  /// @notice The deployer contract for AlgebraBasePluginV3
+  address public immutable deployer;
 
   /// @inheritdoc IBasePluginV3Factory
   AlgebraFeeConfiguration public override defaultFeeConfiguration; // values of constants for sigmoids in fee calculation formula
@@ -40,8 +45,9 @@ contract BasePluginV3Factory is IBasePluginV3Factory {
     _;
   }
 
-  constructor(address _algebraFactory) {
+  constructor(address _algebraFactory, address _deployer) {
     algebraFactory = _algebraFactory;
+    deployer = _deployer;
     defaultFeeConfiguration = AdaptiveFee.initialFeeConfiguration();
     emit DefaultFeeConfiguration(defaultFeeConfiguration);
   }
@@ -72,8 +78,14 @@ contract BasePluginV3Factory is IBasePluginV3Factory {
 
   function _createPlugin(address pool) internal returns (address) {
     require(pluginByPool[pool] == address(0), 'Already created');
-    address plugin = address(
-      new AlgebraBasePluginV3(pool, algebraFactory, address(this), defaultFeeConfiguration, reflexRouter, reflexConfigId, feeDiscountRegistry)
+    address plugin = IBasePluginV3Deployer(deployer).deployPlugin(
+      pool,
+      algebraFactory,
+      address(this),
+      defaultFeeConfiguration,
+      reflexRouter,
+      reflexConfigId,
+      feeDiscountRegistry
     );
     ISecurityPlugin(plugin).setSecurityRegistry(securityRegistry);
     pluginByPool[pool] = plugin;

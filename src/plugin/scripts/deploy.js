@@ -11,18 +11,26 @@ async function getFeeData() {
 
 async function main() {
 
-    const deployDataPath = path.resolve(__dirname, '../../../'+(process.env.DEPLOY_ENV || '')+'deploys.json')
+    const deployDataPath = path.resolve(__dirname, '../../../' + (process.env.DEPLOY_ENV || '') + 'deploys.json')
     const deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'))
 
+    // Deploy BasePluginV3Deployer
+    const BasePluginV3Deployer = await hre.ethers.getContractFactory("BasePluginV3Deployer");
+    const feeDataDeployer = await getFeeData();
+    const pluginDeployer = await BasePluginV3Deployer.deploy({ ...feeDataDeployer });
+    await pluginDeployer.waitForDeployment();
+    console.log("BasePluginV3Deployer to:", pluginDeployer.target);
+
+    // Deploy BasePluginV3Factory
     const BasePluginV3Factory = await hre.ethers.getContractFactory("BasePluginV3Factory");
     const feeData1 = await getFeeData();
-    const pluginFactory = await BasePluginV3Factory.deploy(deploysData.factory, { ...feeData1 });
+    const pluginFactory = await BasePluginV3Factory.deploy(deploysData.factory, pluginDeployer.target, { ...feeData1 });
 
     await pluginFactory.waitForDeployment()
 
     console.log("PluginFactory to:", pluginFactory.target);
 
-    
+
 
     /**
      * @dev This below call setDefaultPluginFactory will fail because the factory's owner is multisig.
@@ -107,6 +115,7 @@ async function main() {
         console.log('setFeeDiscountRegistry failed Reason:', e?.message || e);
     }
 
+    deploysData.BasePluginV3Deployer = pluginDeployer.target;
     deploysData.BasePluginV3Factory = pluginFactory.target;
     deploysData.SecurityRegistry = securityRegistry.target;
     deploysData.FeeDiscountRegistry = feeDiscountRegistry.target;
@@ -117,8 +126,8 @@ async function main() {
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
 main()
-  .then(() => process.exit(0))
-  .catch((error) => {
-      console.error(error);
-      process.exit(1);
-  });
+    .then(() => process.exit(0))
+    .catch((error) => {
+        console.error(error);
+        process.exit(1);
+    });
