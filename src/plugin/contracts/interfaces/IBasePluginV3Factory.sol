@@ -31,6 +31,10 @@ interface IBasePluginV3Factory is IAlgebraPluginFactory {
   /// @param registry The fee discount registry address after the address was changed
   event FeeDiscountRegistry(address registry);
 
+  /// @notice Emitted when the plugin deployer address is changed
+  /// @param deployer The plugin deployer contract address after the address was changed
+  event PluginDeployer(address deployer);
+
   /// @notice The hash of 'ALGEBRA_BASE_PLUGIN_FACTORY_ADMINISTRATOR' used as role
   /// @dev allows to change settings of BasePluginV1Factory
   function ALGEBRA_BASE_PLUGIN_FACTORY_ADMINISTRATOR() external pure returns (bytes32);

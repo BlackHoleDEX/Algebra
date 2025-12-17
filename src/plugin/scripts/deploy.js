@@ -22,7 +22,25 @@ async function main() {
 
     console.log("PluginFactory to:", pluginFactory.target);
 
-    
+    // Deploy PluginV3Deployer
+    const PluginV3Deployer = await hre.ethers.getContractFactory("PluginV3Deployer");
+    const feeDataDeployer = await getFeeData();
+    const pluginDeployer = await PluginV3Deployer.deploy({ ...feeDataDeployer });
+
+    await pluginDeployer.waitForDeployment();
+
+    console.log("PluginV3Deployer deployed to:", pluginDeployer.target);
+
+    // Set PluginV3Deployer in BasePluginV3Factory
+    const feeDataDeployerSet = await getFeeData();
+    try {
+        const tx = await pluginFactory.setPluginDeployer(pluginDeployer.target, { ...feeDataDeployerSet });
+        console.log('setPluginDeployer tx:', tx.hash);
+        await tx.wait();
+        console.log('Updated plugin deployer address in BasePluginV3Factory');
+    } catch (e) {
+        console.log('setPluginDeployer failed Reason:', e?.message || e);
+    }
 
     /**
      * @dev This below call setDefaultPluginFactory will fail because the factory's owner is multisig.
@@ -108,6 +126,7 @@ async function main() {
     }
 
     deploysData.BasePluginV3Factory = pluginFactory.target;
+    deploysData.PluginV3Deployer = pluginDeployer.target;
     deploysData.SecurityRegistry = securityRegistry.target;
     deploysData.FeeDiscountRegistry = feeDiscountRegistry.target;
     fs.writeFileSync(deployDataPath, JSON.stringify(deploysData), 'utf-8');
