@@ -5,6 +5,7 @@ import './interfaces/IBasePluginV3Factory.sol';
 import './interfaces/IPluginV3Deployer.sol';
 import './interfaces/plugins/ISecurityPlugin.sol';
 import '@cryptoalgebra/integral-core/contracts/interfaces/IAlgebraFactory.sol';
+import './libraries/AdaptiveFee.sol';
 
 /// @title Algebra Integral 1.2 default plugin factory
 /// @notice This contract creates Algebra adaptive fee plugins for Algebra liquidity pools
@@ -41,6 +42,7 @@ contract BasePluginV3Factory is IBasePluginV3Factory {
 
   constructor(address _algebraFactory) {
     algebraFactory = _algebraFactory;
+    defaultFeeConfiguration = AdaptiveFee.initialFeeConfiguration();
     emit DefaultFeeConfiguration(defaultFeeConfiguration);
   }
 
@@ -85,7 +87,7 @@ contract BasePluginV3Factory is IBasePluginV3Factory {
 
   /// @inheritdoc IBasePluginV3Factory
   function setDefaultFeeConfiguration(AlgebraFeeConfiguration calldata newConfig) external override onlyAdministrator {
-    // _validateFeeConfiguration(newConfig);
+    AdaptiveFee.validateFeeConfiguration(newConfig);
     defaultFeeConfiguration = newConfig;
     emit DefaultFeeConfiguration(newConfig);
   }
