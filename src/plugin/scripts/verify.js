@@ -24,7 +24,7 @@ async function main() {
 
   // Verify BasePluginV3Factory
   if (BasePluginV3Factory) {
-    await hre.run("verify:verify", {
+    await verifyContract('BasePluginV3Factory', {
       address: BasePluginV3Factory,
       constructorArguments: [
         deploysData.factory
@@ -34,7 +34,7 @@ async function main() {
 
   // Verify PluginV3Deployer
   if (PluginV3Deployer) {
-    await hre.run("verify:verify", {
+    await verifyContract('PluginV3Deployer', {
       address: PluginV3Deployer,
       constructorArguments: [],
     });
@@ -42,7 +42,7 @@ async function main() {
 
   // Verify SecurityRegistry
   if (SecurityRegistry) {
-    await hre.run("verify:verify", {
+    await verifyContract('SecurityRegistry', {
       address: SecurityRegistry,
       constructorArguments: [
         deploysData.factory
@@ -52,7 +52,7 @@ async function main() {
 
   // Verify FeeDiscountRegistry
   if (FeeDiscountRegistry) {
-    await hre.run("verify:verify", {
+    await verifyContract('FeeDiscountRegistry', {
       address: FeeDiscountRegistry,
       constructorArguments: [
         deploysData.factory
