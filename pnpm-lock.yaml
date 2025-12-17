@@ -85,6 +85,9 @@ importers:
       ethers:
         specifier: 6.14.0
         version: 6.14.0
+      flat:
+        specifier: 5.0.2
+        version: 5.0.2
       hardhat:
         specifier: 2.27.0
         version: 2.27.0(ts-node@10.9.0(@types/node@24.10.2)(typescript@5.9.3))(typescript@5.9.3)

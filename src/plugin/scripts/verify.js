@@ -17,20 +17,48 @@ async function main() {
   const deployDataPath = path.resolve(__dirname, '../../../' + (process.env.DEPLOY_ENV || '') + 'deploys.json');
   let deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'));
 
-  const BasePluginV1Factory = deploysData.BasePluginV1Factory;
-  const AlgebraFarmingProxyPluginFactory = deploysData.AlgebraFarmingProxyPluginFactory;
+  const BasePluginV3Factory = deploysData.BasePluginV3Factory;
+  const PluginV3Deployer = deploysData.PluginV3Deployer;
+  const SecurityRegistry = deploysData.SecurityRegistry;
+  const FeeDiscountRegistry = deploysData.FeeDiscountRegistry;
 
-  // Verify BasePluginV1Factory
-  await verifyContract('BasePluginV1Factory', {
-    address: BasePluginV1Factory,
-    constructorArguments: [deploysData.factory],
-  });
+  // Verify BasePluginV3Factory
+  if (BasePluginV3Factory) {
+    await hre.run("verify:verify", {
+      address: BasePluginV3Factory,
+      constructorArguments: [
+        deploysData.factory
+      ],
+    });
+  }
 
-  // Verify AlgebraFarmingProxyPluginFactory
-  await verifyContract('AlgebraFarmingProxyPluginFactory', {
-    address: AlgebraFarmingProxyPluginFactory,
-    constructorArguments: [],
-  });
+  // Verify PluginV3Deployer
+  if (PluginV3Deployer) {
+    await hre.run("verify:verify", {
+      address: PluginV3Deployer,
+      constructorArguments: [],
+    });
+  }
+
+  // Verify SecurityRegistry
+  if (SecurityRegistry) {
+    await hre.run("verify:verify", {
+      address: SecurityRegistry,
+      constructorArguments: [
+        deploysData.factory
+      ],
+    });
+  }
+
+  // Verify FeeDiscountRegistry
+  if (FeeDiscountRegistry) {
+    await hre.run("verify:verify", {
+      address: FeeDiscountRegistry,
+      constructorArguments: [
+        deploysData.factory
+      ],
+    });
+  }
 
   /* TODO:: VERIFY AlgebraFarmingProxyPlugin
     await verifyContract('AlgebraFarmingProxyPlugin', {
