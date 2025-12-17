@@ -24,6 +24,14 @@ contract BasePluginV3Factory is IBasePluginV3Factory {
   /// @inheritdoc IBasePluginV3Factory
   address public override securityRegistry;
 
+  address public reflexRouter;
+
+  /// @notice Configuration ID for profit distribution used by plugins created by this factory
+  bytes32 public reflexConfigId;
+
+  /// @inheritdoc IBasePluginV3Factory
+  address public override feeDiscountRegistry;
+
   /// @inheritdoc IBasePluginV3Factory
   mapping(address poolAddress => address pluginAddress) public override pluginByPool;
 
@@ -64,7 +72,9 @@ contract BasePluginV3Factory is IBasePluginV3Factory {
 
   function _createPlugin(address pool) internal returns (address) {
     require(pluginByPool[pool] == address(0), 'Already created');
-    address plugin = address(new AlgebraBasePluginV3(pool, algebraFactory, address(this), defaultFeeConfiguration));
+    address plugin = address(
+      new AlgebraBasePluginV3(pool, algebraFactory, address(this), defaultFeeConfiguration, reflexRouter, reflexConfigId, feeDiscountRegistry)
+    );
     ISecurityPlugin(plugin).setSecurityRegistry(securityRegistry);
     pluginByPool[pool] = plugin;
     return plugin;
@@ -89,5 +99,21 @@ contract BasePluginV3Factory is IBasePluginV3Factory {
     require(securityRegistry != _securityRegistry);
     securityRegistry = _securityRegistry;
     emit SecurityRegistry(_securityRegistry);
+  }
+
+  /// @inheritdoc IBasePluginV3Factory
+  function setFeeDiscountRegistry(address newFeeDiscountRegistry) external override onlyAdministrator {
+    require(feeDiscountRegistry != newFeeDiscountRegistry);
+    feeDiscountRegistry = newFeeDiscountRegistry;
+    emit FeeDiscountRegistry(newFeeDiscountRegistry);
+  }
+
+  /// @dev updates reflex router and config id used by plugins created by this factory
+  /// @param newReflexRouter The new reflex router address
+  /// @param newReflexConfigId The new reflex configuration id
+  function setReflexConfig(address newReflexRouter, bytes32 newReflexConfigId) external onlyAdministrator {
+    reflexRouter = newReflexRouter;
+    reflexConfigId = newReflexConfigId;
+    emit ReflexConfig(newReflexRouter, newReflexConfigId);
   }
 }
