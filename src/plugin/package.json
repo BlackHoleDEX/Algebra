@@ -40,5 +40,9 @@
   "engines": {
     "npm": ">=8.0.0",
     "node": ">=16.0.0"
+  },
+  "devDependencies": {
+    "hardhat": "2.27.0",
+    "pretty-quick": "4.2.2"
   }
 }
