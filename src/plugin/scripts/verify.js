@@ -60,6 +60,44 @@ async function main() {
     });
   }
 
+
+  // Verify AlgebraBasePluginV3
+  /*try {
+    const poolAddress = '0xbE57FDa66F65B09ec2087461b7e94E57c2f0592A';
+    const pluginAddress = '0xf3F9282a8818301651DA45b9b4E0BFDF919c8Ce0';
+
+    console.log(`Found plugin at ${pluginAddress} for pool ${poolAddress}`);
+
+    if (pluginAddress && pluginAddress !== hre.ethers.ZeroAddress) {
+      const defaultPluginConfig = {
+        alpha1: 0,
+        alpha2: 0,
+        beta1: 0,
+        beta2: 0,
+        gamma1: 0,
+        gamma2: 0,
+        baseFee: 0
+      };
+
+      await verifyContract('AlgebraBasePluginV3', {
+        address: pluginAddress,
+        constructorArguments: [
+          poolAddress,
+          deploysData.factory,
+          deploysData.BasePluginV3Factory, // Assuming this key exists in deploysData
+          defaultPluginConfig,
+          '0x49Aa6A715524561CFb725F071e49c7628De780Bd', // reflexRouter
+          '0x0000000000000000000000000000000000000000000000000000000000000000', // configId
+          deploysData.FeeDiscountRegistry // _feeDiscountRegistry
+        ],
+      });
+    } else {
+      console.log('No plugin connected to the pool or plugin address is zero.');
+    }
+  } catch (error) {
+    console.error('Failed to verify AlgebraBasePluginV3:', error);
+  }*/
+
   /* TODO:: VERIFY AlgebraFarmingProxyPlugin
     await verifyContract('AlgebraFarmingProxyPlugin', {
         address: "0xdB2093a4DF635dcE499A0db0BBA9ABe39dB6594A",
