@@ -2,6 +2,17 @@ const hre = require("hardhat");
 const fs = require('fs');
 const path = require('path');
 
+async function verifyContract(contractName, verifyOptions) {
+  try {
+    console.log(`\n🔍 Verifying ${contractName}...`);
+    await hre.run('verify:verify', verifyOptions);
+    console.log(`✅ ${contractName} verified successfully`);
+  } catch (error) {
+    console.log(`⚠️  ${contractName} verification completed with status check error (contract may still be verified)`);
+    console.log(`Error details: ${error.message}`);
+  }
+}
+
 async function main() {
 
   const deployDataPath = path.resolve(__dirname, '../../../' + (process.env.DEPLOY_ENV || '') + 'deploys.json');
@@ -14,7 +25,7 @@ async function main() {
 
   // Verify BasePluginV3Factory
   if (BasePluginV3Factory) {
-    await hre.run("verify:verify", {
+    await verifyContract('BasePluginV3Factory', {
       address: BasePluginV3Factory,
       constructorArguments: [
         deploysData.factory
@@ -24,7 +35,7 @@ async function main() {
 
   // Verify PluginV3Deployer
   if (PluginV3Deployer) {
-    await hre.run("verify:verify", {
+    await verifyContract('PluginV3Deployer', {
       address: PluginV3Deployer,
       constructorArguments: [],
     });
@@ -32,7 +43,7 @@ async function main() {
 
   // Verify SecurityRegistry
   if (SecurityRegistry) {
-    await hre.run("verify:verify", {
+    await verifyContract('SecurityRegistry', {
       address: SecurityRegistry,
       constructorArguments: [
         deploysData.factory
@@ -42,7 +53,7 @@ async function main() {
 
   // Verify FeeDiscountRegistry
   if (FeeDiscountRegistry) {
-    await hre.run("verify:verify", {
+    await verifyContract('FeeDiscountRegistry', {
       address: FeeDiscountRegistry,
       constructorArguments: [
         deploysData.factory
@@ -51,12 +62,48 @@ async function main() {
   }
 
 
-  /* TODO:: VERIFY AlgebraFarmingProxyPlugin
-   await hre.run('verify:verify', {
-     address: "0xdB2093a4DF635dcE499A0db0BBA9ABe39dB6594A",
-     constructorArguments: ["0x41100C6D2c6920B10d12Cd8D59c8A9AA2eF56fC7", "0x512eb749541B7cf294be882D636218c84a5e9E5F", "0x27ae8c52A41EC52A4150BA6321007eC41702c0F0"],
-   });*/
+  // Verify AlgebraBasePluginV3
+  /*try {
+    const poolAddress = '0xbE57FDa66F65B09ec2087461b7e94E57c2f0592A';
+    const pluginAddress = '0xf3F9282a8818301651DA45b9b4E0BFDF919c8Ce0';
 
+    console.log(`Found plugin at ${pluginAddress} for pool ${poolAddress}`);
+
+    if (pluginAddress && pluginAddress !== hre.ethers.ZeroAddress) {
+      const defaultPluginConfig = {
+        alpha1: 0,
+        alpha2: 0,
+        beta1: 0,
+        beta2: 0,
+        gamma1: 0,
+        gamma2: 0,
+        baseFee: 0
+      };
+
+      await verifyContract('AlgebraBasePluginV3', {
+        address: pluginAddress,
+        constructorArguments: [
+          poolAddress,
+          deploysData.factory,
+          deploysData.BasePluginV3Factory, // Assuming this key exists in deploysData
+          defaultPluginConfig,
+          '0x49Aa6A715524561CFb725F071e49c7628De780Bd', // reflexRouter
+          '0x0000000000000000000000000000000000000000000000000000000000000000', // configId
+          deploysData.FeeDiscountRegistry // _feeDiscountRegistry
+        ],
+      });
+    } else {
+      console.log('No plugin connected to the pool or plugin address is zero.');
+    }
+  } catch (error) {
+    console.error('Failed to verify AlgebraBasePluginV3:', error);
+  }*/
+
+  /* TODO:: VERIFY AlgebraFarmingProxyPlugin
+    await verifyContract('AlgebraFarmingProxyPlugin', {
+        address: "0xdB2093a4DF635dcE499A0db0BBA9ABe39dB6594A",
+        constructorArguments: ["0x41100C6D2c6920B10d12Cd8D59c8A9AA2eF56fC7", "0x512eb749541B7cf294be882D636218c84a5e9E5F", "0x27ae8c52A41EC52A4150BA6321007eC41702c0F0"],
+    });*/
 }
 
 // We recommend this pattern to be able to use async/await everywhere
