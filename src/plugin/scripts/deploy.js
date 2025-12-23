@@ -25,7 +25,7 @@ async function main() {
     // Deploy PluginV3Deployer
     const PluginV3Deployer = await hre.ethers.getContractFactory("PluginV3Deployer");
     const feeDataDeployer = await getFeeData();
-    const pluginDeployer = await PluginV3Deployer.deploy({ ...feeDataDeployer });
+    const pluginDeployer = await PluginV3Deployer.deploy(pluginFactory.target, { ...feeDataDeployer });
 
     await pluginDeployer.waitForDeployment();
 
