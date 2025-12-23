@@ -27,7 +27,8 @@ contract BasePluginV3Factory is IBasePluginV3Factory {
   /// @inheritdoc IBasePluginV3Factory
   mapping(address poolAddress => address pluginAddress) public override pluginByPool;
 
-  address public feeDiscountRegistry;
+  /// @inheritdoc IBasePluginV3Factory
+  address public override feeDiscountRegistry;
 
   modifier onlyAdministrator() {
     require(IAlgebraFactory(algebraFactory).hasRoleOrOwner(ALGEBRA_BASE_PLUGIN_FACTORY_ADMINISTRATOR, msg.sender), 'Only administrator');
@@ -91,5 +92,12 @@ contract BasePluginV3Factory is IBasePluginV3Factory {
     require(securityRegistry != _securityRegistry);
     securityRegistry = _securityRegistry;
     emit SecurityRegistry(_securityRegistry);
+  }
+
+  /// @inheritdoc IBasePluginV3Factory
+  function setFeeDiscountRegistry(address newFeeDiscountRegistry) external override onlyAdministrator {
+    require(feeDiscountRegistry != newFeeDiscountRegistry);
+    feeDiscountRegistry = newFeeDiscountRegistry;
+    emit FeeDiscountRegistry(newFeeDiscountRegistry);
   }
 }

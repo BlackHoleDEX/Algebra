@@ -22,6 +22,10 @@ interface IBasePluginV3Factory is IAlgebraPluginFactory {
   /// @param newFarmingAddress The farming address after the address was changed
   event FarmingAddress(address newFarmingAddress);
 
+  /// @notice Emitted when the fee discount registry address is changed
+  /// @param registry The fee discount registry address after the address was changed
+  event FeeDiscountRegistry(address registry);
+
   /// @notice The hash of 'ALGEBRA_BASE_PLUGIN_FACTORY_ADMINISTRATOR' used as role
   /// @dev allows to change settings of BasePluginV1Factory
   function ALGEBRA_BASE_PLUGIN_FACTORY_ADMINISTRATOR() external pure returns (bytes32);
@@ -70,4 +74,12 @@ interface IBasePluginV3Factory is IAlgebraPluginFactory {
   /// @dev updates securoty registry address on the factory
   /// @param newSecurityRegistry The new security registry contract address
   function setSecurityRegistry(address newSecurityRegistry) external;
+
+  /// @notice Returns current fee discount registry address
+  /// @return The fee discount registry contract address
+  function feeDiscountRegistry() external view returns (address);
+
+  /// @notice Updates fee discount registry address on the factory
+  /// @param newFeeDiscountRegistry The new fee discount registry contract address
+  function setFeeDiscountRegistry(address newFeeDiscountRegistry) external;
 }
