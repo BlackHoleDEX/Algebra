@@ -37,7 +37,9 @@ async function main() {
   if (PluginV3Deployer) {
     await verifyContract('PluginV3Deployer', {
       address: PluginV3Deployer,
-      constructorArguments: [],
+      constructorArguments: [
+        deploysData.BasePluginV3Factory
+      ],
     });
   }
 
