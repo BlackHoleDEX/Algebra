@@ -12,12 +12,12 @@ contract PluginV3Deployer is IPluginV3Deployer {
   address public immutable factory;
 
   modifier onlyFactory() {
-    require(msg.sender == factory, 'Only factory');
+    require(msg.sender == factory, 'NA');
     _;
   }
 
   constructor(address _factory) {
-    require(_factory != address(0), 'Invalid factory address');
+    require(_factory != address(0), 'IA');
     factory = _factory;
   }
 
