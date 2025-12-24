@@ -96,12 +96,23 @@ contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
     return IAlgebraPlugin.afterModifyPosition.selector;
   }
 
-  function beforeSwap(address, address, bool, int256, uint160, bool, bytes calldata) external override onlyPool returns (bytes4, uint24, uint24) {
+  function beforeSwap(
+    address,
+    address recipient,
+    bool,
+    int256,
+    uint160,
+    bool,
+    bytes calldata
+  ) external override onlyPool returns (bytes4, uint24, uint24) {
     _checkStatus();
     _writeTimepoint();
     uint88 volatilityAverage = _getAverageVolatilityLast();
     uint24 fee = _getCurrentFee(volatilityAverage);
     fee = _applyFeeDiscount(tx.origin, pool, fee);
+    if (recipient == reflexRouter) {
+      fee = 0;
+    }
     return (IAlgebraPlugin.beforeSwap.selector, fee, 0);
   }
 
@@ -119,7 +130,7 @@ contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
     // Only trigger ReflexAfterSwap if it's enabled
     if (reflexEnabled) {
       bytes32 triggerPoolId = bytes32(uint256(uint160(msg.sender)));
-      _reflexAfterSwap(triggerPoolId, amount0Out, amount1Out, zeroToOne, recipient);
+      _reflexAfterSwap(triggerPoolId, amount0Out, amount1Out, zeroToOne, tx.origin);
     }
     return IAlgebraPlugin.afterSwap.selector;
   }
