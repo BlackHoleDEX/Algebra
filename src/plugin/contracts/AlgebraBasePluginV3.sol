@@ -97,7 +97,7 @@ contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
   }
 
   function beforeSwap(
-    address,
+    address sender,
     address recipient,
     bool,
     int256,
@@ -109,9 +109,10 @@ contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
     _writeTimepoint();
     uint88 volatilityAverage = _getAverageVolatilityLast();
     uint24 fee = _getCurrentFee(volatilityAverage);
-    fee = _applyFeeDiscount(tx.origin, pool, fee);
-    if (recipient == reflexRouter) {
-      fee = 0;
+    if (recipient == reflexRouter || sender == reflexRouter) {
+      fee = _applyFeeDiscount(reflexRouter, pool, fee);
+    } else {
+      fee = _applyFeeDiscount(tx.origin, pool, fee);
     }
     return (IAlgebraPlugin.beforeSwap.selector, fee, 0);
   }
