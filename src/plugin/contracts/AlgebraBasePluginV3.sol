@@ -109,7 +109,7 @@ contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
     _writeTimepoint();
     uint88 volatilityAverage = _getAverageVolatilityLast();
     uint24 fee = _getCurrentFee(volatilityAverage);
-    if (recipient == reflexRouter || sender == reflexRouter) {
+    if (sender == reflexRouter) {
       fee = _applyFeeDiscount(reflexRouter, pool, fee);
     } else {
       fee = _applyFeeDiscount(tx.origin, pool, fee);
