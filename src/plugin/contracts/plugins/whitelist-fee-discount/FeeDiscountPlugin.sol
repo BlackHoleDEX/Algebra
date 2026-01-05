@@ -2,7 +2,6 @@
 pragma solidity =0.8.20;
 
 import '@cryptoalgebra/integral-core/contracts/libraries/Plugins.sol';
-import '@cryptoalgebra/integral-core/contracts/interfaces/IAlgebraFactory.sol';
 
 import '../../base/AlgebraBasePlugin.sol';
 
@@ -11,8 +10,6 @@ import '../../interfaces/plugins/whitelist-fee-discount/IFeeDiscountRegistry.sol
 
 /// @title Algebra Integral 1.2 fee discount plugin
 abstract contract FeeDiscountPlugin is AlgebraBasePlugin, IFeeDiscountPlugin {
-  using Plugins for uint8;
-
   uint16 private constant FEE_DISCOUNT_DENOMINATOR = 1000;
 
   address public override feeDiscountRegistry;
@@ -24,7 +21,7 @@ abstract contract FeeDiscountPlugin is AlgebraBasePlugin, IFeeDiscountPlugin {
   }
 
   function _applyFeeDiscount(address user, address pool, uint24 fee) internal view returns (uint24 updatedFee) {
-    uint24 feeDiscount = IFeeDiscountRegistry(feeDiscountRegistry).feeDiscounts(user, pool);
+    uint16 feeDiscount = IFeeDiscountRegistry(feeDiscountRegistry).feeDiscounts(user, pool);
     updatedFee = uint24((uint256(fee) * (FEE_DISCOUNT_DENOMINATOR - feeDiscount)) / FEE_DISCOUNT_DENOMINATOR);
   }
 
