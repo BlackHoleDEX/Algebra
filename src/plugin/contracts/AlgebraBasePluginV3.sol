@@ -153,6 +153,5 @@ contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
   function getCurrentFee() external view override returns (uint16 fee) {
     uint88 volatilityAverage = _getAverageVolatilityLast();
     fee = _getCurrentFee(volatilityAverage);
-    fee = uint16(_applyFeeDiscount(tx.origin, pool, uint24(fee)));
   }
 }
