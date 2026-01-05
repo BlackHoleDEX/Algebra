@@ -2,12 +2,13 @@
 pragma solidity ^0.8.20;
 
 import '../../interfaces/plugins/reflex-mev/IReflexRouter.sol';
+import '../../base/AlgebraBasePlugin.sol';
 
 /// @title ReflexAfterSwap
 /// @notice Abstract contract that integrates with Reflex Router for post-swap profit extraction
 /// @dev Implements failsafe mechanisms to prevent router failures from affecting main swap operations
 /// @dev Profit distribution is handled externally - this contract only extracts profits
-abstract contract ReflexAfterSwap {
+abstract contract ReflexAfterSwap is AlgebraBasePlugin {
   // ========== Events ==========
 
   /// @notice Emitted when the Reflex router address is updated
@@ -38,14 +39,11 @@ abstract contract ReflexAfterSwap {
     reflexConfigId = _configId;
   }
 
-  /// @notice Internal function that must be implemented by child contract to enforce admin access control
-  function _onlyReflexAdmin() internal view virtual;
-
   /// @notice Updates the Reflex router address and refreshes admin
   /// @param _router New router address to set
   /// @dev Only callable by current reflex admin, validates non-zero address, and updates admin from new router
   function setReflexRouter(address _router) external {
-    _onlyReflexAdmin();
+    _authorize();
     require(_router != address(0), 'Invalid router address');
     address oldRouter = reflexRouter;
     reflexRouter = _router;
@@ -68,7 +66,7 @@ abstract contract ReflexAfterSwap {
   /// @param _configId New configuration ID to set
   /// @dev Only callable by current reflex admin
   function setReflexConfigId(bytes32 _configId) external {
-    _onlyReflexAdmin();
+    _authorize();
     bytes32 oldConfigId = reflexConfigId;
     reflexConfigId = _configId;
     emit ReflexConfigIdUpdated(oldConfigId, _configId);

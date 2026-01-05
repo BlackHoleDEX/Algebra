@@ -23,7 +23,7 @@ abstract contract FeeDiscountPlugin is AlgebraBasePlugin, IFeeDiscountPlugin {
     feeDiscountRegistry = _feeDiscountRegistry;
   }
 
-  function _applyFeeDiscount(address user, address pool, uint24 fee) internal returns (uint24 updatedFee) {
+  function _applyFeeDiscount(address user, address pool, uint24 fee) internal view returns (uint24 updatedFee) {
     uint24 feeDiscount = IFeeDiscountRegistry(feeDiscountRegistry).feeDiscounts(user, pool);
     updatedFee = uint24((uint256(fee) * (FEE_DISCOUNT_DENOMINATOR - feeDiscount)) / FEE_DISCOUNT_DENOMINATOR);
   }
