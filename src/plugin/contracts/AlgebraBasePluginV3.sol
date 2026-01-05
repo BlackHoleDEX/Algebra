@@ -16,6 +16,7 @@ import './plugins/whitelist-fee-discount/FeeDiscountPlugin.sol';
 contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, VolatilityOraclePlugin, SecurityPlugin, ReflexAfterSwap, FeeDiscountPlugin {
   using Plugins for uint8;
 
+  event ReflexEnabled(bool indexed enabled);
   /// @inheritdoc IAlgebraPlugin
   uint8 public constant override defaultPluginConfig =
     uint8(
@@ -53,6 +54,7 @@ contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
   function setReflexEnabled(bool _enabled) external {
     _authorize();
     reflexEnabled = _enabled;
+    emit ReflexEnabled(_enabled);
   }
 
   /// @notice Check if ReflexAfterSwap functionality is currently enabled
@@ -96,12 +98,24 @@ contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
     return IAlgebraPlugin.afterModifyPosition.selector;
   }
 
-  function beforeSwap(address, address, bool, int256, uint160, bool, bytes calldata) external override onlyPool returns (bytes4, uint24, uint24) {
+  function beforeSwap(
+    address sender,
+    address recipient,
+    bool,
+    int256,
+    uint160,
+    bool,
+    bytes calldata
+  ) external override onlyPool returns (bytes4, uint24, uint24) {
     _checkStatus();
     _writeTimepoint();
     uint88 volatilityAverage = _getAverageVolatilityLast();
     uint24 fee = _getCurrentFee(volatilityAverage);
-    fee = _applyFeeDiscount(tx.origin, pool, fee);
+    if (sender == reflexRouter) {
+      fee = _applyFeeDiscount(reflexRouter, pool, fee);
+    } else {
+      fee = _applyFeeDiscount(tx.origin, pool, fee);
+    }
     return (IAlgebraPlugin.beforeSwap.selector, fee, 0);
   }
 
@@ -119,7 +133,7 @@ contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
     // Only trigger ReflexAfterSwap if it's enabled
     if (reflexEnabled) {
       bytes32 triggerPoolId = bytes32(uint256(uint160(msg.sender)));
-      _reflexAfterSwap(triggerPoolId, amount0Out, amount1Out, zeroToOne, recipient);
+      _reflexAfterSwap(triggerPoolId, amount0Out, amount1Out, zeroToOne, tx.origin);
     }
     return IAlgebraPlugin.afterSwap.selector;
   }
@@ -139,10 +153,5 @@ contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
   function getCurrentFee() external view override returns (uint16 fee) {
     uint88 volatilityAverage = _getAverageVolatilityLast();
     fee = _getCurrentFee(volatilityAverage);
-  }
-
-  /// @inheritdoc ReflexAfterSwap
-  function _onlyReflexAdmin() internal view override {
-    _authorize();
   }
 }

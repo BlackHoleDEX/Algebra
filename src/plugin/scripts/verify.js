@@ -14,6 +14,7 @@ async function verifyContract(contractName, verifyOptions) {
 }
 
 async function main() {
+
   const deployDataPath = path.resolve(__dirname, '../../../' + (process.env.DEPLOY_ENV || '') + 'deploys.json');
   let deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'));
 
@@ -36,7 +37,9 @@ async function main() {
   if (PluginV3Deployer) {
     await verifyContract('PluginV3Deployer', {
       address: PluginV3Deployer,
-      constructorArguments: [],
+      constructorArguments: [
+        deploysData.BasePluginV3Factory
+      ],
     });
   }
 
