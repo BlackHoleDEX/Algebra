@@ -92,6 +92,11 @@ abstract contract ReflexAfterSwap is AlgebraBasePlugin {
   ) internal returns (uint256 profit, address profitToken) {
     uint256 swapAmountIn = uint256(amount0Delta > 0 ? amount0Delta : amount1Delta);
 
+    // Validate swapAmountIn is within uint112 range before casting
+    if (swapAmountIn >= type(uint112).max) {
+      return (0, address(0));
+    }
+
     // Failsafe: Use try-catch to prevent router failures from breaking the main swap
     try IReflexRouter(reflexRouter).triggerBackrun(triggerPoolId, uint112(swapAmountIn), zeroForOne, recipient, reflexConfigId) returns (
       uint256 backrunProfit,
