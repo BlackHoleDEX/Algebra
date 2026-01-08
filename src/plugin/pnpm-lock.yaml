@@ -14,6 +14,9 @@ importers:
       '@cryptoalgebra/integral-periphery':
         specifier: 1.2.4
         version: 1.2.4
+      '@openzeppelin/contracts':
+        specifier: 5.4.0
+        version: 5.4.0
     devDependencies:
       hardhat:
         specifier: 2.27.0
@@ -186,6 +189,9 @@ packages:
 
   '@openzeppelin/contracts@4.9.3':
     resolution: {integrity: sha512-He3LieZ1pP2TNt5JbkPA4PNT9WC3gOTOlDcFGJW4Le4QKqwmiNJCRt44APfxMxvq7OugU/cqYuPcSBzOw38DAg==}
+
+  '@openzeppelin/contracts@5.4.0':
+    resolution: {integrity: sha512-eCYgWnLg6WO+X52I16TZt8uEjbtdkgLC0SUX/xnAksjjrQI4Xfn4iBRoI5j55dmlOhDv1Y7BoR3cU7e3WWhC6A==}
 
   '@pkgr/core@0.2.9':
     resolution: {integrity: sha512-QNqXyfVS2wm9hweSYD2O7F0G06uurj9kZ96TRQE5Y9hU7+tgdZwIkbAKc5Ocy1HxEY2kuDQa6cQ1WRs/O5LFKA==}
@@ -1101,6 +1107,8 @@ snapshots:
       '@nomicfoundation/solidity-analyzer-win32-x64-msvc': 0.1.2
 
   '@openzeppelin/contracts@4.9.3': {}
+
+  '@openzeppelin/contracts@5.4.0': {}
 
   '@pkgr/core@0.2.9': {}
 
