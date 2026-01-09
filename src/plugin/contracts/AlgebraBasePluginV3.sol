@@ -16,6 +16,7 @@ import './plugins/whitelist-fee-discount/FeeDiscountPlugin.sol';
 contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, VolatilityOraclePlugin, SecurityPlugin, ReflexAfterSwap, FeeDiscountPlugin {
   using Plugins for uint8;
 
+  event ReflexEnabled(bool indexed enabled);
   /// @inheritdoc IAlgebraPlugin
   uint8 public constant override defaultPluginConfig =
     uint8(
@@ -53,6 +54,7 @@ contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
   function setReflexEnabled(bool _enabled) external {
     _authorize();
     reflexEnabled = _enabled;
+    emit ReflexEnabled(_enabled);
   }
 
   /// @notice Check if ReflexAfterSwap functionality is currently enabled
@@ -151,10 +153,5 @@ contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
   function getCurrentFee() external view override returns (uint16 fee) {
     uint88 volatilityAverage = _getAverageVolatilityLast();
     fee = _getCurrentFee(volatilityAverage);
-  }
-
-  /// @inheritdoc ReflexAfterSwap
-  function _onlyReflexAdmin() internal view override {
-    _authorize();
   }
 }
