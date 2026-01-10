@@ -69,6 +69,11 @@ interface INonfungiblePositionManager is
     /// @param status The new whitelist status
     event WhitelistStatusChanged(address indexed account, bool status);
 
+    /// @notice Emitted when the liquidity unlock time of a token is changed
+    /// @param tokenId The ID of the token
+    /// @param liquidityUnlockTime The new liquidity unlock time
+    event LiquidityUnlockTimeChanged(uint256 indexed tokenId, uint32 liquidityUnlockTime);
+
     /// @notice Returns the position information associated with a given token ID.
     /// @dev Throws if the token ID is not valid.
     /// @param tokenId The ID of the token that represents the position
@@ -242,4 +247,9 @@ interface INonfungiblePositionManager is
     /// @param account The address of the account
     /// @param status The new whitelist status
     function setWhitelistStatus(address account, bool status) external;
+
+    /// @notice Returns the liquidity unlock time of a token
+    /// @param tokenId The ID of the token
+    /// @return The liquidity unlock time
+    function liquidityUnlockTime(uint256 tokenId) external view returns (uint32);
 }

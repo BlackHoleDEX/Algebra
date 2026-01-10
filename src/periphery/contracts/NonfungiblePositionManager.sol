@@ -331,6 +331,7 @@ contract NonfungiblePositionManager is
         }
 
         emit IncreaseLiquidity(params.tokenId, liquidityDesired, liquidity, amount0, amount1, address(pool));
+        emit LiquidityUnlockTimeChanged(params.tokenId, position.liquidityUnlockTime);
 
         _applyLiquidityDeltaInFarming(params.tokenId, int256(uint256(liquidity)));
     }
@@ -575,5 +576,10 @@ contract NonfungiblePositionManager is
     function _approve(address to, uint256 tokenId) internal override(ERC721) {
         _positions[tokenId].operator = to;
         emit Approval(ownerOf(tokenId), to, tokenId);
+    }
+
+    /// @inheritdoc INonfungiblePositionManager
+    function liquidityUnlockTime(uint256 tokenId) external view override returns (uint32) {
+        return _positions[tokenId].liquidityUnlockTime;
     }
 }
