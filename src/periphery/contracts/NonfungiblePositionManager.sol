@@ -148,8 +148,7 @@ contract NonfungiblePositionManager is
             position.feeGrowthInside0LastX128,
             position.feeGrowthInside1LastX128,
             position.tokensOwed0,
-            position.tokensOwed1,
-            position.liquidityUnlockTime
+            position.tokensOwed1
         );
     }
 

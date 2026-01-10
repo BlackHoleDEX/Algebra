@@ -101,8 +101,7 @@ interface INonfungiblePositionManager is
             uint256 feeGrowthInside0LastX128,
             uint256 feeGrowthInside1LastX128,
             uint128 tokensOwed0,
-            uint128 tokensOwed1,
-            uint32 liquidityUnlockTime
+            uint128 tokensOwed1
         );
 
     struct MintParams {
