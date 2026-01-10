@@ -101,8 +101,7 @@ interface INonfungiblePositionManager is
             uint256 feeGrowthInside0LastX128,
             uint256 feeGrowthInside1LastX128,
             uint128 tokensOwed0,
-            uint128 tokensOwed1,
-            uint32 liquidityUnlockTime
+            uint128 tokensOwed1
         );
 
     struct MintParams {
@@ -230,6 +229,9 @@ interface INonfungiblePositionManager is
 
     /// @notice Returns the duration of the liquidity lock period
     function liquidityLockPeriod() external view returns (uint32);
+
+    /// @notice Returns the timestamp when liquidity can be removed for a given token ID
+    function liquidityUnlockTime(uint256 tokenId) external view returns (uint32);
 
     /// @notice Returns true if the account is whitelisted
     /// @param account The address of the account

@@ -47,7 +47,6 @@ contract NonfungiblePositionManager is
         uint256 feeGrowthInside1LastX128;
         uint128 tokensOwed0; // how many uncollected tokens are owed to the position, as of the last computation
         uint128 tokensOwed1;
-        uint32 liquidityUnlockTime; // the timestamp when liquidity can be removed
     }
 
     /// @dev The role which has the right to change the farming center address
@@ -65,6 +64,7 @@ contract NonfungiblePositionManager is
 
     /// @inheritdoc INonfungiblePositionManager
     mapping(uint256 tokenId => address farmingCenterAddress) public tokenFarmedIn;
+    mapping(uint256 tokenId => uint32) public override liquidityUnlockTime;
 
     /// @inheritdoc INonfungiblePositionManager
     uint32 public override liquidityLockPeriod;
@@ -148,8 +148,7 @@ contract NonfungiblePositionManager is
             position.feeGrowthInside0LastX128,
             position.feeGrowthInside1LastX128,
             position.tokensOwed0,
-            position.tokensOwed1,
-            position.liquidityUnlockTime
+            position.tokensOwed1
         );
     }
 
@@ -195,6 +194,7 @@ contract NonfungiblePositionManager is
             PoolAddress.PoolKey({deployer: params.deployer, token0: params.token0, token1: params.token1})
         );
 
+        liquidityUnlockTime[tokenId] = uint32(_blockTimestamp() + liquidityLockPeriod);
         _positions[tokenId] = Position({
             nonce: 0,
             operator: address(0),
@@ -205,8 +205,7 @@ contract NonfungiblePositionManager is
             feeGrowthInside0LastX128: feeGrowthInside0LastX128,
             feeGrowthInside1LastX128: feeGrowthInside1LastX128,
             tokensOwed0: 0,
-            tokensOwed1: 0,
-            liquidityUnlockTime: uint32(_blockTimestamp() + liquidityLockPeriod)
+            tokensOwed1: 0
         });
 
         emit IncreaseLiquidity(tokenId, liquidityDesired, liquidity, amount0, amount1, address(pool));
@@ -258,6 +257,11 @@ contract NonfungiblePositionManager is
 
         position.feeGrowthInside0LastX128 = feeGrowthInside0LastX128;
         position.feeGrowthInside1LastX128 = feeGrowthInside1LastX128;
+    }
+
+    /// @dev Updates the liquidity unlock time for a position
+    function _updateLiquidityUnlockTime(uint256 tokenId) private {
+        liquidityUnlockTime[tokenId] = uint32(_blockTimestamp() + liquidityLockPeriod);
     }
 
     /// @inheritdoc INonfungiblePositionManager
@@ -328,7 +332,7 @@ contract NonfungiblePositionManager is
                 position.tokensOwed1 += tokensOwed1;
             }
             position.liquidity = positionLiquidity + liquidity;
-            position.liquidityUnlockTime = uint32(_blockTimestamp() + liquidityLockPeriod);
+            _updateLiquidityUnlockTime(params.tokenId);
         }
 
         emit IncreaseLiquidity(params.tokenId, liquidityDesired, liquidity, amount0, amount1, address(pool));
@@ -359,7 +363,7 @@ contract NonfungiblePositionManager is
         require(positionLiquidity >= params.liquidity);
 
         if (!isWhitelisted[msg.sender]) {
-            require(_blockTimestamp() >= uint256(position.liquidityUnlockTime), 'Liquidity is locked');
+            require(_blockTimestamp() >= uint256(liquidityUnlockTime[params.tokenId]), 'Liquidity is locked');
         }
 
         IAlgebraPool pool = IAlgebraPool(_getPoolById(poolId));
@@ -449,7 +453,7 @@ contract NonfungiblePositionManager is
     function burn(uint256 tokenId) external payable override isAuthorizedForToken(tokenId) {
         Position storage position = _positions[tokenId];
         if (!isWhitelisted[msg.sender]) {
-            require(_blockTimestamp() >= uint256(position.liquidityUnlockTime), 'Liquidity is locked');
+            require(_blockTimestamp() >= uint256(liquidityUnlockTime[tokenId]), 'Liquidity is locked');
         }
         require(position.liquidity | position.tokensOwed0 | position.tokensOwed1 == 0);
 
