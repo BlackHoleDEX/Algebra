@@ -60,6 +60,15 @@ interface INonfungiblePositionManager is
     /// @param tokenId The ID of corresponding token
     event FarmingFailed(uint256 indexed tokenId);
 
+    /// @notice Emitted when the liquidity lock period is changed
+    /// @param liquidityLockPeriod The new liquidity lock period
+    event LiquidityLockPeriodChanged(uint32 liquidityLockPeriod);
+
+    /// @notice Emitted when the whitelist status of a account is changed
+    /// @param account The address of the account
+    /// @param status The new whitelist status
+    event WhitelistStatusChanged(address indexed account, bool status);
+
     /// @notice Returns the position information associated with a given token ID.
     /// @dev Throws if the token ID is not valid.
     /// @param tokenId The ID of the token that represents the position
@@ -92,7 +101,8 @@ interface INonfungiblePositionManager is
             uint256 feeGrowthInside0LastX128,
             uint256 feeGrowthInside1LastX128,
             uint128 tokensOwed0,
-            uint128 tokensOwed1
+            uint128 tokensOwed1,
+            uint32 liquidityUnlockTime
         );
 
     struct MintParams {
@@ -217,4 +227,20 @@ interface INonfungiblePositionManager is
 
     /// @notice Returns the address of farming in which this token is farmed, if any
     function tokenFarmedIn(uint256 tokenId) external view returns (address);
+
+    /// @notice Returns the duration of the liquidity lock period
+    function liquidityLockPeriod() external view returns (uint32);
+
+    /// @notice Returns true if the account is whitelisted
+    /// @param account The address of the account
+    function isWhitelisted(address account) external view returns (bool);
+
+    /// @notice Sets the liquidity lock period
+    /// @param _liquidityLockPeriod The new liquidity lock period
+    function setLiquidityLockPeriod(uint32 _liquidityLockPeriod) external;
+
+    /// @notice Sets the whitelist status of an account
+    /// @param account The address of the account
+    /// @param status The new whitelist status
+    function setWhitelistStatus(address account, bool status) external;
 }
