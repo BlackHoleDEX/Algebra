@@ -194,8 +194,7 @@ contract NonfungiblePositionManager is
             PoolAddress.PoolKey({deployer: params.deployer, token0: params.token0, token1: params.token1})
         );
 
-        liquidityUnlockTime[tokenId] = uint32(_blockTimestamp() + liquidityLockPeriod);
-        emit LiquidityUnlockTimeUpdated(tokenId, liquidityUnlockTime[tokenId]);
+        _updateLiquidityUnlockTime(tokenId);
         _positions[tokenId] = Position({
             nonce: 0,
             operator: address(0),
@@ -454,9 +453,6 @@ contract NonfungiblePositionManager is
     /// @inheritdoc INonfungiblePositionManager
     function burn(uint256 tokenId) external payable override isAuthorizedForToken(tokenId) {
         Position storage position = _positions[tokenId];
-        if (!isWhitelisted[msg.sender]) {
-            require(_blockTimestamp() >= uint256(liquidityUnlockTime[tokenId]), 'Liquidity is locked');
-        }
         require(position.liquidity | position.tokensOwed0 | position.tokensOwed1 == 0);
 
         delete _positions[tokenId];
