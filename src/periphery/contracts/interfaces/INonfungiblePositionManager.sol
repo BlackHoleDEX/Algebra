@@ -69,6 +69,11 @@ interface INonfungiblePositionManager is
     /// @param status The new whitelist status
     event WhitelistStatusChanged(address indexed account, bool status);
 
+    /// @notice Emitted when the liquidity unlock time is updated for a position
+    /// @param tokenId The ID of the token
+    /// @param unlockTime The new unlock time
+    event LiquidityUnlockTimeUpdated(uint256 indexed tokenId, uint32 unlockTime);
+
     /// @notice Returns the position information associated with a given token ID.
     /// @dev Throws if the token ID is not valid.
     /// @param tokenId The ID of the token that represents the position
@@ -101,8 +106,7 @@ interface INonfungiblePositionManager is
             uint256 feeGrowthInside0LastX128,
             uint256 feeGrowthInside1LastX128,
             uint128 tokensOwed0,
-            uint128 tokensOwed1,
-            uint32 liquidityUnlockTime
+            uint128 tokensOwed1
         );
 
     struct MintParams {
@@ -230,6 +234,9 @@ interface INonfungiblePositionManager is
 
     /// @notice Returns the duration of the liquidity lock period
     function liquidityLockPeriod() external view returns (uint32);
+
+    /// @notice Returns the timestamp when liquidity can be removed for a given token ID
+    function liquidityUnlockTime(uint256 tokenId) external view returns (uint32);
 
     /// @notice Returns true if the account is whitelisted
     /// @param account The address of the account
