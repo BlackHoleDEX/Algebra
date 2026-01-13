@@ -8,7 +8,7 @@ async function main() {
     // So we'll look at process.env.PLUGIN_ADDRESS or just parse argv for a 0x string.
 
 
-    const algebraPoolAddress = "0x1ec2D78ABe5a1b9bd8C4e56f0e67575DBec10E36";
+const algebraPoolAddress = "0x1ec2D78ABe5a1b9bd8C4e56f0e67575DBec10E36";
 
     // We assume the pool exposes a 'plugin' method or variable
     console.log(`Connecting to AlgebraPool at: ${algebraPoolAddress}`);
@@ -40,6 +40,8 @@ async function main() {
         const ENTRIES_TO_SHOW = currentIndex;
         console.log(`Fetching the last ${ENTRIES_TO_SHOW} entries...`);
 
+        const timepointsData = [];
+
         for (let i = 0; i < ENTRIES_TO_SHOW; i++) {
             // Calculate index respecting the circular buffer (mod 65536)
             let index = Number(currentIndex) - i;
@@ -61,7 +63,30 @@ async function main() {
             console.log(`Volatility Cumulative: ${timepoint.volatilityCumulative}`);
             console.log(`Tick Cumulative:       ${timepoint.tickCumulative}`);
             console.log(`Window Start Index:    ${timepoint.windowStartIndex}`);
+
+            const entry = {
+                index: index,
+                isLatest: i === 0,
+                timestamp: Number(timepoint.blockTimestamp),
+                timestampHuman: new Date(Number(timepoint.blockTimestamp) * 1000).toLocaleString(),
+                tick: Number(timepoint.tick),
+                averageTick: Number(timepoint.averageTick),
+                volatilityCumulative: timepoint.volatilityCumulative.toString(),
+                tickCumulative: timepoint.tickCumulative.toString(),
+                windowStartIndex: Number(timepoint.windowStartIndex)
+            };
+
+            timepointsData.push(entry);
+
+            console.log(`Read index ${index}...`);
         }
+
+        const fs = require('fs');
+        const path = require('path');
+        const outputPath = path.join(__dirname, 'timepoints_data.json');
+
+        fs.writeFileSync(outputPath, JSON.stringify(timepointsData, null, 2));
+        console.log(`\nSuccessfully wrote ${timepointsData.length} timepoints to: ${outputPath}`);
 
     } catch (error) {
         console.error("\nError feching data:", error.message);
