@@ -505,11 +505,10 @@ contract NonfungiblePositionManager is
             IAlgebraFactory(factory).hasRoleOrOwner(NONFUNGIBLE_POSITION_MANAGER_ADMINISTRATOR_ROLE, msg.sender),
             'NA'
         );
-        require(_liquidityLockPeriod <= MAX_LIQUIDITY_LOCK_PERIOD, 'Lock period too long');
-        if (!liquidityLockSettingDisabled) {
-            liquidityLockPeriod = _liquidityLockPeriod;
-            emit LiquidityLockPeriodChanged(_liquidityLockPeriod);
-        }
+        require(_liquidityLockPeriod <= MAX_LIQUIDITY_LOCK_PERIOD, 'LOCK_PERIOD_TOO_LONG');
+        require(!liquidityLockSettingDisabled, 'LOCK_PERIOD_SETTING_DISABLED');
+        liquidityLockPeriod = _liquidityLockPeriod;
+        emit LiquidityLockPeriodChanged(_liquidityLockPeriod);
     }
 
     /// @inheritdoc INonfungiblePositionManager
@@ -521,6 +520,7 @@ contract NonfungiblePositionManager is
         liquidityLockSettingDisabled = true;
         liquidityLockPeriod = 0;
         emit LiquidityLockSettingDisabled();
+        emit LiquidityLockPeriodChanged(liquidityLockPeriod);
     }
 
     /// @inheritdoc INonfungiblePositionManager
