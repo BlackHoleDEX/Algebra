@@ -54,7 +54,10 @@ contract NonfungiblePositionManager is
         keccak256('NONFUNGIBLE_POSITION_MANAGER_ADMINISTRATOR_ROLE');
 
     /// @dev The maximum allowed liquidity lock period
-    uint32 private constant MAX_LIQUIDITY_LOCK_PERIOD = 1 days;
+    uint32 private constant MAX_LIQUIDITY_LOCK_PERIOD = 10 minutes;
+
+    /// @inheritdoc INonfungiblePositionManager
+    bool public override liquidityLockSettingDisabled;
 
     /// @inheritdoc INonfungiblePositionManager
     address public override farmingCenter;
@@ -503,8 +506,21 @@ contract NonfungiblePositionManager is
             'NA'
         );
         require(_liquidityLockPeriod <= MAX_LIQUIDITY_LOCK_PERIOD, 'Lock period too long');
-        liquidityLockPeriod = _liquidityLockPeriod;
-        emit LiquidityLockPeriodChanged(_liquidityLockPeriod);
+        if (!liquidityLockSettingDisabled) {
+            liquidityLockPeriod = _liquidityLockPeriod;
+            emit LiquidityLockPeriodChanged(_liquidityLockPeriod);
+        }
+    }
+
+    /// @inheritdoc INonfungiblePositionManager
+    function permanentlyDisableLiquidityLock() external override {
+        require(
+            IAlgebraFactory(factory).hasRoleOrOwner(NONFUNGIBLE_POSITION_MANAGER_ADMINISTRATOR_ROLE, msg.sender),
+            'NA'
+        );
+        liquidityLockSettingDisabled = true;
+        liquidityLockPeriod = 0;
+        emit LiquidityLockSettingDisabled();
     }
 
     /// @inheritdoc INonfungiblePositionManager
