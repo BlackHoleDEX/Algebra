@@ -98,3 +98,8 @@ $ node scripts/deployAll.js <network>
 
 ## Transfer ownership (from deployer)
 npx hardhat run --network <network> scripts/transferOwnership.js -- <network> 
+
+## To run tests for core to pass 
+update the INIT_DEFAULT_FEE to following value
+uint16 internal constant INIT_DEFAULT_FEE = 0.05e4;
+as well as update the value of INIT_DEFAULT_TICK_SPACING to 60
