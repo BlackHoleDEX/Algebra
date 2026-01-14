@@ -9,3 +9,4 @@ bytecode
 **/coverage
 **/crytic-export
 **/coverage.json
+.DS_Store
