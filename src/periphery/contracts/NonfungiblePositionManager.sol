@@ -367,7 +367,7 @@ contract NonfungiblePositionManager is
         require(positionLiquidity >= params.liquidity);
 
         if (!isWhitelisted[msg.sender]) {
-            require(_blockTimestamp() >= uint256(liquidityUnlockTime[params.tokenId]), 'Liquidity is locked');
+            require(_blockTimestamp() >= uint256(liquidityUnlockTime[params.tokenId]), 'LL');
         }
 
         IAlgebraPool pool = IAlgebraPool(_getPoolById(poolId));
@@ -520,6 +520,7 @@ contract NonfungiblePositionManager is
         );
         liquidityLockSettingDisabled = true;
         liquidityLockPeriod = 0;
+        emit LiquidityLockPeriodChanged(liquidityLockPeriod);
         emit LiquidityLockSettingDisabled();
     }
 
