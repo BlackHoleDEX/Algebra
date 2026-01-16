@@ -264,8 +264,10 @@ contract NonfungiblePositionManager is
 
     /// @dev Updates the liquidity unlock time for a position
     function _updateLiquidityUnlockTime(uint256 tokenId) private {
-        liquidityUnlockTime[tokenId] = uint32(_blockTimestamp() + liquidityLockPeriod);
-        emit LiquidityUnlockTimeUpdated(tokenId, liquidityUnlockTime[tokenId]);
+        if (liquidityLockPeriod > 0) {
+            liquidityUnlockTime[tokenId] = uint32(_blockTimestamp() + liquidityLockPeriod);
+            emit LiquidityUnlockTimeUpdated(tokenId, liquidityUnlockTime[tokenId]);
+        }
     }
 
     /// @inheritdoc INonfungiblePositionManager
