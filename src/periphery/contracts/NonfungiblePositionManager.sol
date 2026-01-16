@@ -366,7 +366,7 @@ contract NonfungiblePositionManager is
         );
         require(positionLiquidity >= params.liquidity);
 
-        if (!isWhitelisted[msg.sender]) {
+        if (!isWhitelisted[msg.sender] && liquidityLockPeriod > 0) {
             require(_blockTimestamp() >= uint256(liquidityUnlockTime[params.tokenId]), 'LL');
         }
 
