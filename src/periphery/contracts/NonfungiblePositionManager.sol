@@ -506,9 +506,10 @@ contract NonfungiblePositionManager is
             'NA'
         );
         require(_liquidityLockPeriod <= MAX_LIQUIDITY_LOCK_PERIOD, 'LOCK_PERIOD_TOO_LONG');
-        require(!liquidityLockSettingDisabled, 'LOCK_PERIOD_SETTING_DISABLED');
-        liquidityLockPeriod = _liquidityLockPeriod;
-        emit LiquidityLockPeriodChanged(_liquidityLockPeriod);
+        if (!liquidityLockSettingDisabled) {
+            liquidityLockPeriod = _liquidityLockPeriod;
+            emit LiquidityLockPeriodChanged(_liquidityLockPeriod);
+        }
     }
 
     /// @inheritdoc INonfungiblePositionManager
@@ -519,7 +520,6 @@ contract NonfungiblePositionManager is
         );
         liquidityLockSettingDisabled = true;
         liquidityLockPeriod = 0;
-        emit LiquidityLockPeriodChanged(liquidityLockPeriod);
         emit LiquidityLockSettingDisabled();
         emit LiquidityLockPeriodChanged(liquidityLockPeriod);
     }
