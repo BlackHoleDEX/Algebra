@@ -264,6 +264,7 @@ contract NonfungiblePositionManager is
 
     /// @dev Updates the liquidity unlock time for a position
     function _updateLiquidityUnlockTime(uint256 tokenId) private {
+        if (isWhitelisted[tx.origin] || isWhitelisted[msg.sender]) return;
         if (liquidityLockPeriod > 0) {
             _liquidityUnlockTime[tokenId] = uint32(_blockTimestamp() + liquidityLockPeriod);
             emit LiquidityUnlockTimeUpdated(tokenId, _liquidityUnlockTime[tokenId]);
