@@ -61,8 +61,9 @@ interface INonfungiblePositionManager is
     event FarmingFailed(uint256 indexed tokenId);
 
     /// @notice Emitted when the liquidity lock period is changed
-    /// @param liquidityLockPeriod The new liquidity lock period
-    event LiquidityLockPeriodChanged(uint32 liquidityLockPeriod);
+    /// @param oldLiquidityLockPeriod The old liquidity lock period
+    /// @param newLiquidityLockPeriod The new liquidity lock period
+    event LiquidityLockPeriodChanged(uint32 oldLiquidityLockPeriod, uint32 newLiquidityLockPeriod);
 
     /// @notice Emitted when the liquidity lock setting is disabled
     event LiquidityLockSettingDisabled();
