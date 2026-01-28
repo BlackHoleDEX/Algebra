@@ -539,6 +539,12 @@ async function generatePngs() {
     const height = 600;
     const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height, backgroundColour: 'white' });
 
+    const latestPrice = ticks[ticks.length - 1];
+    const latestVol = avgVolatility24h[avgVolatility24h.length - 1];
+    const latestFee = calculatedFees[calculatedFees.length - 1];
+    const latestTime = labels[labels.length - 1];
+
+
     // 1. Price Chart PNG
     const priceChartConfig = {
         type: 'line',
@@ -561,7 +567,7 @@ async function generatePngs() {
             ]
         },
         options: {
-            plugins: { title: { display: true, text: 'Price vs Average Price' } }
+            plugins: { title: { display: true, text: `Price vs Avg Price (Latest: ${latestPrice})`, font: { size: 18 } } }
         }
     };
 
@@ -583,7 +589,7 @@ async function generatePngs() {
             ]
         },
         options: {
-            plugins: { title: { display: true, text: '24-Hour Average Volatility' } }
+            plugins: { title: { display: true, text: `24h Avg Volatility (Latest: ${latestVol.toFixed(2)})`, font: { size: 18 } } }
         }
     };
 
@@ -606,7 +612,7 @@ async function generatePngs() {
             ]
         },
         options: {
-            plugins: { title: { display: true, text: 'Adaptive Fee over Time' } },
+            plugins: { title: { display: true, text: `Adaptive Fee (Latest: ${latestFee.toFixed(4)}%)`, font: { size: 18 } } },
             scales: { y: { beginAtZero: true, title: { display: true, text: 'Fee (%)' } } }
         }
     };
@@ -625,7 +631,20 @@ async function generatePngs() {
 }
 
 generatePngs().then(() => {
-    console.log(`\nOUTPUT_FILE_HTML=${htmlPath}`);
+    const latestPrice = ticks[ticks.length - 1];
+    const latestVol = avgVolatility24h[avgVolatility24h.length - 1];
+    const latestFee = calculatedFees[calculatedFees.length - 1];
+
+    console.log(`\n========================================`);
+    console.log(`  CURRENT POOL STATS`);
+    console.log(`========================================`);
+    console.log(`  Latest Price:     ${latestPrice}`);
+    console.log(`  24h Avg Vol:      ${latestVol.toFixed(2)}`);
+    console.log(`  Adaptive Fee:     ${latestFee.toFixed(4)}%`);
+    console.log(`  Last Updated:     ${labels[labels.length - 1]}`);
+    console.log(`========================================\n`);
+
+    console.log(`OUTPUT_FILE_HTML=${htmlPath}`);
     console.log(`OUTPUT_FILE_PRICE_PNG=${pricePngPath}`);
     console.log(`OUTPUT_FILE_VOL_PNG=${volPngPath}`);
     console.log(`OUTPUT_FILE_FEE_PNG=${feePngPath}`);
