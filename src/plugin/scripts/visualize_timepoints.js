@@ -19,7 +19,7 @@ const labels = timepoints.map(t => new Date(t.timestamp * 1000).toLocaleString()
 const ticks = timepoints.map(t => t.tick);
 const averageTicks = timepoints.map(t => t.averageTick);
 
-const WINDOW = 300; // 24 hours
+const WINDOW = 86400; // 24 hours
 
 // Mirroring the struct layout
 function Timepoint(data) {
@@ -283,14 +283,18 @@ function getAverageVolatility(
             let startPoint = self[Number(windowStartIndex) % 65536];
             let startPointNext = self[Number(windowStartIndex + 1n) % 65536];
 
-            let startTimestamp = startPoint.blockTimestamp;
-            cumulativeVolatilityAtStart = startPoint.volatilityCumulative;
+            if (startPoint && startPoint.initialized && startPointNext && startPointNext.initialized) {
+                let startTimestamp = startPoint.blockTimestamp;
+                cumulativeVolatilityAtStart = startPoint.volatilityCumulative;
 
-            const timeDeltaBetweenPoints = BigInt(startPointNext.blockTimestamp - startTimestamp);
+                const timeDeltaBetweenPoints = BigInt(startPointNext.blockTimestamp - startTimestamp);
 
-            cumulativeVolatilityAtStart +=
-                ((startPointNext.volatilityCumulative - cumulativeVolatilityAtStart) * BigInt(currentTime - WINDOW - startTimestamp)) /
-                timeDeltaBetweenPoints;
+                cumulativeVolatilityAtStart +=
+                    ((startPointNext.volatilityCumulative - cumulativeVolatilityAtStart) * BigInt(currentTime - WINDOW - startTimestamp)) /
+                    timeDeltaBetweenPoints;
+            } else {
+                cumulativeVolatilityAtStart = _getVolatilityCumulativeAt(self, currentTime, WINDOW, tick, lastIndex, oldestIndex);
+            }
         } else {
             cumulativeVolatilityAtStart = _getVolatilityCumulativeAt(self, currentTime, WINDOW, tick, lastIndex, oldestIndex);
         }
@@ -341,6 +345,68 @@ for (let i = 0; i < mappedTimepoints.length; i++) {
     avgVolatility24h.push(val);
 }
 
+// Fee Calculation Logic
+function expXg4_fee(x, g, gHighestDegree) {
+    let closestValue;
+    let xdg = Math.floor(x / g);
+    switch (xdg) {
+        case 0: closestValue = BigInt("100000000000000000000"); break;
+        case 1: closestValue = BigInt("271828182845904523536"); break;
+        case 2: closestValue = BigInt("738905609893065022723"); break;
+        case 3: closestValue = BigInt("2008553692318766774092"); break;
+        case 4: closestValue = BigInt("5459815003314423907811"); break;
+        default: closestValue = BigInt("14841315910257660342111"); break;
+    }
+    x = x % g;
+    let bg = BigInt(g);
+    let bx = BigInt(x);
+    if (bx >= bg / 2n) {
+        bx -= bg / 2n;
+        closestValue = (closestValue * BigInt("164872127070012814684")) / BigInt(1e20);
+    }
+    let xLowestDegree = bx;
+    let res = BigInt(gHighestDegree);
+    let gHD = BigInt(gHighestDegree);
+    gHD /= bg;
+    res += xLowestDegree * gHD;
+    gHD /= bg;
+    xLowestDegree *= bx;
+    res += (xLowestDegree * gHD) / 2n;
+    gHD /= bg;
+    xLowestDegree *= bx;
+    res += (xLowestDegree * bg * 4n + xLowestDegree * bx) / 24n;
+    res = (res * closestValue) / BigInt(1e20);
+    return res;
+}
+
+function sigmoid_fee(x, g, alpha, beta) {
+    x = BigInt(x); g = BigInt(g); alpha = BigInt(alpha); beta = BigInt(beta);
+    if (x > beta) {
+        let diff = x - beta;
+        if (diff >= 6n * g) return alpha;
+        let g4 = g ** 4n;
+        let ex = expXg4_fee(Number(diff), Number(g), g4);
+        return (alpha * ex) / (g4 + ex);
+    } else {
+        let diff = beta - x;
+        if (diff >= 6n * g) return 0n;
+        let g4 = g ** 4n;
+        let ex = g4 + expXg4_fee(Number(diff), Number(g), g4);
+        return (alpha * g4) / ex;
+    }
+}
+
+const feeConfig = {
+    alpha1: 4500, alpha2: 15000, beta1: 1667, beta2: 6000,
+    gamma1: 400, gamma2: 500, baseFee: 500
+};
+
+const calculatedFees = avgVolatility24h.map(vol => {
+    let normalizedVol = Math.floor(vol / 15);
+    let s1 = sigmoid_fee(normalizedVol, feeConfig.gamma1, feeConfig.alpha1, feeConfig.beta1);
+    let s2 = sigmoid_fee(normalizedVol, feeConfig.gamma2, feeConfig.alpha2, feeConfig.beta2);
+    return Number(BigInt(feeConfig.baseFee) + s1 + s2) / 10000;
+});
 
 const htmlContent = `
 <!DOCTYPE html>
@@ -361,16 +427,19 @@ const htmlContent = `
         
         <canvas id="priceChart"></canvas>
         <canvas id="volChart"></canvas>
+        <canvas id="feeChart"></canvas>
     </div>
 
     <script>
         const ctxPrice = document.getElementById('priceChart').getContext('2d');
         const ctxVol = document.getElementById('volChart').getContext('2d');
+        const ctxFee = document.getElementById('feeChart').getContext('2d');
 
         const labels = ${JSON.stringify(labels)};
         const ticks = ${JSON.stringify(ticks)};
         const averageTicks = ${JSON.stringify(averageTicks)};
         const volatility = ${JSON.stringify(avgVolatility24h)};
+        const fees = ${JSON.stringify(calculatedFees)};
 
         new Chart(ctxPrice, {
             type: 'line',
@@ -402,7 +471,7 @@ const htmlContent = `
         });
 
         new Chart(ctxVol, {
-            type: 'line', // Changed to line for tracking average
+            type: 'line',
             data: {
                 labels: labels,
                 datasets: [{
@@ -417,6 +486,27 @@ const htmlContent = `
             options: {
                 responsive: true,
                 plugins: { title: { display: true, text: '24-Hour Average Volatility' } }
+            }
+        });
+
+        new Chart(ctxFee, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Calculated Fee (%)',
+                    data: fees,
+                    backgroundColor: 'rgba(255, 159, 64, 0.5)',
+                    borderColor: 'rgb(255, 159, 64)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { title: { display: true, text: 'Adaptive Fee over Time' } },
+                scales: { y: { beginAtZero: true, title: { display: true, text: 'Fee (%)' } } }
             }
         });
     </script>

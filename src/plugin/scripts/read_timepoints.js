@@ -8,7 +8,7 @@ async function main() {
     // So we'll look at process.env.PLUGIN_ADDRESS or just parse argv for a 0x string.
 
 
-const algebraPoolAddress = "0x1ec2D78ABe5a1b9bd8C4e56f0e67575DBec10E36";
+    const algebraPoolAddress = "0xbCf4A97e83eBF99C06Caa904db6bee53025e804F";
 
     // We assume the pool exposes a 'plugin' method or variable
     console.log(`Connecting to AlgebraPool at: ${algebraPoolAddress}`);
@@ -37,7 +37,7 @@ const algebraPoolAddress = "0x1ec2D78ABe5a1b9bd8C4e56f0e67575DBec10E36";
         console.log(`\nLatest Timepoint Index (Cursor): ${currentIndex}`);
 
         // 2. Read the last 5 timepoints to show the history
-        const ENTRIES_TO_SHOW = currentIndex;
+        const ENTRIES_TO_SHOW = Number(currentIndex) + 1;
         console.log(`Fetching the last ${ENTRIES_TO_SHOW} entries...`);
 
         const timepointsData = [];
