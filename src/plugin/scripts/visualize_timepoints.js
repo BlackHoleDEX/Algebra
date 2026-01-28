@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { ChartJSNodeCanvas } = require('chartjs-node-canvas');
 
 // Get pool address from environment variable or default
 const POOL_ADDRESS = process.env.POOL_ADDRESS || "0xbCf4A97e83eBF99C06Caa904db6bee53025e804F";
@@ -7,6 +8,9 @@ const POOL_ADDRESS = process.env.POOL_ADDRESS || "0xbCf4A97e83eBF99C06Caa904db6b
 // Input/Output paths include pool address
 const dataPath = process.env.INPUT_FILE || path.join(__dirname, `timepoints_${POOL_ADDRESS}.json`);
 const htmlPath = process.env.OUTPUT_FILE || path.join(__dirname, `volatility_chart_${POOL_ADDRESS}.html`);
+const pricePngPath = path.join(__dirname, `volatility_chart_${POOL_ADDRESS}_price.png`);
+const volPngPath = path.join(__dirname, `volatility_chart_${POOL_ADDRESS}_volatility.png`);
+const feePngPath = path.join(__dirname, `volatility_chart_${POOL_ADDRESS}_fee.png`);
 
 console.log(`\n========================================`);
 console.log(`  Visualize Timepoints Script`);
@@ -527,6 +531,105 @@ const htmlContent = `
 `;
 
 fs.writeFileSync(htmlPath, htmlContent);
-console.log(`\n✅ Chart generated at: ${htmlPath}`);
-console.log(`\nOUTPUT_FILE=${htmlPath}`);
-console.log(`POOL_ADDRESS=${POOL_ADDRESS}`);
+console.log(`\n✅ HTML Chart generated at: ${htmlPath}`);
+
+// PNG Generation Setup
+async function generatePngs() {
+    const width = 1200;
+    const height = 600;
+    const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height, backgroundColour: 'white' });
+
+    // 1. Price Chart PNG
+    const priceChartConfig = {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Tick (Spot Price)',
+                    data: ticks,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1,
+                },
+                {
+                    label: 'Average Tick (24h Avg)',
+                    data: averageTicks,
+                    borderColor: 'rgb(255, 99, 132)',
+                    borderDash: [5, 5],
+                    tension: 0.1,
+                }
+            ]
+        },
+        options: {
+            plugins: { title: { display: true, text: 'Price vs Average Price' } }
+        }
+    };
+
+    // 2. Volatility Chart PNG
+    const volChartConfig = {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: '24h Average Volatility',
+                    data: avgVolatility24h,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgb(54, 162, 235)',
+                    borderWidth: 2,
+                    fill: true,
+                    pointRadius: 0
+                }
+            ]
+        },
+        options: {
+            plugins: { title: { display: true, text: '24-Hour Average Volatility' } }
+        }
+    };
+
+    // 3. Fee Chart PNG
+    const feeChartConfig = {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Calculated Fee (%)',
+                    data: calculatedFees,
+                    backgroundColor: 'rgba(255, 159, 64, 0.5)',
+                    borderColor: 'rgb(255, 159, 64)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0
+                }
+            ]
+        },
+        options: {
+            plugins: { title: { display: true, text: 'Adaptive Fee over Time' } },
+            scales: { y: { beginAtZero: true, title: { display: true, text: 'Fee (%)' } } }
+        }
+    };
+
+    const priceBuffer = await chartJSNodeCanvas.renderToBuffer(priceChartConfig);
+    fs.writeFileSync(pricePngPath, priceBuffer);
+    console.log(`✅ Price PNG generated at: ${pricePngPath}`);
+
+    const volBuffer = await chartJSNodeCanvas.renderToBuffer(volChartConfig);
+    fs.writeFileSync(volPngPath, volBuffer);
+    console.log(`✅ Volatility PNG generated at: ${volPngPath}`);
+
+    const feeBuffer = await chartJSNodeCanvas.renderToBuffer(feeChartConfig);
+    fs.writeFileSync(feePngPath, feeBuffer);
+    console.log(`✅ Fee PNG generated at: ${feePngPath}`);
+}
+
+generatePngs().then(() => {
+    console.log(`\nOUTPUT_FILE_HTML=${htmlPath}`);
+    console.log(`OUTPUT_FILE_PRICE_PNG=${pricePngPath}`);
+    console.log(`OUTPUT_FILE_VOL_PNG=${volPngPath}`);
+    console.log(`OUTPUT_FILE_FEE_PNG=${feePngPath}`);
+    console.log(`POOL_ADDRESS=${POOL_ADDRESS}`);
+}).catch(err => {
+    console.error("Error generating PNGs:", err);
+});
