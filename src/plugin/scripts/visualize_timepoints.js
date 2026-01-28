@@ -1,11 +1,22 @@
 const fs = require('fs');
 const path = require('path');
 
-const dataPath = path.join(__dirname, 'timepoints_data.json');
-const htmlPath = path.join(__dirname, 'volatility_chart.html');
+// Get pool address from environment variable or default
+const POOL_ADDRESS = process.env.POOL_ADDRESS || "0xbCf4A97e83eBF99C06Caa904db6bee53025e804F";
+
+// Input/Output paths include pool address
+const dataPath = process.env.INPUT_FILE || path.join(__dirname, `timepoints_${POOL_ADDRESS}.json`);
+const htmlPath = process.env.OUTPUT_FILE || path.join(__dirname, `volatility_chart_${POOL_ADDRESS}.html`);
+
+console.log(`\n========================================`);
+console.log(`  Visualize Timepoints Script`);
+console.log(`========================================`);
+console.log(`Pool Address: ${POOL_ADDRESS}`);
+console.log(`Input File: ${dataPath}`);
+console.log(`Output File: ${htmlPath}\n`);
 
 if (!fs.existsSync(dataPath)) {
-    console.error("Error: timepoints_data.json not found. Run read_timepoints.js first.");
+    console.error(`Error: ${dataPath} not found. Run read_timepoints.js first with POOL_ADDRESS=${POOL_ADDRESS}`);
     process.exit(1);
 }
 
@@ -515,4 +526,6 @@ const htmlContent = `
 `;
 
 fs.writeFileSync(htmlPath, htmlContent);
-console.log("Chart generated at:", htmlPath);
+console.log(`\n✅ Chart generated at: ${htmlPath}`);
+console.log(`\nOUTPUT_FILE=${htmlPath}`);
+console.log(`POOL_ADDRESS=${POOL_ADDRESS}`);

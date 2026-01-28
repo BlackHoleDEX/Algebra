@@ -1,14 +1,27 @@
 const { ethers } = require("hardhat");
+const fs = require('fs');
+const path = require('path');
+
+// Get pool address from: 1) CLI arg, 2) env var, 3) default
+function getPoolAddress() {
+    // Check for CLI argument (look for 0x... pattern)
+    const cliArg = process.argv.find(arg => arg.startsWith('0x') && arg.length === 42);
+    if (cliArg) return cliArg;
+
+    // Check environment variable
+    if (process.env.POOL_ADDRESS) return process.env.POOL_ADDRESS;
+
+    // Default fallback
+    return "0xbCf4A97e83eBF99C06Caa904db6bee53025e804F";
+}
 
 async function main() {
-    // Get the plugin address from arguments
-    // Since hardhat puts network args in process.argv, we look for the first arg that looks like an address
-    // or just assume it's passed differently. Easiest is to look for the last arg or specific flag.
-    // However, clean usage with hardhat run is: `npx hardhat run script.js --network localhost` (no args support easily without parsing)
-    // So we'll look at process.env.PLUGIN_ADDRESS or just parse argv for a 0x string.
+    const algebraPoolAddress = getPoolAddress();
 
-
-    const algebraPoolAddress = "0xbCf4A97e83eBF99C06Caa904db6bee53025e804F";
+    console.log(`\n========================================`);
+    console.log(`  Read Timepoints Script`);
+    console.log(`========================================`);
+    console.log(`Pool Address: ${algebraPoolAddress}\n`);
 
     // We assume the pool exposes a 'plugin' method or variable
     console.log(`Connecting to AlgebraPool at: ${algebraPoolAddress}`);
@@ -81,12 +94,16 @@ async function main() {
             console.log(`Read index ${index}...`);
         }
 
-        const fs = require('fs');
-        const path = require('path');
-        const outputPath = path.join(__dirname, 'timepoints_data.json');
+        // Output filename includes pool address for Jenkins
+        const outputFilename = `timepoints_${algebraPoolAddress}.json`;
+        const outputPath = path.join(__dirname, outputFilename);
 
         fs.writeFileSync(outputPath, JSON.stringify(timepointsData, null, 2));
-        console.log(`\nSuccessfully wrote ${timepointsData.length} timepoints to: ${outputPath}`);
+        console.log(`\n✅ Successfully wrote ${timepointsData.length} timepoints to: ${outputPath}`);
+
+        // Also output the path for downstream scripts
+        console.log(`\nOUTPUT_FILE=${outputPath}`);
+        console.log(`POOL_ADDRESS=${algebraPoolAddress}`);
 
     } catch (error) {
         console.error("\nError feching data:", error.message);
