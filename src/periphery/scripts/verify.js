@@ -1,4 +1,4 @@
-const hre = require("hardhat");
+const hre = require('hardhat');
 const fs = require('fs');
 const path = require('path');
 
@@ -54,9 +54,15 @@ async function main() {
   });
 
   // Verify NFTDescriptor
-  await verifyContract('NFTDescriptor', {
+  await verifyContract('NonfungibleTokenPositionDescriptor', {
     address: deploysData.nftDescriptor,
     constructorArguments: [deploysData.wrapped, 'ETH', []],
+  });
+
+  // Verify NFTDescriptorLibrary
+  await verifyContract('NFTDescriptor', {
+    address: deploysData.nftDescriptorLibrary,
+    constructorArguments: [],
   });
 
   // Verify NonfungiblePositionManager

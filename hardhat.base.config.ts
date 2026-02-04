@@ -96,6 +96,11 @@ export default {
       chainId: 11155111,
       accounts: [`0x${MNEMONIC}`],
     },
+    sepoliaMocknet: {
+      url: `https://bitter-solitary-frost.ethereum-sepolia.quiknode.pro/ca090f980f3013fc7d11ecfb8812b0a99894f408/`,
+      chainId: 11155111,
+      accounts: [`0x${MNEMONIC}`],
+    },
     blastTestnet: {
       url: `https://blast-sepolia.blockpi.network/v1/rpc/public`,
       chainId: 168587773,
@@ -174,6 +179,14 @@ export default {
       },
       {
         network: 'sepoliaDevnet',
+        chainId: 11155111,
+        urls: {
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=11155111',
+          browserURL: 'https://sepolia.etherscan.io',
+        },
+      },
+      {
+        network: 'sepoliaMocknet',
         chainId: 11155111,
         urls: {
           apiURL: 'https://api.etherscan.io/v2/api?chainid=11155111',
