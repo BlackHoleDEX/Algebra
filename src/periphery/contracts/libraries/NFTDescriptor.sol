@@ -102,7 +102,7 @@ library NFTDescriptor {
         return
             string(
                 abi.encodePacked(
-                    'This NFT represents a liquidity position in a Algebra ',
+                    'This NFT represents a liquidity position in a Supernova ',
                     quoteTokenSymbol,
                     '-',
                     baseTokenSymbol,
@@ -143,7 +143,7 @@ library NFTDescriptor {
         return
             string(
                 abi.encodePacked(
-                    'Algebra - ',
+                    'Supernova - ',
                     escapeQuotes(params.quoteTokenSymbol),
                     '/',
                     escapeQuotes(params.baseTokenSymbol),
