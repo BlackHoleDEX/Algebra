@@ -1,7 +1,6 @@
 const path = require('path');
 const config = require('dotenv').config({ path: path.resolve(__dirname, '.env') });
-const { ETHERSCAN_API_KEY, BSCSCAN_API_KEY, POLYGONSCAN_API_KEY, DEPLOY_GAS_LIMIT_MAX, DEPLOY_GAS_PRICE, INFURA_ID_PROJECT } =
-  config.parsed || {};
+const { ETHERSCAN_API_KEY, BSCSCAN_API_KEY, POLYGONSCAN_API_KEY, DEPLOY_GAS_LIMIT_MAX, DEPLOY_GAS_PRICE, INFURA_ID_PROJECT } = config.parsed || {};
 
 const MNEMONIC = process.env.MNEMONIC;
 export default {
@@ -21,7 +20,7 @@ export default {
       gas: 10000000,
     },
     ethmainnet: {
-      url: `${process.env.RPC_URL??"https://ethereum.publicnode.com"}`, // Public Ethereum RPC
+      url: `${process.env.RPC_URL ?? 'https://ethereum.publicnode.com'}`, // Public Ethereum RPC
       chainId: 1,
       accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
       gas: 15_000_000,
@@ -143,13 +142,13 @@ export default {
   etherscan: {
     // Your API key for Etherscan
     // Obtain one at https://etherscan.io/
-    apiKey: `${process.env.APIKEY??"UNKNOWN"}`,
+    apiKey: `${process.env.APIKEY ?? 'UNKNOWN'}`,
     customChains: [
       {
         network: 'ethmainnet',
         chainId: 1,
         urls: {
-          apiURL: 'https://api.etherscan.io/api',
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=1',
           browserURL: 'https://etherscan.io',
         },
       },
