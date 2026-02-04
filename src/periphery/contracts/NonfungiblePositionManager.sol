@@ -54,7 +54,10 @@ contract NonfungiblePositionManager is
         keccak256('NONFUNGIBLE_POSITION_MANAGER_ADMINISTRATOR_ROLE');
 
     /// @dev The maximum allowed liquidity lock period
-    uint32 private constant MAX_LIQUIDITY_LOCK_PERIOD = 1 days;
+    uint32 private constant MAX_LIQUIDITY_LOCK_PERIOD = 10 minutes;
+
+    /// @inheritdoc INonfungiblePositionManager
+    bool public override liquidityLockSettingDisabled;
 
     /// @inheritdoc INonfungiblePositionManager
     address public override farmingCenter;
@@ -64,7 +67,7 @@ contract NonfungiblePositionManager is
 
     /// @inheritdoc INonfungiblePositionManager
     mapping(uint256 tokenId => address farmingCenterAddress) public tokenFarmedIn;
-    mapping(uint256 tokenId => uint32) public override liquidityUnlockTime;
+    mapping(uint256 tokenId => uint32) private _liquidityUnlockTime;
 
     /// @inheritdoc INonfungiblePositionManager
     uint32 public override liquidityLockPeriod;
@@ -261,8 +264,11 @@ contract NonfungiblePositionManager is
 
     /// @dev Updates the liquidity unlock time for a position
     function _updateLiquidityUnlockTime(uint256 tokenId) private {
-        liquidityUnlockTime[tokenId] = uint32(_blockTimestamp() + liquidityLockPeriod);
-        emit LiquidityUnlockTimeUpdated(tokenId, liquidityUnlockTime[tokenId]);
+        if (isWhitelisted[tx.origin] || isWhitelisted[msg.sender]) return;
+        if (liquidityLockPeriod > 0) {
+            _liquidityUnlockTime[tokenId] = uint32(_blockTimestamp() + liquidityLockPeriod);
+            emit LiquidityUnlockTimeUpdated(tokenId, _liquidityUnlockTime[tokenId]);
+        }
     }
 
     /// @inheritdoc INonfungiblePositionManager
@@ -363,8 +369,8 @@ contract NonfungiblePositionManager is
         );
         require(positionLiquidity >= params.liquidity);
 
-        if (!isWhitelisted[msg.sender]) {
-            require(_blockTimestamp() >= uint256(liquidityUnlockTime[params.tokenId]), 'Liquidity is locked');
+        if (!isWhitelisted[msg.sender] && liquidityLockPeriod > 0) {
+            require(_blockTimestamp() >= uint256(_liquidityUnlockTime[params.tokenId]), 'LL');
         }
 
         IAlgebraPool pool = IAlgebraPool(_getPoolById(poolId));
@@ -502,9 +508,25 @@ contract NonfungiblePositionManager is
             IAlgebraFactory(factory).hasRoleOrOwner(NONFUNGIBLE_POSITION_MANAGER_ADMINISTRATOR_ROLE, msg.sender),
             'NA'
         );
-        require(_liquidityLockPeriod <= MAX_LIQUIDITY_LOCK_PERIOD, 'Lock period too long');
-        liquidityLockPeriod = _liquidityLockPeriod;
-        emit LiquidityLockPeriodChanged(_liquidityLockPeriod);
+        require(_liquidityLockPeriod <= MAX_LIQUIDITY_LOCK_PERIOD, 'LOCK_PERIOD_TOO_LONG');
+        if (!liquidityLockSettingDisabled) {
+            uint32 oldLiquidityLockPeriod = liquidityLockPeriod;
+            liquidityLockPeriod = _liquidityLockPeriod;
+            emit LiquidityLockPeriodChanged(oldLiquidityLockPeriod, _liquidityLockPeriod);
+        }
+    }
+
+    /// @inheritdoc INonfungiblePositionManager
+    function permanentlyDisableLiquidityLock() external override {
+        require(
+            IAlgebraFactory(factory).hasRoleOrOwner(NONFUNGIBLE_POSITION_MANAGER_ADMINISTRATOR_ROLE, msg.sender),
+            'NA'
+        );
+        uint32 oldLiquidityLockPeriod = liquidityLockPeriod;
+        liquidityLockSettingDisabled = true;
+        liquidityLockPeriod = 0;
+        emit LiquidityLockSettingDisabled();
+        emit LiquidityLockPeriodChanged(oldLiquidityLockPeriod, 0);
     }
 
     /// @inheritdoc INonfungiblePositionManager
@@ -512,6 +534,12 @@ contract NonfungiblePositionManager is
         require(IAlgebraFactory(factory).hasRoleOrOwner(NONFUNGIBLE_POSITION_MANAGER_ADMINISTRATOR_ROLE, msg.sender));
         isWhitelisted[account] = status;
         emit WhitelistStatusChanged(account, status);
+    }
+
+    /// @inheritdoc INonfungiblePositionManager
+    function liquidityUnlockTime(uint256 tokenId) external view override returns (uint32) {
+        if (liquidityLockSettingDisabled || liquidityLockPeriod == 0) return 0;
+        return _liquidityUnlockTime[tokenId];
     }
 
     /// @inheritdoc IERC721Metadata

@@ -61,8 +61,12 @@ interface INonfungiblePositionManager is
     event FarmingFailed(uint256 indexed tokenId);
 
     /// @notice Emitted when the liquidity lock period is changed
-    /// @param liquidityLockPeriod The new liquidity lock period
-    event LiquidityLockPeriodChanged(uint32 liquidityLockPeriod);
+    /// @param oldLiquidityLockPeriod The old liquidity lock period
+    /// @param newLiquidityLockPeriod The new liquidity lock period
+    event LiquidityLockPeriodChanged(uint32 oldLiquidityLockPeriod, uint32 newLiquidityLockPeriod);
+
+    /// @notice Emitted when the liquidity lock setting is disabled
+    event LiquidityLockSettingDisabled();
 
     /// @notice Emitted when the whitelist status of a account is changed
     /// @param account The address of the account
@@ -245,6 +249,12 @@ interface INonfungiblePositionManager is
     /// @notice Sets the liquidity lock period
     /// @param _liquidityLockPeriod The new liquidity lock period
     function setLiquidityLockPeriod(uint32 _liquidityLockPeriod) external;
+
+    /// @notice Permanently disables the liquidity lock setting
+    function permanentlyDisableLiquidityLock() external;
+
+    /// @notice Returns true if the liquidity lock setting is disabled
+    function liquidityLockSettingDisabled() external view returns (bool);
 
     /// @notice Sets the whitelist status of an account
     /// @param account The address of the account
