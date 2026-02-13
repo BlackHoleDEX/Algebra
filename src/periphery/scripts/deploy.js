@@ -111,6 +111,7 @@ async function main() {
   const NFTDescriptorFactory = await hre.ethers.getContractFactory('NFTDescriptor');
   const feeData8 = await getFeeData();
   const NFTDescriptor = await NFTDescriptorFactory.deploy({ ...feeData8 });
+  deploysData.nftDescriptorLibrary = NFTDescriptor.target;
 
   await NFTDescriptor.waitForDeployment();
 
