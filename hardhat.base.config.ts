@@ -22,6 +22,7 @@ export default {
     },
     mainnet: {
       url: `https://ethereum-json-rpc.stakely.io`,
+      accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
     },
     ropsten: {
       url: `https://ropsten.infura.io/v3/${INFURA_ID_PROJECT}`,
