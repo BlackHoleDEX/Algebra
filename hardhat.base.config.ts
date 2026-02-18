@@ -21,7 +21,7 @@ export default {
       gas: 10000000,
     },
     mainnet: {
-      url: `https://mainnet.infura.io/v3/${INFURA_ID_PROJECT}`,
+      url: `https://ethereum-json-rpc.stakely.io`,
     },
     ropsten: {
       url: `https://ropsten.infura.io/v3/${INFURA_ID_PROJECT}`,
