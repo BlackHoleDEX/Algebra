@@ -21,7 +21,7 @@ export default {
       gas: 10000000,
     },
     mainnet: {
-      url: `https://ethereum-json-rpc.stakely.io`,
+      url: `https://lb.drpc.live/ethereum/AhWtsxH3UU0ouxmDERKpMgZ_Cc_4paER8IKjwg8TMB_n`,
       accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
     },
     ropsten: {
