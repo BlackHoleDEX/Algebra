@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat';
 import { Wallet } from 'ethers';
 import { loadFixture, impersonateAccount, stopImpersonatingAccount, setBalance } from '@nomicfoundation/hardhat-network-helpers';
-import { TestERC20, AlgebraEternalFarming, NftPosManagerMock, FarmingCenter } from '../../typechain';
+import { TestERC20, AlgebraEternalFarming, NftPosManagerMock, FarmingCenter, FarmingCenterV2 } from '../../typechain';
 import { algebraFixture, AlgebraFixtureType, mintPosition } from '../shared/fixtures';
 import {
   expect,
@@ -462,6 +462,33 @@ describe('unit/FarmingCenter', () => {
         },
         tokenIdEternal
       );
+    });
+
+    it('can exit in new farming center for legacy farm', async () => {
+      const farmingCenterFactory = await ethers.getContractFactory('FarmingCenterV2');
+      const farmingCenterV2 = (await farmingCenterFactory.deploy(
+        await context.eternalFarming.getAddress(),
+        await context.nft.getAddress()
+      )) as any as FarmingCenterV2;
+
+      await context.eternalFarming.setFarmingCenterAddress(farmingCenterV2);
+      await context.nft.setFarmingCenter(farmingCenterV2);
+      await context.pluginFactory.setFarmingAddress(farmingCenterV2);
+
+      await expect(
+        farmingCenterV2.connect(lpUser0).exitFarming(
+          {
+            rewardToken: context.rewardToken,
+            bonusRewardToken: context.bonusRewardToken,
+            pool: context.pool01,
+            nonce,
+          },
+          tokenIdEternal
+        )
+      ).to.not.be.reverted;
+
+      expect(await context.nft.tokenFarmedIn(tokenIdEternal)).to.be.eq(ZERO_ADDRESS);
+      expect(await farmingCenterV2.legacyExitCompleted(tokenIdEternal)).to.be.eq(true);
     });
   });
 
