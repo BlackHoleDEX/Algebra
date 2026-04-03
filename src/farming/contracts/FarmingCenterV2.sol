@@ -21,6 +21,8 @@ contract FarmingCenterV2 is IFarmingCenter, IPositionFollower, Multicall {
   INonfungiblePositionManager public immutable override nonfungiblePositionManager;
   /// @inheritdoc IFarmingCenter
   address public immutable override algebraPoolDeployer;
+  /// @notice Previous farming center address accepted for legacy exits
+  address public immutable legacyFarmingCenter;
 
   /// @inheritdoc IFarmingCenter
   mapping(address poolAddress => address virtualPoolAddress) public override virtualPoolAddresses;
@@ -35,10 +37,16 @@ contract FarmingCenterV2 is IFarmingCenter, IPositionFollower, Multicall {
 
   event LegacyExitCompleted(uint256 indexed tokenId, bytes32 indexed incentiveId, address indexed legacyFarmingCenter);
 
-  constructor(IAlgebraEternalFarming _eternalFarming, INonfungiblePositionManager _nonfungiblePositionManager) {
+  constructor(
+    IAlgebraEternalFarming _eternalFarming,
+    INonfungiblePositionManager _nonfungiblePositionManager,
+    address _legacyFarmingCenter
+  ) {
+    require(_legacyFarmingCenter != address(0), 'Zero legacy farming center');
     eternalFarming = _eternalFarming;
     nonfungiblePositionManager = _nonfungiblePositionManager;
     algebraPoolDeployer = _nonfungiblePositionManager.poolDeployer();
+    legacyFarmingCenter = _legacyFarmingCenter;
   }
 
   modifier isApprovedOrOwner(uint256 tokenId) {
@@ -66,9 +74,10 @@ contract FarmingCenterV2 is IFarmingCenter, IPositionFollower, Multicall {
 
   function _exitFarming(IncentiveKey memory key, uint256 tokenId, address tokenOwner) private {
     bytes32 incentiveId = IncentiveId.compute(key);
-    (bool isValidDeposit, bool isLegacyDeposit, address legacyFarmingCenter) = _resolveDepositSource(tokenId, incentiveId);
+    (bool isValidDeposit, bool isLegacyDeposit) = _resolveDepositSource(tokenId, incentiveId);
     require(isValidDeposit, 'Invalid incentiveId');
     if (isLegacyDeposit) {
+      require(!legacyExitCompleted[tokenId], 'Legacy exit already completed');
       legacyExitCompleted[tokenId] = true;
       emit LegacyExitCompleted(tokenId, incentiveId, legacyFarmingCenter);
     }
@@ -77,18 +86,18 @@ contract FarmingCenterV2 is IFarmingCenter, IPositionFollower, Multicall {
     IAlgebraEternalFarming(eternalFarming).exitFarming(key, tokenId, tokenOwner);
   }
 
-  function _resolveDepositSource(uint256 tokenId, bytes32 incentiveId) internal view returns (bool, bool, address) {
-    if (deposits[tokenId] == incentiveId) return (true, false, address(0));
+  function _resolveDepositSource(uint256 tokenId, bytes32 incentiveId) internal view returns (bool, bool) {
+    if (deposits[tokenId] == incentiveId) return (true, false);
 
-    address legacyFarmingCenter = nonfungiblePositionManager.tokenFarmedIn(tokenId);
-    if (legacyFarmingCenter == address(0) || legacyFarmingCenter == address(this) || legacyFarmingCenter.code.length == 0) {
-      return (false, false, address(0));
+    address tokenFarmedIn = nonfungiblePositionManager.tokenFarmedIn(tokenId);
+    if (tokenFarmedIn != legacyFarmingCenter) {
+      return (false, false);
     }
 
     (bool success, bytes memory returndata) = legacyFarmingCenter.staticcall(abi.encodeWithSelector(IFarmingCenter.deposits.selector, tokenId));
-    if (!success || returndata.length < 32) return (false, false, address(0));
+    if (!success || returndata.length < 32) return (false, false);
 
-    return (abi.decode(returndata, (bytes32)) == incentiveId, true, legacyFarmingCenter);
+    return (abi.decode(returndata, (bytes32)) == incentiveId, true);
   }
 
   function _switchFarmingStatusOff(uint256 tokenId) internal {

@@ -15,10 +15,17 @@ async function main() {
   if (!deploysData.eternal) throw new Error('deploys.json missing "eternal" address')
   if (!deploysData.nonfungiblePositionManager) throw new Error('deploys.json missing "nonfungiblePositionManager" address')
   if (!deploysData.BasePluginV1Factory) throw new Error('deploys.json missing "BasePluginV1Factory" address')
+  const legacyFarmingCenter = deploysData.fcV1 || deploysData.fc
+  if (!legacyFarmingCenter) throw new Error('deploys.json missing legacy farming center address ("fc" or "fcV1")')
 
   const FarmingCenterV2Factory = await hre.ethers.getContractFactory('FarmingCenterV2')
   const feeData1 = await getFeeData()
-  const farmingCenterV2 = await FarmingCenterV2Factory.deploy(deploysData.eternal, deploysData.nonfungiblePositionManager, { ...feeData1 })
+  const farmingCenterV2 = await FarmingCenterV2Factory.deploy(
+    deploysData.eternal,
+    deploysData.nonfungiblePositionManager,
+    legacyFarmingCenter,
+    { ...feeData1 }
+  )
   await farmingCenterV2.waitForDeployment()
   console.log('FarmingCenterV2 deployed to:', farmingCenterV2.target)
 
