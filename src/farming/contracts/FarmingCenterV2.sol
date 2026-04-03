@@ -46,15 +46,12 @@ contract FarmingCenterV2 is IFarmingCenter, IPositionFollower, Multicall {
   mapping(uint256 tokenId => uint256 enteredAt) public farmingEnteredAt;
 
   event LegacyExitCompleted(uint256 indexed tokenId, bytes32 indexed incentiveId, address indexed legacyFarmingCenter);
+  event FarmingEnteredAtUpdated(uint256 indexed tokenId, uint256 newTimestamp);
   event FarmingExitTimelockUpdated(uint256 oldTimelock, uint256 newTimelock);
   event OwnershipTransferStarted(address indexed previousOwner, address indexed newOwner);
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
-  constructor(
-    IAlgebraEternalFarming _eternalFarming,
-    INonfungiblePositionManager _nonfungiblePositionManager,
-    address _legacyFarmingCenter
-  ) {
+  constructor(IAlgebraEternalFarming _eternalFarming, INonfungiblePositionManager _nonfungiblePositionManager, address _legacyFarmingCenter) {
     require(_legacyFarmingCenter != address(0), 'Zero legacy farming center');
     eternalFarming = _eternalFarming;
     nonfungiblePositionManager = _nonfungiblePositionManager;
@@ -154,6 +151,10 @@ contract FarmingCenterV2 is IFarmingCenter, IPositionFollower, Multicall {
   /// @inheritdoc IPositionFollower
   function applyLiquidityDelta(uint256 tokenId, int256 liquidityDelta) external override {
     require(msg.sender == address(nonfungiblePositionManager), 'Only nonfungiblePosManager');
+    if (liquidityDelta > 0 && deposits[tokenId] != bytes32(0)) {
+      farmingEnteredAt[tokenId] = block.timestamp;
+      emit FarmingEnteredAtUpdated(tokenId, block.timestamp);
+    }
     if (liquidityDelta < 0 && deposits[tokenId] != bytes32(0)) {
       require(_isExitTimelockPassed(tokenId), 'Exit timelocked');
     }
