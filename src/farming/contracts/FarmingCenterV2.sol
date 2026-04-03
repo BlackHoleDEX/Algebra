@@ -19,6 +19,10 @@ contract FarmingCenterV2 is IFarmingCenter, IPositionFollower, Multicall {
   IAlgebraEternalFarming public immutable override eternalFarming;
   /// @inheritdoc IFarmingCenter
   INonfungiblePositionManager public immutable override nonfungiblePositionManager;
+  /// @notice Owner allowed to manage configurable params
+  address public owner;
+  /// @notice Pending owner that must accept ownership transfer
+  address public pendingOwner;
   /// @inheritdoc IFarmingCenter
   address public immutable override algebraPoolDeployer;
   /// @notice Previous farming center address accepted for legacy exits
@@ -34,8 +38,17 @@ contract FarmingCenterV2 is IFarmingCenter, IPositionFollower, Multicall {
   mapping(bytes32 incentiveId => IncentiveKey incentiveKey) public override incentiveKeys;
   /// @notice Marks tokenIds that were exited through legacy farming-center state
   mapping(uint256 tokenId => bool exitedViaLegacy) public legacyExitCompleted;
+  /// @notice Maximum allowed lock duration for farming exit timelock
+  uint256 public constant maxFarmingExitTimelock = 30 minutes;
+  /// @notice Lock duration applied after enterFarming before exits/liquidity removal are allowed
+  uint256 public farmingExitTimelock = 7 minutes;
+  /// @notice Timestamp when a tokenId last entered farming
+  mapping(uint256 tokenId => uint256 enteredAt) public farmingEnteredAt;
 
   event LegacyExitCompleted(uint256 indexed tokenId, bytes32 indexed incentiveId, address indexed legacyFarmingCenter);
+  event FarmingExitTimelockUpdated(uint256 oldTimelock, uint256 newTimelock);
+  event OwnershipTransferStarted(address indexed previousOwner, address indexed newOwner);
+  event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
   constructor(
     IAlgebraEternalFarming _eternalFarming,
@@ -47,11 +60,39 @@ contract FarmingCenterV2 is IFarmingCenter, IPositionFollower, Multicall {
     nonfungiblePositionManager = _nonfungiblePositionManager;
     algebraPoolDeployer = _nonfungiblePositionManager.poolDeployer();
     legacyFarmingCenter = _legacyFarmingCenter;
+    owner = msg.sender;
+    emit OwnershipTransferred(address(0), msg.sender);
   }
 
   modifier isApprovedOrOwner(uint256 tokenId) {
     require(nonfungiblePositionManager.isApprovedOrOwner(msg.sender, tokenId), 'Not approved for token');
     _;
+  }
+
+  modifier onlyOwner() {
+    require(msg.sender == owner, 'Only owner');
+    _;
+  }
+
+  function transferOwnership(address newOwner) external onlyOwner {
+    require(newOwner != address(0), 'Zero owner');
+    pendingOwner = newOwner;
+    emit OwnershipTransferStarted(owner, newOwner);
+  }
+
+  function acceptOwnership() external {
+    require(msg.sender == pendingOwner, 'Only pending owner');
+    address oldOwner = owner;
+    owner = pendingOwner;
+    pendingOwner = address(0);
+    emit OwnershipTransferred(oldOwner, owner);
+  }
+
+  function setFarmingExitTimelock(uint256 newTimelock) external onlyOwner {
+    require(newTimelock <= maxFarmingExitTimelock, 'Timelock too large');
+    uint256 oldTimelock = farmingExitTimelock;
+    farmingExitTimelock = newTimelock;
+    emit FarmingExitTimelockUpdated(oldTimelock, newTimelock);
   }
 
   /// @inheritdoc IFarmingCenter
@@ -62,6 +103,7 @@ contract FarmingCenterV2 is IFarmingCenter, IPositionFollower, Multicall {
     require(deposits[tokenId] == bytes32(0), 'Token already farmed');
     legacyExitCompleted[tokenId] = false;
     deposits[tokenId] = incentiveId;
+    farmingEnteredAt[tokenId] = block.timestamp;
     nonfungiblePositionManager.switchFarmingStatus(tokenId, true);
 
     IAlgebraEternalFarming(eternalFarming).enterFarming(key, tokenId);
@@ -76,6 +118,7 @@ contract FarmingCenterV2 is IFarmingCenter, IPositionFollower, Multicall {
     bytes32 incentiveId = IncentiveId.compute(key);
     (bool isValidDeposit, bool isLegacyDeposit) = _resolveDepositSource(tokenId, incentiveId);
     require(isValidDeposit, 'Invalid incentiveId');
+    require(_isExitTimelockPassed(tokenId), 'Exit timelocked');
     if (isLegacyDeposit) {
       require(!legacyExitCompleted[tokenId], 'Legacy exit already completed');
       legacyExitCompleted[tokenId] = true;
@@ -102,19 +145,22 @@ contract FarmingCenterV2 is IFarmingCenter, IPositionFollower, Multicall {
 
   function _switchFarmingStatusOff(uint256 tokenId) internal {
     deposits[tokenId] = bytes32(0);
+    farmingEnteredAt[tokenId] = 0;
     if (nonfungiblePositionManager.tokenFarmedIn(tokenId) == address(this) || nonfungiblePositionManager.farmingCenter() == address(this)) {
       nonfungiblePositionManager.switchFarmingStatus(tokenId, false);
     }
   }
 
   /// @inheritdoc IPositionFollower
-  function applyLiquidityDelta(uint256 tokenId, int256) external override {
+  function applyLiquidityDelta(uint256 tokenId, int256 liquidityDelta) external override {
+    require(msg.sender == address(nonfungiblePositionManager), 'Only nonfungiblePosManager');
+    if (liquidityDelta < 0 && deposits[tokenId] != bytes32(0)) {
+      require(_isExitTimelockPassed(tokenId), 'Exit timelocked');
+    }
     _updatePosition(tokenId);
   }
 
   function _updatePosition(uint256 tokenId) private {
-    require(msg.sender == address(nonfungiblePositionManager), 'Only nonfungiblePosManager');
-
     bytes32 _eternalIncentiveId = deposits[tokenId];
     if (_eternalIncentiveId != bytes32(0)) {
       address tokenOwner = nonfungiblePositionManager.ownerOf(tokenId);
@@ -139,6 +185,11 @@ contract FarmingCenterV2 is IFarmingCenter, IPositionFollower, Multicall {
         }
       }
     }
+  }
+
+  function _isExitTimelockPassed(uint256 tokenId) internal view returns (bool) {
+    uint256 enteredAt = farmingEnteredAt[tokenId];
+    return enteredAt == 0 || block.timestamp >= enteredAt + farmingExitTimelock;
   }
 
   /// @inheritdoc IFarmingCenter

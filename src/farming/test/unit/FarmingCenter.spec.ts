@@ -468,7 +468,8 @@ describe('unit/FarmingCenter', () => {
       const farmingCenterFactory = await ethers.getContractFactory('FarmingCenterV2');
       const farmingCenterV2 = (await farmingCenterFactory.deploy(
         await context.eternalFarming.getAddress(),
-        await context.nft.getAddress()
+        await context.nft.getAddress(),
+        await context.farmingCenter.getAddress()
       )) as any as FarmingCenterV2;
 
       await context.eternalFarming.setFarmingCenterAddress(farmingCenterV2);
