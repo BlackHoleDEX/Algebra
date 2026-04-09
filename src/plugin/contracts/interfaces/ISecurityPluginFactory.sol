@@ -4,28 +4,23 @@ pragma abicoder v2;
 
 import '@cryptoalgebra/integral-core/contracts/interfaces/plugin/IAlgebraPluginFactory.sol';
 
-/// @title The interface for the BasePluginV2Factory
-/// @notice This contract creates Algebra default plugins for Algebra liquidity pools
-interface IBasePluginV2Factory is IAlgebraPluginFactory {
-  /// @notice Emitted when the farming address is changed
-  /// @param newFarmingAddress The farming address after the address was changed
-  event FarmingAddress(address newFarmingAddress);
-
-  event DefaultBaseFee(uint16 newDefaultBaseFee);
+/// @title The interface for the SecurityPluginFactory
+interface ISecurityPluginFactory is IAlgebraPluginFactory {
+  /// @notice Emitted when the security registry address is changed
+  /// @param securityRegistry The security registry address after the address was changed
+  event SecurityRegistry(address securityRegistry);
 
   /// @notice The hash of 'ALGEBRA_BASE_PLUGIN_FACTORY_ADMINISTRATOR' used as role
-  /// @dev allows to change settings of BasePluginV2Factory
+  /// @dev allows to change settings of BasePluginV1Factory
   function ALGEBRA_BASE_PLUGIN_FACTORY_ADMINISTRATOR() external pure returns (bytes32);
 
   /// @notice Returns the address of AlgebraFactory
   /// @return The AlgebraFactory contract address
   function algebraFactory() external view returns (address);
 
-  /// @notice Returns current farming address
-  /// @return The farming contract address
-  function farmingAddress() external view returns (address);
-
-  function defaultBaseFee() external view returns (uint16);
+  /// @notice Returns current securityRegistry address
+  /// @return The securityRegistry contract address
+  function securityRegistry() external view returns (address);
 
   /// @notice Returns address of plugin created for given AlgebraPool
   /// @param pool The address of AlgebraPool
@@ -38,9 +33,7 @@ interface IBasePluginV2Factory is IAlgebraPluginFactory {
   /// @return The address of created plugin
   function createPluginForExistingPool(address token0, address token1) external returns (address);
 
-  /// @dev updates farmings manager address on the factory
-  /// @param newFarmingAddress The new tokenomics contract address
-  function setFarmingAddress(address newFarmingAddress) external;
-
-  function setDefaultBaseFee(uint16 newDefaultBaseFee) external;
+  /// @dev updates securoty registry address on the factory
+  /// @param newSecurityRegistry The new security registry contract address
+  function setSecurityRegistry(address newSecurityRegistry) external;
 }
