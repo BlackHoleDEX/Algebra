@@ -1,0 +1,654 @@
+const fs = require('fs');
+const path = require('path');
+const { ChartJSNodeCanvas } = require('chartjs-node-canvas');
+
+// Get pool address from environment variable or default
+const POOL_ADDRESS = process.env.POOL_ADDRESS || "0xbCf4A97e83eBF99C06Caa904db6bee53025e804F";
+
+// Input/Output paths include pool address
+const dataPath = process.env.INPUT_FILE || path.join(__dirname, `timepoints_${POOL_ADDRESS}.json`);
+const htmlPath = process.env.OUTPUT_FILE || path.join(__dirname, `volatility_chart_${POOL_ADDRESS}.html`);
+const pricePngPath = path.join(__dirname, `volatility_chart_${POOL_ADDRESS}_price.png`);
+const volPngPath = path.join(__dirname, `volatility_chart_${POOL_ADDRESS}_volatility.png`);
+const feePngPath = path.join(__dirname, `volatility_chart_${POOL_ADDRESS}_fee.png`);
+
+console.log(`\n========================================`);
+console.log(`  Visualize Timepoints Script`);
+console.log(`========================================`);
+console.log(`Pool Address: ${POOL_ADDRESS}`);
+console.log(`Input File: ${dataPath}`);
+console.log(`Output File: ${htmlPath}\n`);
+
+if (!fs.existsSync(dataPath)) {
+    console.error(`Error: ${dataPath} not found. Run read_timepoints.js first with POOL_ADDRESS=${POOL_ADDRESS}`);
+    process.exit(1);
+}
+
+const rawData = fs.readFileSync(dataPath, 'utf8');
+const timepoints = JSON.parse(rawData);
+
+// Sort by timestamp just in case
+timepoints.sort((a, b) => a.timestamp - b.timestamp);
+
+const labels = timepoints.map(t => new Date(t.timestamp * 1000).toLocaleString());
+const ticks = timepoints.map(t => t.tick);
+const averageTicks = timepoints.map(t => t.averageTick);
+
+const WINDOW = 86400; // 24 hours
+
+// Mirroring the struct layout
+function Timepoint(data) {
+    this.blockTimestamp = Number(data.timestamp); // uint32 (using timestamp from JSON)
+    this.volatilityCumulative = BigInt(data.volatilityCumulative); // uint88
+    this.tickCumulative = BigInt(data.tickCumulative); // int56
+    this.tick = Number(data.tick); // int24
+    this.averageTick = Number(data.averageTick); // int24
+    this.windowStartIndex = Number(data.windowStartIndex); // uint16
+    this.initialized = true;
+}
+
+// Emulating helper `_lteConsideringOverflow`
+// simplified: since we have full JS numbers, we don't strictly typically see overflow logic in the same way,
+// but let's assume our input IS sorted / circular-safe.
+function _lteConsideringOverflow(a, b, currentTime) {
+    // Solidity: res = a > currentTime;
+    //           if (res == b > currentTime) res = a <= b;
+    let res = a > currentTime;
+    if (res === (b > currentTime)) res = a <= b;
+    return res;
+}
+
+// Emulating internal `_getTimepointsAt`
+// In the contract, this performs a binary search on the circular buffer.
+// Here `self` is our flat, time-ordered array of timepoints.
+// Emulating internal `_binarySearch`
+// Performs a binary search (or heuristic search) to find the timepoints surrounding 'target'
+function _binarySearch(self, currentTime, target, upperIndex, lowerIndex, withHeuristic) {
+    let left = lowerIndex;
+    let right = upperIndex < lowerIndex ? upperIndex + 65536 : upperIndex; // We use constant 65536 for UINT16_MODULO
+
+    return _binarySearchInternal(self, currentTime, target, left, right, withHeuristic);
+}
+
+function _binarySearchInternal(self, currentTime, target, left, right, withHeuristic) {
+    let indexBeforeOrAt = (left + right) >> 1n;
+
+    let beforeOrAt = self[Number(indexBeforeOrAt) % 65536];
+    let atOrAfter = beforeOrAt; // to suppress compiler warning; will be overridden
+    let firstIteration = true;
+
+    if (withHeuristic && right - left > 2) {
+        indexBeforeOrAt = left + 1; // heuristic for first guess
+    } else {
+        indexBeforeOrAt = (left + right) >> 1; // "middle" point between the boundaries
+    }
+    beforeOrAt = self[Number(indexBeforeOrAt) % 65536]; // checking the "middle" point between the boundaries
+    atOrAfter = beforeOrAt; // to suppress compiler warning; will be overridden
+    firstIteration = true;
+
+    do {
+        let initializedBefore = beforeOrAt.initialized;
+        let timestampBefore = beforeOrAt.blockTimestamp;
+
+        if (initializedBefore) {
+            if (_lteConsideringOverflow(timestampBefore, target, currentTime)) {
+                // is current point before or at `target`?
+                atOrAfter = self[Number(indexBeforeOrAt + 1n) % 65536];
+                let initializedAfter = atOrAfter.initialized;
+                let timestampAfter = atOrAfter.blockTimestamp;
+
+                if (initializedAfter) {
+                    if (_lteConsideringOverflow(target, timestampAfter, currentTime)) {
+                        // is the "next" point after or at `target`?
+                        return { beforeOrAt, atOrAfter, indexBeforeOrAt };
+                    }
+                    left = indexBeforeOrAt + 1n; // "next" point is before the `target`, so looking in the right half
+                } else {
+                    return { beforeOrAt, atOrAfter: beforeOrAt, indexBeforeOrAt };
+                }
+            } else {
+                right = indexBeforeOrAt - 1n; // current point is after the `target`, so looking in the left half
+            }
+        } else {
+            // we've landed on an uninitialized timepoint, keep searching higher
+            left = indexBeforeOrAt + 1n;
+        }
+
+        // use heuristic if looking in the right half after first iteration
+        let useHeuristic = firstIteration && withHeuristic && left == indexBeforeOrAt + 1n;
+        if (useHeuristic && right - left > 16n) {
+            indexBeforeOrAt = left + 8n;
+        } else {
+            indexBeforeOrAt = (left + right) >> 1n; // calculating the new "middle" point index after updating the bounds
+        }
+        beforeOrAt = self[Number(indexBeforeOrAt) % 65536];
+        firstIteration = false;
+
+        if (left > right) break; // Defensive JS
+    } while (true);
+
+    return { beforeOrAt, atOrAfter, indexBeforeOrAt };
+}
+
+// Emulating internal `_getTimepointsAt`
+function _getTimepointsAt(self, currentTime, target, lastIndex, oldestIndex) {
+    const lastTimepoint = self[Number(lastIndex) % 65536];
+    const lastTimepointTimestamp = lastTimepoint.blockTimestamp;
+    const windowStartIndex = lastTimepoint.windowStartIndex;
+
+    // if target is newer than last timepoint
+    if (target === currentTime || _lteConsideringOverflow(lastTimepointTimestamp, target, currentTime)) {
+        return { beforeOrAt: lastTimepoint, atOrAfter: lastTimepoint, samePoint: true, indexBeforeOrAt: lastIndex };
+    }
+
+    let useHeuristic = false;
+
+    // Check if we can limit scope using windowStartIndex
+    if (lastTimepointTimestamp - target <= WINDOW) {
+        // We can limit the scope of the search. It is safe because when the array overflows,
+        // `windowsStartIndex` cannot point to the overwritten timepoint (check at `write(...)`)
+        oldestIndex = windowStartIndex;
+        useHeuristic = (target == currentTime - WINDOW); // heuristic will optimize search for timepoints close to `currentTime - WINDOW`
+    }
+
+    let oldestTimepoint = self[Number(oldestIndex) % 65536];
+    const oldestTimestamp = oldestTimepoint.blockTimestamp;
+
+    if (!_lteConsideringOverflow(oldestTimestamp, target, currentTime)) return { beforeOrAt: null };
+    if (oldestTimestamp == target) return { beforeOrAt: oldestTimepoint, atOrAfter: oldestTimepoint, samePoint: true, indexBeforeOrAt: oldestIndex };
+
+    // no need to search if we already know the answer
+    if (lastIndex == initialOldestIndex + 1) return { beforeOrAt: oldestTimepoint, atOrAfter: lastTimepoint, samePoint: false, indexBeforeOrAt: initialOldestIndex };
+
+    const { beforeOrAt, atOrAfter, indexBeforeOrAt } = _binarySearch(self, currentTime, target, lastIndex, initialOldestIndex, useHeuristic);
+    return { beforeOrAt, atOrAfter, samePoint: false, indexBeforeOrAt };
+}
+
+// Emulating `_volatilityOnRange` from Solidity
+function _volatilityOnRange(dt, tick0, tick1, avgTick0, avgTick1) {
+    // dt: int256, tick0: int256, tick1: int256, avgTick0: int256, avgTick1: int256
+    const k = BigInt(tick1 - tick0) - BigInt(avgTick1 - avgTick0);
+    const b = BigInt(tick0 - avgTick0) * BigInt(dt);
+    const sumOfSequence = BigInt(dt) * (BigInt(dt) + 1n);
+    const sumOfSquares = sumOfSequence * (2n * BigInt(dt) + 1n);
+
+    // (k ** 2 * sumOfSquares + 6 * b * k * sumOfSequence + 6 * dt * b ** 2) / (6 * dt ** 2)
+    const dt2 = BigInt(dt) ** 2n;
+    const numerator = (k ** 2n * sumOfSquares) + (6n * b * k * sumOfSequence) + (6n * BigInt(dt) * b ** 2n);
+    const denominator = 6n * dt2;
+
+    return numerator / denominator;
+}
+
+// Emulating `_getTickCumulativeAt` from Solidity
+function _getTickCumulativeAt(self, time, secondsAgo, tick, lastIndex, oldestIndex) {
+    const target = time - secondsAgo;
+    const { beforeOrAt, atOrAfter, samePoint, indexBeforeOrAt } = _getTimepointsAt(self, time, target, lastIndex, oldestIndex);
+
+    const timestampBefore = beforeOrAt.blockTimestamp;
+    const tickCumulativeBefore = beforeOrAt.tickCumulative;
+
+    if (target === timestampBefore) return [tickCumulativeBefore, indexBeforeOrAt];
+
+    if (samePoint) {
+        return [tickCumulativeBefore + BigInt(tick) * BigInt(target - timestampBefore), indexBeforeOrAt];
+    }
+
+    const timestampAfter = atOrAfter.blockTimestamp;
+    const tickCumulativeAfter = atOrAfter.tickCumulative;
+
+    if (target === timestampAfter) return [tickCumulativeAfter, indexBeforeOrAt + 1];
+
+    const timepointTimeDelta = BigInt(timestampAfter - timestampBefore);
+    const targetDelta = BigInt(target - timestampBefore);
+
+    return [
+        tickCumulativeBefore + ((tickCumulativeAfter - tickCumulativeBefore) / timepointTimeDelta) * targetDelta,
+        indexBeforeOrAt
+    ];
+}
+
+// Emulating `_getAverageTick` from Solidity
+function _getAverageTick(self, currentTime, tick, lastIndex, oldestIndex, lastTimestamp, lastTickCumulative) {
+    const oldestTimestamp = self[oldestIndex].blockTimestamp;
+    const oldestTickCumulative = self[oldestIndex].tickCumulative;
+
+    const currentTickCumulative = lastTickCumulative + BigInt(tick) * BigInt(currentTime - lastTimestamp);
+
+    if (!_lteConsideringOverflow(oldestTimestamp, currentTime - WINDOW, currentTime)) {
+        if (currentTime === oldestTimestamp) return [tick, oldestIndex];
+        return [Number((currentTickCumulative - oldestTickCumulative) / BigInt(currentTime - oldestTimestamp)), oldestIndex];
+    }
+
+    if (_lteConsideringOverflow(lastTimestamp, currentTime - WINDOW, currentTime)) {
+        return [tick, lastIndex];
+    } else {
+        const [tickCumulativeAtStart, windowStartIndex] = _getTickCumulativeAt(self, currentTime, WINDOW, tick, lastIndex, oldestIndex);
+        const avgTick = Number((currentTickCumulative - tickCumulativeAtStart) / BigInt(WINDOW));
+        return [avgTick, windowStartIndex];
+    }
+}
+
+// Emulating `_getAverageTickCasted` from Solidity
+function _getAverageTickCasted(self, time, tick, lastIndex, oldestIndex, lastTimestamp, lastTickCumulative) {
+    const [avgTick, windowStartIndex] = _getAverageTick(self, time, tick, lastIndex, oldestIndex, lastTimestamp, lastTickCumulative);
+    return [avgTick, windowStartIndex];
+}
+
+// Emulating `_getVolatilityCumulativeAt`
+// Note: Arguments mirror Solidity exactly
+function _getVolatilityCumulativeAt(self, time, secondsAgo, tick, lastIndex, oldestIndex) {
+    const target = time - secondsAgo;
+
+    const { beforeOrAt, atOrAfter, samePoint, indexBeforeOrAt } = _getTimepointsAt(self, time, target, lastIndex, oldestIndex);
+
+    if (!beforeOrAt) return 0n; // Fallback
+
+    const timestampBefore = beforeOrAt.blockTimestamp;
+    const volatilityCumulativeBefore = beforeOrAt.volatilityCumulative;
+
+    if (target === timestampBefore) return volatilityCumulativeBefore; // left boundary
+
+    if (samePoint) {
+        const [avgTick] = _getAverageTickCasted(self, target, tick, lastIndex, oldestIndex, timestampBefore, beforeOrAt.tickCumulative);
+
+        return (volatilityCumulativeBefore +
+            BigInt(_volatilityOnRange(target - timestampBefore, tick, tick, beforeOrAt.averageTick, avgTick)));
+    }
+
+    const timestampAfter = atOrAfter.blockTimestamp;
+    const volatilityCumulativeAfter = atOrAfter.volatilityCumulative;
+
+    if (target === timestampAfter) return volatilityCumulativeAfter; // right boundary
+
+    // Middle interpolation
+    const timepointTimeDelta = BigInt(timestampAfter - timestampBefore);
+    const targetDelta = BigInt(target - timestampBefore);
+
+    return volatilityCumulativeBefore + ((volatilityCumulativeAfter - volatilityCumulativeBefore) / timepointTimeDelta) * targetDelta;
+}
+
+
+// Emulating `getAverageVolatility`
+// Note: Arguments mirror Solidity exactly
+function getAverageVolatility(
+    self,
+    currentTime,
+    tick,
+    lastIndex,
+    oldestIndex
+) {
+    const lastTimepoint = self[Number(lastIndex) % 65536];
+    const timeAtLastTimepoint = lastTimepoint.blockTimestamp === currentTime;
+    let lastCumulativeVolatility = lastTimepoint.volatilityCumulative;
+    const windowStartIndex = BigInt(lastTimepoint.windowStartIndex); // index of timepoint before of at lastTimepoint.blockTimestamp - WINDOW
+
+    if (!timeAtLastTimepoint) {
+        lastCumulativeVolatility = _getVolatilityCumulativeAt(self, currentTime, 0, tick, lastIndex, oldestIndex);
+    }
+
+    const oldestTimestamp = self[Number(oldestIndex) % 65536].blockTimestamp;
+    if (_lteConsideringOverflow(oldestTimestamp, currentTime - WINDOW, currentTime)) {
+        // oldest timepoint is earlier than 24 hours ago
+        let cumulativeVolatilityAtStart;
+        if (timeAtLastTimepoint) {
+            // interpolate cumulative volatility to avoid search. Since the last timepoint has _just_ been written, we know for sure
+            // that the start of the window is between windowStartIndex and windowStartIndex + 1
+
+            let startPoint = self[Number(windowStartIndex) % 65536];
+            let startPointNext = self[Number(windowStartIndex + 1n) % 65536];
+
+            if (startPoint && startPoint.initialized && startPointNext && startPointNext.initialized) {
+                let startTimestamp = startPoint.blockTimestamp;
+                cumulativeVolatilityAtStart = startPoint.volatilityCumulative;
+
+                const timeDeltaBetweenPoints = BigInt(startPointNext.blockTimestamp - startTimestamp);
+
+                cumulativeVolatilityAtStart +=
+                    ((startPointNext.volatilityCumulative - cumulativeVolatilityAtStart) * BigInt(currentTime - WINDOW - startTimestamp)) /
+                    timeDeltaBetweenPoints;
+            } else {
+                cumulativeVolatilityAtStart = _getVolatilityCumulativeAt(self, currentTime, WINDOW, tick, lastIndex, oldestIndex);
+            }
+        } else {
+            cumulativeVolatilityAtStart = _getVolatilityCumulativeAt(self, currentTime, WINDOW, tick, lastIndex, oldestIndex);
+        }
+
+        return Number((lastCumulativeVolatility - cumulativeVolatilityAtStart) / BigInt(WINDOW)); // sample is big enough to ignore bias of variance
+    } else if (currentTime !== oldestTimestamp) {
+        // recorded timepoints are not enough, so we will extrapolate
+        const _oldestVolatilityCumulative = self[Number(oldestIndex) % 65536].volatilityCumulative;
+        let unbiasedDenominator = currentTime - oldestTimestamp;
+        if (unbiasedDenominator > 1) unbiasedDenominator--; // Bessel's correction for "small" sample
+        return Number((lastCumulativeVolatility - _oldestVolatilityCumulative) / BigInt(unbiasedDenominator));
+    }
+    return 0;
+}
+
+const avgVolatility24h = [];
+
+// Prepare data structure for "self"
+// The helpers expect a random-access collection where we can look up by index.
+// Our `timepoints` is that array.
+// `lastIndex` will act as `i` in our loop (the point we are conceptually "at").
+// `oldestIndex` will always be 0 (the start of our fetched history).
+
+const mappedTimepoints = timepoints.map(t => ({ ...new Timepoint(t), index: Number(t.index) }));
+
+// Emulating the storage layout: Timepoint[65536] self
+const selfBuffer = new Array(65536).fill(null).map(() => ({ initialized: false }));
+
+for (let i = 0; i < mappedTimepoints.length; i++) {
+    const current = mappedTimepoints[i];
+
+    // Write current point into buffer to simulate contract storage
+    selfBuffer[current.index] = current;
+
+    const currentTime = current.blockTimestamp;
+    const tick = current.tick;
+    const lastIndex = BigInt(current.index);
+    const oldestIndex = BigInt(mappedTimepoints[0].index); // Our fetched history's oldest point
+
+    const val = getAverageVolatility(
+        selfBuffer,
+        currentTime,
+        tick,
+        lastIndex,
+        oldestIndex
+    );
+
+    avgVolatility24h.push(val);
+}
+
+// Fee Calculation Logic
+function expXg4_fee(x, g, gHighestDegree) {
+    let closestValue;
+    let xdg = Math.floor(x / g);
+    switch (xdg) {
+        case 0: closestValue = BigInt("100000000000000000000"); break;
+        case 1: closestValue = BigInt("271828182845904523536"); break;
+        case 2: closestValue = BigInt("738905609893065022723"); break;
+        case 3: closestValue = BigInt("2008553692318766774092"); break;
+        case 4: closestValue = BigInt("5459815003314423907811"); break;
+        default: closestValue = BigInt("14841315910257660342111"); break;
+    }
+    x = x % g;
+    let bg = BigInt(g);
+    let bx = BigInt(x);
+    if (bx >= bg / 2n) {
+        bx -= bg / 2n;
+        closestValue = (closestValue * BigInt("164872127070012814684")) / BigInt(1e20);
+    }
+    let xLowestDegree = bx;
+    let res = BigInt(gHighestDegree);
+    let gHD = BigInt(gHighestDegree);
+    gHD /= bg;
+    res += xLowestDegree * gHD;
+    gHD /= bg;
+    xLowestDegree *= bx;
+    res += (xLowestDegree * gHD) / 2n;
+    gHD /= bg;
+    xLowestDegree *= bx;
+    res += (xLowestDegree * bg * 4n + xLowestDegree * bx) / 24n;
+    res = (res * closestValue) / BigInt(1e20);
+    return res;
+}
+
+function sigmoid_fee(x, g, alpha, beta) {
+    x = BigInt(x); g = BigInt(g); alpha = BigInt(alpha); beta = BigInt(beta);
+    if (x > beta) {
+        let diff = x - beta;
+        if (diff >= 6n * g) return alpha;
+        let g4 = g ** 4n;
+        let ex = expXg4_fee(Number(diff), Number(g), g4);
+        return (alpha * ex) / (g4 + ex);
+    } else {
+        let diff = beta - x;
+        if (diff >= 6n * g) return 0n;
+        let g4 = g ** 4n;
+        let ex = g4 + expXg4_fee(Number(diff), Number(g), g4);
+        return (alpha * g4) / ex;
+    }
+}
+
+const feeConfig = {
+    alpha1: 4500, alpha2: 15000, beta1: 1667, beta2: 6000,
+    gamma1: 400, gamma2: 500, baseFee: 500
+};
+
+const calculatedFees = avgVolatility24h.map(vol => {
+    let normalizedVol = Math.floor(vol / 15);
+    let s1 = sigmoid_fee(normalizedVol, feeConfig.gamma1, feeConfig.alpha1, feeConfig.beta1);
+    let s2 = sigmoid_fee(normalizedVol, feeConfig.gamma2, feeConfig.alpha2, feeConfig.beta2);
+    return Number(BigInt(feeConfig.baseFee) + s1 + s2) / 10000;
+});
+
+const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Volatility Oracle Data</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline';">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f4f9; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        canvas { margin-bottom: 40px; }
+        h1 { text-align: center; color: #333; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Volatility Oracle Visualization</h1>
+        
+        <canvas id="priceChart"></canvas>
+        <canvas id="volChart"></canvas>
+        <canvas id="feeChart"></canvas>
+    </div>
+
+    <script>
+        const ctxPrice = document.getElementById('priceChart').getContext('2d');
+        const ctxVol = document.getElementById('volChart').getContext('2d');
+        const ctxFee = document.getElementById('feeChart').getContext('2d');
+
+        const labels = ${JSON.stringify(labels)};
+        const ticks = ${JSON.stringify(ticks)};
+        const averageTicks = ${JSON.stringify(averageTicks)};
+        const volatility = ${JSON.stringify(avgVolatility24h)};
+        const fees = ${JSON.stringify(calculatedFees)};
+
+        new Chart(ctxPrice, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Tick (Spot Price)',
+                        data: ticks,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Average Tick (24h Avg)',
+                        data: averageTicks,
+                        borderColor: 'rgb(255, 99, 132)',
+                        borderDash: [5, 5],
+                        tension: 0.1,
+                        yAxisID: 'y'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                interaction: { mode: 'index', intersect: false },
+                plugins: { title: { display: true, text: 'Price vs Average Price' } }
+            }
+        });
+
+        new Chart(ctxVol, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '24h Average Volatility',
+                    data: volatility,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgb(54, 162, 235)',
+                    borderWidth: 2,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { title: { display: true, text: '24-Hour Average Volatility' } }
+            }
+        });
+
+        new Chart(ctxFee, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Calculated Fee (%)',
+                    data: fees,
+                    backgroundColor: 'rgba(255, 159, 64, 0.5)',
+                    borderColor: 'rgb(255, 159, 64)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { title: { display: true, text: 'Adaptive Fee over Time' } },
+                scales: { y: { beginAtZero: true, title: { display: true, text: 'Fee (%)' } } }
+            }
+        });
+    </script>
+</body>
+</html>
+`;
+
+fs.writeFileSync(htmlPath, htmlContent);
+console.log(`\n✅ HTML Chart generated at: ${htmlPath}`);
+
+// PNG Generation Setup
+async function generatePngs() {
+    const width = 1200;
+    const height = 600;
+    const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height, backgroundColour: 'white' });
+
+    const latestPrice = ticks[ticks.length - 1];
+    const latestVol = avgVolatility24h[avgVolatility24h.length - 1];
+    const latestFee = calculatedFees[calculatedFees.length - 1];
+    const latestTime = labels[labels.length - 1];
+
+
+    // 1. Price Chart PNG
+    const priceChartConfig = {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Tick (Spot Price)',
+                    data: ticks,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1,
+                },
+                {
+                    label: 'Average Tick (24h Avg)',
+                    data: averageTicks,
+                    borderColor: 'rgb(255, 99, 132)',
+                    borderDash: [5, 5],
+                    tension: 0.1,
+                }
+            ]
+        },
+        options: {
+            plugins: { title: { display: true, text: `Price vs Avg Price (Latest: ${latestPrice})`, font: { size: 18 } } }
+        }
+    };
+
+    // 2. Volatility Chart PNG
+    const volChartConfig = {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: '24h Average Volatility',
+                    data: avgVolatility24h,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgb(54, 162, 235)',
+                    borderWidth: 2,
+                    fill: true,
+                    pointRadius: 0
+                }
+            ]
+        },
+        options: {
+            plugins: { title: { display: true, text: `24h Avg Volatility (Latest: ${latestVol.toFixed(2)})`, font: { size: 18 } } }
+        }
+    };
+
+    // 3. Fee Chart PNG
+    const feeChartConfig = {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Calculated Fee (%)',
+                    data: calculatedFees,
+                    backgroundColor: 'rgba(255, 159, 64, 0.5)',
+                    borderColor: 'rgb(255, 159, 64)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0
+                }
+            ]
+        },
+        options: {
+            plugins: { title: { display: true, text: `Adaptive Fee (Latest: ${latestFee.toFixed(4)}%)`, font: { size: 18 } } },
+            scales: { y: { beginAtZero: true, title: { display: true, text: 'Fee (%)' } } }
+        }
+    };
+
+    const priceBuffer = await chartJSNodeCanvas.renderToBuffer(priceChartConfig);
+    fs.writeFileSync(pricePngPath, priceBuffer);
+    console.log(`✅ Price PNG generated at: ${pricePngPath}`);
+
+    const volBuffer = await chartJSNodeCanvas.renderToBuffer(volChartConfig);
+    fs.writeFileSync(volPngPath, volBuffer);
+    console.log(`✅ Volatility PNG generated at: ${volPngPath}`);
+
+    const feeBuffer = await chartJSNodeCanvas.renderToBuffer(feeChartConfig);
+    fs.writeFileSync(feePngPath, feeBuffer);
+    console.log(`✅ Fee PNG generated at: ${feePngPath}`);
+}
+
+generatePngs().then(() => {
+    const latestPrice = ticks[ticks.length - 1];
+    const latestVol = avgVolatility24h[avgVolatility24h.length - 1];
+    const latestFee = calculatedFees[calculatedFees.length - 1];
+
+    console.log(`\n========================================`);
+    console.log(`  CURRENT POOL STATS`);
+    console.log(`========================================`);
+    console.log(`  Latest Price:     ${latestPrice}`);
+    console.log(`  24h Avg Vol:      ${latestVol.toFixed(2)}`);
+    console.log(`  Adaptive Fee:     ${latestFee.toFixed(4)}%`);
+    console.log(`  Last Updated:     ${labels[labels.length - 1]}`);
+    console.log(`========================================\n`);
+
+    console.log(`OUTPUT_FILE_HTML=${htmlPath}`);
+    console.log(`OUTPUT_FILE_PRICE_PNG=${pricePngPath}`);
+    console.log(`OUTPUT_FILE_VOL_PNG=${volPngPath}`);
+    console.log(`OUTPUT_FILE_FEE_PNG=${feePngPath}`);
+    console.log(`POOL_ADDRESS=${POOL_ADDRESS}`);
+}).catch(err => {
+    console.error("Error generating PNGs:", err);
+});
