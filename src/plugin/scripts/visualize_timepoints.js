@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { ChartJSNodeCanvas } = require('chartjs-node-canvas');
+const { ethers } = require('ethers');
 
 // Get pool address from environment variable or default
 const POOL_ADDRESS = process.env.POOL_ADDRESS || "0xbCf4A97e83eBF99C06Caa904db6bee53025e804F";
@@ -11,6 +12,12 @@ const htmlPath = process.env.OUTPUT_FILE || path.join(__dirname, `volatility_cha
 const pricePngPath = path.join(__dirname, `volatility_chart_${POOL_ADDRESS}_price.png`);
 const volPngPath = path.join(__dirname, `volatility_chart_${POOL_ADDRESS}_volatility.png`);
 const feePngPath = path.join(__dirname, `volatility_chart_${POOL_ADDRESS}_fee.png`);
+const RPC_URL = process.env.RPC_URL;
+
+const DEFAULT_FEE_CONFIG = {
+    alpha1: 4500, alpha2: 15000, beta1: 1667, beta2: 6000,
+    gamma1: 400, gamma2: 500, baseFee: 500
+};
 
 console.log(`\n========================================`);
 console.log(`  Visualize Timepoints Script`);
@@ -411,19 +418,63 @@ function sigmoid_fee(x, g, alpha, beta) {
     }
 }
 
-const feeConfig = {
-    alpha1: 4500, alpha2: 15000, beta1: 1667, beta2: 6000,
-    gamma1: 400, gamma2: 500, baseFee: 500
-};
+function calculateFeesWithConfig(feeConfig) {
+    return avgVolatility24h.map(vol => {
+        let normalizedVol = Math.floor(vol / 15);
+        let s1 = sigmoid_fee(normalizedVol, feeConfig.gamma1, feeConfig.alpha1, feeConfig.beta1);
+        let s2 = sigmoid_fee(normalizedVol, feeConfig.gamma2, feeConfig.alpha2, feeConfig.beta2);
+        return Number(BigInt(feeConfig.baseFee) + s1 + s2) / 10000;
+    });
+}
 
-const calculatedFees = avgVolatility24h.map(vol => {
-    let normalizedVol = Math.floor(vol / 15);
-    let s1 = sigmoid_fee(normalizedVol, feeConfig.gamma1, feeConfig.alpha1, feeConfig.beta1);
-    let s2 = sigmoid_fee(normalizedVol, feeConfig.gamma2, feeConfig.alpha2, feeConfig.beta2);
-    return Number(BigInt(feeConfig.baseFee) + s1 + s2) / 10000;
-});
+async function getOnChainFeeConfig(poolAddress) {
+    if (!RPC_URL) return null;
 
-const htmlContent = `
+    const provider = new ethers.JsonRpcProvider(RPC_URL);
+    const poolAbi = ['function plugin() external view returns (address)'];
+    const feeAbi = ['function feeConfig() external view returns (uint16 alpha1, uint16 alpha2, uint32 beta1, uint32 beta2, uint16 gamma1, uint16 gamma2, uint16 baseFee)'];
+
+    const pool = new ethers.Contract(poolAddress, poolAbi, provider);
+    const pluginAddress = await pool.plugin();
+    if (!pluginAddress || pluginAddress === ethers.ZeroAddress) return null;
+
+    const feeManager = new ethers.Contract(pluginAddress, feeAbi, provider);
+    const config = await feeManager.feeConfig();
+
+    return {
+        alpha1: Number(config.alpha1),
+        alpha2: Number(config.alpha2),
+        beta1: Number(config.beta1),
+        beta2: Number(config.beta2),
+        gamma1: Number(config.gamma1),
+        gamma2: Number(config.gamma2),
+        baseFee: Number(config.baseFee),
+        pluginAddress
+    };
+}
+
+async function resolveFeeConfig(poolAddress) {
+    if (!RPC_URL) {
+        console.log(`⚠️  RPC_URL is not set. Falling back to default feeConfig values.`);
+        return { feeConfig: DEFAULT_FEE_CONFIG, source: 'default' };
+    }
+
+    try {
+        const onChainConfig = await getOnChainFeeConfig(poolAddress);
+        if (!onChainConfig) {
+            console.log(`⚠️  On-chain fee config unavailable. Falling back to default feeConfig values.`);
+            return { feeConfig: DEFAULT_FEE_CONFIG, source: 'default' };
+        }
+        console.log(`✅ Loaded feeConfig from chain via plugin: ${onChainConfig.pluginAddress}`);
+        return { feeConfig: onChainConfig, source: 'on-chain' };
+    } catch (err) {
+        console.log(`⚠️  Failed to fetch on-chain fee config (${err.message}). Falling back to defaults.`);
+        return { feeConfig: DEFAULT_FEE_CONFIG, source: 'default' };
+    }
+}
+
+function buildHtmlContent(calculatedFees) {
+    return `
 <!DOCTYPE html>
 <html>
 <head>
@@ -529,12 +580,10 @@ const htmlContent = `
 </body>
 </html>
 `;
-
-fs.writeFileSync(htmlPath, htmlContent);
-console.log(`\n✅ HTML Chart generated at: ${htmlPath}`);
+}
 
 // PNG Generation Setup
-async function generatePngs() {
+async function generatePngs(calculatedFees) {
     const width = 1200;
     const height = 600;
     const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height, backgroundColour: 'white' });
@@ -630,7 +679,16 @@ async function generatePngs() {
     console.log(`✅ Fee PNG generated at: ${feePngPath}`);
 }
 
-generatePngs().then(() => {
+async function main() {
+    const { feeConfig, source } = await resolveFeeConfig(POOL_ADDRESS);
+    const calculatedFees = calculateFeesWithConfig(feeConfig);
+    const htmlContent = buildHtmlContent(calculatedFees);
+
+    fs.writeFileSync(htmlPath, htmlContent);
+    console.log(`\n✅ HTML Chart generated at: ${htmlPath}`);
+
+    await generatePngs(calculatedFees);
+
     const latestPrice = ticks[ticks.length - 1];
     const latestVol = avgVolatility24h[avgVolatility24h.length - 1];
     const latestFee = calculatedFees[calculatedFees.length - 1];
@@ -638,6 +696,7 @@ generatePngs().then(() => {
     console.log(`\n========================================`);
     console.log(`  CURRENT POOL STATS`);
     console.log(`========================================`);
+    console.log(`  Fee Config Src:   ${source}`);
     console.log(`  Latest Price:     ${latestPrice}`);
     console.log(`  24h Avg Vol:      ${latestVol.toFixed(2)}`);
     console.log(`  Adaptive Fee:     ${latestFee.toFixed(4)}%`);
@@ -649,6 +708,9 @@ generatePngs().then(() => {
     console.log(`OUTPUT_FILE_VOL_PNG=${volPngPath}`);
     console.log(`OUTPUT_FILE_FEE_PNG=${feePngPath}`);
     console.log(`POOL_ADDRESS=${POOL_ADDRESS}`);
-}).catch(err => {
-    console.error("Error generating PNGs:", err);
+}
+
+main().catch(err => {
+    console.error("Error generating visualization:", err);
+    process.exit(1);
 });
