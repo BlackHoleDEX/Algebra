@@ -12,12 +12,34 @@ const htmlPath = process.env.OUTPUT_FILE || path.join(__dirname, `volatility_cha
 const pricePngPath = path.join(__dirname, `volatility_chart_${POOL_ADDRESS}_price.png`);
 const volPngPath = path.join(__dirname, `volatility_chart_${POOL_ADDRESS}_volatility.png`);
 const feePngPath = path.join(__dirname, `volatility_chart_${POOL_ADDRESS}_fee.png`);
-const RPC_URL = process.env.RPC_URL;
+const NETWORK = process.env.NETWORK;
 
 const DEFAULT_FEE_CONFIG = {
     alpha1: 4500, alpha2: 15000, beta1: 1667, beta2: 6000,
     gamma1: 400, gamma2: 500, baseFee: 500
 };
+
+function resolveRpcUrlFromConfig(networkName) {
+    if (!networkName) return null;
+
+    try {
+        // Allow loading TypeScript config in plain Node script.
+        require('ts-node/register/transpile-only');
+        const baseConfigPath = path.resolve(__dirname, '../../../hardhat.base.config.ts');
+        const baseConfigModule = require(baseConfigPath);
+        const baseConfig = baseConfigModule.default || baseConfigModule;
+        return baseConfig?.networks?.[networkName]?.url || null;
+    } catch (err) {
+        console.log(`⚠️  Unable to read hardhat base config for network "${networkName}": ${err.message}`);
+        return null;
+    }
+}
+
+function resolveRpcUrl() {
+    if (process.env.RPC_URL) return process.env.RPC_URL;
+    if (!NETWORK) return null;
+    return resolveRpcUrlFromConfig(NETWORK);
+}
 
 console.log(`\n========================================`);
 console.log(`  Visualize Timepoints Script`);
@@ -428,9 +450,10 @@ function calculateFeesWithConfig(feeConfig) {
 }
 
 async function getOnChainFeeConfig(poolAddress) {
-    if (!RPC_URL) return null;
+    const rpcUrl = resolveRpcUrl();
+    if (!rpcUrl) return null;
 
-    const provider = new ethers.JsonRpcProvider(RPC_URL);
+    const provider = new ethers.JsonRpcProvider(rpcUrl);
     const poolAbi = ['function plugin() external view returns (address)'];
     const feeAbi = ['function feeConfig() external view returns (uint16 alpha1, uint16 alpha2, uint32 beta1, uint32 beta2, uint16 gamma1, uint16 gamma2, uint16 baseFee)'];
 
@@ -454,9 +477,14 @@ async function getOnChainFeeConfig(poolAddress) {
 }
 
 async function resolveFeeConfig(poolAddress) {
-    if (!RPC_URL) {
-        console.log(`⚠️  RPC_URL is not set. Falling back to default feeConfig values.`);
+    const rpcUrl = resolveRpcUrl();
+    if (!rpcUrl) {
+        console.log(`⚠️  RPC_URL is not set and no RPC URL found for NETWORK="${NETWORK || 'unset'}" in hardhat config. Falling back to default feeConfig values.`);
         return { feeConfig: DEFAULT_FEE_CONFIG, source: 'default' };
+    }
+
+    if (!process.env.RPC_URL && NETWORK) {
+        console.log(`ℹ️  Using RPC URL from hardhat config for NETWORK="${NETWORK}".`);
     }
 
     try {
