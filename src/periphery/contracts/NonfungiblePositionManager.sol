@@ -103,7 +103,7 @@ contract NonfungiblePositionManager is
         address _tokenDescriptor_,
         address _poolDeployer
     )
-        ERC721Permit('Blackhole Positions NFT-V1', 'BH-POS', '1')
+        ERC721Permit('Blackhole Positions NFT-V2', 'BH-POS', '2')
         PeripheryImmutableState(_factory, _WNativeToken, _poolDeployer)
     {
         _tokenDescriptor = _tokenDescriptor_;
