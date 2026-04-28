@@ -22,6 +22,19 @@ interface IBasePluginV3Factory is IAlgebraPluginFactory {
   /// @param newFarmingAddress The farming address after the address was changed
   event FarmingAddress(address newFarmingAddress);
 
+  /// @notice Emitted when the reflex router or config id is changed
+  /// @param reflexRouter The reflex router address after the change
+  /// @param reflexConfigId The reflex configuration id after the change
+  event ReflexConfig(address reflexRouter, bytes32 reflexConfigId);
+
+  /// @notice Emitted when the fee discount registry address is changed
+  /// @param registry The fee discount registry address after the address was changed
+  event FeeDiscountRegistry(address registry);
+
+  /// @notice Emitted when the plugin deployer address is changed
+  /// @param deployer The plugin deployer contract address after the address was changed
+  event PluginDeployer(address deployer);
+
   /// @notice The hash of 'ALGEBRA_BASE_PLUGIN_FACTORY_ADMINISTRATOR' used as role
   /// @dev allows to change settings of BasePluginV1Factory
   function ALGEBRA_BASE_PLUGIN_FACTORY_ADMINISTRATOR() external pure returns (bytes32);
@@ -45,6 +58,10 @@ interface IBasePluginV3Factory is IAlgebraPluginFactory {
   /// @notice Returns current securityRegistry address
   /// @return The securityRegistry contract address
   function securityRegistry() external view returns (address);
+
+  /// @notice Returns current fee discount registry address
+  /// @return The fee discount registry contract address
+  function feeDiscountRegistry() external view returns (address);
 
   /// @notice Returns address of plugin created for given AlgebraPool
   /// @param pool The address of AlgebraPool
@@ -70,4 +87,8 @@ interface IBasePluginV3Factory is IAlgebraPluginFactory {
   /// @dev updates securoty registry address on the factory
   /// @param newSecurityRegistry The new security registry contract address
   function setSecurityRegistry(address newSecurityRegistry) external;
+
+  /// @dev updates fee discount registry address on the factory
+  /// @param newFeeDiscountRegistry The new fee discount registry contract address
+  function setFeeDiscountRegistry(address newFeeDiscountRegistry) external;
 }

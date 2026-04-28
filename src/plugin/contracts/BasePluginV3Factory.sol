@@ -2,8 +2,10 @@
 pragma solidity =0.8.20;
 
 import './interfaces/IBasePluginV3Factory.sol';
+import './interfaces/IPluginV3Deployer.sol';
+import './interfaces/plugins/ISecurityPlugin.sol';
+import '@cryptoalgebra/integral-core/contracts/interfaces/IAlgebraFactory.sol';
 import './libraries/AdaptiveFee.sol';
-import './AlgebraBasePluginV3.sol';
 
 /// @title Algebra Integral 1.2 default plugin factory
 /// @notice This contract creates Algebra adaptive fee plugins for Algebra liquidity pools
@@ -24,8 +26,19 @@ contract BasePluginV3Factory is IBasePluginV3Factory {
   /// @inheritdoc IBasePluginV3Factory
   address public override securityRegistry;
 
+  address public reflexRouter;
+
+  /// @notice Configuration ID for profit distribution used by plugins created by this factory
+  bytes32 public reflexConfigId;
+
+  /// @inheritdoc IBasePluginV3Factory
+  address public override feeDiscountRegistry;
+
   /// @inheritdoc IBasePluginV3Factory
   mapping(address poolAddress => address pluginAddress) public override pluginByPool;
+
+  /// @dev Helper contract address used to deploy plugins (keeps this factory's bytecode smaller)
+  address public pluginDeployer;
 
   modifier onlyAdministrator() {
     require(IAlgebraFactory(algebraFactory).hasRoleOrOwner(ALGEBRA_BASE_PLUGIN_FACTORY_ADMINISTRATOR, msg.sender), 'Only administrator');
@@ -64,7 +77,16 @@ contract BasePluginV3Factory is IBasePluginV3Factory {
 
   function _createPlugin(address pool) internal returns (address) {
     require(pluginByPool[pool] == address(0), 'Already created');
-    address plugin = address(new AlgebraBasePluginV3(pool, algebraFactory, address(this), defaultFeeConfiguration));
+    require(pluginDeployer != address(0), 'Plugin deployer not set');
+    address plugin = IPluginV3Deployer(pluginDeployer).deployPlugin(
+      pool,
+      algebraFactory,
+      address(this),
+      defaultFeeConfiguration,
+      reflexRouter,
+      reflexConfigId,
+      feeDiscountRegistry
+    );
     ISecurityPlugin(plugin).setSecurityRegistry(securityRegistry);
     pluginByPool[pool] = plugin;
     return plugin;
@@ -89,5 +111,30 @@ contract BasePluginV3Factory is IBasePluginV3Factory {
     require(securityRegistry != _securityRegistry);
     securityRegistry = _securityRegistry;
     emit SecurityRegistry(_securityRegistry);
+  }
+
+  /// @inheritdoc IBasePluginV3Factory
+  function setFeeDiscountRegistry(address newFeeDiscountRegistry) external override onlyAdministrator {
+    require(feeDiscountRegistry != newFeeDiscountRegistry);
+    feeDiscountRegistry = newFeeDiscountRegistry;
+    emit FeeDiscountRegistry(newFeeDiscountRegistry);
+  }
+
+  /// @dev updates reflex router and config id used by plugins created by this factory
+  /// @param newReflexRouter The new reflex router address
+  /// @param newReflexConfigId The new reflex configuration id
+  function setReflexConfig(address newReflexRouter, bytes32 newReflexConfigId) external onlyAdministrator {
+    reflexRouter = newReflexRouter;
+    reflexConfigId = newReflexConfigId;
+    emit ReflexConfig(newReflexRouter, newReflexConfigId);
+  }
+
+  /// @dev sets the plugin deployer address
+  /// @param newPluginDeployer The new plugin deployer contract address
+  function setPluginDeployer(address newPluginDeployer) external onlyAdministrator {
+    require(newPluginDeployer != address(0), 'Invalid deployer address');
+    require(pluginDeployer != newPluginDeployer, 'Same deployer address');
+    pluginDeployer = newPluginDeployer;
+    emit PluginDeployer(newPluginDeployer);
   }
 }
