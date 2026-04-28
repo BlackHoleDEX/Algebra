@@ -34,9 +34,11 @@
     "precommit": "pretty-quick --staged --pattern '**/*.sol' && hardhat compile && node ../../scripts/updatePoolHash.js",
     "solhint": "solhint ./contracts/**/*.sol",
     "compile": "hardhat compile",
+    "build": "npx tsc",
     "test": "hardhat test --parallel",
     "coverage": "hardhat coverage --solcoverjs ./.solcover.js",
-    "validateNatspec": "hardhat validateOutput"
+    "validateNatspec": "hardhat validateOutput",
+    "prepublishOnly": "npm run compile && npm run build"
   },
   "engines": {
     "npm": ">=8.0.0",

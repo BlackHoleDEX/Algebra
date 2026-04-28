@@ -170,6 +170,7 @@ contract AlgebraPool is AlgebraPoolBase, TickStructure, ReentrancyGuard, Positio
       emit Burn(msg.sender, bottomTick, topTick, amount, amount0, amount1);
     }
 
+    
     _unlock();
     _afterModifyPos(msg.sender, bottomTick, topTick, liquidityDelta, amount0, amount1, data);
   }
