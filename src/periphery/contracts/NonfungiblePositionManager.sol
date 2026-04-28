@@ -54,7 +54,7 @@ contract NonfungiblePositionManager is
         keccak256('NONFUNGIBLE_POSITION_MANAGER_ADMINISTRATOR_ROLE');
 
     /// @dev The maximum allowed liquidity lock period
-    uint32 private constant MAX_LIQUIDITY_LOCK_PERIOD = 10 minutes;
+    uint32 private constant MAX_LIQUIDITY_LOCK_PERIOD = 60 minutes;
 
     /// @inheritdoc INonfungiblePositionManager
     bool public override liquidityLockSettingDisabled;
