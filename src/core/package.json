@@ -5,7 +5,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "1.2.5",
+  "version": "1.2.8",
   "keywords": [
     "algebra"
   ],
@@ -34,15 +34,20 @@
     "precommit": "pretty-quick --staged --pattern '**/*.sol' && hardhat compile && node ../../scripts/updatePoolHash.js",
     "solhint": "solhint ./contracts/**/*.sol",
     "compile": "hardhat compile",
+    "build": "npx tsc",
     "test": "hardhat test --parallel",
     "coverage": "hardhat coverage --solcoverjs ./.solcover.js",
-    "validateNatspec": "hardhat validateOutput"
+    "validateNatspec": "hardhat validateOutput",
+    "prepublishOnly": "npm run compile && npm run build"
   },
   "engines": {
     "npm": ">=8.0.0",
     "node": ">=16.0.0"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "4.9.3"
+    "@openzeppelin/contracts": "4.9.3",
+    "@safe-global/api-kit": "^3.0.2",
+    "@safe-global/protocol-kit": "^6.0.5",
+    "@safe-global/types-kit": "^2.0.1"
   }
 }
