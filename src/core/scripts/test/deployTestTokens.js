@@ -16,7 +16,7 @@ async function main() {
   console.log(`TestToken0: ${token0}`);
   console.log(`TestToken1: ${token1}`);
 
-  const deployDataPath = path.resolve(__dirname, '../../../../deploys.json');
+  const deployDataPath = path.resolve(__dirname, '../../../../'+(process.env.DEPLOY_ENV || '')+'deploys.json');
   let deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'));
   deploysData.testToken0 = token0;
   deploysData.testToken1 = token1;

@@ -94,3 +94,7 @@ To deploy all modules in specific network:
 ```
 $ node scripts/deployAll.js <network>
 ```
+
+
+## Transfer ownership (from deployer)
+npx hardhat run --network <network> scripts/transferOwnership.js -- <network> 

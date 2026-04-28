@@ -2,24 +2,42 @@ const hre = require("hardhat");
 const fs = require('fs');
 const path = require('path');
 
+
+async function getFeeData() {
+    const { maxFeePerGas, maxPriorityFeePerGas } = await hre.ethers.provider.getFeeData();
+    return { maxFeePerGas, maxPriorityFeePerGas };
+}
+
+
 async function main() {
 
-    const deployDataPath = path.resolve(__dirname, '../../../deploys.json')
+    const deployDataPath = path.resolve(__dirname, '../../../'+(process.env.DEPLOY_ENV || '')+'deploys.json')
     const deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'))
 
     const BasePluginV1Factory = await hre.ethers.getContractFactory("BasePluginV1Factory");
-    const dsFactory = await BasePluginV1Factory.deploy(deploysData.factory);
+    const feeData1 = await getFeeData();
+    const dsFactory = await BasePluginV1Factory.deploy(deploysData.factory, { ...feeData1 });
 
     await dsFactory.waitForDeployment()
 
     console.log("PluginFactory to:", dsFactory.target);
 
+    const FarmingProxyPluginFactory = await hre.ethers.getContractFactory("AlgebraFarmingProxyPluginFactory");
+    const feeData2 = await getFeeData();
+    const fpFactory = await FarmingProxyPluginFactory.deploy({ ...feeData2 });
+
+    await fpFactory.waitForDeployment()
+
+    console.log("FarmingProxyPluginFactory to:", fpFactory.target);
+
     const factory = await hre.ethers.getContractAt('IAlgebraFactory', deploysData.factory)
 
-    await factory.setDefaultPluginFactory(dsFactory.target)
+    const feeData3 = await getFeeData();
+    await factory.setDefaultPluginFactory(dsFactory.target, { ...feeData3 })
     console.log('Updated plugin factory address in factory')
 
     deploysData.BasePluginV1Factory = dsFactory.target;
+    deploysData.AlgebraFarmingProxyPluginFactory = fpFactory.target;
     fs.writeFileSync(deployDataPath, JSON.stringify(deploysData), 'utf-8');
 
 }
@@ -29,6 +47,6 @@ async function main() {
 main()
   .then(() => process.exit(0))
   .catch((error) => {
-    console.error(error);
-    process.exit(1);
+      console.error(error);
+      process.exit(1);
   });
