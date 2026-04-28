@@ -3,7 +3,6 @@ pragma solidity =0.8.20;
 import './BasePluginV1Factory.sol';
 import '@cryptoalgebra/integral-core/contracts/interfaces/IAlgebraFactory.sol';
 import './interfaces/ICustomPluginV1Factory.sol';
-
 /// @title Algebra Integral 1.2.2 custom plugin factory
 /// @notice This contract creates Algebra adaptive fee plugins for Algebra liquidity pools
 /// @dev This plugin factory can only be used for Algebra base pools

@@ -33,7 +33,7 @@
   },
   "scripts": {
     "precommit": "pretty-quick --staged --pattern '**/*.sol' && hardhat compile",
-    "compile": "npm --prefix ../core run compile && npm --prefix ../periphery run compile && hardhat compile",
+    "compile": "pnpm --prefix ../core run compile && pnpm --prefix ../periphery run compile && hardhat compile",
     "solhint": "solhint ./contracts/**/*.sol",
     "test": "hardhat test --parallel",
     "coverage": "hardhat coverage --solcoverjs ./.solcover.js"

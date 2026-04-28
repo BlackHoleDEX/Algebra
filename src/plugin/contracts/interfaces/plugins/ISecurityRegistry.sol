@@ -14,16 +14,11 @@ interface ISecurityRegistry {
   event PoolStatus(address pool, Status status);
 
   function setGlobalStatus(Status newStatus) external;
-
   function getPoolStatus(address pool) external returns (Status);
-
   function setPoolsStatus(address[] memory pools, Status[] memory newStatuses) external;
 
   function algebraFactory() external view returns (address);
-
   function GUARD() external pure returns (bytes32);
-
   function globalStatus() external view returns (Status);
-
   function isPoolStatusOverrided() external view returns (bool);
 }

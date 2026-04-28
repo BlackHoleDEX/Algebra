@@ -1,21 +1,24 @@
 const hre = require('hardhat');
 const fs = require('fs');
 const path = require('path');
+const { keccak256, toUtf8Bytes } = require("ethers");
 
 async function main() {
   const multisigAddress = process.env.MULTI_SIG_WALLET; //@Todo : replace this
+  const opsMultisigAddress = process.env.OPS_MULTI_SIG_WALLET;
 
-  if (!multisigAddress) {
+  if (!multisigAddress || !opsMultisigAddress) {
     console.error('Please provide multisig wallet address as second argument');
     process.exit(1);
   }
 
-  if (!hre.ethers.isAddress(multisigAddress)) {
+  if (!hre.ethers.isAddress(multisigAddress) || !hre.ethers.isAddress(opsMultisigAddress)) {
     console.error('Invalid multisig address provided');
     process.exit(1);
   }
 
   console.log(`Starting ownership transfer to multisig: ${multisigAddress}`);
+  console.log(`Starting Guard transfer to ops multisig: ${opsMultisigAddress}`);
 
   // Read deployment addresses (environment-specific)
   const deployDataPath = path.resolve(__dirname, '../../../' + (process.env.DEPLOY_ENV || '') + 'deploys.json');
@@ -36,6 +39,20 @@ async function main() {
   const AlgebraVaultFactoryABI = require('../artifacts/contracts/AlgebraVaultFactory.sol/AlgebraVaultFactory.json').abi;
 
   console.log('\n=== STARTING OWNERSHIP TRANSFER ===\n');
+
+  // Grant GUARD role to OPS MultiSig
+  if (deploysData.factory) {
+    console.log('Granting GUARD role to OPS Multisig...');
+    try {
+      const factory = new hre.ethers.Contract(deploysData.factory, AlgebraFactoryABI, deployer);
+      const GUARD_ROLE = keccak256(toUtf8Bytes("GUARD"));
+      const tx = await factory.grantRole(GUARD_ROLE, opsMultisigAddress);
+      await tx.wait();
+      console.log(`   ✅ GUARD role granted to OPS Multisig. Transaction: ${tx.hash}`);
+    } catch (error) {
+      console.error('   ❌ Error granting GUARD role:', error.message);
+    }
+  }
 
   // 1. Transfer AlgebraFactory ownership (uses Ownable2Step)
   if (deploysData.factory) {
