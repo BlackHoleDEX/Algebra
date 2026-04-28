@@ -7,7 +7,7 @@ import {IAlgebraFactory} from '@cryptoalgebra/integral-core/contracts/interfaces
 
 /// @title Algebra custom pool entry point
 /// @notice Is used to create custom pools
-/// @dev Version: Algebra Integral 1.2.1
+/// @dev Version: Algebra Integral 1.2.2
 contract AlgebraCustomPoolEntryPoint is IAlgebraCustomPoolEntryPoint {
     /// @inheritdoc IAlgebraCustomPoolEntryPoint
     address public immutable override factory;
@@ -78,6 +78,10 @@ contract AlgebraCustomPoolEntryPoint is IAlgebraCustomPoolEntryPoint {
     /// @inheritdoc IAlgebraCustomPoolEntryPoint
     function setFee(address pool, uint16 newFee) external override onlyCustomDeployer(pool) {
         IAlgebraPool(pool).setFee(newFee);
+    }
+
+    function setCommunityFee(address pool, uint16 newCommunityFee) external onlyCustomDeployer(pool) {
+        IAlgebraPool(pool).setCommunityFee(newCommunityFee);
     }
 
     function _checkIfDeployer(address pool) internal view {

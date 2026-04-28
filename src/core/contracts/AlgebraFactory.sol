@@ -17,7 +17,7 @@ import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 
 /// @title Algebra factory
 /// @notice Is used to deploy pools and its plugins
-/// @dev Version: Algebra Integral 1.2.1
+/// @dev Version: Algebra Integral 1.2.2
 contract AlgebraFactory is IAlgebraFactory, Ownable2Step, AccessControlEnumerable, ReentrancyGuard {
   /// @inheritdoc IAlgebraFactory
   bytes32 public constant override POOLS_ADMINISTRATOR_ROLE = keccak256('POOLS_ADMINISTRATOR'); // it`s here for the public visibility of the value
@@ -55,11 +55,11 @@ contract AlgebraFactory is IAlgebraFactory, Ownable2Step, AccessControlEnumerabl
   /// @inheritdoc IAlgebraFactory
   mapping(address => mapping(address => mapping(address => address))) public override customPoolByPair;
 
-  address[] public allPairs; 
+  address[] public allPairs;
 
   /// @inheritdoc IAlgebraFactory
   /// @dev keccak256 of AlgebraPool init bytecode. Used to compute pool address deterministically
-  bytes32 public constant POOL_INIT_CODE_HASH = 0xa18736c3ee97fe3c96c9428c0cc2a9116facec18e84f95f9da30543f8238a782;
+  bytes32 public constant POOL_INIT_CODE_HASH = 0xeaa3eea3233916c82fe1281a51bd9cde844b7c4673c0714ca0028a57f5634752;
 
   constructor(address _poolDeployer) {
     require(_poolDeployer != address(0));
@@ -240,5 +240,9 @@ contract AlgebraFactory is IAlgebraFactory, Ownable2Step, AccessControlEnumerabl
     if (owner() != address(0)) {
       _grantRole(DEFAULT_ADMIN_ROLE, owner());
     }
+  }
+
+  function allPairsLength() external view returns (uint) {
+    return allPairs.length;
   }
 }
