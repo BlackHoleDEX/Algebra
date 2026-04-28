@@ -4,19 +4,35 @@ const path = require('path');
 const { ethers } = require('ethers');
 const AlgebraFactoryComplied = require('@cryptoalgebra/integral-core/artifacts/contracts/AlgebraFactory.sol/AlgebraFactory.json');
 
+
+async function getFeeData() {
+  const { maxFeePerGas, maxPriorityFeePerGas } = await hre.ethers.provider.getFeeData();
+  return { maxFeePerGas, maxPriorityFeePerGas };
+}
+
+
 async function main() {
-  const deployDataPath = path.resolve(__dirname, '../../../deploys.json');
+  const deployDataPath = path.resolve(__dirname, '../../../'+(process.env.DEPLOY_ENV || '')+'deploys.json');
   let deploysData = JSON.parse(fs.readFileSync(deployDataPath, 'utf8'));
 
   // WNativeTokenAddress
-  const WNativeTokenAddress = '0x4200000000000000000000000000000000000006';
+  const WNativeTokenAddress = process.env.WNATIVE_TOKEN_ADDRESS;
+  if (!WNativeTokenAddress) {
+    throw new Error('WNativeToken address is required');
+  }
+  const NativeTokenTickerName = process.env.NATIVE_TOKEN_TICKER_NAME;
+  if (!NativeTokenTickerName) {
+    throw new Error('NativeTokenTickerName is required');
+  }
+
   const signers = await hre.ethers.getSigners();
   const ProxyAdmin = signers[0].address;
 
   deploysData.wrapped = WNativeTokenAddress;
 
   const entryPointFactory = await hre.ethers.getContractFactory('AlgebraCustomPoolEntryPoint')
-  const entryPoint = await entryPointFactory.deploy(deploysData.factory)
+  const feeData1 = await getFeeData();
+  const entryPoint = await entryPointFactory.deploy(deploysData.factory, { ...feeData1 })
 
   await entryPoint.waitForDeployment()
 
@@ -24,14 +40,26 @@ async function main() {
   console.log('EntryPoint deployed to:', entryPoint.target)
 
   const factory = await hre.ethers.getContractAt(AlgebraFactoryComplied.abi, deploysData.factory)
-  
-  const deployerRole = await factory.grantRole("0xc9cf812513d9983585eb40fcfe6fd49fbb6a45815663ec33b30a6c6c7de3683b", entryPoint.target);
+
+  const feeData2 = await getFeeData();
+  const deployerRole = await factory.grantRole(
+    "0xc9cf812513d9983585eb40fcfe6fd49fbb6a45815663ec33b30a6c6c7de3683b",
+    entryPoint.target,
+    { ...feeData2 }
+  );
   await deployerRole.wait()
-  const administratorRole = await factory.grantRole("0xb73ce166ead2f8e9add217713a7989e4edfba9625f71dfd2516204bb67ad3442", entryPoint.target);
+
+  const feeData3 = await getFeeData();
+  const administratorRole = await factory.grantRole(
+    "0xb73ce166ead2f8e9add217713a7989e4edfba9625f71dfd2516204bb67ad3442",
+    entryPoint.target,
+    { ...feeData3 }
+  );
   await administratorRole.wait()
 
   const TickLensFactory = await hre.ethers.getContractFactory('TickLens');
-  const TickLens = await TickLensFactory.deploy();
+  const feeData4 = await getFeeData();
+  const TickLens = await TickLensFactory.deploy({ ...feeData4 });
 
   await TickLens.waitForDeployment();
 
@@ -39,7 +67,13 @@ async function main() {
   console.log('TickLens deployed to:', TickLens.target);
 
   const QuoterFactory = await hre.ethers.getContractFactory('Quoter');
-  const Quoter = await QuoterFactory.deploy(deploysData.factory, WNativeTokenAddress, deploysData.poolDeployer);
+  const feeData5 = await getFeeData();
+  const Quoter = await QuoterFactory.deploy(
+    deploysData.factory,
+    WNativeTokenAddress,
+    deploysData.poolDeployer,
+    { ...feeData5 }
+  );
 
   await Quoter.waitForDeployment();
 
@@ -47,7 +81,13 @@ async function main() {
   console.log('Quoter deployed to:', Quoter.target);
 
   const QuoterV2Factory = await hre.ethers.getContractFactory('QuoterV2');
-  const QuoterV2 = await QuoterV2Factory.deploy(deploysData.factory, WNativeTokenAddress, deploysData.poolDeployer);
+  const feeData6 = await getFeeData();
+  const QuoterV2 = await QuoterV2Factory.deploy(
+    deploysData.factory,
+    WNativeTokenAddress,
+    deploysData.poolDeployer,
+    { ...feeData6 }
+  );
 
   await QuoterV2.waitForDeployment();
 
@@ -55,7 +95,13 @@ async function main() {
   console.log('QuoterV2 deployed to:', QuoterV2.target);
 
   const SwapRouterFactory = await hre.ethers.getContractFactory('SwapRouter');
-  const SwapRouter = await SwapRouterFactory.deploy(deploysData.factory, WNativeTokenAddress, deploysData.poolDeployer);
+  const feeData7 = await getFeeData();
+  const SwapRouter = await SwapRouterFactory.deploy(
+    deploysData.factory,
+    WNativeTokenAddress,
+    deploysData.poolDeployer,
+    { ...feeData7 }
+  );
 
   await SwapRouter.waitForDeployment();
 
@@ -63,7 +109,8 @@ async function main() {
   console.log('SwapRouter deployed to:', SwapRouter.target);
 
   const NFTDescriptorFactory = await hre.ethers.getContractFactory('NFTDescriptor');
-  const NFTDescriptor = await NFTDescriptorFactory.deploy();
+  const feeData8 = await getFeeData();
+  const NFTDescriptor = await NFTDescriptorFactory.deploy({ ...feeData8 });
 
   await NFTDescriptor.waitForDeployment();
 
@@ -75,10 +122,12 @@ async function main() {
       },
     }
   );
+  const feeData9 = await getFeeData();
   const NonfungibleTokenPositionDescriptor = await NonfungibleTokenPositionDescriptorFactory.deploy(
     WNativeTokenAddress,
-    'ETH',
-    []
+    NativeTokenTickerName,
+    [],
+    { ...feeData9 }
   );
 
   await NonfungibleTokenPositionDescriptor.waitForDeployment();
@@ -86,9 +135,14 @@ async function main() {
   console.log('NonfungibleTokenPositionDescriptor deployed to:', NonfungibleTokenPositionDescriptor.target);
   deploysData.nftDescriptor = NonfungibleTokenPositionDescriptor.target;
 
-
   const ProxyFactory = await hre.ethers.getContractFactory('TransparentUpgradeableProxy');
-  const Proxy = await ProxyFactory.deploy(NonfungibleTokenPositionDescriptor.target, ProxyAdmin, '0x');
+  const feeData10 = await getFeeData();
+  const Proxy = await ProxyFactory.deploy(
+    NonfungibleTokenPositionDescriptor.target,
+    ProxyAdmin,
+    '0x',
+    { ...feeData10 }
+  );
 
   await Proxy.waitForDeployment();
 
@@ -96,13 +150,14 @@ async function main() {
   deploysData.admin = ProxyAdmin;
   console.log('Proxy deployed to:', Proxy.target);
 
-
   const NonfungiblePositionManagerFactory = await hre.ethers.getContractFactory('NonfungiblePositionManager');
+  const feeData11 = await getFeeData();
   const NonfungiblePositionManager = await NonfungiblePositionManagerFactory.deploy(
     deploysData.factory,
     WNativeTokenAddress,
     Proxy.target,
-    deploysData.poolDeployer
+    deploysData.poolDeployer,
+    { ...feeData11 }
   );
 
   await NonfungiblePositionManager.waitForDeployment();
@@ -111,7 +166,8 @@ async function main() {
   console.log('NonfungiblePositionManager deployed to:', NonfungiblePositionManager.target);
 
   const AlgebraInterfaceMulticallFactory = await hre.ethers.getContractFactory('AlgebraInterfaceMulticall');
-  const AlgebraInterfaceMulticall = await AlgebraInterfaceMulticallFactory.deploy();
+  const feeData12 = await getFeeData();
+  const AlgebraInterfaceMulticall = await AlgebraInterfaceMulticallFactory.deploy({ ...feeData12 });
 
   await AlgebraInterfaceMulticall.waitForDeployment();
 

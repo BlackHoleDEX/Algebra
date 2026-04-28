@@ -31,7 +31,7 @@ function deployTestTokens(network) {
 }
 
 function getDeploysData() {
-  const deployDataPath = path.resolve(__dirname, '../../deploys.json');
+  const deployDataPath = path.resolve(__dirname, '../../'+(process.env.DEPLOY_ENV || '')+'deploys.json');
   return JSON.parse(fs.readFileSync(deployDataPath, 'utf8'));
 }
 
