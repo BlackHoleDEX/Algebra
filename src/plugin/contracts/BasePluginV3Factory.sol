@@ -44,9 +44,9 @@ contract BasePluginV3Factory is IBasePluginV3Factory {
   address public mevxExecutor;
   address public profitDistributor;
 
-  event MevxRouter(address mevxRouter);
-  event MevxExecutor(address mevxExecutor);
-  event ProfitDistributor(address profitDistributor);
+  event MevxRouter(address indexed oldMevxRouter, address indexed newMevxRouter);
+  event MevxExecutor(address indexed oldMevxExecutor, address indexed newMevxExecutor);
+  event ProfitDistributor(address indexed oldProfitDistributor, address indexed newProfitDistributor);
 
   modifier onlyAdministrator() {
     require(IAlgebraFactory(algebraFactory).hasRoleOrOwner(ALGEBRA_BASE_PLUGIN_FACTORY_ADMINISTRATOR, msg.sender), 'Only administrator');
@@ -152,21 +152,21 @@ contract BasePluginV3Factory is IBasePluginV3Factory {
   function setMevxRouter(address newMevxRouter) external onlyAdministrator {
     require(mevxRouter != newMevxRouter);
     require(newMevxRouter != address(0), 'Invalid mevx router address');
+    emit MevxRouter(mevxRouter, newMevxRouter);
     mevxRouter = newMevxRouter;
-    emit MevxRouter(newMevxRouter);
   }
 
   function setMevxExecutor(address newMevxExecutor) external onlyAdministrator {
     require(mevxExecutor != newMevxExecutor);
     require(newMevxExecutor != address(0), 'Invalid mevx executor address');
+    emit MevxExecutor(mevxExecutor, newMevxExecutor);
     mevxExecutor = newMevxExecutor;
-    emit MevxExecutor(newMevxExecutor);
   }
 
   function setProfitDistributor(address newProfitDistributor) external onlyAdministrator {
     require(profitDistributor != newProfitDistributor);
     require(newProfitDistributor != address(0), 'Invalid profit distributor address');
+    emit ProfitDistributor(profitDistributor, newProfitDistributor);
     profitDistributor = newProfitDistributor;
-    emit ProfitDistributor(newProfitDistributor);
   }
 }
