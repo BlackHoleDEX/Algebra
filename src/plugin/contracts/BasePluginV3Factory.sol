@@ -40,6 +40,14 @@ contract BasePluginV3Factory is IBasePluginV3Factory {
   /// @dev Helper contract address used to deploy plugins (keeps this factory's bytecode smaller)
   address public pluginDeployer;
 
+  address public mevxRouter;
+  address public mevxExecutor;
+  address public profitDistributor;
+
+  event MevxRouter(address mevxRouter);
+  event MevxExecutor(address mevxExecutor);
+  event ProfitDistributor(address profitDistributor);
+
   modifier onlyAdministrator() {
     require(IAlgebraFactory(algebraFactory).hasRoleOrOwner(ALGEBRA_BASE_PLUGIN_FACTORY_ADMINISTRATOR, msg.sender), 'Only administrator');
     _;
@@ -85,7 +93,10 @@ contract BasePluginV3Factory is IBasePluginV3Factory {
       defaultFeeConfiguration,
       reflexRouter,
       reflexConfigId,
-      feeDiscountRegistry
+      feeDiscountRegistry,
+      mevxRouter,
+      mevxExecutor,
+      profitDistributor
     );
     ISecurityPlugin(plugin).setSecurityRegistry(securityRegistry);
     pluginByPool[pool] = plugin;
@@ -136,5 +147,26 @@ contract BasePluginV3Factory is IBasePluginV3Factory {
     require(pluginDeployer != newPluginDeployer, 'Same deployer address');
     pluginDeployer = newPluginDeployer;
     emit PluginDeployer(newPluginDeployer);
+  }
+
+  function setMevxRouter(address newMevxRouter) external onlyAdministrator {
+    require(mevxRouter != newMevxRouter);
+    require(newMevxRouter != address(0), 'Invalid mevx router address');
+    mevxRouter = newMevxRouter;
+    emit MevxRouter(newMevxRouter);
+  }
+
+  function setMevxExecutor(address newMevxExecutor) external onlyAdministrator {
+    require(mevxExecutor != newMevxExecutor);
+    require(newMevxExecutor != address(0), 'Invalid mevx executor address');
+    mevxExecutor = newMevxExecutor;
+    emit MevxExecutor(newMevxExecutor);
+  }
+
+  function setProfitDistributor(address newProfitDistributor) external onlyAdministrator {
+    require(profitDistributor != newProfitDistributor);
+    require(newProfitDistributor != address(0), 'Invalid profit distributor address');
+    profitDistributor = newProfitDistributor;
+    emit ProfitDistributor(newProfitDistributor);
   }
 }

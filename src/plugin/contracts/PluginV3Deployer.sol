@@ -28,10 +28,24 @@ contract PluginV3Deployer is IPluginV3Deployer {
     AlgebraFeeConfiguration memory defaultFeeConfiguration,
     address reflexRouter,
     bytes32 reflexConfigId,
-    address feeDiscountRegistry
+    address feeDiscountRegistry,
+    address mevxRouter,
+    address mevxExecutor,
+    address profitDistributor
   ) external override onlyFactory returns (address plugin) {
     plugin = address(
-      new AlgebraBasePluginV3(pool, algebraFactory, pluginFactory, defaultFeeConfiguration, reflexRouter, reflexConfigId, feeDiscountRegistry)
+      new AlgebraBasePluginV3(
+        pool,
+        algebraFactory,
+        pluginFactory,
+        defaultFeeConfiguration,
+        reflexRouter,
+        reflexConfigId,
+        feeDiscountRegistry,
+        mevxRouter,
+        mevxExecutor,
+        profitDistributor
+      )
     );
   }
 }

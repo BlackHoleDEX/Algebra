@@ -13,6 +13,9 @@ interface IPluginV3Deployer {
     AlgebraFeeConfiguration memory defaultFeeConfiguration,
     address reflexRouter,
     bytes32 reflexConfigId,
-    address feeDiscountRegistry
+    address feeDiscountRegistry,
+    address mevxRouter,
+    address mevxExecutor,
+    address profitDistributor
   ) external returns (address plugin);
 }
