@@ -1,6 +1,7 @@
 const hre = require('hardhat');
 const fs = require('fs');
 const path = require('path');
+const { keccak256, toUtf8Bytes } = require("ethers");
 
 async function main() {
   const multisigAddress = process.env.MULTI_SIG_WALLET; //@Todo : replace this
@@ -44,7 +45,8 @@ async function main() {
     console.log('Granting GUARD role to OPS Multisig...');
     try {
       const factory = new hre.ethers.Contract(deploysData.factory, AlgebraFactoryABI, deployer);
-      const tx = await factory.grantRole(keccak256('GUARD'), opsMultisigAddress);
+      const GUARD_ROLE = keccak256(toUtf8Bytes("GUARD"));
+      const tx = await factory.grantRole(GUARD_ROLE, opsMultisigAddress);
       await tx.wait();
       console.log(`   ✅ GUARD role granted to OPS Multisig. Transaction: ${tx.hash}`);
     } catch (error) {

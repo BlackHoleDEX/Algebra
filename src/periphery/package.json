@@ -25,12 +25,14 @@
     "!artifacts/contracts/base/**/*"
   ],
   "dependencies": {
+    "@cryptoalgebra/integral-core": "1.2.9",
     "@openzeppelin/contracts": "4.9.6",
-    "@uniswap/v2-core": "1.0.1",
-    "@cryptoalgebra/integral-core": "1.2.9"
+    "@uniswap/v2-core": "1.0.1"
   },
   "devDependencies": {
-    "is-svg": "4.3.1"
+    "hardhat": "2.27.0",
+    "is-svg": "4.3.1",
+    "pretty-quick": "4.2.2"
   },
   "scripts": {
     "compile": "pnpm --prefix ../core run compile  && hardhat compile",

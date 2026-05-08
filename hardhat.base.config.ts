@@ -1,7 +1,6 @@
 const path = require('path');
 const config = require('dotenv').config({ path: path.resolve(__dirname, '.env') });
-const { ETHERSCAN_API_KEY, BSCSCAN_API_KEY, POLYGONSCAN_API_KEY, DEPLOY_GAS_LIMIT_MAX, DEPLOY_GAS_PRICE, INFURA_ID_PROJECT } =
-  config.parsed || {};
+const { ETHERSCAN_API_KEY, BSCSCAN_API_KEY, POLYGONSCAN_API_KEY, DEPLOY_GAS_LIMIT_MAX, DEPLOY_GAS_PRICE, INFURA_ID_PROJECT } = config.parsed || {};
 
 const MNEMONIC = process.env.MNEMONIC;
 export default {
@@ -20,8 +19,11 @@ export default {
       chainId: 1337,
       gas: 10000000,
     },
-    mainnet: {
-      url: `https://mainnet.infura.io/v3/${INFURA_ID_PROJECT}`,
+    ethmainnet: {
+      url: `${process.env.RPC_URL ?? 'https://ethereum.publicnode.com'}`, // Public Ethereum RPC
+      chainId: 1,
+      accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
+      gas: 15_000_000,
     },
     ropsten: {
       url: `https://ropsten.infura.io/v3/${INFURA_ID_PROJECT}`,
@@ -88,6 +90,16 @@ export default {
       chainId: 11155111,
       accounts: [`0x${MNEMONIC}`],
     },
+    sepoliaDevnet: {
+      url: `https://bitter-solitary-frost.ethereum-sepolia.quiknode.pro/ca090f980f3013fc7d11ecfb8812b0a99894f408/`,
+      chainId: 11155111,
+      accounts: [`0x${MNEMONIC}`],
+    },
+    sepoliaMocknet: {
+      url: `https://bitter-solitary-frost.ethereum-sepolia.quiknode.pro/ca090f980f3013fc7d11ecfb8812b0a99894f408/`,
+      chainId: 11155111,
+      accounts: [`0x${MNEMONIC}`],
+    },
     blastTestnet: {
       url: `https://blast-sepolia.blockpi.network/v1/rpc/public`,
       chainId: 168587773,
@@ -115,8 +127,14 @@ export default {
       accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
     },
     avalanche: {
-      url: "https://api.avax.network/ext/bc/C/rpc", // Mainnet RPC
+      url: 'https://api.avax.network/ext/bc/C/rpc', // Mainnet RPC
       chainId: 43114,
+      accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
+      gas: 15_000_000,
+    },
+    baseSepolia: {
+      url: `https://sepolia.base.org`,
+      chainId: 84532,
       accounts: [`0x${MNEMONIC || '1000000000000000000000000000000000000000000000000000000000000000'}`],
       gas: 15_000_000,
     },
@@ -124,8 +142,16 @@ export default {
   etherscan: {
     // Your API key for Etherscan
     // Obtain one at https://etherscan.io/
-    apiKey: { sepoliaTestnet: `${process.env.APIKEY??"UNKNOWN"}`, avaxTestnet: `${process.env.APIKEY??"UNKNOWN"}`, avalanche: `${process.env.APIKEY??"UNKNOWN"}` },
+    apiKey: `${process.env.APIKEY ?? 'UNKNOWN'}`,
     customChains: [
+      {
+        network: 'ethmainnet',
+        chainId: 1,
+        urls: {
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=1',
+          browserURL: 'https://etherscan.io',
+        },
+      },
       {
         network: 'seiTestnet',
         chainId: 713715,
@@ -146,7 +172,31 @@ export default {
         network: 'sepoliaTestnet',
         chainId: 11155111,
         urls: {
-          apiURL: 'https://api-sepolia.etherscan.io/api',
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=11155111',
+          browserURL: 'https://sepolia.etherscan.io',
+        },
+      },
+      {
+        network: 'sepoliaDevnet',
+        chainId: 11155111,
+        urls: {
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=11155111',
+          browserURL: 'https://sepolia.etherscan.io',
+        },
+      },
+      {
+        network: 'sepoliaMocknet',
+        chainId: 11155111,
+        urls: {
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=11155111',
+          browserURL: 'https://sepolia.etherscan.io',
+        },
+      },
+      {
+        network: 'sepolia',
+        chainId: 11155111,
+        urls: {
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=11155111',
           browserURL: 'https://sepolia.etherscan.io',
         },
       },
@@ -154,7 +204,8 @@ export default {
         network: 'avalanche',
         chainId: 43114,
         urls: {
-          apiURL: 'https://api.routescan.io/v2/network/mainnet/evm/43114/etherscan/api',
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=43114', //for snowtrace use this
+          // apiURL: 'https://api.routescan.io/v2/network/mainnet/evm/43114/etherscan/api', //for snowscan use this
           browserURL: 'https://snowtrace.io/',
         },
       },
@@ -180,6 +231,22 @@ export default {
         urls: {
           apiURL: 'https://api.routescan.io/v2/network/testnet/evm/80085/etherscan/api/',
           browserURL: 'https://artio.beratrail.io/',
+        },
+      },
+      {
+        network: 'bscTestnet',
+        chainId: 97,
+        urls: {
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=97',
+          browserURL: 'https://testnet.bscscan.com/',
+        },
+      },
+      {
+        network: 'baseSepolia',
+        chainId: 84532,
+        urls: {
+          apiURL: 'https://api-sepolia.basescan.org/api',
+          browserURL: 'https://sepolia.basescan.org',
         },
       },
     ],

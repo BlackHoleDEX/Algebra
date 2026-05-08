@@ -111,6 +111,7 @@ async function main() {
   const NFTDescriptorFactory = await hre.ethers.getContractFactory('NFTDescriptor');
   const feeData8 = await getFeeData();
   const NFTDescriptor = await NFTDescriptorFactory.deploy({ ...feeData8 });
+  deploysData.nftDescriptorLibrary = NFTDescriptor.target;
 
   await NFTDescriptor.waitForDeployment();
 
@@ -155,7 +156,7 @@ async function main() {
   const NonfungiblePositionManager = await NonfungiblePositionManagerFactory.deploy(
     deploysData.factory,
     WNativeTokenAddress,
-    Proxy.target,
+    deploysData.nftDescriptor,
     deploysData.poolDeployer,
     { ...feeData11 }
   );
@@ -165,14 +166,14 @@ async function main() {
   deploysData.nonfungiblePositionManager = NonfungiblePositionManager.target;
   console.log('NonfungiblePositionManager deployed to:', NonfungiblePositionManager.target);
 
-  const AlgebraInterfaceMulticallFactory = await hre.ethers.getContractFactory('AlgebraInterfaceMulticall');
-  const feeData12 = await getFeeData();
-  const AlgebraInterfaceMulticall = await AlgebraInterfaceMulticallFactory.deploy({ ...feeData12 });
+  // const AlgebraInterfaceMulticallFactory = await hre.ethers.getContractFactory('AlgebraInterfaceMulticall');
+  // const feeData12 = await getFeeData();
+  // const AlgebraInterfaceMulticall = await AlgebraInterfaceMulticallFactory.deploy({ ...feeData12 });
 
-  await AlgebraInterfaceMulticall.waitForDeployment();
+  // await AlgebraInterfaceMulticall.waitForDeployment();
 
-  console.log('AlgebraInterfaceMulticall deployed to:', AlgebraInterfaceMulticall.target);
-  deploysData.mcall = AlgebraInterfaceMulticall.target;
+  // console.log('AlgebraInterfaceMulticall deployed to:', AlgebraInterfaceMulticall.target);
+  // deploysData.mcall = AlgebraInterfaceMulticall.target;
 
   fs.writeFileSync(deployDataPath, JSON.stringify(deploysData), 'utf-8');
 }
