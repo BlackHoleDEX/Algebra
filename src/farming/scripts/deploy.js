@@ -41,24 +41,36 @@ async function main() {
   await FarmingCenter.waitForDeployment()
   console.log('FarmingCenter deployed to:', FarmingCenter.target)
 
-  const feeData3 = await getFeeData();
-  await (await AlgebraEternalFarming.setFarmingCenterAddress(FarmingCenter.target, { ...feeData3 })).wait()
-  console.log('Updated farming center address in eternal(incentive) farming')
+  try {
+    const feeData3 = await getFeeData();
+    await (await AlgebraEternalFarming.setFarmingCenterAddress(FarmingCenter.target, { ...feeData3 })).wait()
+    console.log('Updated farming center address in eternal(incentive) farming')
+  } catch (e) {
+    console.log('setFarmingCenterAddress in AlgebraEternalFarming failed Reason:', e?.message || e);
+  }
 
   if (deploysData.BasePluginV3Factory) {
     const pluginV3Factory = await hre.ethers.getContractAt(BasePluginV3FactoryComplied.abi, deploysData.BasePluginV3Factory)
-
-    const feeData6 = await getFeeData();
-    await (await pluginV3Factory.setFarmingAddress(FarmingCenter.target, { ...feeData6 })).wait()
-    console.log('Updated farming center address in BasePluginV3Factory')
+    try {
+      const feeData6 = await getFeeData();
+      await (await pluginV3Factory.setFarmingAddress(FarmingCenter.target, { ...feeData6 })).wait()
+      console.log('Updated farming center address in BasePluginV3Factory')
+    } catch (e) {
+      console.log('setFarmingAddress in pluginV3Factory failed Reason:', e?.message || e);
+    }
   }
 
   const posManager = await hre.ethers.getContractAt(
     NonfungiblePositionManagerComplied.abi,
     deploysData.nonfungiblePositionManager
   )
-  const feeData5 = await getFeeData();
-  await (await posManager.setFarmingCenter(FarmingCenter.target, { ...feeData5 })).wait()
+  try {
+    const feeData5 = await getFeeData();
+    await (await posManager.setFarmingCenter(FarmingCenter.target, { ...feeData5 })).wait()
+    console.log('Updated farming center address in posManager')
+  }catch (e) {
+    console.log('setFarmingCenter in posManager failed Reason:', e?.message || e);
+  }
 
   fs.writeFileSync(deployDataPath, JSON.stringify(deploysData), 'utf-8');
 }

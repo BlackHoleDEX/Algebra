@@ -1,6 +1,6 @@
 {
   "extends": "solhint:recommended",
-  "plugins": ["prettier", "algebra"],
+  "plugins": ["prettier", "local-algebra"],
   "rules": {
     "max-line-length": "off",
     "no-global-import": "off",
@@ -13,7 +13,7 @@
     "compiler-version": "off",
     "comprehensive-interface": "warn",
     "modifier-name-mixedcase": "error",
-    "algebra/interface-names": "error",
-    "algebra/leading-underscore": "warn"
+    "local-algebra/interface-names": "error",
+    "local-algebra/leading-underscore": "warn"
   }
 }
