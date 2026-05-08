@@ -204,7 +204,8 @@ export default {
         network: 'avalanche',
         chainId: 43114,
         urls: {
-          apiURL: 'https://api.routescan.io/v2/network/mainnet/evm/43114/etherscan/api',
+          apiURL: 'https://api.etherscan.io/v2/api?chainid=43114', //for snowtrace use this
+          // apiURL: 'https://api.routescan.io/v2/network/mainnet/evm/43114/etherscan/api', //for snowscan use this
           browserURL: 'https://snowtrace.io/',
         },
       },
