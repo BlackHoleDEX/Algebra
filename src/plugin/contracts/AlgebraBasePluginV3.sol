@@ -12,6 +12,10 @@ import './base/AlgebraBasePlugin.sol';
 import './plugins/reflex-mev/ReflexAfterSwap.sol';
 import './plugins/whitelist-fee-discount/FeeDiscountPlugin.sol';
 
+import {IMevxExecutor} from './interfaces/IMevxExecutor.sol';
+import {IMevxRouter} from './interfaces/IMevxRouter.sol';
+import {IProfitDistributor} from './interfaces/IProfitDistributor.sol';
+
 /// @title Algebra Integral 1.2, contains adaptive fee, twap oracle, farming proxy and security plugins
 contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, VolatilityOraclePlugin, SecurityPlugin, ReflexAfterSwap, FeeDiscountPlugin {
   using Plugins for uint8;
@@ -31,6 +35,21 @@ contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
   /// @notice Boolean flag to enable/disable ReflexAfterSwap functionality at plugin level
   bool public reflexEnabled;
 
+  /// @notice Mevx Config Settings
+  uint16 private constant ALGEBRA_POOL_TYPE = 2;
+
+  bytes32 public configId;
+  IProfitDistributor public profitDistributor;
+  IMevxExecutor public mevxExecutor;
+  IMevxRouter public mevxRouter;
+  bool public mevxEnabled;
+
+  event ConfigIdSet(bytes32 oldConfigId, bytes32 newConfigId);
+  event ProfitDistributorSet(address oldProfitDistributor, address newProfitDistributor);
+  event MevxExecutorSet(address oldMevxExecutor, address newMevxExecutor);
+  event MevxRouterSet(address oldMevxRouter, address newMevxRouter);
+  event MevxEnabled(bool indexed enabled);
+
   constructor(
     address _pool,
     address _factory,
@@ -38,13 +57,25 @@ contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
     AlgebraFeeConfiguration memory _config,
     address _reflexRouter,
     bytes32 _configId,
-    address _feeDiscountRegistry
+    address _feeDiscountRegistry,
+    address mevxRouter_,
+    address mevxExecutor_,
+    address profitDistributor_
   )
     AlgebraBasePlugin(_pool, _factory, _pluginFactory)
     DynamicFeePlugin(_config)
     ReflexAfterSwap(_reflexRouter, _configId)
     FeeDiscountPlugin(_feeDiscountRegistry)
-  {}
+  {
+    mevxExecutor = IMevxExecutor(mevxExecutor_);
+    mevxRouter = IMevxRouter(mevxRouter_);
+    profitDistributor = IProfitDistributor(profitDistributor_);
+
+    (uint160 price, , , , , ) = IAlgebraPoolState(pool).globalState();
+    bytes memory data = abi.encode(price);
+    bytes32 poolId = bytes32(uint256(uint160(msg.sender)));
+    try mevxRouter.initializePool(poolId, ALGEBRA_POOL_TYPE, data) {} catch {}
+  }
 
   // ###### REFLEX CONTROL ######
 
@@ -111,8 +142,11 @@ contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
     _writeTimepoint();
     uint88 volatilityAverage = _getAverageVolatilityLast();
     uint24 fee = _getCurrentFee(volatilityAverage);
+    address mevxRouterAddress = address(mevxRouter);
     if (sender == reflexRouter) {
       fee = _applyFeeDiscount(reflexRouter, pool, fee);
+    } else if (sender == mevxRouterAddress) {
+      fee = _applyFeeDiscount(mevxRouterAddress, pool, fee);
     } else {
       fee = _applyFeeDiscount(tx.origin, pool, fee);
     }
@@ -130,10 +164,12 @@ contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
     bytes calldata
   ) external override onlyPool returns (bytes4) {
     _updateVirtualPoolTick(zeroToOne);
+    bytes32 triggerPoolId = bytes32(uint256(uint160(msg.sender)));
     // Only trigger ReflexAfterSwap if it's enabled
     if (reflexEnabled) {
-      bytes32 triggerPoolId = bytes32(uint256(uint160(msg.sender)));
       _reflexAfterSwap(triggerPoolId, amount0Out, amount1Out, zeroToOne, tx.origin);
+    } else if (mevxEnabled) {
+      _mevxAfterSwap(triggerPoolId, amount0Out, amount1Out, zeroToOne, tx.origin);
     }
     return IAlgebraPlugin.afterSwap.selector;
   }
@@ -153,5 +189,58 @@ contract AlgebraBasePluginV3 is DynamicFeePlugin, FarmingProxyPlugin, Volatility
   function getCurrentFee() external view override returns (uint16 fee) {
     uint88 volatilityAverage = _getAverageVolatilityLast();
     fee = _getCurrentFee(volatilityAverage);
+  }
+
+  // ###### SET CONFIGS for Mevx######
+  function setProfitDistributor(IProfitDistributor _profitDistributor) external {
+    _authorize();
+    address oldProfitDistributor = address(profitDistributor);
+    profitDistributor = _profitDistributor;
+    emit ProfitDistributorSet(oldProfitDistributor, address(_profitDistributor));
+  }
+
+  function setMevxExecutor(IMevxExecutor _mevxExecutor) external {
+    _authorize();
+    address oldMevxExecutor = address(mevxExecutor);
+    mevxExecutor = _mevxExecutor;
+    emit MevxExecutorSet(oldMevxExecutor, address(_mevxExecutor));
+  }
+
+  function setMevxRouter(IMevxRouter _mevxRouter) external {
+    _authorize();
+    address oldMevxRouter = address(mevxRouter);
+    mevxRouter = _mevxRouter;
+    emit MevxRouterSet(oldMevxRouter, address(_mevxRouter));
+  }
+
+  /// @notice Enable or disable MEVX route execution at plugin level
+  /// @param _enabled True to enable, false to disable
+  /// @dev Only callable by addresses with ALGEBRA_BASE_PLUGIN_MANAGER role
+  function setMevxEnabled(bool _enabled) external {
+    _authorize();
+    mevxEnabled = _enabled;
+    emit MevxEnabled(_enabled);
+  }
+
+  function _mevxAfterSwap(bytes32 poolId, int256 amount0, int256 amount1, bool zeroToOne, address recipient) internal {
+    bytes memory callData = abi.encodeWithSelector(IMevxRouter.constructArbitrageRoute.selector, poolId, zeroToOne, amount0, amount1);
+
+    (bool success, bytes memory returnData) = address(mevxRouter).call(callData);
+
+    bool isArbPossible;
+    address profitToken;
+    address[] memory pools;
+    uint256 amountIn;
+    bytes memory encodedRoute;
+
+    if (success && returnData.length > 0) {
+      (isArbPossible, profitToken, pools, amountIn, encodedRoute) = abi.decode(returnData, (bool, address, address[], uint256, bytes));
+    }
+
+    if (isArbPossible) {
+      try mevxExecutor.executeRoute(encodedRoute, pools, amountIn, address(profitDistributor)) {
+        try profitDistributor.distributeProfit(configId, profitToken, recipient) {} catch {}
+      } catch {}
+    }
   }
 }
